@@ -54,6 +54,7 @@ lazy_static! {
         &background::BackgroundGradientToPlugin,
         &background::BackgroundPositionPlugin,
         &background::BackgroundRepeatPlugin,
+        &background::BackgroundSizePlugin,
         &border::BorderColorPlugin,
         &border::BorderOpacityPlugin,
         &border::DivideColorPlugin,

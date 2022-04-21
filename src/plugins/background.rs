@@ -219,7 +219,7 @@ impl Plugin for BackgroundGradientToPlugin {
             val.to_string()
         };
 
-        format!("--tw-gradient-to: {};", val)
+        format!("--tw-gradient-to: {val};")
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -242,7 +242,7 @@ impl Plugin for BackgroundPositionPlugin {
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
         // TODO: Is that really list?
         // https://developer.mozilla.org/en-US/docs/Web/CSS/background-position
-        hint == "list" || val.split(',').any(|v| v.split('_').any(is_matching_position))
+        hint == "list" || val.split(',').all(|v| v.split('_').all(is_matching_position))
     }
 
     fn css_template_value(&self, val: &str) -> String {
@@ -273,40 +273,41 @@ impl Plugin for BackgroundRepeatPlugin {
         "bg".to_string()
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_color(val)
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "repeat" => Some("background-repeat: repeat;".to_string()),
+            "no-repeat" => Some("background-repeat: no-repeat;".to_string()),
+            "repeat-x" => Some("background-repeat: repeat-x;".to_string()),
+            "repeat-y" => Some("background-repeat: repeat-y;".to_string()),
+            "repeat-round" => Some("background-repeat: round;".to_string()),
+            "repeat-space" => Some("background-repeat: spacet;".to_string()),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct BackgroundSizePlugin;
+
+impl Plugin for BackgroundSizePlugin {
+    fn namespace(&self) -> String {
+        "bg".to_string()
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        hint == "length" || val.split(',').all(|v| v.split('_').all(|v| is_matching_length(v) || is_matching_percentage(v) || is_matching_auto(v) || ["contain", "cover"].contains(&v)))
     }
 
     fn css_template_value(&self, val: &str) -> String {
-        // TODO: Prevent `.to_string()`ing
-        let val = if val.contains("--tw-opacity") {
-            val.replace(" / var(--tw-opacity)", "")
-        } else {
-            val.to_string()
-        };
-
-        format!("--tw-gradient-to: {};", val)
+        format!("background-size: {val};")
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        if modifier == "inherit" {
-            return Some(self.css_template_value("inherit"));
+        match modifier {
+            "auto" => Some(self.css_template_value("auto")),
+            "cover" => Some(self.css_template_value("cover")),
+            "contain" => Some(self.css_template_value("contain")),
+            _ => None,
         }
-
-        default_colors::get(modifier).map(|c| self.css_template_value(&c))
     }
 }
-
-/*
-pub fn init(selectors: &mut SelectorList) {
-    selectors.register("bg-repeat", "".to_string());
-    selectors.register("bg-no-repeat", "".to_string());
-    selectors.register("bg-repeat-x", "".to_string());
-    selectors.register("bg-repeat-y", "".to_string());
-    selectors.register("bg-repeat-round", "".to_string());
-    selectors.register("bg-repeat-space", "".to_string());
-    selectors.register("bg-auto", "".to_string());
-    selectors.register("bg-cover", "".to_string());
-    selectors.register("bg-contain", "".to_string());
-}
-*/
