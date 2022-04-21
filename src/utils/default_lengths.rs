@@ -72,10 +72,8 @@ pub fn get_fraction(val: &str) -> Option<String> {
     }
 }
 
-pub fn get_keyword(val: &str) -> Option<String> {
+pub fn get_keyword_size(val: &str) -> Option<String> {
     match val {
-        "auto" => Some("auto".to_string()),
-        "full" => Some("100%".to_string()),
         "screen" => Some("100vw".to_string()),
         "min" => Some("min-content".to_string()),
         "max" => Some("max-content".to_string()),
@@ -83,6 +81,18 @@ pub fn get_keyword(val: &str) -> Option<String> {
     }
 }
 
+pub fn get_keyword(val: &str) -> Option<String> {
+    match val {
+        "auto" => Some("auto".to_string()),
+        "full" => Some("100%".to_string()),
+        _ => None,
+    }
+}
+
 pub fn get_extended(val: &str) -> Option<String> {
     get_keyword(val).or_else(|| get_basic(val).or_else(|| get_fraction(val)))
+}
+
+pub fn get_extended_size(val: &str) -> Option<String> {
+    get_keyword(val).or_else(|| get_keyword_size(val).or_else(|| get_basic(val).or_else(|| get_fraction(val))))
 }

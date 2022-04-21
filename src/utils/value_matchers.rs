@@ -150,10 +150,10 @@ pub fn is_matching_gradient(val: &str) -> bool {
 }
 
 pub fn is_matching_position(val: &str) -> bool {
-    is_matching_var(val)
-        || VALID_POSITIONS.contains(&val)
+    VALID_POSITIONS.contains(&val)
         || is_matching_length(val)
         || is_matching_percentage(val)
+        || is_matching_var(val)
 }
 
 pub fn is_matching_line_width(val: &str) -> bool {

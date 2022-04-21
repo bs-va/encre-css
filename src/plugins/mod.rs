@@ -34,6 +34,8 @@ pub trait Plugin: fmt::Debug {
     /// By default, arbitrary values are disallowed
     ///
     /// The `hint` argument can be ignored, for example if the namespace contains a single plugin
+    ///
+    /// TODO: Remove this function in favor of checking get_css_for_modifier != None
     fn is_matching_value(&self, _hint: &str, _val: &str) -> bool {
         false
     }
@@ -89,5 +91,28 @@ lazy_static! {
         &sizing::SizingHeightPlugin,
         &sizing::SizingMinHeightPlugin,
         &sizing::SizingMaxHeightPlugin,
+        &layout::LayoutInsetPlugin,
+        &layout::LayoutInsetXPlugin,
+        &layout::LayoutInsetYPlugin,
+        &layout::LayoutTopPlugin,
+        &layout::LayoutBottomPlugin,
+        &layout::LayoutLeftPlugin,
+        &layout::LayoutRightPlugin,
+        &layout::LayoutZIndexPlugin,
+        &layout::LayoutContainerPlugin,
+        &layout::LayoutBoxDecorationBreakPlugin,
+        &layout::LayoutBoxSizingPlugin,
+        &layout::LayoutFloatPlugin,
+        &layout::LayoutClearPlugin,
+        &layout::LayoutIsolationPlugin,
+        &layout::LayoutObjectFitPlugin,
+        &layout::LayoutObjectPositionPlugin,
+        &layout::LayoutOverflowPlugin,
+        &layout::LayoutOverscrollPlugin,
+
+        // It is better to include the following plugins at the end because they match the "" namespace
+        &layout::LayoutDisplayPlugin,
+        &layout::LayoutPositionPlugin,
+        &layout::LayoutVisibilityPlugin,
     ];
 }

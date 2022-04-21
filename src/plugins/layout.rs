@@ -1,705 +1,448 @@
-/*use super::SelectorList;
+use super::Plugin;
+use crate::utils::{default_lengths, value_matchers::*};
 
-pub fn init(selectors: &mut SelectorList) {
-    selectors.register("container-none", "width: 100%;".to_string());
-    selectors.register("container-sm", "max-width: 640px;".to_string());
-    selectors.register("container-md", "max-width: 768px;".to_string());
-    selectors.register("container-lg", "max-width: 1024px;".to_string());
-    selectors.register("container-xl", "max-width: 1280px;".to_string());
-    selectors.register("container-2xl", "max-width: 1536px;".to_string());
-    selectors.register(
-        "decoration-slice",
-        "box-decoration-break: slice;".to_string(),
-    );
-    selectors.register(
-        "decoration-clone",
-        "box-decoration-break: clone;".to_string(),
-    );
-    selectors.register("box-border", "box-sizing: border-box;".to_string());
-    selectors.register("box-content", "box-sizing: content-box;".to_string());
-    selectors.register("hidden", "display: none;".to_string());
-    selectors.register("contents", "display: contents;".to_string());
-    selectors.register("list-item", "display: list-item;".to_string());
-    selectors.register("block", "display: block;".to_string());
-    selectors.register("inline-block", "display: inline-block;".to_string());
-    selectors.register("flex", "display: flex;".to_string());
-    selectors.register("inline-flex", "display: inline-flex;".to_string());
-    selectors.register("inline", "display: inline;".to_string());
-    selectors.register("table", "display: table;".to_string());
-    selectors.register("inline-table", "display: inline-table;".to_string());
-    selectors.register("table-cell", "display: table-cell;".to_string());
-    selectors.register("table-caption", "display: table-caption;".to_string());
-    selectors.register("table-column", "display: table-column;".to_string());
-    selectors.register(
-        "table-column-group",
-        "display: table-column-group;".to_string(),
-    );
-    selectors.register(
-        "table-footer-group",
-        "display: table-footer-group;".to_string(),
-    );
-    selectors.register(
-        "table-header-group",
-        "display: table-header-group;".to_string(),
-    );
-    selectors.register("table-row-group", "display: table-row-group;".to_string());
-    selectors.register("table-row", "display: table-row;".to_string());
-    selectors.register("flow-root", "display: flow-root;".to_string());
-    selectors.register("grid", "display: grid;".to_string());
-    selectors.register("inline-grid", "display: inline-grid;".to_string());
-    selectors.register("float-right", "float: right;".to_string());
-    selectors.register("float-left", "float: left;".to_string());
-    selectors.register("float-none", "float: none;".to_string());
-    selectors.register("clear-left", "clear: left;".to_string());
-    selectors.register("clear-right", "clear: right;".to_string());
-    selectors.register("clear-both", "clear: both;".to_string());
-    selectors.register("clear-none", "clear: none;".to_string());
-    selectors.register("isolate", "isolation: isolate;".to_string());
-    selectors.register("isolate-auto", "isolation: auto;".to_string());
-    selectors.register("object-contain", "object-fit: contain;".to_string());
-    selectors.register("object-cover", "object-fit: cover;".to_string());
-    selectors.register("object-fill", "object-fit: fill;".to_string());
-    selectors.register("object-none", "object-fit: none;".to_string());
-    selectors.register("object-scale-down", "object-fit: scale-down;".to_string());
-    selectors.register("object-bottom", "object-position: bottom;".to_string());
-    selectors.register("object-center", "object-position: center;".to_string());
-    selectors.register("object-left", "object-position: left;".to_string());
-    selectors.register(
-        "object-left-bottom",
-        "object-position: left bottom;".to_string(),
-    );
-    selectors.register("object-left-top", "object-position: left top;".to_string());
-    selectors.register("object-right", "object-position: right;".to_string());
-    selectors.register(
-        "object-right-bottom",
-        "object-position: right bottom;".to_string(),
-    );
-    selectors.register(
-        "object-right-top",
-        "object-position: right top;".to_string(),
-    );
-    selectors.register("object-top", "object-position: top;".to_string());
-    selectors.register("overflow-auto", "overflow: auto;".to_string());
-    selectors.register("overflow-x-auto", "overflow-x: auto;".to_string());
-    selectors.register("overflow-y-auto", "overflow-y: auto;".to_string());
-    selectors.register("overflow-hidden", "overflow: hidden;".to_string());
-    selectors.register("overflow-x-hidden", "overflow-x: hidden;".to_string());
-    selectors.register("overflow-y-hidden", "overflow-y: hidden;".to_string());
-    selectors.register("overflow-visible", "overflow: visible;".to_string());
-    selectors.register("overflow-x-visible", "overflow-x: visible;".to_string());
-    selectors.register("overflow-y-visible", "overflow-y: visible;".to_string());
-    selectors.register("overflow-scroll", "overflow: scroll;".to_string());
-    selectors.register("overflow-x-scroll", "overflow-x: scroll;".to_string());
-    selectors.register("overflow-y-scroll", "overflow-y: scroll;".to_string());
-    selectors.register(
-        "scrolling-touch",
-        "-webkit-overflow-scrolling: touch;".to_string(),
-    );
-    selectors.register(
-        "scrolling-auto",
-        "-webkit-overflow-scrolling: auto;".to_string(),
-    );
-    selectors.register("overscroll-auto", "overscroll-behavior: auto;".to_string());
-    selectors.register(
-        "overscroll-y-auto",
-        "overscroll-behavior-y: auto;".to_string(),
-    );
-    selectors.register(
-        "overscroll-x-auto",
-        "overscroll-behavior-x: auto;".to_string(),
-    );
-    selectors.register(
-        "overscroll-contain",
-        "overscroll-behavior: contain;".to_string(),
-    );
-    selectors.register(
-        "overscroll-y-contain",
-        "overscroll-behavior-y: contain;".to_string(),
-    );
-    selectors.register(
-        "overscroll-x-contain",
-        "overscroll-behavior-x: contain;".to_string(),
-    );
-    selectors.register("overscroll-none", "overscroll-behavior: none;".to_string());
-    selectors.register(
-        "overscroll-y-none",
-        "overscroll-behavior-y: none;".to_string(),
-    );
-    selectors.register(
-        "overscroll-x-none",
-        "overscroll-behavior-x: none;".to_string(),
-    );
-    selectors.register("static", "position: static;".to_string());
-    selectors.register("fixed", "position: fixed;".to_string());
-    selectors.register("absolute", "position: absolute;".to_string());
-    selectors.register("relative", "position: relative;".to_string());
-    selectors.register("sticky", "position: sticky;".to_string());
-    selectors.register(
-        "inset-0",
-        "top: 0; right: 0; bottom: 0; left: 0;".to_string(),
-    );
-    selectors.register(
-        "-inset-0",
-        "top: 0; right: 0; bottom: 0; left: 0;".to_string(),
-    );
-    selectors.register("inset-y-0", "top: 0; bottom: 0;".to_string());
-    selectors.register("-inset-y-0", "top: 0; bottom: 0;".to_string());
-    selectors.register("inset-x-0", "right: 0; left: 0;".to_string());
-    selectors.register("-inset-x-0", "right: 0; left: 0;".to_string());
-    selectors.register("top-0", "top: 0;".to_string());
-    selectors.register("right-0", "right: 0;".to_string());
-    selectors.register("bottom-0", "bottom: 0;".to_string());
-    selectors.register("left-0", "left: 0;".to_string());
-    selectors.register("-top-0", "top: 0;".to_string());
-    selectors.register("-right-0", "right: 0;".to_string());
-    selectors.register("-bottom-0", "bottom: 0;".to_string());
-    selectors.register("-left-0", "left: 0;".to_string());
-    selectors.register("inset-0.5", "".to_string());
-    selectors.register("-inset-0.5", "".to_string());
-    selectors.register("inset-y-0.5", "".to_string());
-    selectors.register("-inset-y-0.5", "".to_string());
-    selectors.register("inset-x-0.5", "".to_string());
-    selectors.register("-inset-x-0.5", "".to_string());
-    selectors.register("top-0.5", "".to_string());
-    selectors.register("right-0.5", "".to_string());
-    selectors.register("bottom-0.5", "".to_string());
-    selectors.register("left-0.5", "".to_string());
-    selectors.register("-top-0.5", "".to_string());
-    selectors.register("-right-0.5", "".to_string());
-    selectors.register("-bottom-0.5", "".to_string());
-    selectors.register("-left-0.5", "".to_string());
-    selectors.register("inset-1", "".to_string());
-    selectors.register("-inset-1", "".to_string());
-    selectors.register("inset-y-1", "".to_string());
-    selectors.register("-inset-y-1", "".to_string());
-    selectors.register("inset-x-1", "".to_string());
-    selectors.register("-inset-x-1", "".to_string());
-    selectors.register("top-1", "".to_string());
-    selectors.register("right-1", "".to_string());
-    selectors.register("bottom-1", "".to_string());
-    selectors.register("left-1", "".to_string());
-    selectors.register("-top-1", "".to_string());
-    selectors.register("-right-1", "".to_string());
-    selectors.register("-bottom-1", "".to_string());
-    selectors.register("-left-1", "".to_string());
-    selectors.register("inset-1.5", "".to_string());
-    selectors.register("-inset-1.5", "".to_string());
-    selectors.register("inset-y-1.5", "".to_string());
-    selectors.register("-inset-y-1.5", "".to_string());
-    selectors.register("inset-x-1.5", "".to_string());
-    selectors.register("-inset-x-1.5", "".to_string());
-    selectors.register("top-1.5", "".to_string());
-    selectors.register("right-1.5", "".to_string());
-    selectors.register("bottom-1.5", "".to_string());
-    selectors.register("left-1.5", "".to_string());
-    selectors.register("-top-1.5", "".to_string());
-    selectors.register("-right-1.5", "".to_string());
-    selectors.register("-bottom-1.5", "".to_string());
-    selectors.register("-left-1.5", "".to_string());
-    selectors.register("inset-2", "".to_string());
-    selectors.register("-inset-2", "".to_string());
-    selectors.register("inset-y-2", "".to_string());
-    selectors.register("-inset-y-2", "".to_string());
-    selectors.register("inset-x-2", "".to_string());
-    selectors.register("-inset-x-2", "".to_string());
-    selectors.register("top-2", "".to_string());
-    selectors.register("right-2", "".to_string());
-    selectors.register("bottom-2", "".to_string());
-    selectors.register("left-2", "".to_string());
-    selectors.register("-top-2", "".to_string());
-    selectors.register("-right-2", "".to_string());
-    selectors.register("-bottom-2", "".to_string());
-    selectors.register("-left-2", "".to_string());
-    selectors.register("inset-2.5", "".to_string());
-    selectors.register("-inset-2.5", "".to_string());
-    selectors.register("inset-y-2.5", "".to_string());
-    selectors.register("-inset-y-2.5", "".to_string());
-    selectors.register("inset-x-2.5", "".to_string());
-    selectors.register("-inset-x-2.5", "".to_string());
-    selectors.register("top-2.5", "".to_string());
-    selectors.register("right-2.5", "".to_string());
-    selectors.register("bottom-2.5", "".to_string());
-    selectors.register("left-2.5", "".to_string());
-    selectors.register("-top-2.5", "".to_string());
-    selectors.register("-right-2.5", "".to_string());
-    selectors.register("-bottom-2.5", "".to_string());
-    selectors.register("-left-2.5", "".to_string());
-    selectors.register("inset-3", "".to_string());
-    selectors.register("-inset-3", "".to_string());
-    selectors.register("inset-y-3", "".to_string());
-    selectors.register("-inset-y-3", "".to_string());
-    selectors.register("inset-x-3", "".to_string());
-    selectors.register("-inset-x-3", "".to_string());
-    selectors.register("top-3", "".to_string());
-    selectors.register("right-3", "".to_string());
-    selectors.register("bottom-3", "".to_string());
-    selectors.register("left-3", "".to_string());
-    selectors.register("-top-3", "".to_string());
-    selectors.register("-right-3", "".to_string());
-    selectors.register("-bottom-3", "".to_string());
-    selectors.register("-left-3", "".to_string());
-    selectors.register("inset-3.5", "".to_string());
-    selectors.register("-inset-3.5", "".to_string());
-    selectors.register("inset-y-3.5", "".to_string());
-    selectors.register("-inset-y-3.5", "".to_string());
-    selectors.register("inset-x-3.5", "".to_string());
-    selectors.register("-inset-x-3.5", "".to_string());
-    selectors.register("top-3.5", "".to_string());
-    selectors.register("right-3.5", "".to_string());
-    selectors.register("bottom-3.5", "".to_string());
-    selectors.register("left-3.5", "".to_string());
-    selectors.register("-top-3.5", "".to_string());
-    selectors.register("-right-3.5", "".to_string());
-    selectors.register("-bottom-3.5", "".to_string());
-    selectors.register("-left-3.5", "".to_string());
-    selectors.register("inset-4", "".to_string());
-    selectors.register("-inset-4", "".to_string());
-    selectors.register("inset-y-4", "".to_string());
-    selectors.register("-inset-y-4", "".to_string());
-    selectors.register("inset-x-4", "".to_string());
-    selectors.register("-inset-x-4", "".to_string());
-    selectors.register("top-4", "".to_string());
-    selectors.register("right-4", "".to_string());
-    selectors.register("bottom-4", "".to_string());
-    selectors.register("left-4", "".to_string());
-    selectors.register("-top-4", "".to_string());
-    selectors.register("-right-4", "".to_string());
-    selectors.register("-bottom-4", "".to_string());
-    selectors.register("-left-4", "".to_string());
-    selectors.register("inset-5", "".to_string());
-    selectors.register("-inset-5", "".to_string());
-    selectors.register("inset-y-5", "".to_string());
-    selectors.register("-inset-y-5", "".to_string());
-    selectors.register("inset-x-5", "".to_string());
-    selectors.register("-inset-x-5", "".to_string());
-    selectors.register("top-5", "".to_string());
-    selectors.register("right-5", "".to_string());
-    selectors.register("bottom-5", "".to_string());
-    selectors.register("left-5", "".to_string());
-    selectors.register("-top-5", "".to_string());
-    selectors.register("-right-5", "".to_string());
-    selectors.register("-bottom-5", "".to_string());
-    selectors.register("-left-5", "".to_string());
-    selectors.register("inset-6", "".to_string());
-    selectors.register("-inset-6", "".to_string());
-    selectors.register("inset-y-6", "".to_string());
-    selectors.register("-inset-y-6", "".to_string());
-    selectors.register("inset-x-6", "".to_string());
-    selectors.register("-inset-x-6", "".to_string());
-    selectors.register("top-6", "".to_string());
-    selectors.register("right-6", "".to_string());
-    selectors.register("bottom-6", "".to_string());
-    selectors.register("left-6", "".to_string());
-    selectors.register("-top-6", "".to_string());
-    selectors.register("-right-6", "".to_string());
-    selectors.register("-bottom-6", "".to_string());
-    selectors.register("-left-6", "".to_string());
-    selectors.register("inset-7", "".to_string());
-    selectors.register("-inset-7", "".to_string());
-    selectors.register("inset-y-7", "".to_string());
-    selectors.register("-inset-y-7", "".to_string());
-    selectors.register("inset-x-7", "".to_string());
-    selectors.register("-inset-x-7", "".to_string());
-    selectors.register("top-7", "".to_string());
-    selectors.register("right-7", "".to_string());
-    selectors.register("bottom-7", "".to_string());
-    selectors.register("left-7", "".to_string());
-    selectors.register("-top-7", "".to_string());
-    selectors.register("-right-7", "".to_string());
-    selectors.register("-bottom-7", "".to_string());
-    selectors.register("-left-7", "".to_string());
-    selectors.register("inset-8", "".to_string());
-    selectors.register("-inset-8", "".to_string());
-    selectors.register("inset-y-8", "".to_string());
-    selectors.register("-inset-y-8", "".to_string());
-    selectors.register("inset-x-8", "".to_string());
-    selectors.register("-inset-x-8", "".to_string());
-    selectors.register("top-8", "".to_string());
-    selectors.register("right-8", "".to_string());
-    selectors.register("bottom-8", "".to_string());
-    selectors.register("left-8", "".to_string());
-    selectors.register("-top-8", "".to_string());
-    selectors.register("-right-8", "".to_string());
-    selectors.register("-bottom-8", "".to_string());
-    selectors.register("-left-8", "".to_string());
-    selectors.register("inset-9", "".to_string());
-    selectors.register("-inset-9", "".to_string());
-    selectors.register("inset-y-9", "".to_string());
-    selectors.register("-inset-y-9", "".to_string());
-    selectors.register("inset-x-9", "".to_string());
-    selectors.register("-inset-x-9", "".to_string());
-    selectors.register("top-9", "".to_string());
-    selectors.register("right-9", "".to_string());
-    selectors.register("bottom-9", "".to_string());
-    selectors.register("left-9", "".to_string());
-    selectors.register("-top-9", "".to_string());
-    selectors.register("-right-9", "".to_string());
-    selectors.register("-bottom-9", "".to_string());
-    selectors.register("-left-9", "".to_string());
-    selectors.register("inset-10", "".to_string());
-    selectors.register("-inset-10", "".to_string());
-    selectors.register("inset-y-10", "".to_string());
-    selectors.register("-inset-y-10", "".to_string());
-    selectors.register("inset-x-10", "".to_string());
-    selectors.register("-inset-x-10", "".to_string());
-    selectors.register("top-10", "".to_string());
-    selectors.register("right-10", "".to_string());
-    selectors.register("bottom-10", "".to_string());
-    selectors.register("left-10", "".to_string());
-    selectors.register("-top-10", "".to_string());
-    selectors.register("-right-10", "".to_string());
-    selectors.register("-bottom-10", "".to_string());
-    selectors.register("-left-10", "".to_string());
-    selectors.register("inset-11", "".to_string());
-    selectors.register("-inset-11", "".to_string());
-    selectors.register("inset-y-11", "".to_string());
-    selectors.register("-inset-y-11", "".to_string());
-    selectors.register("inset-x-11", "".to_string());
-    selectors.register("-inset-x-11", "".to_string());
-    selectors.register("top-11", "".to_string());
-    selectors.register("right-11", "".to_string());
-    selectors.register("bottom-11", "".to_string());
-    selectors.register("left-11", "".to_string());
-    selectors.register("-top-11", "".to_string());
-    selectors.register("-right-11", "".to_string());
-    selectors.register("-bottom-11", "".to_string());
-    selectors.register("-left-11", "".to_string());
-    selectors.register("inset-12", "".to_string());
-    selectors.register("-inset-12", "".to_string());
-    selectors.register("inset-y-12", "".to_string());
-    selectors.register("-inset-y-12", "".to_string());
-    selectors.register("inset-x-12", "".to_string());
-    selectors.register("-inset-x-12", "".to_string());
-    selectors.register("top-12", "".to_string());
-    selectors.register("right-12", "".to_string());
-    selectors.register("bottom-12", "".to_string());
-    selectors.register("left-12", "".to_string());
-    selectors.register("-top-12", "".to_string());
-    selectors.register("-right-12", "".to_string());
-    selectors.register("-bottom-12", "".to_string());
-    selectors.register("-left-12", "".to_string());
-    selectors.register("inset-14", "".to_string());
-    selectors.register("-inset-14", "".to_string());
-    selectors.register("inset-y-14", "".to_string());
-    selectors.register("-inset-y-14", "".to_string());
-    selectors.register("inset-x-14", "".to_string());
-    selectors.register("-inset-x-14", "".to_string());
-    selectors.register("top-14", "".to_string());
-    selectors.register("right-14", "".to_string());
-    selectors.register("bottom-14", "".to_string());
-    selectors.register("left-14", "".to_string());
-    selectors.register("-top-14", "".to_string());
-    selectors.register("-right-14", "".to_string());
-    selectors.register("-bottom-14", "".to_string());
-    selectors.register("-left-14", "".to_string());
-    selectors.register("inset-16", "".to_string());
-    selectors.register("-inset-16", "".to_string());
-    selectors.register("inset-y-16", "".to_string());
-    selectors.register("-inset-y-16", "".to_string());
-    selectors.register("inset-x-16", "".to_string());
-    selectors.register("-inset-x-16", "".to_string());
-    selectors.register("top-16", "".to_string());
-    selectors.register("right-16", "".to_string());
-    selectors.register("bottom-16", "".to_string());
-    selectors.register("left-16", "".to_string());
-    selectors.register("-top-16", "".to_string());
-    selectors.register("-right-16", "".to_string());
-    selectors.register("-bottom-16", "".to_string());
-    selectors.register("-left-16", "".to_string());
-    selectors.register("inset-20", "".to_string());
-    selectors.register("-inset-20", "".to_string());
-    selectors.register("inset-y-20", "".to_string());
-    selectors.register("-inset-y-20", "".to_string());
-    selectors.register("inset-x-20", "".to_string());
-    selectors.register("-inset-x-20", "".to_string());
-    selectors.register("top-20", "".to_string());
-    selectors.register("right-20", "".to_string());
-    selectors.register("bottom-20", "".to_string());
-    selectors.register("left-20", "".to_string());
-    selectors.register("-top-20", "".to_string());
-    selectors.register("-right-20", "".to_string());
-    selectors.register("-bottom-20", "".to_string());
-    selectors.register("-left-20", "".to_string());
-    selectors.register("inset-24", "".to_string());
-    selectors.register("-inset-24", "".to_string());
-    selectors.register("inset-y-24", "".to_string());
-    selectors.register("-inset-y-24", "".to_string());
-    selectors.register("inset-x-24", "".to_string());
-    selectors.register("-inset-x-24", "".to_string());
-    selectors.register("top-24", "".to_string());
-    selectors.register("right-24", "".to_string());
-    selectors.register("bottom-24", "".to_string());
-    selectors.register("left-24", "".to_string());
-    selectors.register("-top-24", "".to_string());
-    selectors.register("-right-24", "".to_string());
-    selectors.register("-bottom-24", "".to_string());
-    selectors.register("-left-24", "".to_string());
-    selectors.register("inset-28", "".to_string());
-    selectors.register("-inset-28", "".to_string());
-    selectors.register("inset-y-28", "".to_string());
-    selectors.register("-inset-y-28", "".to_string());
-    selectors.register("inset-x-28", "".to_string());
-    selectors.register("-inset-x-28", "".to_string());
-    selectors.register("top-28", "".to_string());
-    selectors.register("right-28", "".to_string());
-    selectors.register("bottom-28", "".to_string());
-    selectors.register("left-28", "".to_string());
-    selectors.register("-top-28", "".to_string());
-    selectors.register("-right-28", "".to_string());
-    selectors.register("-bottom-28", "".to_string());
-    selectors.register("-left-28", "".to_string());
-    selectors.register("inset-32", "".to_string());
-    selectors.register("-inset-32", "".to_string());
-    selectors.register("inset-y-32", "".to_string());
-    selectors.register("-inset-y-32", "".to_string());
-    selectors.register("inset-x-32", "".to_string());
-    selectors.register("-inset-x-32", "".to_string());
-    selectors.register("top-32", "".to_string());
-    selectors.register("right-32", "".to_string());
-    selectors.register("bottom-32", "".to_string());
-    selectors.register("left-32", "".to_string());
-    selectors.register("-top-32", "".to_string());
-    selectors.register("-right-32", "".to_string());
-    selectors.register("-bottom-32", "".to_string());
-    selectors.register("-left-32", "".to_string());
-    selectors.register("inset-36", "".to_string());
-    selectors.register("-inset-36", "".to_string());
-    selectors.register("inset-y-36", "".to_string());
-    selectors.register("-inset-y-36", "".to_string());
-    selectors.register("inset-x-36", "".to_string());
-    selectors.register("-inset-x-36", "".to_string());
-    selectors.register("top-36", "".to_string());
-    selectors.register("right-36", "".to_string());
-    selectors.register("bottom-36", "".to_string());
-    selectors.register("left-36", "".to_string());
-    selectors.register("-top-36", "".to_string());
-    selectors.register("-right-36", "".to_string());
-    selectors.register("-bottom-36", "".to_string());
-    selectors.register("-left-36", "".to_string());
-    selectors.register("inset-40", "".to_string());
-    selectors.register("-inset-40", "".to_string());
-    selectors.register("inset-y-40", "".to_string());
-    selectors.register("-inset-y-40", "".to_string());
-    selectors.register("inset-x-40", "".to_string());
-    selectors.register("-inset-x-40", "".to_string());
-    selectors.register("top-40", "".to_string());
-    selectors.register("right-40", "".to_string());
-    selectors.register("bottom-40", "".to_string());
-    selectors.register("left-40", "".to_string());
-    selectors.register("-top-40", "".to_string());
-    selectors.register("-right-40", "".to_string());
-    selectors.register("-bottom-40", "".to_string());
-    selectors.register("-left-40", "".to_string());
-    selectors.register("inset-44", "".to_string());
-    selectors.register("-inset-44", "".to_string());
-    selectors.register("inset-y-44", "".to_string());
-    selectors.register("-inset-y-44", "".to_string());
-    selectors.register("inset-x-44", "".to_string());
-    selectors.register("-inset-x-44", "".to_string());
-    selectors.register("top-44", "".to_string());
-    selectors.register("right-44", "".to_string());
-    selectors.register("bottom-44", "".to_string());
-    selectors.register("left-44", "".to_string());
-    selectors.register("-top-44", "".to_string());
-    selectors.register("-right-44", "".to_string());
-    selectors.register("-bottom-44", "".to_string());
-    selectors.register("-left-44", "".to_string());
-    selectors.register("inset-48", "".to_string());
-    selectors.register("-inset-48", "".to_string());
-    selectors.register("inset-y-48", "".to_string());
-    selectors.register("-inset-y-48", "".to_string());
-    selectors.register("inset-x-48", "".to_string());
-    selectors.register("-inset-x-48", "".to_string());
-    selectors.register("top-48", "".to_string());
-    selectors.register("right-48", "".to_string());
-    selectors.register("bottom-48", "".to_string());
-    selectors.register("left-48", "".to_string());
-    selectors.register("-top-48", "".to_string());
-    selectors.register("-right-48", "".to_string());
-    selectors.register("-bottom-48", "".to_string());
-    selectors.register("-left-48", "".to_string());
-    selectors.register("inset-52", "".to_string());
-    selectors.register("-inset-52", "".to_string());
-    selectors.register("inset-y-52", "".to_string());
-    selectors.register("-inset-y-52", "".to_string());
-    selectors.register("inset-x-52", "".to_string());
-    selectors.register("-inset-x-52", "".to_string());
-    selectors.register("top-52", "".to_string());
-    selectors.register("right-52", "".to_string());
-    selectors.register("bottom-52", "".to_string());
-    selectors.register("left-52", "".to_string());
-    selectors.register("-top-52", "".to_string());
-    selectors.register("-right-52", "".to_string());
-    selectors.register("-bottom-52", "".to_string());
-    selectors.register("-left-52", "".to_string());
-    selectors.register("inset-56", "".to_string());
-    selectors.register("-inset-56", "".to_string());
-    selectors.register("inset-y-56", "".to_string());
-    selectors.register("-inset-y-56", "".to_string());
-    selectors.register("inset-x-56", "".to_string());
-    selectors.register("-inset-x-56", "".to_string());
-    selectors.register("top-56", "".to_string());
-    selectors.register("right-56", "".to_string());
-    selectors.register("bottom-56", "".to_string());
-    selectors.register("left-56", "".to_string());
-    selectors.register("-top-56", "".to_string());
-    selectors.register("-right-56", "".to_string());
-    selectors.register("-bottom-56", "".to_string());
-    selectors.register("-left-56", "".to_string());
-    selectors.register("inset-60", "".to_string());
-    selectors.register("-inset-60", "".to_string());
-    selectors.register("inset-y-60", "".to_string());
-    selectors.register("-inset-y-60", "".to_string());
-    selectors.register("inset-x-60", "".to_string());
-    selectors.register("-inset-x-60", "".to_string());
-    selectors.register("top-60", "".to_string());
-    selectors.register("right-60", "".to_string());
-    selectors.register("bottom-60", "".to_string());
-    selectors.register("left-60", "".to_string());
-    selectors.register("-top-60", "".to_string());
-    selectors.register("-right-60", "".to_string());
-    selectors.register("-bottom-60", "".to_string());
-    selectors.register("-left-60", "".to_string());
-    selectors.register("inset-64", "".to_string());
-    selectors.register("-inset-64", "".to_string());
-    selectors.register("inset-y-64", "".to_string());
-    selectors.register("-inset-y-64", "".to_string());
-    selectors.register("inset-x-64", "".to_string());
-    selectors.register("-inset-x-64", "".to_string());
-    selectors.register("top-64", "".to_string());
-    selectors.register("right-64", "".to_string());
-    selectors.register("bottom-64", "".to_string());
-    selectors.register("left-64", "".to_string());
-    selectors.register("-top-64", "".to_string());
-    selectors.register("-right-64", "".to_string());
-    selectors.register("-bottom-64", "".to_string());
-    selectors.register("-left-64", "".to_string());
-    selectors.register("inset-72", "".to_string());
-    selectors.register("-inset-72", "".to_string());
-    selectors.register("inset-y-72", "".to_string());
-    selectors.register("-inset-y-72", "".to_string());
-    selectors.register("inset-x-72", "".to_string());
-    selectors.register("-inset-x-72", "".to_string());
-    selectors.register("top-72", "".to_string());
-    selectors.register("right-72", "".to_string());
-    selectors.register("bottom-72", "".to_string());
-    selectors.register("left-72", "".to_string());
-    selectors.register("-top-72", "".to_string());
-    selectors.register("-right-72", "".to_string());
-    selectors.register("-bottom-72", "".to_string());
-    selectors.register("-left-72", "".to_string());
-    selectors.register("inset-80", "".to_string());
-    selectors.register("-inset-80", "".to_string());
-    selectors.register("inset-y-80", "".to_string());
-    selectors.register("-inset-y-80", "".to_string());
-    selectors.register("inset-x-80", "".to_string());
-    selectors.register("-inset-x-80", "".to_string());
-    selectors.register("top-80", "".to_string());
-    selectors.register("right-80", "".to_string());
-    selectors.register("bottom-80", "".to_string());
-    selectors.register("left-80", "".to_string());
-    selectors.register("-top-80", "".to_string());
-    selectors.register("-right-80", "".to_string());
-    selectors.register("-bottom-80", "".to_string());
-    selectors.register("-left-80", "".to_string());
-    selectors.register("inset-96", "".to_string());
-    selectors.register("-inset-96", "".to_string());
-    selectors.register("inset-y-96", "".to_string());
-    selectors.register("-inset-y-96", "".to_string());
-    selectors.register("inset-x-96", "".to_string());
-    selectors.register("-inset-x-96", "".to_string());
-    selectors.register("top-96", "".to_string());
-    selectors.register("right-96", "".to_string());
-    selectors.register("bottom-96", "".to_string());
-    selectors.register("left-96", "".to_string());
-    selectors.register("-top-96", "".to_string());
-    selectors.register("-right-96", "".to_string());
-    selectors.register("-bottom-96", "".to_string());
-    selectors.register("-left-96", "".to_string());
-    selectors.register("inset-auto", "".to_string());
-    selectors.register("inset-y-auto", "".to_string());
-    selectors.register("inset-x-auto", "".to_string());
-    selectors.register("top-auto", "".to_string());
-    selectors.register("right-auto", "".to_string());
-    selectors.register("bottom-auto", "".to_string());
-    selectors.register("left-auto", "".to_string());
-    selectors.register("inset-1/2", "".to_string());
-    selectors.register("inset-2/3", "".to_string());
-    selectors.register("inset-1/4", "".to_string());
-    selectors.register("inset-3/4", "".to_string());
-    selectors.register("inset-full", "".to_string());
-    selectors.register("-inset-1/2", "".to_string());
-    selectors.register("-inset-2/3", "".to_string());
-    selectors.register("-inset-1/4", "".to_string());
-    selectors.register("-inset-3/4", "".to_string());
-    selectors.register("-inset-full", "".to_string());
-    selectors.register("inset-x-1/2", "".to_string());
-    selectors.register("inset-x-2/3", "".to_string());
-    selectors.register("inset-x-1/4", "".to_string());
-    selectors.register("inset-x-3/4", "".to_string());
-    selectors.register("inset-x-full", "".to_string());
-    selectors.register("-inset-x-1/2", "".to_string());
-    selectors.register("-inset-x-2/3", "".to_string());
-    selectors.register("-inset-x-1/4", "".to_string());
-    selectors.register("-inset-x-3/4", "".to_string());
-    selectors.register("-inset-x-full", "".to_string());
-    selectors.register("inset-y-1/2", "".to_string());
-    selectors.register("inset-y-2/3", "".to_string());
-    selectors.register("inset-y-1/4", "".to_string());
-    selectors.register("inset-y-3/4", "".to_string());
-    selectors.register("inset-y-full", "".to_string());
-    selectors.register("-inset-y-1/2", "".to_string());
-    selectors.register("-inset-y-2/3", "".to_string());
-    selectors.register("-inset-y-1/4", "".to_string());
-    selectors.register("-inset-y-3/4", "".to_string());
-    selectors.register("-inset-y-full", "".to_string());
-    selectors.register("top-1/2", "".to_string());
-    selectors.register("top-2/3", "".to_string());
-    selectors.register("top-1/4", "".to_string());
-    selectors.register("top-3/4", "".to_string());
-    selectors.register("top-full", "".to_string());
-    selectors.register("-top-1/2", "".to_string());
-    selectors.register("-top-2/3", "".to_string());
-    selectors.register("-top-1/4", "".to_string());
-    selectors.register("-top-3/4", "".to_string());
-    selectors.register("-top-full", "".to_string());
-    selectors.register("right-1/2", "".to_string());
-    selectors.register("right-2/3", "".to_string());
-    selectors.register("right-1/4", "".to_string());
-    selectors.register("right-3/4", "".to_string());
-    selectors.register("right-full", "".to_string());
-    selectors.register("-right-1/2", "".to_string());
-    selectors.register("-right-2/3", "".to_string());
-    selectors.register("-right-1/4", "".to_string());
-    selectors.register("-right-3/4", "".to_string());
-    selectors.register("-right-full", "".to_string());
-    selectors.register("bottom-1/2", "".to_string());
-    selectors.register("bottom-2/3", "".to_string());
-    selectors.register("bottom-1/4", "".to_string());
-    selectors.register("bottom-3/4", "".to_string());
-    selectors.register("bottom-full", "".to_string());
-    selectors.register("-bottom-1/2", "".to_string());
-    selectors.register("-bottom-2/3", "".to_string());
-    selectors.register("-bottom-1/4", "".to_string());
-    selectors.register("-bottom-3/4", "".to_string());
-    selectors.register("-bottom-full", "".to_string());
-    selectors.register("left-1/2", "".to_string());
-    selectors.register("left-2/3", "".to_string());
-    selectors.register("left-1/4", "".to_string());
-    selectors.register("left-3/4", "".to_string());
-    selectors.register("left-full", "".to_string());
-    selectors.register("-left-1/2", "".to_string());
-    selectors.register("-left-2/3", "".to_string());
-    selectors.register("-left-1/4", "".to_string());
-    selectors.register("-left-3/4", "".to_string());
-    selectors.register("-left-full", "".to_string());
-    selectors.register("visible", "visibility: visible;".to_string());
-    selectors.register("invisible", "visibility: hidden;".to_string());
-    selectors.register("z-0", "z-index: 0;".to_string());
-    selectors.register("z-10", "z-index: 10;".to_string());
-    selectors.register("z-20", "z-index: 20;".to_string());
-    selectors.register("z-30", "z-index: 30;".to_string());
-    selectors.register("z-40", "z-index: 40;".to_string());
-    selectors.register("z-50", "z-index: 50;".to_string());
-    selectors.register("z-auto", "z-index: auto;".to_string());
-}*/
+#[derive(Debug)]
+pub struct LayoutPositionPlugin;
+
+impl Plugin for LayoutPositionPlugin {
+    fn namespace(&self) -> String {
+        "".to_string()
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if ["static", "fixed", "absolute", "relative", "sticky"].contains(&modifier) {
+            Some(format!("position: {modifier};"))
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct LayoutDisplayPlugin;
+
+impl Plugin for LayoutDisplayPlugin {
+    fn namespace(&self) -> String {
+        "".to_string()
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "hidden" => Some("display: none;".to_string()),
+            "contents" => Some("display: contents;".to_string()),
+            "list-item" => Some("display: list-item;".to_string()),
+            "block" => Some("display: block;".to_string()),
+            "inline-block" => Some("display: inline-block;".to_string()),
+            "flex" => Some("display: flex;".to_string()),
+            "inline-flex" => Some("display: inline-flex;".to_string()),
+            "inline" => Some("display: inline;".to_string()),
+            "table" => Some("display: table;".to_string()),
+            "inline-table" => Some("display: inline-table;".to_string()),
+            "table-cell" => Some("display: table-cell;".to_string()),
+            "table-caption" => Some("display: table-caption;".to_string()),
+            "table-column" => Some("display: table-column;".to_string()),
+            "table-column-group" => Some("display: table-column-group;".to_string()),
+            "table-footer-group" => Some("display: table-footer-group;".to_string()),
+            "table-header-group" => Some("display: table-header-group;".to_string()),
+            "table-row-group" => Some("display: table-row-group;".to_string()),
+            "table-row" => Some("display: table-row;".to_string()),
+            "flow-root" => Some("display: flow-root;".to_string()),
+            "grid" => Some("display: grid;".to_string()),
+            "inline-grid" => Some("display: inline-grid;".to_string()),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct LayoutVisibilityPlugin;
+
+impl Plugin for LayoutVisibilityPlugin {
+    fn namespace(&self) -> String {
+        "".to_string()
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "visible" => Some("visibility: visible;".to_string()),
+            "invisible" => Some("visibility: hidden;".to_string()),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct LayoutIsolationPlugin;
+
+impl Plugin for LayoutIsolationPlugin {
+    fn namespace(&self) -> String {
+        "".to_string()
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "isolate" => Some("isolation: isolate;".to_string()),
+            "isolation-auto" => Some("isolation: auto;".to_string()),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct LayoutInsetPlugin;
+
+impl Plugin for LayoutInsetPlugin {
+    fn namespace(&self) -> String {
+        "inset".to_string()
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("top: {val};
+  right: {val};
+  bottom: {val};
+  left: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        default_lengths::get_extended(modifier).map(|c| self.css_template_value(&c))
+    }
+}
+
+#[derive(Debug)]
+pub struct LayoutInsetXPlugin;
+
+impl Plugin for LayoutInsetXPlugin {
+    fn namespace(&self) -> String {
+        "inset-x".to_string()
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("left: {val};
+  right: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        default_lengths::get_extended(modifier).map(|c| self.css_template_value(&c))
+    }
+}
+
+#[derive(Debug)]
+pub struct LayoutInsetYPlugin;
+
+impl Plugin for LayoutInsetYPlugin {
+    fn namespace(&self) -> String {
+        "inset-y".to_string()
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("top: {val};
+  bottom: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        default_lengths::get_extended(modifier).map(|c| self.css_template_value(&c))
+    }
+}
+
+#[derive(Debug)]
+pub struct LayoutTopPlugin;
+
+impl Plugin for LayoutTopPlugin {
+    fn namespace(&self) -> String {
+        "top".to_string()
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("top: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        default_lengths::get_extended(modifier).map(|c| self.css_template_value(&c))
+    }
+}
+
+#[derive(Debug)]
+pub struct LayoutBottomPlugin;
+
+impl Plugin for LayoutBottomPlugin {
+    fn namespace(&self) -> String {
+        "bottom".to_string()
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("bottom: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        default_lengths::get_extended(modifier).map(|c| self.css_template_value(&c))
+    }
+}
+
+#[derive(Debug)]
+pub struct LayoutLeftPlugin;
+
+impl Plugin for LayoutLeftPlugin {
+    fn namespace(&self) -> String {
+        "left".to_string()
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("left: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        default_lengths::get_extended(modifier).map(|c| self.css_template_value(&c))
+    }
+}
+
+#[derive(Debug)]
+pub struct LayoutRightPlugin;
+
+impl Plugin for LayoutRightPlugin {
+    fn namespace(&self) -> String {
+        "right".to_string()
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("right: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        default_lengths::get_extended(modifier).map(|c| self.css_template_value(&c))
+    }
+}
+
+#[derive(Debug)]
+pub struct LayoutZIndexPlugin;
+
+impl Plugin for LayoutZIndexPlugin {
+    fn namespace(&self) -> String {
+        "z".to_string()
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        // Support all values
+        if modifier.parse::<usize>().is_ok() || is_matching_auto(modifier) {
+            Some(format!("z-index: {modifier};"))
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct LayoutContainerPlugin;
+
+impl Plugin for LayoutContainerPlugin {
+    fn namespace(&self) -> String {
+        "container".to_string()
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "none" => Some("width: 100%;".to_string()),
+            "sm" => Some("max-width: 640px;".to_string()),
+            "md" => Some("max-width: 768px;".to_string()),
+            "lg" => Some("max-width: 1024px;".to_string()),
+            "xl" => Some("max-width: 1280px;".to_string()),
+            "2xl" => Some("max-width: 1536px;".to_string()),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct LayoutBoxDecorationBreakPlugin;
+
+impl Plugin for LayoutBoxDecorationBreakPlugin {
+    fn namespace(&self) -> String {
+        "decoration".to_string()
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if ["slice", "clone"].contains(&modifier) {
+            Some(format!("box-decoration-break: {modifier};"))
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct LayoutBoxSizingPlugin;
+
+impl Plugin for LayoutBoxSizingPlugin {
+    fn namespace(&self) -> String {
+        "box".to_string()
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if ["border", "content"].contains(&modifier) {
+            Some(format!("box-sizing: {modifier}-box;"))
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct LayoutFloatPlugin;
+
+impl Plugin for LayoutFloatPlugin {
+    fn namespace(&self) -> String {
+        "float".to_string()
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if ["left", "right", "none"].contains(&modifier) {
+            Some(format!("float: {modifier};"))
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct LayoutClearPlugin;
+
+impl Plugin for LayoutClearPlugin {
+    fn namespace(&self) -> String {
+        "clear".to_string()
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if ["left", "right", "both", "none"].contains(&modifier) {
+            Some(format!("clear: {modifier};"))
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct LayoutObjectFitPlugin;
+
+impl Plugin for LayoutObjectFitPlugin {
+    fn namespace(&self) -> String {
+        "object".to_string()
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if ["contain", "cover", "fill", "none", "scale-down"].contains(&modifier) {
+            Some(format!("object-fit: {modifier};"))
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct LayoutObjectPositionPlugin;
+
+impl Plugin for LayoutObjectPositionPlugin {
+    fn namespace(&self) -> String {
+        "object".to_string()
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        val.split('_').all(is_matching_position)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("object-position: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "bottom" => Some(self.css_template_value("bottom")),
+            "center" => Some(self.css_template_value("center")),
+            "left" => Some(self.css_template_value("left")),
+            "left-bottom" => Some(self.css_template_value("left bottom")),
+            "left-top" => Some(self.css_template_value("left top")),
+            "right" => Some(self.css_template_value("right")),
+            "right-bottom" => Some(self.css_template_value("right bottom")),
+            "right-top" => Some(self.css_template_value("right top")),
+            "top" => Some(self.css_template_value("top")),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct LayoutOverflowPlugin;
+
+impl Plugin for LayoutOverflowPlugin {
+    fn namespace(&self) -> String {
+        "overflow".to_string()
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "auto" => Some("overflow: auto;".to_string()),
+            "x-auto" => Some("overflow-x: auto;".to_string()),
+            "y-auto" => Some("overflow-y: auto;".to_string()),
+            "hidden" => Some("overflow: hidden;".to_string()),
+            "x-hidden" => Some("overflow-x: hidden;".to_string()),
+            "y-hidden" => Some("overflow-y: hidden;".to_string()),
+            "visible" => Some("overflow: visible;".to_string()),
+            "x-visible" => Some("overflow-x: visible;".to_string()),
+            "y-visible" => Some("overflow-y: visible;".to_string()),
+            "scroll" => Some("overflow: scroll;".to_string()),
+            "x-scroll" => Some("overflow-x: scroll;".to_string()),
+            "y-scroll" => Some("overflow-y: scroll;".to_string()),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct LayoutOverscrollPlugin;
+
+impl Plugin for LayoutOverscrollPlugin {
+    fn namespace(&self) -> String {
+        "overscroll".to_string()
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "auto" => Some("overscroll-behavior: auto;".to_string()),
+            "y-auto" => Some("overscroll-behavior-y: auto;".to_string()),
+            "x-auto" => Some("overscroll-behavior-x: auto;".to_string()),
+            "contain" => Some("overscroll-behavior: contain;".to_string()),
+            "y-contain" => Some("overscroll-behavior-y: contain;".to_string()),
+            "x-contain" => Some("overscroll-behavior-x: contain;".to_string()),
+            "none" => Some("overscroll-behavior: none;".to_string()),
+            "y-none" => Some("overscroll-behavior-y: none;".to_string()),
+            "x-none" => Some("overscroll-behavior-x: none;".to_string()),
+            _ => None,
+        }
+    }
+}

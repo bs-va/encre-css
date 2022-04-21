@@ -18,7 +18,7 @@ impl Plugin for SizingWidthPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_lengths::get_extended(modifier).map(|c| self.css_template_value(&c))
+        default_lengths::get_extended_size(modifier).map(|c| self.css_template_value(&c))
     }
 }
 
@@ -113,7 +113,7 @@ impl Plugin for SizingHeightPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_lengths::get_extended(modifier).map(|c| self.css_template_value(&c))
+        default_lengths::get_extended_size(modifier).map(|c| self.css_template_value(&c))
     }
 }
 
