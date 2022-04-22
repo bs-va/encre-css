@@ -235,17 +235,29 @@ pub fn get(modifier: &str) -> Option<String> {
     // TODO: Prevent `.to_string()`ing
 
     // Handle the new opacity syntax (e.g. `bg-red-500/25`)
-    let (mut opacity, modifier) = if let Some(opacity_suffix) = OPACITY_SUFFIX_REGEX.captures(modifier) {
-        let new_modifier = &OPACITY_SUFFIX_REGEX.replace(modifier, "");
-        (Some(opacity_suffix.get(1).unwrap().as_str().parse::<f32>().unwrap() / 100.), new_modifier.to_string())
-    } else {
-        // The `current` modifier cannot have its opacity changed
-        if modifier == "current" {
-            return Some("currentColor".to_string());
-        }
+    let (mut opacity, modifier) =
+        if let Some(opacity_suffix) = OPACITY_SUFFIX_REGEX.captures(modifier) {
+            let new_modifier = &OPACITY_SUFFIX_REGEX.replace(modifier, "");
+            (
+                Some(
+                    opacity_suffix
+                        .get(1)
+                        .unwrap()
+                        .as_str()
+                        .parse::<f32>()
+                        .unwrap()
+                        / 100.,
+                ),
+                new_modifier.to_string(),
+            )
+        } else {
+            // The `current` modifier cannot have its opacity changed
+            if modifier == "current" {
+                return Some("currentColor".to_string());
+            }
 
-        (None, modifier.to_string())
-    };
+            (None, modifier.to_string())
+        };
 
     let rgb_result = if modifier == "transparent" {
         if opacity.is_none() {
@@ -271,5 +283,17 @@ pub fn get(modifier: &str) -> Option<String> {
     };
 
     // Convert the array to a CSS color with an opacity value (if the color is found)
-    rgb_result.map(|rgb_result| format!("rgb({} {} {} / {})", rgb_result[0], rgb_result[1], rgb_result[2], if let Some(opacity) = opacity { opacity.to_string() } else {  "var(--tw-opacity)".to_string() }))
+    rgb_result.map(|rgb_result| {
+        format!(
+            "rgb({} {} {} / {})",
+            rgb_result[0],
+            rgb_result[1],
+            rgb_result[2],
+            if let Some(opacity) = opacity {
+                opacity.to_string()
+            } else {
+                "var(--tw-opacity)".to_string()
+            }
+        )
+    })
 }

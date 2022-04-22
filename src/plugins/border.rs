@@ -15,8 +15,11 @@ impl Plugin for BorderColorPlugin {
 
     fn css_template_value(&self, val: &str) -> String {
         if val.contains("--tw-opacity") {
-            format!("--tw-border-opacity: 1;
-  border-color: {};", val.replace("--tw-opacity", "--tw-border-opacity"))
+            format!(
+                "--tw-border-opacity: 1;
+  border-color: {};",
+                val.replace("--tw-opacity", "--tw-border-opacity")
+            )
         } else {
             format!("border-color: {val};")
         }
@@ -59,8 +62,11 @@ impl Plugin for DivideColorPlugin {
 
     fn css_template_value(&self, val: &str) -> String {
         if val.contains("--tw-opacity") {
-            format!("--tw-divide-opacity: 1;
-  border-color: {};", val.replace("--tw-opacity", "--tw-divide-opacity"))
+            format!(
+                "--tw-divide-opacity: 1;
+  border-color: {};",
+                val.replace("--tw-opacity", "--tw-divide-opacity")
+            )
         } else {
             format!("border-color: {val};")
         }
@@ -103,8 +109,11 @@ impl Plugin for RingColorPlugin {
 
     fn css_template_value(&self, val: &str) -> String {
         if val.contains("--tw-opacity") {
-            format!("--tw-ring-opacity: 1;
-  --ring-color: {};", val.replace("--tw-opacity", "--tw-ring-opacity"))
+            format!(
+                "--tw-ring-opacity: 1;
+  --ring-color: {};",
+                val.replace("--tw-opacity", "--tw-ring-opacity")
+            )
         } else {
             format!("--ring-color: {val};")
         }
@@ -147,8 +156,11 @@ impl Plugin for RingOffsetColorPlugin {
 
     fn css_template_value(&self, val: &str) -> String {
         if val.contains("--tw-opacity") {
-            format!("--tw-ring-offset-opacity: 1;
-  --ring-offset-color: {};", val.replace("--tw-opacity", "--tw-ring-offset-opacity"))
+            format!(
+                "--tw-ring-offset-opacity: 1;
+  --ring-offset-color: {};",
+                val.replace("--tw-opacity", "--tw-ring-offset-opacity")
+            )
         } else {
             format!("--ring-offset-color: {val};")
         }
@@ -170,7 +182,10 @@ impl Plugin for RingOffsetOpacityPlugin {
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
         // Support all values
         if let Ok(opacity_value) = modifier.parse::<f32>() {
-            Some(format!("--tw-ring-offset-opacity: {};", opacity_value / 100.))
+            Some(format!(
+                "--tw-ring-offset-opacity: {};",
+                opacity_value / 100.
+            ))
         } else {
             None
         }

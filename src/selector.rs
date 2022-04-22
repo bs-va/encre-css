@@ -13,6 +13,7 @@ pub struct Selector {
 impl Selector {
     pub fn new<T: Into<String>>(data: T) -> Self {
         let data = data.into();
+        println!("{:#?}", data);
         let arbitrary_value = {
             let modifier = if data.contains('-') {
                 let mut iter = data.split('-');
@@ -32,8 +33,10 @@ impl Selector {
             };
 
             if let Some(ref modifier) = modifier {
-                if modifier.contains('[') && modifier.contains(']') {
-                    Some(modifier[1..modifier.len() - 1].to_string())
+                if let Some(opening_index) = modifier.find('[') {
+                    modifier
+                        .find(']')
+                        .map(|closing_index| modifier[opening_index + 1..closing_index].to_string())
                 } else {
                     None
                 }
@@ -68,13 +71,11 @@ impl Selector {
 
     /// Get the modifier of the selector from the namespace of a plugin
     pub fn get_modifier(&self, namespace: &str) -> String {
-        self.content.replace(&format!("{}-", namespace), "")
-    }
-
-    /// Return the selector without its prefix
-    pub fn without_prefix(mut self) -> Self {
-        self.prefix = None;
-        self
+        if namespace.is_empty() {
+            self.content.clone()
+        } else {
+            self.content.replace(&format!("{}-", namespace), "")
+        }
     }
 
     pub fn contains(&self, other: &Selector) -> bool {

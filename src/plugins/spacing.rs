@@ -1,5 +1,5 @@
 use super::Plugin;
-use crate::utils::{value_matchers::*, default_lengths};
+use crate::utils::{default_lengths, value_matchers::*};
 
 // TODO: Boilerplate generator (just one structure for padding and another for margin)
 #[derive(Debug)]
@@ -174,6 +174,10 @@ impl Plugin for SpacingMarginPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if is_matching_auto(modifier) {
+            return Some(self.css_template_value("auto"));
+        }
+
         default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
     }
 }
@@ -198,6 +202,10 @@ impl Plugin for SpacingMarginXPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if is_matching_auto(modifier) {
+            return Some(self.css_template_value("auto"));
+        }
+
         default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
     }
 }
@@ -222,6 +230,10 @@ impl Plugin for SpacingMarginYPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if is_matching_auto(modifier) {
+            return Some(self.css_template_value("auto"));
+        }
+
         default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
     }
 }
@@ -243,6 +255,10 @@ impl Plugin for SpacingMarginLeftPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if is_matching_auto(modifier) {
+            return Some(self.css_template_value("auto"));
+        }
+
         default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
     }
 }
@@ -264,6 +280,10 @@ impl Plugin for SpacingMarginRightPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if is_matching_auto(modifier) {
+            return Some(self.css_template_value("auto"));
+        }
+
         default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
     }
 }
@@ -285,6 +305,10 @@ impl Plugin for SpacingMarginTopPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if is_matching_auto(modifier) {
+            return Some(self.css_template_value("auto"));
+        }
+
         default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
     }
 }
@@ -306,6 +330,10 @@ impl Plugin for SpacingMarginBottomPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if is_matching_auto(modifier) {
+            return Some(self.css_template_value("auto"));
+        }
+
         default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
     }
 }

@@ -27,7 +27,7 @@ pub struct SizingMinWidthPlugin;
 
 impl Plugin for SizingMinWidthPlugin {
     fn namespace(&self) -> String {
-        "w-min".to_string()
+        "min-w".to_string()
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -54,10 +54,11 @@ pub struct SizingMaxWidthPlugin;
 
 impl Plugin for SizingMaxWidthPlugin {
     fn namespace(&self) -> String {
-        "w".to_string()
+        "max-w".to_string()
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        println!("{:#?}", val);
         is_matching_length(val)
     }
 

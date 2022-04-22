@@ -1,5 +1,5 @@
-use regex::Regex;
 use lazy_static::lazy_static;
+use regex::Regex;
 
 use super::Plugin;
 use crate::utils::{default_colors, value_matchers::*};
@@ -22,8 +22,11 @@ impl Plugin for BackgroundColorPlugin {
 
     fn css_template_value(&self, val: &str) -> String {
         if val.contains("--tw-opacity") {
-            format!("--tw-bg-opacity: 1;
-  background-color: {};", val.replace("--tw-opacity", "--tw-bg-opacity"))
+            format!(
+                "--tw-bg-opacity: 1;
+  background-color: {};",
+                val.replace("--tw-opacity", "--tw-bg-opacity")
+            )
         } else {
             format!("background-color: {val};")
         }
@@ -109,14 +112,34 @@ impl Plugin for BackgroundImagePlugin {
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
         match modifier {
             "bg-none" => Some(self.css_template_value("none")),
-            "gradient-to-t" => Some(self.css_template_value("linear-gradient(to top, var(--tw-gradient-stops))")),
-            "gradient-to-tr" => Some(self.css_template_value("linear-gradient(to top right, var(--tw-gradient-stops))")),
-            "gradient-to-r" => Some(self.css_template_value("linear-gradient(to right, var(--tw-gradient-stops))")),
-            "gradient-to-br" => Some(self.css_template_value("linear-gradient(to bottom right, var(--tw-gradient-stops))")),
-            "gradient-to-b" => Some(self.css_template_value("linear-gradient(to bottom, var(--tw-gradient-stops))")),
-            "gradient-to-bl" => Some(self.css_template_value("linear-gradient(to bottom left, var(--tw-gradient-stops))")),
-            "gradient-to-l" => Some(self.css_template_value("linear-gradient(to left, var(--tw-gradient-stops))")),
-            "gradient-to-tl" => Some(self.css_template_value("linear-gradient(to top left, var(--tw-gradient-stops))")),
+            "gradient-to-t" => {
+                Some(self.css_template_value("linear-gradient(to top, var(--tw-gradient-stops))"))
+            }
+            "gradient-to-tr" => Some(
+                self.css_template_value("linear-gradient(to top right, var(--tw-gradient-stops))"),
+            ),
+            "gradient-to-r" => {
+                Some(self.css_template_value("linear-gradient(to right, var(--tw-gradient-stops))"))
+            }
+            "gradient-to-br" => {
+                Some(self.css_template_value(
+                    "linear-gradient(to bottom right, var(--tw-gradient-stops))",
+                ))
+            }
+            "gradient-to-b" => Some(
+                self.css_template_value("linear-gradient(to bottom, var(--tw-gradient-stops))"),
+            ),
+            "gradient-to-bl" => {
+                Some(self.css_template_value(
+                    "linear-gradient(to bottom left, var(--tw-gradient-stops))",
+                ))
+            }
+            "gradient-to-l" => {
+                Some(self.css_template_value("linear-gradient(to left, var(--tw-gradient-stops))"))
+            }
+            "gradient-to-tl" => Some(
+                self.css_template_value("linear-gradient(to top left, var(--tw-gradient-stops))"),
+            ),
             _ => None,
         }
     }
@@ -138,7 +161,7 @@ impl Plugin for BackgroundGradientFromPlugin {
         // TODO: Prevent `.to_string()`ing
         let default_to = if val == "inherit" || val == "currentColor" {
             "rgb(255 255 255 / 0)".to_string()
-        } else  {
+        } else {
             OPACITY_IN_RGB_REGEX.replace(val, "/ 0)").to_string()
         };
 
@@ -148,8 +171,10 @@ impl Plugin for BackgroundGradientFromPlugin {
             val.to_string()
         };
 
-        format!("--tw-gradient-from: {val};
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, {default_to});")
+        format!(
+            "--tw-gradient-from: {val};
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, {default_to});"
+        )
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -177,7 +202,7 @@ impl Plugin for BackgroundGradientViaPlugin {
         // TODO: Prevent `.to_string()`ing
         let default_to = if val == "inherit" || val == "currentColor" {
             "rgb(255 255 255 / 0)".to_string()
-        } else  {
+        } else {
             OPACITY_IN_RGB_REGEX.replace(val, "/ 0)").to_string()
         };
 
@@ -187,7 +212,10 @@ impl Plugin for BackgroundGradientViaPlugin {
             val.to_string()
         };
 
-        format!("--tw-gradient-stops: var(--tw-gradient-from), {}, var(--tw-gradient-to, {});", val, default_to)
+        format!(
+            "--tw-gradient-stops: var(--tw-gradient-from), {}, var(--tw-gradient-to, {});",
+            val, default_to
+        )
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -242,7 +270,10 @@ impl Plugin for BackgroundPositionPlugin {
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
         // TODO: Is that really list?
         // https://developer.mozilla.org/en-US/docs/Web/CSS/background-position
-        hint == "list" || val.split(',').all(|v| v.split('_').all(is_matching_position))
+        hint == "list"
+            || val
+                .split(',')
+                .all(|v| v.split('_').all(is_matching_position))
     }
 
     fn css_template_value(&self, val: &str) -> String {
@@ -295,7 +326,15 @@ impl Plugin for BackgroundSizePlugin {
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || val.split(',').all(|v| v.split('_').all(|v| is_matching_length(v) || is_matching_percentage(v) || is_matching_auto(v) || ["contain", "cover"].contains(&v)))
+        hint == "length"
+            || val.split(',').all(|v| {
+                v.split('_').all(|v| {
+                    is_matching_length(v)
+                        || is_matching_percentage(v)
+                        || is_matching_auto(v)
+                        || ["contain", "cover"].contains(&v)
+                })
+            })
     }
 
     fn css_template_value(&self, val: &str) -> String {

@@ -94,5 +94,6 @@ pub fn get_extended(val: &str) -> Option<String> {
 }
 
 pub fn get_extended_size(val: &str) -> Option<String> {
-    get_keyword(val).or_else(|| get_keyword_size(val).or_else(|| get_basic(val).or_else(|| get_fraction(val))))
+    get_keyword(val)
+        .or_else(|| get_keyword_size(val).or_else(|| get_basic(val).or_else(|| get_fraction(val))))
 }

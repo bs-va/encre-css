@@ -47,8 +47,7 @@ const RELATIVE_SIZES: [&str; 2] = ["larger", "smaller"];
 
 lazy_static! {
     static ref COLOR_REGEX: Regex =
-        Regex::new(r"^(#[a-f\d]{3}|#[a-f\d]{6}|rgba?\(.*\)|hsla?\(.*\))$")
-            .unwrap();
+        Regex::new(r"^(#[a-f\d]{3}|#[a-f\d]{6}|rgba?\(.*\)|hsla?\(.*\))$").unwrap();
     static ref LENGTH_REGEX: Regex =
         Regex::new(&format!("(?:{})", LENGTH_UNITS.join("|"))).unwrap();
 }
@@ -70,7 +69,9 @@ pub fn is_matching_var(val: &str) -> bool {
 }
 
 pub fn is_matching_color(val: &str) -> bool {
-    COLOR_REGEX.is_match(val) || Color::val().by_string(val.to_string()).is_ok() || is_matching_var(val)
+    COLOR_REGEX.is_match(val)
+        || Color::val().by_string(val.to_string()).is_ok()
+        || is_matching_var(val)
 }
 
 pub fn is_matching_length(val: &str) -> bool {
@@ -173,5 +174,12 @@ pub fn is_matching_relative_size(val: &str) -> bool {
 }
 
 pub fn is_matching_image(val: &str) -> bool {
-    val.split(',').all(|v| is_matching_var(v) || is_matching_url(v) || is_matching_gradient(v) || ["element(", "image(", "cross-fade(", "image-set("].iter().any(|e| v.starts_with(e)))
+    val.split(',').all(|v| {
+        is_matching_var(v)
+            || is_matching_url(v)
+            || is_matching_gradient(v)
+            || ["element(", "image(", "cross-fade(", "image-set("]
+                .iter()
+                .any(|e| v.starts_with(e))
+    })
 }

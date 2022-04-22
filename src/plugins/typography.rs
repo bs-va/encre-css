@@ -1,6 +1,8 @@
 use super::Plugin;
 use crate::utils::{default_colors, value_matchers::*};
 
+use regex::Regex;
+
 #[derive(Debug)]
 pub struct TypographyColorPlugin;
 
@@ -15,8 +17,11 @@ impl Plugin for TypographyColorPlugin {
 
     fn css_template_value(&self, val: &str) -> String {
         if val.contains("--tw-opacity") {
-            format!("--tw-text-opacity: 1;
-  color: {};", val.replace("--tw-opacity", "--tw-text-opacity"))
+            format!(
+                "--tw-text-opacity: 1;
+  color: {};",
+                val.replace("--tw-opacity", "--tw-text-opacity")
+            )
         } else {
             format!("color: {val};")
         }
@@ -45,109 +50,93 @@ impl Plugin for TypographyOpacityPlugin {
     }
 }
 
+#[derive(Debug)]
+pub struct TypographyFontFamilyPlugin;
+
+impl Plugin for TypographyFontFamilyPlugin {
+    fn namespace(&self) -> String {
+        "font".to_string()
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        val.split(',').all(|v| {
+            if is_matching_generic_name(v) || is_matching_var(v) {
+                true
+            } else {
+                !(v.contains('_')
+                    && fancy_regex::Regex::new(r#"!/(['"])([^"']+)\1"#)
+                        .unwrap()
+                        .is_match(v)
+                        .unwrap())
+                    || Regex::new(r"^\d").unwrap().is_match(v)
+            }
+        })
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("font-family: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "sans" => Some(r#"font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";"#.to_string()),
+            "serif" => Some(r#"font-family: Georgia, Cambria, "Times New Roman", Times, serif;"#.to_string()),
+            "mono" => Some(r#"font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;"#.to_string()),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct TypographyFontSizePlugin;
+
+impl Plugin for TypographyFontSizePlugin {
+    fn namespace(&self) -> String {
+        "text".to_string()
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        hint == "length" || is_matching_length(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("font-size: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "xs" => Some("font-size: 0.75rem;
+  line-height: 1rem;".to_string()),
+            "sm" => Some("font-size: 0.875rem;
+  line-height: 1.25rem;".to_string()),
+            "base" => Some("font-size: 1rem;
+  line-height: 1.5rem;".to_string()),
+            "lg" => Some("font-size: 1.125rem;
+  line-height: 1.75rem;".to_string()),
+            "xl" => Some("font-size: 1.25rem;
+  line-height: 1.75rem;".to_string()),
+            "2xl" => Some("font-size: 1.5rem;
+  line-height: 2rem;".to_string()),
+            "3xl" => Some("font-size: 1.875rem;
+  line-height: 2.25rem;".to_string()),
+            "4xl" => Some("font-size: 2.25rem;
+  line-height: 2.5rem;".to_string()),
+            "5xl" => Some("font-size: 3rem;
+  line-height: 1;".to_string()),
+            "6xl" => Some("font-size: 3.75rem;
+  line-height: 1;".to_string()),
+            "7xl" => Some("font-size: 4.5rem;
+  line-height: 1;".to_string()),
+            "8xl" => Some("font-size: 6rem;
+  line-height: 1;".to_string()),
+            "9xl" => Some("font-size: 8rem;
+  line-height: 1;".to_string()),
+            _ => None,
+        }
+    }
+}
+
 /*pub fn init(selectors: &mut SelectorList) {
-    selectors.register("text-opacity-0", "text-opacity: 0;".to_string());
-    selectors.register("text-opacity-5", "text-opacity: 0.05;".to_string());
-    selectors.register("text-opacity-10", "text-opacity: 0.1;".to_string());
-    selectors.register("text-opacity-20", "text-opacity: 0.2;".to_string());
-    selectors.register("text-opacity-25", "text-opacity: 0.25;".to_string());
-    selectors.register("text-opacity-30", "text-opacity: 0.3;".to_string());
-    selectors.register("text-opacity-40", "text-opacity: 0.4;".to_string());
-    selectors.register("text-opacity-50", "text-opacity: 0.5;".to_string());
-    selectors.register("text-opacity-60", "text-opacity: 0.6;".to_string());
-    selectors.register("text-opacity-70", "text-opacity: 0.7;".to_string());
-    selectors.register("text-opacity-75", "text-opacity: 0.75;".to_string());
-    selectors.register("text-opacity-80", "text-opacity: 0.8;".to_string());
-    selectors.register("text-opacity-90", "text-opacity: 0.9;".to_string());
-    selectors.register("text-opacity-100", "text-opacity: 1;".to_string());
-    selectors.register("font-sans", r#"font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";"#.to_string());
-    selectors.register(
-        "font-serif",
-        r#"font-family: Georgia, Cambria, "Times New Roman", Times, serif;"#.to_string(),
-    );
-    selectors.register(
-        "font-mono",
-        r#"font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;"#
-            .to_string(),
-    );
-    selectors.register(
-        "text-xs",
-        "font-size: 0.75rem;
-line-height: 1rem;"
-            .to_string(),
-    );
-    selectors.register(
-        "text-sm",
-        "font-size: 0.875rem;
-line-height: 1.25rem;"
-            .to_string(),
-    );
-    selectors.register(
-        "text-base",
-        "font-size: 1rem;
-line-height: 1.5rem;"
-            .to_string(),
-    );
-    selectors.register(
-        "text-lg",
-        "font-size: 1.125rem;
-line-height: 1.75rem;"
-            .to_string(),
-    );
-    selectors.register(
-        "text-xl",
-        "font-size: 1.25rem;
-line-height: 1.75rem;"
-            .to_string(),
-    );
-    selectors.register(
-        "text-2xl",
-        "font-size: 1.5rem;
-line-height: 2rem;"
-            .to_string(),
-    );
-    selectors.register(
-        "text-3xl",
-        "font-size: 1.875rem;
-line-height: 2.25rem;"
-            .to_string(),
-    );
-    selectors.register(
-        "text-4xl",
-        "font-size: 2.25rem;
-line-height: 2.5rem;"
-            .to_string(),
-    );
-    selectors.register(
-        "text-5xl",
-        "font-size: 3rem;
-line-height: 1;"
-            .to_string(),
-    );
-    selectors.register(
-        "text-6xl",
-        "font-size: 3.75rem;
-line-height: 1;"
-            .to_string(),
-    );
-    selectors.register(
-        "text-7xl",
-        "font-size: 4.5rem;
-line-height: 1;"
-            .to_string(),
-    );
-    selectors.register(
-        "text-8xl",
-        "font-size: 6rem;
-line-height: 1;"
-            .to_string(),
-    );
-    selectors.register(
-        "text-9xl",
-        "font-size: 8rem;
-line-height: 1;"
-            .to_string(),
-    );
     selectors.register(
         "antialiased",
         "-webkit-font-smoothing: antialiased;

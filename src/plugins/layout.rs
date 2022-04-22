@@ -101,10 +101,12 @@ impl Plugin for LayoutInsetPlugin {
     }
 
     fn css_template_value(&self, val: &str) -> String {
-        format!("top: {val};
+        format!(
+            "top: {val};
   right: {val};
   bottom: {val};
-  left: {val};")
+  left: {val};"
+        )
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -125,8 +127,10 @@ impl Plugin for LayoutInsetXPlugin {
     }
 
     fn css_template_value(&self, val: &str) -> String {
-        format!("left: {val};
-  right: {val};")
+        format!(
+            "left: {val};
+  right: {val};"
+        )
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -147,8 +151,10 @@ impl Plugin for LayoutInsetYPlugin {
     }
 
     fn css_template_value(&self, val: &str) -> String {
-        format!("top: {val};
-  bottom: {val};")
+        format!(
+            "top: {val};
+  bottom: {val};"
+        )
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {

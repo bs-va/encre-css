@@ -67,6 +67,8 @@ lazy_static! {
         &border::RingOffsetOpacityPlugin,
         &typography::TypographyColorPlugin,
         &typography::TypographyOpacityPlugin,
+        &typography::TypographyFontFamilyPlugin,
+        &typography::TypographyFontSizePlugin,
         &spacing::SpacingPaddingPlugin,
         &spacing::SpacingPaddingXPlugin,
         &spacing::SpacingPaddingYPlugin,
@@ -114,5 +116,6 @@ lazy_static! {
         &layout::LayoutDisplayPlugin,
         &layout::LayoutPositionPlugin,
         &layout::LayoutVisibilityPlugin,
+        &filter::FilterPlugin,
     ];
 }
