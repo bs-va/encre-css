@@ -47,14 +47,20 @@ const RELATIVE_SIZES: [&str; 2] = ["larger", "smaller"];
 
 lazy_static! {
     static ref COLOR_REGEX: Regex =
-        Regex::new(r"^(#[a-f\d]{3}|#[a-f\d]{6}|rgba?\(.*\)|hsla?\(.*\))$").unwrap();
+        Regex::new(r"^(#[a-f\d]{3}|#[a-f\d]{6}|rgba?\(.+\)|hsla?\(.+\))$").unwrap();
     static ref LENGTH_REGEX: Regex =
         Regex::new(&format!("(?:{})", LENGTH_UNITS.join("|"))).unwrap();
+    static ref TIME_REGEX: Regex =
+        Regex::new(r"\d+m?s$").unwrap();
 }
 
 // TODO: Support:
 // - global values like inherit, initial, revert, revert-layer, unset
 // - intrinsic sizing keywords: fill, max-content, min-content, fit-content
+
+pub fn is_matching_all(_val: &str) -> bool {
+    true
+}
 
 pub fn is_matching_auto(val: &str) -> bool {
     val == AUTO_KEYWORD
@@ -101,6 +107,10 @@ pub fn is_matching_percentage(val: &str) -> bool {
         || CSS_FUNCTIONS
             .iter()
             .any(|f| Regex::new(&format!(r"^{}\(.+?%", f)).unwrap().is_match(val))
+}
+
+pub fn is_matching_time(val: &str) -> bool {
+    TIME_REGEX.is_match(val)
 }
 
 pub fn is_matching_shadow(val: &str) -> bool {

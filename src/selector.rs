@@ -13,7 +13,6 @@ pub struct Selector {
 impl Selector {
     pub fn new<T: Into<String>>(data: T) -> Self {
         let data = data.into();
-        println!("{:#?}", data);
         let arbitrary_value = {
             let modifier = if data.contains('-') {
                 let mut iter = data.split('-');
@@ -74,7 +73,7 @@ impl Selector {
         if namespace.is_empty() {
             self.content.clone()
         } else {
-            self.content.replace(&format!("{}-", namespace), "")
+            self.content.replace(&format!("{}{}", namespace, if self.content.contains('-') { "-" } else { "" }), "")
         }
     }
 

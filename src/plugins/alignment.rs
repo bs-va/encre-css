@@ -1,21 +1,49 @@
+use super::Plugin;
+
+#[derive(Debug)]
+pub struct AlignmentAlignItemsPlugin;
+
+impl Plugin for AlignmentAlignItemsPlugin {
+    fn namespace(&self) -> String {
+        "items".to_string()
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "stretch" => Some("align-items: stretch;".to_string()),
+            "start" => Some("align-items: flex-start;".to_string()),
+            "center" => Some("align-items: center;".to_string()),
+            "end" => Some("align-items: flex-end;".to_string()),
+            "baseline" => Some("align-items: baseline;".to_string()),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct AlignmentJustifyContentPlugin;
+
+impl Plugin for AlignmentJustifyContentPlugin {
+    fn namespace(&self) -> String {
+        "justify".to_string()
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "start" => Some("justify-content: flex-start;".to_string()),
+            "center" => Some("justify-content: center;".to_string()),
+            "end" => Some("justify-content: flex-end;".to_string()),
+            "between" => Some("justify-content: space-between;".to_string()),
+            "around" => Some("justify-content: space-around;".to_string()),
+            "evenly" => Some("justify-content: space-evenly;".to_string()),
+            _ => None,
+        }
+    }
+}
+
 /*use super::SelectorList;
 
 pub fn init(selectors: &mut SelectorList) {
-    selectors.register("justify-start", "justify-content: flex-start;".to_string());
-    selectors.register("justify-center", "justify-content: center;".to_string());
-    selectors.register("justify-end", "justify-content: flex-end;".to_string());
-    selectors.register(
-        "justify-between",
-        "justify-content: space-between;".to_string(),
-    );
-    selectors.register(
-        "justify-around",
-        "justify-content: space-around;".to_string(),
-    );
-    selectors.register(
-        "justify-evenly",
-        "justify-content: space-evenly;".to_string(),
-    );
     selectors.register(
         "justify-items-stretch",
         "justify-items: stretch;".to_string(),
@@ -38,11 +66,6 @@ pub fn init(selectors: &mut SelectorList) {
     );
     selectors.register("content-around", "align-content: space-around;".to_string());
     selectors.register("content-evenly", "align-content: space-evenly;".to_string());
-    selectors.register("items-stretch", "align-items: stretch;".to_string());
-    selectors.register("items-start", "align-items: flex-start;".to_string());
-    selectors.register("items-center", "align-items: center;".to_string());
-    selectors.register("items-end", "align-items: flex-end;".to_string());
-    selectors.register("items-baseline", "align-items: baseline;".to_string());
     selectors.register("self-auto", "align-self: auto;".to_string());
     selectors.register("self-start", "align-self: flex-start;".to_string());
     selectors.register("self-center", "align-self: center;".to_string());

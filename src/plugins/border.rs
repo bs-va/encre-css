@@ -39,11 +39,115 @@ impl Plugin for BorderOpacityPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        // Support all values
+        // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.parse::<f32>() {
             Some(format!("--tw-border-opacity: {};", opacity_value / 100.))
         } else {
             None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct BorderRadiusPlugin;
+
+impl Plugin for BorderRadiusPlugin {
+    fn namespace(&self) -> String {
+        "rounded".to_string()
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        val.split('_').all(|v| is_matching_length(v) || is_matching_percentage(v))
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("border-radius: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "" => Some(self.css_template_value("0.25rem")),
+            "none" => Some(self.css_template_value("0")),
+            "sm" => Some(self.css_template_value("0.125rem")),
+            "md" => Some(self.css_template_value("0.375rem")),
+            "lg" => Some(self.css_template_value("0.5rem")),
+            "xl" => Some(self.css_template_value("0.75rem")),
+            "2xl" => Some(self.css_template_value("1rem")),
+            "3xl" => Some(self.css_template_value("1.5rem")),
+            "full" => Some(self.css_template_value("9999px")),
+            "t-none" => Some(self.css_template_value("")),
+            "r-none" => Some(self.css_template_value("")),
+            "b-none" => Some(self.css_template_value("")),
+            "l-none" => Some(self.css_template_value("")),
+            "t-sm" => Some(self.css_template_value("")),
+            "r-sm" => Some(self.css_template_value("")),
+            "b-sm" => Some(self.css_template_value("")),
+            "l-sm" => Some(self.css_template_value("")),
+            "t" => Some(self.css_template_value("")),
+            "r" => Some(self.css_template_value("")),
+            "b" => Some(self.css_template_value("")),
+            "l" => Some(self.css_template_value("")),
+            "t-md" => Some(self.css_template_value("")),
+            "r-md" => Some(self.css_template_value("")),
+            "b-md" => Some(self.css_template_value("")),
+            "l-md" => Some(self.css_template_value("")),
+            "t-lg" => Some(self.css_template_value("")),
+            "r-lg" => Some(self.css_template_value("")),
+            "b-lg" => Some(self.css_template_value("")),
+            "l-lg" => Some(self.css_template_value("")),
+            "t-xl" => Some(self.css_template_value("")),
+            "r-xl" => Some(self.css_template_value("")),
+            "b-xl" => Some(self.css_template_value("")),
+            "l-xl" => Some(self.css_template_value("")),
+            "t-2xl" => Some(self.css_template_value("")),
+            "r-2xl" => Some(self.css_template_value("")),
+            "b-2xl" => Some(self.css_template_value("")),
+            "l-2xl" => Some(self.css_template_value("")),
+            "t-3xl" => Some(self.css_template_value("")),
+            "r-3xl" => Some(self.css_template_value("")),
+            "b-3xl" => Some(self.css_template_value("")),
+            "l-3xl" => Some(self.css_template_value("")),
+            "t-full" => Some(self.css_template_value("")),
+            "r-full" => Some(self.css_template_value("")),
+            "b-full" => Some(self.css_template_value("")),
+            "l-full" => Some(self.css_template_value("")),
+            "tl-none" => Some(self.css_template_value("")),
+            "tr-none" => Some(self.css_template_value("")),
+            "br-none" => Some(self.css_template_value("")),
+            "bl-none" => Some(self.css_template_value("")),
+            "tl-sm" => Some(self.css_template_value("")),
+            "tr-sm" => Some(self.css_template_value("")),
+            "br-sm" => Some(self.css_template_value("")),
+            "bl-sm" => Some(self.css_template_value("")),
+            "tl" => Some(self.css_template_value("")),
+            "tr" => Some(self.css_template_value("")),
+            "br" => Some(self.css_template_value("")),
+            "bl" => Some(self.css_template_value("")),
+            "tl-md" => Some(self.css_template_value("")),
+            "tr-md" => Some(self.css_template_value("")),
+            "br-md" => Some(self.css_template_value("")),
+            "bl-md" => Some(self.css_template_value("")),
+            "tl-lg" => Some(self.css_template_value("")),
+            "tr-lg" => Some(self.css_template_value("")),
+            "br-lg" => Some(self.css_template_value("")),
+            "bl-lg" => Some(self.css_template_value("")),
+            "tl-xl" => Some(self.css_template_value("")),
+            "tr-xl" => Some(self.css_template_value("")),
+            "br-xl" => Some(self.css_template_value("")),
+            "bl-xl" => Some(self.css_template_value("")),
+            "tl-2xl" => Some(self.css_template_value("")),
+            "tr-2xl" => Some(self.css_template_value("")),
+            "br-2xl" => Some(self.css_template_value("")),
+            "bl-2xl" => Some(self.css_template_value("")),
+            "tl-3xl" => Some(self.css_template_value("")),
+            "tr-3xl" => Some(self.css_template_value("")),
+            "br-3xl" => Some(self.css_template_value("")),
+            "bl-3xl" => Some(self.css_template_value("")),
+            "tl-full" => Some(self.css_template_value("")),
+            "tr-full" => Some(self.css_template_value("")),
+            "br-full" => Some(self.css_template_value("")),
+            "bl-full" => Some(self.css_template_value("")),
+            _ => None,
         }
     }
 }
@@ -86,7 +190,7 @@ impl Plugin for DivideOpacityPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        // Support all values
+        // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.parse::<f32>() {
             Some(format!("--tw-divide-opacity: {};", opacity_value / 100.))
         } else {
@@ -133,7 +237,7 @@ impl Plugin for RingOpacityPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        // Support all values
+        // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.parse::<f32>() {
             Some(format!("--tw-ring-opacity: {};", opacity_value / 100.))
         } else {
@@ -180,7 +284,7 @@ impl Plugin for RingOffsetOpacityPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        // Support all values
+        // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.parse::<f32>() {
             Some(format!(
                 "--tw-ring-offset-opacity: {};",
@@ -193,87 +297,6 @@ impl Plugin for RingOffsetOpacityPlugin {
 }
 
 /*pub fn init(selectors: &mut SelectorList) {
-    selectors.register("rounded-none", "border-radius: 0;".to_string());
-    selectors.register("rounded-sm", "border-radius: 0.125rem;".to_string());
-    selectors.register("rounded", "border-radius: 0.25rem;".to_string());
-    selectors.register("rounded-md", "border-radius: 0.375rem;".to_string());
-    selectors.register("rounded-lg", "border-radius: 0.5rem;".to_string());
-    selectors.register("rounded-xl", "border-radius: 0.75rem;".to_string());
-    selectors.register("rounded-2xl", "border-radius: 1rem;".to_string());
-    selectors.register("rounded-3xl", "border-radius: 1.5rem;".to_string());
-    selectors.register("rounded-full", "border-radius: 9999px;".to_string());
-    selectors.register("rounded-t-none", "".to_string());
-    selectors.register("rounded-r-none", "".to_string());
-    selectors.register("rounded-b-none", "".to_string());
-    selectors.register("rounded-l-none", "".to_string());
-    selectors.register("rounded-t-sm", "".to_string());
-    selectors.register("rounded-r-sm", "".to_string());
-    selectors.register("rounded-b-sm", "".to_string());
-    selectors.register("rounded-l-sm", "".to_string());
-    selectors.register("rounded-t", "".to_string());
-    selectors.register("rounded-r", "".to_string());
-    selectors.register("rounded-b", "".to_string());
-    selectors.register("rounded-l", "".to_string());
-    selectors.register("rounded-t-md", "".to_string());
-    selectors.register("rounded-r-md", "".to_string());
-    selectors.register("rounded-b-md", "".to_string());
-    selectors.register("rounded-l-md", "".to_string());
-    selectors.register("rounded-t-lg", "".to_string());
-    selectors.register("rounded-r-lg", "".to_string());
-    selectors.register("rounded-b-lg", "".to_string());
-    selectors.register("rounded-l-lg", "".to_string());
-    selectors.register("rounded-t-xl", "".to_string());
-    selectors.register("rounded-r-xl", "".to_string());
-    selectors.register("rounded-b-xl", "".to_string());
-    selectors.register("rounded-l-xl", "".to_string());
-    selectors.register("rounded-t-2xl", "".to_string());
-    selectors.register("rounded-r-2xl", "".to_string());
-    selectors.register("rounded-b-2xl", "".to_string());
-    selectors.register("rounded-l-2xl", "".to_string());
-    selectors.register("rounded-t-3xl", "".to_string());
-    selectors.register("rounded-r-3xl", "".to_string());
-    selectors.register("rounded-b-3xl", "".to_string());
-    selectors.register("rounded-l-3xl", "".to_string());
-    selectors.register("rounded-t-full", "".to_string());
-    selectors.register("rounded-r-full", "".to_string());
-    selectors.register("rounded-b-full", "".to_string());
-    selectors.register("rounded-l-full", "".to_string());
-    selectors.register("rounded-tl-none", "".to_string());
-    selectors.register("rounded-tr-none", "".to_string());
-    selectors.register("rounded-br-none", "".to_string());
-    selectors.register("rounded-bl-none", "".to_string());
-    selectors.register("rounded-tl-sm", "".to_string());
-    selectors.register("rounded-tr-sm", "".to_string());
-    selectors.register("rounded-br-sm", "".to_string());
-    selectors.register("rounded-bl-sm", "".to_string());
-    selectors.register("rounded-tl", "".to_string());
-    selectors.register("rounded-tr", "".to_string());
-    selectors.register("rounded-br", "".to_string());
-    selectors.register("rounded-bl", "".to_string());
-    selectors.register("rounded-tl-md", "".to_string());
-    selectors.register("rounded-tr-md", "".to_string());
-    selectors.register("rounded-br-md", "".to_string());
-    selectors.register("rounded-bl-md", "".to_string());
-    selectors.register("rounded-tl-lg", "".to_string());
-    selectors.register("rounded-tr-lg", "".to_string());
-    selectors.register("rounded-br-lg", "".to_string());
-    selectors.register("rounded-bl-lg", "".to_string());
-    selectors.register("rounded-tl-xl", "".to_string());
-    selectors.register("rounded-tr-xl", "".to_string());
-    selectors.register("rounded-br-xl", "".to_string());
-    selectors.register("rounded-bl-xl", "".to_string());
-    selectors.register("rounded-tl-2xl", "".to_string());
-    selectors.register("rounded-tr-2xl", "".to_string());
-    selectors.register("rounded-br-2xl", "".to_string());
-    selectors.register("rounded-bl-2xl", "".to_string());
-    selectors.register("rounded-tl-3xl", "".to_string());
-    selectors.register("rounded-tr-3xl", "".to_string());
-    selectors.register("rounded-br-3xl", "".to_string());
-    selectors.register("rounded-bl-3xl", "".to_string());
-    selectors.register("rounded-tl-full", "".to_string());
-    selectors.register("rounded-tr-full", "".to_string());
-    selectors.register("rounded-br-full", "".to_string());
-    selectors.register("rounded-bl-full", "".to_string());
     selectors.register("border", "border-width: 1px;".to_string());
     selectors.register("border-0", "border-width: 0;".to_string());
     selectors.register("border-2", "border-width: 2px;".to_string());

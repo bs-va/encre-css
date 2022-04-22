@@ -1,55 +1,90 @@
+use super::Plugin;
+use crate::utils::{default_lengths, value_matchers::*};
+
+#[derive(Debug)]
+pub struct GridColumnsPlugin;
+
+impl Plugin for GridColumnsPlugin {
+    fn namespace(&self) -> String {
+        "grid-cols".to_string()
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        is_matching_all(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("grid-template-columns: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if modifier == "none" {
+            return Some(self.css_template_value("none"));
+        }
+
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        if let Ok(num_cols) = modifier.parse::<usize>() {
+            Some(self.css_template_value(&format!("repeat({num_cols}, minmax(0, 1fr))")))
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct GridRowsPlugin;
+
+impl Plugin for GridRowsPlugin {
+    fn namespace(&self) -> String {
+        "grid-rows".to_string()
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        is_matching_all(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("grid-template-rows: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if modifier == "none" {
+            return Some(self.css_template_value("none"));
+        }
+
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        if let Ok(num_cols) = modifier.parse::<usize>() {
+            Some(self.css_template_value(&format!("repeat({num_cols}, minmax(0, 1fr))")))
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct GridGapPlugin;
+
+impl Plugin for GridGapPlugin {
+    fn namespace(&self) -> String {
+        "gap".to_string()
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        is_matching_length(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("gap: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
+    }
+}
+
 /*use super::SelectorList;
 
 pub fn init(selectors: &mut SelectorList) {
-    selectors.register(
-        "grid-cols-1",
-        "grid-template-columns: repeat(1, minmax(0, 1fr));".to_string(),
-    );
-    selectors.register(
-        "grid-cols-2",
-        "grid-template-columns: repeat(2, minmax(0, 1fr));".to_string(),
-    );
-    selectors.register(
-        "grid-cols-3",
-        "grid-template-columns: repeat(3, minmax(0, 1fr));".to_string(),
-    );
-    selectors.register(
-        "grid-cols-4",
-        "grid-template-columns: repeat(4, minmax(0, 1fr));".to_string(),
-    );
-    selectors.register(
-        "grid-cols-5",
-        "grid-template-columns: repeat(5, minmax(0, 1fr));".to_string(),
-    );
-    selectors.register(
-        "grid-cols-6",
-        "grid-template-columns: repeat(6, minmax(0, 1fr));".to_string(),
-    );
-    selectors.register(
-        "grid-cols-7",
-        "grid-template-columns: repeat(7, minmax(0, 1fr));".to_string(),
-    );
-    selectors.register(
-        "grid-cols-8",
-        "grid-template-columns: repeat(8, minmax(0, 1fr));".to_string(),
-    );
-    selectors.register(
-        "grid-cols-9",
-        "grid-template-columns: repeat(9, minmax(0, 1fr));".to_string(),
-    );
-    selectors.register(
-        "grid-cols-10",
-        "grid-template-columns: repeat(10, minmax(0, 1fr));".to_string(),
-    );
-    selectors.register(
-        "grid-cols-11",
-        "grid-template-columns: repeat(11, minmax(0, 1fr));".to_string(),
-    );
-    selectors.register(
-        "grid-cols-12",
-        "grid-template-columns: repeat(12, minmax(0, 1fr));".to_string(),
-    );
-    selectors.register("grid-cols-none", "grid-template-columns: none;".to_string());
     selectors.register("col-auto", "".to_string());
     selectors.register("col-span-1", "".to_string());
     selectors.register("col-span-2", "".to_string());
@@ -121,38 +156,6 @@ pub fn init(selectors: &mut SelectorList) {
     selectors.register("row-end-6", "".to_string());
     selectors.register("row-end-7", "".to_string());
     selectors.register("row-end-auto", "".to_string());
-    selectors.register("gap-0", "gap: 0;".to_string());
-    selectors.register("gap-0.5", "gap: 0.125rem;".to_string());
-    selectors.register("gap-1", "gap: 0.25rem;".to_string());
-    selectors.register("gap-1.5", "gap: 0.375rem;".to_string());
-    selectors.register("gap-2", "gap: 0.5rem;".to_string());
-    selectors.register("gap-2.5", "gap: 0.625rem;".to_string());
-    selectors.register("gap-3", "gap: 0.75rem;".to_string());
-    selectors.register("gap-3.5", "gap: 0.875rem;".to_string());
-    selectors.register("gap-4", "gap: 1rem;".to_string());
-    selectors.register("gap-5", "gap: 1.25rem;".to_string());
-    selectors.register("gap-6", "gap: 1.5rem;".to_string());
-    selectors.register("gap-8", "gap: 2rem;".to_string());
-    selectors.register("gap-10", "gap: 2.5rem;".to_string());
-    selectors.register("gap-11", "gap: 2.75rem;".to_string());
-    selectors.register("gap-12", "gap: 3rem;".to_string());
-    selectors.register("gap-14", "gap: 3.5rem;".to_string());
-    selectors.register("gap-16", "gap: 4rem;".to_string());
-    selectors.register("gap-20", "gap: 5rem;".to_string());
-    selectors.register("gap-24", "gap: 6rem;".to_string());
-    selectors.register("gap-28", "gap: 7rem;".to_string());
-    selectors.register("gap-32", "gap: 8rem;".to_string());
-    selectors.register("gap-36", "gap: 9rem;".to_string());
-    selectors.register("gap-40", "gap: 10rem;".to_string());
-    selectors.register("gap-44", "gap: 11rem;".to_string());
-    selectors.register("gap-48", "gap: 12rem;".to_string());
-    selectors.register("gap-52", "gap: 13rem;".to_string());
-    selectors.register("gap-56", "gap: 14rem;".to_string());
-    selectors.register("gap-64", "gap: 16rem;".to_string());
-    selectors.register("gap-72", "gap: 18rem;".to_string());
-    selectors.register("gap-80", "gap: 20rem;".to_string());
-    selectors.register("gap-96", "gap: 24rem;".to_string());
-    selectors.register("gap-px", "gap: 1px;".to_string());
     selectors.register("gap-x-0", "".to_string());
     selectors.register("gap-x-0.5", "".to_string());
     selectors.register("gap-x-1", "".to_string());

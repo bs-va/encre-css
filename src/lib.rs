@@ -64,7 +64,9 @@ pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
         .replace('(', "\\(")
         .replace(')', "\\)")
         .replace('#', "\\#")
-        .replace(':', "\\:");
+        .replace(':', "\\:")
+        .replace(',', r"\2c ")
+        .replace('.', "\\.");
 
     if let Some(ref prefix) = selector.prefix {
         let prefixed_version = PREFIXES.get(prefix).expect("prefix not defined?");
@@ -105,8 +107,8 @@ pub fn gen_css_from_files(files: impl Iterator<Item = PathBuf>) -> String {
 
     let mut result = vec![];
 
-    'capture_loop: for sub_capture in scanned_selectors {
-        let selector = Selector::new(sub_capture.as_str().to_string());
+    'capture_loop: for scan in scanned_selectors {
+        let selector = Selector::new(scan);
 
         // Find the right plugin to handle this selector (if the resulting CSS is valid,
         // the plugin is good)

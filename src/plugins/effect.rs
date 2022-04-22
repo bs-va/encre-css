@@ -1,3 +1,36 @@
+use super::Plugin;
+
+#[derive(Debug)]
+pub struct EffectMixBlendModePlugin;
+
+impl Plugin for EffectMixBlendModePlugin {
+    fn namespace(&self) -> String {
+        "mix-blend".to_string()
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "normal" => Some("mix-blend-mode: normal;".to_string()),
+            "multiply" => Some("mix-blend-mode: multiply;".to_string()),
+            "screen" => Some("mix-blend-mode: screen;".to_string()),
+            "overlay" => Some("mix-blend-mode: overlay;".to_string()),
+            "darken" => Some("mix-blend-mode: darken;".to_string()),
+            "lighten" => Some("mix-blend-mode: lighten;".to_string()),
+            "color-dodge" => Some("mix-blend-mode: color-dodge;".to_string()),
+            "color-burn" => Some("mix-blend-mode: color-burn;".to_string()),
+            "hard-light" => Some("mix-blend-mode: hard-light;".to_string()),
+            "soft-light" => Some("mix-blend-mode: soft-light;".to_string()),
+            "difference" => Some("mix-blend-mode: difference;".to_string()),
+            "exclusion" => Some("mix-blend-mode: exclusion;".to_string()),
+            "hue" => Some("mix-blend-mode: hue;".to_string()),
+            "saturation" => Some("mix-blend-mode: saturation;".to_string()),
+            "color" => Some("mix-blend-mode: color;".to_string()),
+            "luminosity" => Some("mix-blend-mode: luminosity;".to_string()),
+            _ => None,
+        }
+    }
+}
+
 /*use super::SelectorList;
 
 pub fn init(selectors: &mut SelectorList) {
@@ -55,49 +88,6 @@ pub fn init(selectors: &mut SelectorList) {
     selectors.register("opacity-80", "opacity: 0.8;".to_string());
     selectors.register("opacity-90", "opacity: 0.9;".to_string());
     selectors.register("opacity-100", "opacity: 1;".to_string());
-    selectors.register("mix-blend-normal", "mix-blend-mode: normal;".to_string());
-    selectors.register(
-        "mix-blend-multiply",
-        "mix-blend-mode: multiply;".to_string(),
-    );
-    selectors.register("mix-blend-screen", "mix-blend-mode: screen;".to_string());
-    selectors.register("mix-blend-overlay", "mix-blend-mode: overlay;".to_string());
-    selectors.register("mix-blend-darken", "mix-blend-mode: darken;".to_string());
-    selectors.register("mix-blend-lighten", "mix-blend-mode: lighten;".to_string());
-    selectors.register(
-        "mix-blend-color-dodge",
-        "mix-blend-mode: color-dodge;".to_string(),
-    );
-    selectors.register(
-        "mix-blend-color-burn",
-        "mix-blend-mode: color-burn;".to_string(),
-    );
-    selectors.register(
-        "mix-blend-hard-light",
-        "mix-blend-mode: hard-light;".to_string(),
-    );
-    selectors.register(
-        "mix-blend-soft-light",
-        "mix-blend-mode: soft-light;".to_string(),
-    );
-    selectors.register(
-        "mix-blend-difference",
-        "mix-blend-mode: difference;".to_string(),
-    );
-    selectors.register(
-        "mix-blend-exclusion",
-        "mix-blend-mode: exclusion;".to_string(),
-    );
-    selectors.register("mix-blend-hue", "mix-blend-mode: hue;".to_string());
-    selectors.register(
-        "mix-blend-saturation",
-        "mix-blend-mode: saturation;".to_string(),
-    );
-    selectors.register("mix-blend-color", "mix-blend-mode: color;".to_string());
-    selectors.register(
-        "mix-blend-luminosity",
-        "mix-blend-mode: luminosity;".to_string(),
-    );
     selectors.register(
         "bg-blend-normal",
         "background-blend-mode: normal;".to_string(),

@@ -41,7 +41,7 @@ impl Plugin for TypographyOpacityPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        // Support all values
+        // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.parse::<f32>() {
             Some(format!("--tw-text-opacity: {};", opacity_value / 100.))
         } else {
@@ -63,18 +63,15 @@ impl Plugin for TypographyFontFamilyPlugin {
             if is_matching_generic_name(v) || is_matching_var(v) {
                 true
             } else {
-                !(v.contains('_')
-                    && fancy_regex::Regex::new(r#"!/(['"])([^"']+)\1"#)
-                        .unwrap()
-                        .is_match(v)
-                        .unwrap())
-                    || Regex::new(r"^\d").unwrap().is_match(v)
+                !Regex::new(r"^\d").unwrap().is_match(v)
             }
         })
     }
 
     fn css_template_value(&self, val: &str) -> String {
-        format!("font-family: {val};")
+        // NOTE: Not-compatible with TailwindCSS, it is not needed to add quotes to fonts
+        // containing spaces, they are added later
+        format!("font-family: {maybe_quote}{val}{maybe_quote};", maybe_quote = if val.contains(' ') { "\"" } else { "" })
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -136,6 +133,76 @@ impl Plugin for TypographyFontSizePlugin {
     }
 }
 
+#[derive(Debug)]
+pub struct TypographyFontWeightPlugin;
+
+impl Plugin for TypographyFontWeightPlugin {
+    fn namespace(&self) -> String {
+        "font".to_string()
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        ["normal", "bold", "lighter", "bolder"].contains(&val) || is_matching_number(val) || is_matching_var(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("font-weight: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "thin" => Some(self.css_template_value("100")),
+            "extralight" => Some(self.css_template_value("200")),
+            "light" => Some(self.css_template_value("300")),
+            "normal" => Some(self.css_template_value("400")),
+            "medium" => Some(self.css_template_value("500")),
+            "semibold" => Some(self.css_template_value("600")),
+            "bold" => Some(self.css_template_value("700")),
+            "extrabold" => Some(self.css_template_value("800")),
+            "black" => Some(self.css_template_value("900")),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct TypographyTextAlignmentPlugin;
+
+impl Plugin for TypographyTextAlignmentPlugin {
+    fn namespace(&self) -> String {
+        "text".to_string()
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "left" => Some("text-align: left;".to_string()),
+            "center" => Some("text-align: center;".to_string()),
+            "right" => Some("text-align: right;".to_string()),
+            "justify" => Some("text-align: justify;".to_string()),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct TypographyTextTransformPlugin;
+
+impl Plugin for TypographyTextTransformPlugin {
+    fn namespace(&self) -> String {
+        "".to_string()
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "uppercase" => Some("text-transform: uppercase;".to_string()),
+            "lowercase" => Some("text-transform: lowercase;".to_string()),
+            "capitalize" => Some("text-transform: capitalize;".to_string()),
+            "normal-case" => Some("text-transform: none;".to_string()),
+            _ => None,
+        }
+    }
+}
+
 /*pub fn init(selectors: &mut SelectorList) {
     selectors.register(
         "antialiased",
@@ -151,15 +218,6 @@ impl Plugin for TypographyFontSizePlugin {
     );
     selectors.register("italic", "font-style: italic;".to_string());
     selectors.register("not-italic", "font-style: normal;".to_string());
-    selectors.register("font-thin", "font-weight: 100;".to_string());
-    selectors.register("font-extralight", "font-weight: 200;".to_string());
-    selectors.register("font-light", "font-weight: 300;".to_string());
-    selectors.register("font-normal", "font-weight: 400;".to_string());
-    selectors.register("font-medium", "font-weight: 500;".to_string());
-    selectors.register("font-semibold", "font-weight: 600;".to_string());
-    selectors.register("font-bold", "font-weight: 700;".to_string());
-    selectors.register("font-extrabold", "font-weight: 800;".to_string());
-    selectors.register("font-black", "font-weight: 900;".to_string());
     selectors.register("normal-nums", "font-variant-numeric: normal;".to_string());
     selectors.register("ordinal", "font-variant-numeric: ordinal;".to_string());
     selectors.register(
@@ -215,17 +273,9 @@ impl Plugin for TypographyFontSizePlugin {
     selectors.register("list-decimal", "list-style-type: decimal;".to_string());
     selectors.register("list-inside", "list-style-position: inside;".to_string());
     selectors.register("list-outside", "list-style-position: outside;".to_string());
-    selectors.register("text-left", "text-align: left;".to_string());
-    selectors.register("text-center", "text-align: center;".to_string());
-    selectors.register("text-right", "text-align: right;".to_string());
-    selectors.register("text-justify", "text-align: justify;".to_string());
     selectors.register("underline", "text-decoration: underline;".to_string());
     selectors.register("line-through", "text-decoration: line-through;".to_string());
     selectors.register("no-underline", "text-decoration: none;".to_string());
-    selectors.register("uppercase", "text-transform: uppercase;".to_string());
-    selectors.register("lowercase", "text-transform: lowercase;".to_string());
-    selectors.register("capitalize", "text-transform: capitalize;".to_string());
-    selectors.register("normal-case", "text-transform: none;".to_string());
     selectors.register(
         "truncate",
         "overflow: hidden;

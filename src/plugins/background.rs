@@ -83,7 +83,7 @@ impl Plugin for BackgroundOpacityPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        // Support all values
+        // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.parse::<f32>() {
             Some(format!("--tw-bg-opacity: {};", opacity_value / 100.))
         } else {

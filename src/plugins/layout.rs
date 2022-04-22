@@ -255,7 +255,7 @@ impl Plugin for LayoutZIndexPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        // Support all values
+        // NOTE: Not-compatible with TailwindCSS, support all values
         if modifier.parse::<usize>().is_ok() || is_matching_auto(modifier) {
             Some(format!("z-index: {modifier};"))
         } else {
