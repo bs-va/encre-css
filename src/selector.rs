@@ -1,11 +1,11 @@
 use regex::Regex;
 use std::fmt;
 
-use crate::prefix::PREFIX_SEPARATOR;
+use crate::variant::VARIANT_SEPARATOR;
 
 #[derive(Debug, PartialEq, Eq, Clone, Hash, PartialOrd, Ord)]
 pub struct Selector {
-    pub prefix: Option<String>,
+    pub variant: Option<String>,
     pub content: String,                 // FIXME: Remove this pub!!!
     pub arbitrary_value: Option<String>, // FIXME: Remove this pub!!!
 }
@@ -45,18 +45,18 @@ impl Selector {
         };
 
         if Regex::new(r"^[^\[]*:").unwrap().is_match(&data) {
-            let mut split = data.split(PREFIX_SEPARATOR);
-            let prefix = split.next().unwrap();
+            let mut split = data.split(VARIANT_SEPARATOR);
+            let variant = split.next().unwrap();
             let content = split.next().unwrap();
 
             Self {
-                prefix: Some(prefix.to_string()),
+                variant: Some(variant.to_string()),
                 content: content.to_string(),
                 arbitrary_value,
             }
         } else {
             Self {
-                prefix: None,
+                variant: None,
                 content: data,
                 arbitrary_value,
             }
@@ -78,7 +78,7 @@ impl Selector {
     }
 
     pub fn contains(&self, other: &Selector) -> bool {
-        if self.prefix != other.prefix {
+        if self.variant != other.variant {
             return false;
         }
 
@@ -102,8 +102,8 @@ impl Selector {
 
 impl fmt::Display for Selector {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        if let Some(ref prefix) = self.prefix {
-            write!(f, "{}{}{}", prefix, PREFIX_SEPARATOR, self.content)
+        if let Some(ref variant) = self.variant {
+            write!(f, "{}{}{}", variant, VARIANT_SEPARATOR, self.content)
         } else {
             write!(f, "{}", self.content)
         }

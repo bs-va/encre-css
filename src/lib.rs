@@ -1,5 +1,5 @@
 pub mod plugins;
-pub mod prefix;
+pub mod variant;
 pub mod preflight;
 pub mod selector;
 pub mod utils;
@@ -9,22 +9,20 @@ use regex::Regex;
 use std::{fs, path::PathBuf};
 
 use plugins::PLUGINS;
-use prefix::PREFIXES;
+use variant::VARIANTS;
 use preflight::TAILWIND_PREFLIGHT_CSS;
 use selector::Selector;
 
 // TODO features:
 // - Important
 // - Cache (dedup directly by scanning in all files at once (+ use rayon later))
-// - Variant stacking (instead let prefix = split.next()..., reverse the iterator and collect all
-// the prefixes)
+// - Variant stacking (instead let variant = split.next()..., reverse the iterator and collect all
+// variants)
 // - Negative values for free for all selectors
 // - Find changed files (using timestamp of generated files and timestamp of source files)
 // - Real prefix (like tw-)???
-// - CSS prefix for dark: configurable
-//
-// Fixes:
-// - Rename prefix -> variant
+// - CSS variant for dark: configurable
+// - Configurable preflight
 
 lazy_static! {
     static ref SPLIT_REGEX: Regex = Regex::new(r#"[\s'"`;>=]+"#).unwrap();
@@ -38,7 +36,7 @@ const WILL_BE_REPLACED_BY_UNDERSCORE: &str = "WILL-BE-REPLACED-BY-UNDERSCORE";
 pub fn to_css_value(val: &str) -> String {
     // Don't replace `_` if it is a URL
     if !Regex::new("^url\\(.*\\)$").unwrap().is_match(val) {
-        // Don't replace `_` if prefixed by a `\`
+        // Don't replace `_` if varianted by a `\`
         val.replace("\\_", WILL_BE_REPLACED_BY_UNDERSCORE)
             .replace('_', " ")
             .replace(WILL_BE_REPLACED_BY_UNDERSCORE, "_")
@@ -74,10 +72,10 @@ pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
         .replace(',', r"\2c ")
         .replace('.', "\\.");
 
-    if let Some(ref prefix) = selector.prefix {
-        let prefixed_version = PREFIXES.get(prefix).expect("prefix not defined?");
+    if let Some(ref variant) = selector.variant {
+        let varianted_version = VARIANTS.get(variant).expect("variant not defined?");
 
-        prefixed_version
+        varianted_version
             .replace("{class}", &css_selector)
             .replace("{css}", css_content)
     } else {
@@ -85,31 +83,29 @@ pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
     }
 }
 
-/// Scan a file and return all the selectors found
-///
-/// TODO: Safelist
+// TODO: Safelist
 pub fn gen_css_from_files(files: impl Iterator<Item = PathBuf>) -> String {
-    let mut scanned_selectors_not_prefixed: Vec<Selector> = vec![];
-    let mut scanned_selectors_prefixed: Vec<Selector> = vec![];
+    let mut scanned_selectors_not_varianted: Vec<Selector> = vec![];
+    let mut scanned_selectors_varianted: Vec<Selector> = vec![];
 
     for file in files {
         let file_content = fs::read_to_string(file).expect("failed to read the file");
         for val in SPLIT_REGEX.split(&file_content).filter(|m| FILTER_REGEX.is_match(m).unwrap()) {
             let selector = Selector::new(val);
 
-            if selector.prefix.is_some() {
-                if !scanned_selectors_prefixed.contains(&selector) {
-                    scanned_selectors_prefixed.push(selector);
+            if selector.variant.is_some() {
+                if !scanned_selectors_varianted.contains(&selector) {
+                    scanned_selectors_varianted.push(selector);
                 }
-            } else if !scanned_selectors_not_prefixed.contains(&selector) {
-                scanned_selectors_not_prefixed.push(selector);
+            } else if !scanned_selectors_not_varianted.contains(&selector) {
+                scanned_selectors_not_varianted.push(selector);
             }
         }
     }
 
     let mut result = vec![];
 
-    'capture_loop: for selector in [scanned_selectors_not_prefixed, scanned_selectors_prefixed].iter().flatten() {
+    'capture_loop: for selector in [scanned_selectors_not_varianted, scanned_selectors_varianted].iter().flatten() {
         // Find the right plugin to handle this selector (if the resulting CSS is valid,
         // the plugin is good)
         for plugin in PLUGINS.iter() {
@@ -164,28 +160,26 @@ pub fn gen_css_from_files(files: impl Iterator<Item = PathBuf>) -> String {
     format!("{}{}", TAILWIND_PREFLIGHT_CSS, result.join("\n\n"),)
 }
 
-/// Scan a file and return all the selectors found
-///
-/// TODO: Safelist
+// TODO: Safelist
 pub fn gen_css_from_content<T: Into<String>>(content: T) -> String {
-    let mut scanned_selectors_not_prefixed: Vec<Selector> = vec![];
-    let mut scanned_selectors_prefixed: Vec<Selector> = vec![];
+    let mut scanned_selectors_not_varianted: Vec<Selector> = vec![];
+    let mut scanned_selectors_varianted: Vec<Selector> = vec![];
 
     for val in SPLIT_REGEX.split(&content.into()).filter(|m| FILTER_REGEX.is_match(m).unwrap()) {
         let selector = Selector::new(val);
 
-        if selector.prefix.is_some() {
-            if !scanned_selectors_prefixed.contains(&selector) {
-                scanned_selectors_prefixed.push(selector);
+        if selector.variant.is_some() {
+            if !scanned_selectors_varianted.contains(&selector) {
+                scanned_selectors_varianted.push(selector);
             }
-        } else if !scanned_selectors_not_prefixed.contains(&selector) {
-            scanned_selectors_not_prefixed.push(selector);
+        } else if !scanned_selectors_not_varianted.contains(&selector) {
+            scanned_selectors_not_varianted.push(selector);
         }
     }
 
     let mut result = vec![];
 
-    'capture_loop: for selector in [scanned_selectors_not_prefixed, scanned_selectors_prefixed].iter().flatten() {
+    'capture_loop: for selector in [scanned_selectors_not_varianted, scanned_selectors_varianted].iter().flatten() {
         // Find the right plugin to handle this selector (if the resulting CSS is valid,
         // the plugin is good)
         for plugin in PLUGINS.iter() {
@@ -282,7 +276,7 @@ mod tests {
     }
 
     #[test]
-    fn gen_prefixed_selector_css_test() {
+    fn gen_varianted_selector_css_test() {
         assert_eq!(
             gen_css_from_content("focus:w-full"),
             format!(
