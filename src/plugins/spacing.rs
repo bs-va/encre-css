@@ -3,9 +3,9 @@ use crate::utils::{default_lengths, value_matchers::*};
 
 // TODO: Boilerplate generator (just one structure for padding and another for margin)
 #[derive(Debug)]
-pub struct SpacingPaddingPlugin;
+pub struct PaddingPlugin;
 
-impl Plugin for SpacingPaddingPlugin {
+impl Plugin for PaddingPlugin {
     fn namespace(&self) -> String {
         "p".to_string()
     }
@@ -24,9 +24,9 @@ impl Plugin for SpacingPaddingPlugin {
 }
 
 #[derive(Debug)]
-pub struct SpacingPaddingXPlugin;
+pub struct PaddingXPlugin;
 
-impl Plugin for SpacingPaddingXPlugin {
+impl Plugin for PaddingXPlugin {
     fn namespace(&self) -> String {
         "px".to_string()
     }
@@ -48,9 +48,9 @@ impl Plugin for SpacingPaddingXPlugin {
 }
 
 #[derive(Debug)]
-pub struct SpacingPaddingYPlugin;
+pub struct PaddingYPlugin;
 
-impl Plugin for SpacingPaddingYPlugin {
+impl Plugin for PaddingYPlugin {
     fn namespace(&self) -> String {
         "py".to_string()
     }
@@ -72,9 +72,9 @@ impl Plugin for SpacingPaddingYPlugin {
 }
 
 #[derive(Debug)]
-pub struct SpacingPaddingLeftPlugin;
+pub struct PaddingLeftPlugin;
 
-impl Plugin for SpacingPaddingLeftPlugin {
+impl Plugin for PaddingLeftPlugin {
     fn namespace(&self) -> String {
         "pl".to_string()
     }
@@ -93,9 +93,9 @@ impl Plugin for SpacingPaddingLeftPlugin {
 }
 
 #[derive(Debug)]
-pub struct SpacingPaddingRightPlugin;
+pub struct PaddingRightPlugin;
 
-impl Plugin for SpacingPaddingRightPlugin {
+impl Plugin for PaddingRightPlugin {
     fn namespace(&self) -> String {
         "pr".to_string()
     }
@@ -114,9 +114,9 @@ impl Plugin for SpacingPaddingRightPlugin {
 }
 
 #[derive(Debug)]
-pub struct SpacingPaddingTopPlugin;
+pub struct PaddingTopPlugin;
 
-impl Plugin for SpacingPaddingTopPlugin {
+impl Plugin for PaddingTopPlugin {
     fn namespace(&self) -> String {
         "pt".to_string()
     }
@@ -135,9 +135,9 @@ impl Plugin for SpacingPaddingTopPlugin {
 }
 
 #[derive(Debug)]
-pub struct SpacingPaddingBottomPlugin;
+pub struct PaddingBottomPlugin;
 
-impl Plugin for SpacingPaddingBottomPlugin {
+impl Plugin for PaddingBottomPlugin {
     fn namespace(&self) -> String {
         "pb".to_string()
     }
@@ -158,9 +158,9 @@ impl Plugin for SpacingPaddingBottomPlugin {
 // Margin
 
 #[derive(Debug)]
-pub struct SpacingMarginPlugin;
+pub struct MarginPlugin;
 
-impl Plugin for SpacingMarginPlugin {
+impl Plugin for MarginPlugin {
     fn namespace(&self) -> String {
         "m".to_string()
     }
@@ -183,9 +183,9 @@ impl Plugin for SpacingMarginPlugin {
 }
 
 #[derive(Debug)]
-pub struct SpacingMarginXPlugin;
+pub struct MarginXPlugin;
 
-impl Plugin for SpacingMarginXPlugin {
+impl Plugin for MarginXPlugin {
     fn namespace(&self) -> String {
         "mx".to_string()
     }
@@ -211,9 +211,9 @@ impl Plugin for SpacingMarginXPlugin {
 }
 
 #[derive(Debug)]
-pub struct SpacingMarginYPlugin;
+pub struct MarginYPlugin;
 
-impl Plugin for SpacingMarginYPlugin {
+impl Plugin for MarginYPlugin {
     fn namespace(&self) -> String {
         "my".to_string()
     }
@@ -239,9 +239,9 @@ impl Plugin for SpacingMarginYPlugin {
 }
 
 #[derive(Debug)]
-pub struct SpacingMarginLeftPlugin;
+pub struct MarginLeftPlugin;
 
-impl Plugin for SpacingMarginLeftPlugin {
+impl Plugin for MarginLeftPlugin {
     fn namespace(&self) -> String {
         "ml".to_string()
     }
@@ -264,9 +264,9 @@ impl Plugin for SpacingMarginLeftPlugin {
 }
 
 #[derive(Debug)]
-pub struct SpacingMarginRightPlugin;
+pub struct MarginRightPlugin;
 
-impl Plugin for SpacingMarginRightPlugin {
+impl Plugin for MarginRightPlugin {
     fn namespace(&self) -> String {
         "mr".to_string()
     }
@@ -289,9 +289,9 @@ impl Plugin for SpacingMarginRightPlugin {
 }
 
 #[derive(Debug)]
-pub struct SpacingMarginTopPlugin;
+pub struct MarginTopPlugin;
 
-impl Plugin for SpacingMarginTopPlugin {
+impl Plugin for MarginTopPlugin {
     fn namespace(&self) -> String {
         "mt".to_string()
     }
@@ -314,9 +314,9 @@ impl Plugin for SpacingMarginTopPlugin {
 }
 
 #[derive(Debug)]
-pub struct SpacingMarginBottomPlugin;
+pub struct MarginBottomPlugin;
 
-impl Plugin for SpacingMarginBottomPlugin {
+impl Plugin for MarginBottomPlugin {
     fn namespace(&self) -> String {
         "mb".to_string()
     }
@@ -339,9 +339,9 @@ impl Plugin for SpacingMarginBottomPlugin {
 }
 
 #[derive(Debug)]
-pub struct SpacingSpaceXPlugin;
+pub struct SpaceXPlugin;
 
-impl Plugin for SpacingSpaceXPlugin {
+impl Plugin for SpaceXPlugin {
     fn namespace(&self) -> String {
         "space-x".to_string()
     }
@@ -374,9 +374,9 @@ impl Plugin for SpacingSpaceXPlugin {
 }
 
 #[derive(Debug)]
-pub struct SpacingSpaceYPlugin;
+pub struct SpaceYPlugin;
 
-impl Plugin for SpacingSpaceYPlugin {
+impl Plugin for SpaceYPlugin {
     fn namespace(&self) -> String {
         "space-y".to_string()
     }

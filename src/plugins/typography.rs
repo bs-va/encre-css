@@ -367,10 +367,6 @@ impl Plugin for TypographyTextDecorationColorPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        if modifier == "inherit" {
-            return Some(self.css_template_value("inherit"));
-        }
-
         default_colors::get(modifier).map(|c| self.css_template_value(&c))
     }
 }

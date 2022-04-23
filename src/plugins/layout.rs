@@ -2,9 +2,9 @@ use super::Plugin;
 use crate::utils::{default_lengths, value_matchers::*};
 
 #[derive(Debug)]
-pub struct LayoutPositionPlugin;
+pub struct PositionPlugin;
 
-impl Plugin for LayoutPositionPlugin {
+impl Plugin for PositionPlugin {
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
         if ["static", "fixed", "absolute", "relative", "sticky"].contains(&modifier) {
             Some(format!("position: {modifier};"))
@@ -15,9 +15,9 @@ impl Plugin for LayoutPositionPlugin {
 }
 
 #[derive(Debug)]
-pub struct LayoutDisplayPlugin;
+pub struct DisplayPlugin;
 
-impl Plugin for LayoutDisplayPlugin {
+impl Plugin for DisplayPlugin {
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
         match modifier {
             "hidden" => Some("display: none;".to_string()),
@@ -47,9 +47,9 @@ impl Plugin for LayoutDisplayPlugin {
 }
 
 #[derive(Debug)]
-pub struct LayoutVisibilityPlugin;
+pub struct VisibilityPlugin;
 
-impl Plugin for LayoutVisibilityPlugin {
+impl Plugin for VisibilityPlugin {
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
         match modifier {
             "visible" => Some("visibility: visible;".to_string()),
@@ -60,9 +60,9 @@ impl Plugin for LayoutVisibilityPlugin {
 }
 
 #[derive(Debug)]
-pub struct LayoutIsolationPlugin;
+pub struct IsolationPlugin;
 
-impl Plugin for LayoutIsolationPlugin {
+impl Plugin for IsolationPlugin {
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
         match modifier {
             "isolate" => Some("isolation: isolate;".to_string()),
@@ -73,9 +73,9 @@ impl Plugin for LayoutIsolationPlugin {
 }
 
 #[derive(Debug)]
-pub struct LayoutInsetPlugin;
+pub struct InsetPlugin;
 
-impl Plugin for LayoutInsetPlugin {
+impl Plugin for InsetPlugin {
     fn namespace(&self) -> String {
         "inset".to_string()
     }
@@ -99,9 +99,9 @@ impl Plugin for LayoutInsetPlugin {
 }
 
 #[derive(Debug)]
-pub struct LayoutInsetXPlugin;
+pub struct InsetXPlugin;
 
-impl Plugin for LayoutInsetXPlugin {
+impl Plugin for InsetXPlugin {
     fn namespace(&self) -> String {
         "inset-x".to_string()
     }
@@ -123,9 +123,9 @@ impl Plugin for LayoutInsetXPlugin {
 }
 
 #[derive(Debug)]
-pub struct LayoutInsetYPlugin;
+pub struct InsetYPlugin;
 
-impl Plugin for LayoutInsetYPlugin {
+impl Plugin for InsetYPlugin {
     fn namespace(&self) -> String {
         "inset-y".to_string()
     }
@@ -147,9 +147,9 @@ impl Plugin for LayoutInsetYPlugin {
 }
 
 #[derive(Debug)]
-pub struct LayoutTopPlugin;
+pub struct TopPlugin;
 
-impl Plugin for LayoutTopPlugin {
+impl Plugin for TopPlugin {
     fn namespace(&self) -> String {
         "top".to_string()
     }
@@ -168,9 +168,9 @@ impl Plugin for LayoutTopPlugin {
 }
 
 #[derive(Debug)]
-pub struct LayoutBottomPlugin;
+pub struct BottomPlugin;
 
-impl Plugin for LayoutBottomPlugin {
+impl Plugin for BottomPlugin {
     fn namespace(&self) -> String {
         "bottom".to_string()
     }
@@ -189,9 +189,9 @@ impl Plugin for LayoutBottomPlugin {
 }
 
 #[derive(Debug)]
-pub struct LayoutLeftPlugin;
+pub struct LeftPlugin;
 
-impl Plugin for LayoutLeftPlugin {
+impl Plugin for LeftPlugin {
     fn namespace(&self) -> String {
         "left".to_string()
     }
@@ -210,9 +210,9 @@ impl Plugin for LayoutLeftPlugin {
 }
 
 #[derive(Debug)]
-pub struct LayoutRightPlugin;
+pub struct RightPlugin;
 
-impl Plugin for LayoutRightPlugin {
+impl Plugin for RightPlugin {
     fn namespace(&self) -> String {
         "right".to_string()
     }
@@ -231,9 +231,9 @@ impl Plugin for LayoutRightPlugin {
 }
 
 #[derive(Debug)]
-pub struct LayoutZIndexPlugin;
+pub struct ZIndexPlugin;
 
-impl Plugin for LayoutZIndexPlugin {
+impl Plugin for ZIndexPlugin {
     fn namespace(&self) -> String {
         "z".to_string()
     }
@@ -249,9 +249,9 @@ impl Plugin for LayoutZIndexPlugin {
 }
 
 #[derive(Debug)]
-pub struct LayoutContainerPlugin;
+pub struct ContainerPlugin;
 
-impl Plugin for LayoutContainerPlugin {
+impl Plugin for ContainerPlugin {
     fn namespace(&self) -> String {
         "container".to_string()
     }
@@ -270,9 +270,9 @@ impl Plugin for LayoutContainerPlugin {
 }
 
 #[derive(Debug)]
-pub struct LayoutBoxDecorationBreakPlugin;
+pub struct BoxDecorationBreakPlugin;
 
-impl Plugin for LayoutBoxDecorationBreakPlugin {
+impl Plugin for BoxDecorationBreakPlugin {
     fn namespace(&self) -> String {
         "decoration".to_string()
     }
@@ -287,9 +287,9 @@ impl Plugin for LayoutBoxDecorationBreakPlugin {
 }
 
 #[derive(Debug)]
-pub struct LayoutBoxSizingPlugin;
+pub struct BoxSizingPlugin;
 
-impl Plugin for LayoutBoxSizingPlugin {
+impl Plugin for BoxSizingPlugin {
     fn namespace(&self) -> String {
         "box".to_string()
     }
@@ -304,9 +304,9 @@ impl Plugin for LayoutBoxSizingPlugin {
 }
 
 #[derive(Debug)]
-pub struct LayoutFloatPlugin;
+pub struct FloatPlugin;
 
-impl Plugin for LayoutFloatPlugin {
+impl Plugin for FloatPlugin {
     fn namespace(&self) -> String {
         "float".to_string()
     }
@@ -321,9 +321,9 @@ impl Plugin for LayoutFloatPlugin {
 }
 
 #[derive(Debug)]
-pub struct LayoutClearPlugin;
+pub struct ClearPlugin;
 
-impl Plugin for LayoutClearPlugin {
+impl Plugin for ClearPlugin {
     fn namespace(&self) -> String {
         "clear".to_string()
     }
@@ -338,9 +338,9 @@ impl Plugin for LayoutClearPlugin {
 }
 
 #[derive(Debug)]
-pub struct LayoutObjectFitPlugin;
+pub struct ObjectFitPlugin;
 
-impl Plugin for LayoutObjectFitPlugin {
+impl Plugin for ObjectFitPlugin {
     fn namespace(&self) -> String {
         "object".to_string()
     }
@@ -355,9 +355,9 @@ impl Plugin for LayoutObjectFitPlugin {
 }
 
 #[derive(Debug)]
-pub struct LayoutObjectPositionPlugin;
+pub struct ObjectPositionPlugin;
 
-impl Plugin for LayoutObjectPositionPlugin {
+impl Plugin for ObjectPositionPlugin {
     fn namespace(&self) -> String {
         "object".to_string()
     }
@@ -387,9 +387,9 @@ impl Plugin for LayoutObjectPositionPlugin {
 }
 
 #[derive(Debug)]
-pub struct LayoutOverflowPlugin;
+pub struct OverflowPlugin;
 
-impl Plugin for LayoutOverflowPlugin {
+impl Plugin for OverflowPlugin {
     fn namespace(&self) -> String {
         "overflow".to_string()
     }
@@ -414,9 +414,9 @@ impl Plugin for LayoutOverflowPlugin {
 }
 
 #[derive(Debug)]
-pub struct LayoutOverscrollPlugin;
+pub struct OverscrollPlugin;
 
-impl Plugin for LayoutOverscrollPlugin {
+impl Plugin for OverscrollPlugin {
     fn namespace(&self) -> String {
         "overscroll".to_string()
     }

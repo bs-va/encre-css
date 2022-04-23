@@ -2,9 +2,9 @@ use super::Plugin;
 use crate::utils::{default_colors, value_matchers::*};
 
 #[derive(Debug)]
-pub struct EffectMixBlendModePlugin;
+pub struct MixBlendModePlugin;
 
-impl Plugin for EffectMixBlendModePlugin {
+impl Plugin for MixBlendModePlugin {
     fn namespace(&self) -> String {
         "mix-blend".to_string()
     }
@@ -33,9 +33,9 @@ impl Plugin for EffectMixBlendModePlugin {
 }
 
 #[derive(Debug)]
-pub struct EffectBoxShadowPlugin;
+pub struct BoxShadowPlugin;
 
-impl Plugin for EffectBoxShadowPlugin {
+impl Plugin for BoxShadowPlugin {
     fn namespace(&self) -> String {
         "shadow".to_string()
     }
@@ -72,9 +72,9 @@ impl Plugin for EffectBoxShadowPlugin {
 }
 
 #[derive(Debug)]
-pub struct EffectBoxShadowColorPlugin;
+pub struct BoxShadowColorPlugin;
 
-impl Plugin for EffectBoxShadowColorPlugin {
+impl Plugin for BoxShadowColorPlugin {
     fn namespace(&self) -> String {
         "shadow".to_string()
     }
@@ -95,10 +95,6 @@ impl Plugin for EffectBoxShadowColorPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        if modifier == "inherit" {
-            return Some(self.css_template_value("inherit"));
-        }
-
         default_colors::get(modifier).map(|c| self.css_template_value(&c))
     }
 }

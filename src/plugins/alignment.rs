@@ -1,9 +1,9 @@
 use super::Plugin;
 
 #[derive(Debug)]
-pub struct AlignmentAlignItemsPlugin;
+pub struct AlignItemsPlugin;
 
-impl Plugin for AlignmentAlignItemsPlugin {
+impl Plugin for AlignItemsPlugin {
     fn namespace(&self) -> String {
         "items".to_string()
     }
@@ -21,9 +21,9 @@ impl Plugin for AlignmentAlignItemsPlugin {
 }
 
 #[derive(Debug)]
-pub struct AlignmentJustifyContentPlugin;
+pub struct JustifyContentPlugin;
 
-impl Plugin for AlignmentJustifyContentPlugin {
+impl Plugin for JustifyContentPlugin {
     fn namespace(&self) -> String {
         "justify".to_string()
     }

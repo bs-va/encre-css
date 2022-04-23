@@ -5,11 +5,11 @@ use crate::variant::VARIANT_SEPARATOR;
 
 #[derive(Debug, PartialEq, Eq, Clone, Hash, PartialOrd, Ord)]
 pub struct Selector {
-    pub variant: Option<String>,
-    pub content: String,                 // FIXME: Remove this pub!!!
-    pub arbitrary_value: Option<String>, // FIXME: Remove this pub!!!
-    pub is_negative: bool,
-    pub is_important: bool,
+    variant: Option<String>,
+    content: String,                 // FIXME: Remove this pub!!!
+    arbitrary_value: Option<String>, // FIXME: Remove this pub!!!
+    is_negative: bool,
+    is_important: bool,
 }
 
 impl Selector {
@@ -61,7 +61,6 @@ impl Selector {
         }
     }
 
-    // TODO: Prevent allocating a String
     pub fn check_namespace(&self, maybe_namespace: &str) -> bool {
         self.content.starts_with(maybe_namespace)
     }
@@ -88,6 +87,18 @@ impl Selector {
                 )
             )
         }
+    }
+
+    pub fn get_variant(&self) -> &Option<String> {
+        &self.variant
+    }
+
+    pub fn get_arbitrary_value(&self) -> &Option<String> {
+        &self.arbitrary_value
+    }
+
+    pub fn is_important(&self) -> bool {
+        self.is_important
     }
 
     pub fn contains(&self, other: &Selector) -> bool {

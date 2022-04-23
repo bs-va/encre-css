@@ -1,9 +1,9 @@
 use super::Plugin;
 
 #[derive(Debug)]
-pub struct InteractivityCursorPlugin;
+pub struct CursorPlugin;
 
-impl Plugin for InteractivityCursorPlugin {
+impl Plugin for CursorPlugin {
     fn namespace(&self) -> String {
         "cursor".to_string()
     }

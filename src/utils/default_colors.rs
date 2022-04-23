@@ -251,9 +251,11 @@ pub fn get(modifier: &str) -> Option<String> {
                 new_modifier.to_string(),
             )
         } else {
-            // The `current` modifier cannot have its opacity changed
+            // The `current` and `inherit` modifiers cannot have their opacity changed
             if modifier == "current" {
                 return Some("currentColor".to_string());
+            } else if modifier == "inherit" {
+                return Some("inherit".to_string());
             }
 
             (None, modifier.to_string())

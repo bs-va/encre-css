@@ -9,9 +9,9 @@ lazy_static! {
 }
 
 #[derive(Debug)]
-pub struct TransitionPropertyPlugin;
+pub struct PropertyPlugin;
 
-impl Plugin for TransitionPropertyPlugin {
+impl Plugin for PropertyPlugin {
     fn namespace(&self) -> String {
         "transition".to_string()
     }
@@ -51,9 +51,9 @@ impl Plugin for TransitionPropertyPlugin {
 }
 
 #[derive(Debug)]
-pub struct TransitionDurationPlugin;
+pub struct DurationPlugin;
 
-impl Plugin for TransitionDurationPlugin {
+impl Plugin for DurationPlugin {
     fn namespace(&self) -> String {
         "duration".to_string()
     }

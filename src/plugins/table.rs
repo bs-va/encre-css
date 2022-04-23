@@ -1,8 +1,35 @@
-/*use super::SelectorList;
+use super::Plugin;
 
-pub fn init(selectors: &mut SelectorList) {
-    selectors.register("border-collapse", "border-collapse: collapse;".to_string());
-    selectors.register("border-separate", "border-collapse: separate;".to_string());
-    selectors.register("table-auto", "table-layout: auto;".to_string());
-    selectors.register("table-fixed", "table-layout: fixed;".to_string());
-}*/
+#[derive(Debug)]
+pub struct BorderCollapsePlugin;
+
+impl Plugin for BorderCollapsePlugin {
+    fn namespace(&self) -> String {
+        "border".to_string()
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "collapse" => Some("border-collapse: collapse;".to_string()),
+            "separate" => Some("border-collapse: separate;".to_string()),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct TableLayoutPlugin;
+
+impl Plugin for TableLayoutPlugin {
+    fn namespace(&self) -> String {
+        "table".to_string()
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "auto" => Some("table-layout: auto;".to_string()),
+            "fixed" => Some("table-layout: fixed;".to_string()),
+            _ => None,
+        }
+    }
+}

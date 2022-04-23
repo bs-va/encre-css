@@ -9,9 +9,9 @@ lazy_static! {
 }
 
 #[derive(Debug)]
-pub struct BackgroundColorPlugin;
+pub struct ColorPlugin;
 
-impl Plugin for BackgroundColorPlugin {
+impl Plugin for ColorPlugin {
     fn namespace(&self) -> String {
         "bg".to_string()
     }
@@ -33,18 +33,14 @@ impl Plugin for BackgroundColorPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        if modifier == "inherit" {
-            return Some(self.css_template_value("inherit"));
-        }
-
         default_colors::get(modifier).map(|c| self.css_template_value(&c))
     }
 }
 
 #[derive(Debug)]
-pub struct BackgroundAttachmentPlugin;
+pub struct AttachmentPlugin;
 
-impl Plugin for BackgroundAttachmentPlugin {
+impl Plugin for AttachmentPlugin {
     fn namespace(&self) -> String {
         "bg".to_string()
     }
@@ -60,9 +56,9 @@ impl Plugin for BackgroundAttachmentPlugin {
 }
 
 #[derive(Debug)]
-pub struct BackgroundClipPlugin;
+pub struct ClipPlugin;
 
-impl Plugin for BackgroundClipPlugin {
+impl Plugin for ClipPlugin {
     fn namespace(&self) -> String {
         "bg-clip".to_string()
     }
@@ -79,9 +75,9 @@ impl Plugin for BackgroundClipPlugin {
 }
 
 #[derive(Debug)]
-pub struct BackgroundOpacityPlugin;
+pub struct OpacityPlugin;
 
-impl Plugin for BackgroundOpacityPlugin {
+impl Plugin for OpacityPlugin {
     fn namespace(&self) -> String {
         "bg-opacity".to_string()
     }
@@ -97,9 +93,9 @@ impl Plugin for BackgroundOpacityPlugin {
 }
 
 #[derive(Debug)]
-pub struct BackgroundImagePlugin;
+pub struct ImagePlugin;
 
-impl Plugin for BackgroundImagePlugin {
+impl Plugin for ImagePlugin {
     fn namespace(&self) -> String {
         "bg".to_string()
     }
@@ -150,9 +146,9 @@ impl Plugin for BackgroundImagePlugin {
 }
 
 #[derive(Debug)]
-pub struct BackgroundGradientFromPlugin;
+pub struct GradientFromPlugin;
 
-impl Plugin for BackgroundGradientFromPlugin {
+impl Plugin for GradientFromPlugin {
     fn namespace(&self) -> String {
         "from".to_string()
     }
@@ -182,18 +178,14 @@ impl Plugin for BackgroundGradientFromPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        if modifier == "inherit" {
-            return Some(self.css_template_value("inherit"));
-        }
-
         default_colors::get(modifier).map(|c| self.css_template_value(&c))
     }
 }
 
 #[derive(Debug)]
-pub struct BackgroundGradientViaPlugin;
+pub struct GradientViaPlugin;
 
-impl Plugin for BackgroundGradientViaPlugin {
+impl Plugin for GradientViaPlugin {
     fn namespace(&self) -> String {
         "via".to_string()
     }
@@ -223,18 +215,14 @@ impl Plugin for BackgroundGradientViaPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        if modifier == "inherit" {
-            return Some(self.css_template_value("inherit"));
-        }
-
         default_colors::get(modifier).map(|c| self.css_template_value(&c))
     }
 }
 
 #[derive(Debug)]
-pub struct BackgroundGradientToPlugin;
+pub struct GradientToPlugin;
 
-impl Plugin for BackgroundGradientToPlugin {
+impl Plugin for GradientToPlugin {
     fn namespace(&self) -> String {
         "to".to_string()
     }
@@ -255,18 +243,14 @@ impl Plugin for BackgroundGradientToPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        if modifier == "inherit" {
-            return Some(self.css_template_value("inherit"));
-        }
-
         default_colors::get(modifier).map(|c| self.css_template_value(&c))
     }
 }
 
 #[derive(Debug)]
-pub struct BackgroundPositionPlugin;
+pub struct PositionPlugin;
 
-impl Plugin for BackgroundPositionPlugin {
+impl Plugin for PositionPlugin {
     fn namespace(&self) -> String {
         "bg".to_string()
     }
@@ -301,9 +285,9 @@ impl Plugin for BackgroundPositionPlugin {
 }
 
 #[derive(Debug)]
-pub struct BackgroundRepeatPlugin;
+pub struct RepeatPlugin;
 
-impl Plugin for BackgroundRepeatPlugin {
+impl Plugin for RepeatPlugin {
     fn namespace(&self) -> String {
         "bg".to_string()
     }
@@ -322,9 +306,9 @@ impl Plugin for BackgroundRepeatPlugin {
 }
 
 #[derive(Debug)]
-pub struct BackgroundSizePlugin;
+pub struct SizePlugin;
 
-impl Plugin for BackgroundSizePlugin {
+impl Plugin for SizePlugin {
     fn namespace(&self) -> String {
         "bg".to_string()
     }

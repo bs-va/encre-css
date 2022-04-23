@@ -2,9 +2,9 @@ use super::Plugin;
 use crate::utils::{default_lengths, value_matchers::*};
 
 #[derive(Debug)]
-pub struct SizingWidthPlugin;
+pub struct WidthPlugin;
 
-impl Plugin for SizingWidthPlugin {
+impl Plugin for WidthPlugin {
     fn namespace(&self) -> String {
         "w".to_string()
     }
@@ -23,9 +23,9 @@ impl Plugin for SizingWidthPlugin {
 }
 
 #[derive(Debug)]
-pub struct SizingMinWidthPlugin;
+pub struct MinWidthPlugin;
 
-impl Plugin for SizingMinWidthPlugin {
+impl Plugin for MinWidthPlugin {
     fn namespace(&self) -> String {
         "min-w".to_string()
     }
@@ -51,9 +51,9 @@ impl Plugin for SizingMinWidthPlugin {
 }
 
 #[derive(Debug)]
-pub struct SizingMaxWidthPlugin;
+pub struct MaxWidthPlugin;
 
-impl Plugin for SizingMaxWidthPlugin {
+impl Plugin for MaxWidthPlugin {
     fn namespace(&self) -> String {
         "max-w".to_string()
     }
@@ -99,9 +99,9 @@ impl Plugin for SizingMaxWidthPlugin {
 // Height
 
 #[derive(Debug)]
-pub struct SizingHeightPlugin;
+pub struct HeightPlugin;
 
-impl Plugin for SizingHeightPlugin {
+impl Plugin for HeightPlugin {
     fn namespace(&self) -> String {
         "h".to_string()
     }
@@ -120,9 +120,9 @@ impl Plugin for SizingHeightPlugin {
 }
 
 #[derive(Debug)]
-pub struct SizingMinHeightPlugin;
+pub struct MinHeightPlugin;
 
-impl Plugin for SizingMinHeightPlugin {
+impl Plugin for MinHeightPlugin {
     fn namespace(&self) -> String {
         "min-h".to_string()
     }
@@ -149,9 +149,9 @@ impl Plugin for SizingMinHeightPlugin {
 }
 
 #[derive(Debug)]
-pub struct SizingMaxHeightPlugin;
+pub struct MaxHeightPlugin;
 
-impl Plugin for SizingMaxHeightPlugin {
+impl Plugin for MaxHeightPlugin {
     fn namespace(&self) -> String {
         "max-h".to_string()
     }

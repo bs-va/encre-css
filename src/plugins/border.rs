@@ -2,9 +2,9 @@ use super::Plugin;
 use crate::utils::{default_colors, value_matchers::*};
 
 #[derive(Debug)]
-pub struct BorderColorPlugin;
+pub struct ColorPlugin;
 
-impl Plugin for BorderColorPlugin {
+impl Plugin for ColorPlugin {
     fn namespace(&self) -> String {
         "border".to_string()
     }
@@ -26,18 +26,14 @@ impl Plugin for BorderColorPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        if modifier == "inherit" {
-            return Some(self.css_template_value("inherit"));
-        }
-
         default_colors::get(modifier).map(|c| self.css_template_value(&c))
     }
 }
 
 #[derive(Debug)]
-pub struct BorderWidthPlugin;
+pub struct WidthPlugin;
 
-impl Plugin for BorderWidthPlugin {
+impl Plugin for WidthPlugin {
     fn namespace(&self) -> String {
         "border".to_string()
     }
@@ -65,9 +61,9 @@ impl Plugin for BorderWidthPlugin {
 }
 
 #[derive(Debug)]
-pub struct BorderWidthXPlugin;
+pub struct WidthXPlugin;
 
-impl Plugin for BorderWidthXPlugin {
+impl Plugin for WidthXPlugin {
     fn namespace(&self) -> String {
         "border-x".to_string()
     }
@@ -98,9 +94,9 @@ impl Plugin for BorderWidthXPlugin {
 }
 
 #[derive(Debug)]
-pub struct BorderWidthYPlugin;
+pub struct WidthYPlugin;
 
-impl Plugin for BorderWidthYPlugin {
+impl Plugin for WidthYPlugin {
     fn namespace(&self) -> String {
         "border-y".to_string()
     }
@@ -131,9 +127,9 @@ impl Plugin for BorderWidthYPlugin {
 }
 
 #[derive(Debug)]
-pub struct BorderWidthTopPlugin;
+pub struct WidthTopPlugin;
 
-impl Plugin for BorderWidthTopPlugin {
+impl Plugin for WidthTopPlugin {
     fn namespace(&self) -> String {
         "border-t".to_string()
     }
@@ -161,9 +157,9 @@ impl Plugin for BorderWidthTopPlugin {
 }
 
 #[derive(Debug)]
-pub struct BorderWidthBottomPlugin;
+pub struct WidthBottomPlugin;
 
-impl Plugin for BorderWidthBottomPlugin {
+impl Plugin for WidthBottomPlugin {
     fn namespace(&self) -> String {
         "border-b".to_string()
     }
@@ -191,9 +187,9 @@ impl Plugin for BorderWidthBottomPlugin {
 }
 
 #[derive(Debug)]
-pub struct BorderWidthLeftPlugin;
+pub struct WidthLeftPlugin;
 
-impl Plugin for BorderWidthLeftPlugin {
+impl Plugin for WidthLeftPlugin {
     fn namespace(&self) -> String {
         "border-l".to_string()
     }
@@ -221,9 +217,9 @@ impl Plugin for BorderWidthLeftPlugin {
 }
 
 #[derive(Debug)]
-pub struct BorderWidthRightPlugin;
+pub struct WidthRightPlugin;
 
-impl Plugin for BorderWidthRightPlugin {
+impl Plugin for WidthRightPlugin {
     fn namespace(&self) -> String {
         "border-r".to_string()
     }
@@ -251,9 +247,9 @@ impl Plugin for BorderWidthRightPlugin {
 }
 
 #[derive(Debug)]
-pub struct BorderOpacityPlugin;
+pub struct OpacityPlugin;
 
-impl Plugin for BorderOpacityPlugin {
+impl Plugin for OpacityPlugin {
     fn namespace(&self) -> String {
         "border-opacity".to_string()
     }
@@ -269,9 +265,9 @@ impl Plugin for BorderOpacityPlugin {
 }
 
 #[derive(Debug)]
-pub struct BorderRadiusPlugin;
+pub struct RadiusPlugin;
 
-impl Plugin for BorderRadiusPlugin {
+impl Plugin for RadiusPlugin {
     fn namespace(&self) -> String {
         "rounded".to_string()
     }
@@ -398,10 +394,6 @@ impl Plugin for DivideColorPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        if modifier == "inherit" {
-            return Some(self.css_template_value("inherit"));
-        }
-
         default_colors::get(modifier).map(|c| self.css_template_value(&c))
     }
 }
@@ -449,10 +441,6 @@ impl Plugin for RingColorPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        if modifier == "inherit" {
-            return Some(self.css_template_value("inherit"));
-        }
-
         default_colors::get(modifier).map(|c| self.css_template_value(&c))
     }
 }
@@ -500,10 +488,6 @@ impl Plugin for RingOffsetColorPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        if modifier == "inherit" {
-            return Some(self.css_template_value("inherit"));
-        }
-
         default_colors::get(modifier).map(|c| self.css_template_value(&c))
     }
 }

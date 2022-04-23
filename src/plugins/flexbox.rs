@@ -2,9 +2,9 @@ use super::Plugin;
 use crate::utils::value_matchers::*;
 
 #[derive(Debug)]
-pub struct FlexboxOrderPlugin;
+pub struct OrderPlugin;
 
-impl Plugin for FlexboxOrderPlugin {
+impl Plugin for OrderPlugin {
     fn namespace(&self) -> String {
         "order".to_string()
     }
@@ -35,9 +35,9 @@ impl Plugin for FlexboxOrderPlugin {
 }
 
 #[derive(Debug)]
-pub struct FlexboxDirectionPlugin;
+pub struct DirectionPlugin;
 
-impl Plugin for FlexboxDirectionPlugin {
+impl Plugin for DirectionPlugin {
     fn namespace(&self) -> String {
         "flex".to_string()
     }
@@ -54,9 +54,9 @@ impl Plugin for FlexboxDirectionPlugin {
 }
 
 #[derive(Debug)]
-pub struct FlexboxWrapPlugin;
+pub struct WrapPlugin;
 
-impl Plugin for FlexboxWrapPlugin {
+impl Plugin for WrapPlugin {
     fn namespace(&self) -> String {
         "flex".to_string()
     }
@@ -72,9 +72,9 @@ impl Plugin for FlexboxWrapPlugin {
 }
 
 #[derive(Debug)]
-pub struct FlexboxGrowShrinkBasisPlugin;
+pub struct GrowShrinkBasisPlugin;
 
-impl Plugin for FlexboxGrowShrinkBasisPlugin {
+impl Plugin for GrowShrinkBasisPlugin {
     fn namespace(&self) -> String {
         "flex".to_string()
     }

@@ -74,13 +74,13 @@ pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
         .replace('.', "\\.")
         .replace('!', "\\!");
 
-    let css_content = if selector.is_important {
+    let css_content = if selector.is_important() {
         css_content.replace(';', " !important;")
     } else {
         css_content.to_string() // TODO: Prevent?
     };
 
-    if let Some(ref variant) = selector.variant {
+    if let Some(ref variant) = selector.get_variant() {
         let with_variant = if let Some(result) = VARIANTS.get(variant) {
             result
         } else {
@@ -108,7 +108,7 @@ pub fn gen_css_from_files(files: impl Iterator<Item = PathBuf>) -> String {
         {
             let selector = Selector::new(val);
 
-            if selector.variant.is_some() {
+            if selector.get_variant().is_some() {
                 if !scanned_selectors_with_variant.contains(&selector) {
                     scanned_selectors_with_variant.push(selector);
                 }
@@ -131,7 +131,7 @@ pub fn gen_css_from_files(files: impl Iterator<Item = PathBuf>) -> String {
         // the plugin is good)
         for plugin in PLUGINS.iter() {
             if selector.check_namespace(&plugin.namespace()) {
-                let arbitrary_value = if let Some(ref arbitrary_value) = selector.arbitrary_value {
+                let arbitrary_value = if let Some(ref arbitrary_value) = selector.get_arbitrary_value() {
                     let mut split = arbitrary_value.split(':');
                     let maybe_hint = split.next().unwrap();
 
@@ -192,7 +192,7 @@ pub fn gen_css_from_content<T: Into<String>>(content: T) -> String {
     {
         let selector = Selector::new(val);
 
-        if selector.variant.is_some() {
+        if selector.get_variant().is_some() {
             if !scanned_selectors_with_variant.contains(&selector) {
                 scanned_selectors_with_variant.push(selector);
             }
@@ -214,7 +214,7 @@ pub fn gen_css_from_content<T: Into<String>>(content: T) -> String {
         // the plugin is good)
         for plugin in PLUGINS.iter() {
             if selector.check_namespace(&plugin.namespace()) {
-                let arbitrary_value = if let Some(ref arbitrary_value) = selector.arbitrary_value {
+                let arbitrary_value = if let Some(ref arbitrary_value) = selector.get_arbitrary_value() {
                     let mut split = arbitrary_value.split(':');
                     let maybe_hint = split.next().unwrap();
 

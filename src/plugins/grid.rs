@@ -2,9 +2,9 @@ use super::Plugin;
 use crate::utils::{default_lengths, value_matchers::*};
 
 #[derive(Debug)]
-pub struct GridColumnsPlugin;
+pub struct ColumnsPlugin;
 
-impl Plugin for GridColumnsPlugin {
+impl Plugin for ColumnsPlugin {
     fn namespace(&self) -> String {
         "grid-cols".to_string()
     }
@@ -32,9 +32,9 @@ impl Plugin for GridColumnsPlugin {
 }
 
 #[derive(Debug)]
-pub struct GridRowsPlugin;
+pub struct RowsPlugin;
 
-impl Plugin for GridRowsPlugin {
+impl Plugin for RowsPlugin {
     fn namespace(&self) -> String {
         "grid-rows".to_string()
     }
@@ -62,9 +62,9 @@ impl Plugin for GridRowsPlugin {
 }
 
 #[derive(Debug)]
-pub struct GridGapPlugin;
+pub struct GapPlugin;
 
-impl Plugin for GridGapPlugin {
+impl Plugin for GapPlugin {
     fn namespace(&self) -> String {
         "gap".to_string()
     }
