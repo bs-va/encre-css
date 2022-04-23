@@ -50,11 +50,19 @@ impl Plugin for EffectBoxShadowPlugin {
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
         match modifier {
-            "" => Some(self.css_template_value("0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);")),
+            "" => Some(self.css_template_value(
+                "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);",
+            )),
             "sm" => Some(self.css_template_value("0 1px 2px 0 rgba(0, 0, 0, 0.05)")),
-            "md" => Some(self.css_template_value("0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)")),
-            "lg" => Some(self.css_template_value("0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)")),
-            "xl" => Some(self.css_template_value("0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)")),
+            "md" => Some(self.css_template_value(
+                "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+            )),
+            "lg" => Some(self.css_template_value(
+                "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+            )),
+            "xl" => Some(self.css_template_value(
+                "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+            )),
             "2xl" => Some(self.css_template_value("0 25px 50px -12px rgba(0, 0, 0, 0.25)")),
             "inner" => Some(self.css_template_value("inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)")),
             "none" => Some(self.css_template_value("none")),

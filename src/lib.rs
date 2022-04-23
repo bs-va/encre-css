@@ -1,17 +1,17 @@
 pub mod plugins;
-pub mod variant;
 pub mod preflight;
 pub mod selector;
 pub mod utils;
+pub mod variant;
 
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::{fs, path::PathBuf};
 
 use plugins::PLUGINS;
-use variant::VARIANTS;
 use preflight::TAILWIND_PREFLIGHT_CSS;
 use selector::Selector;
+use variant::VARIANTS;
 
 // TODO features:
 // - Cache (dedup directly by scanning in all files at once (+ use rayon later))
@@ -21,6 +21,7 @@ use selector::Selector;
 // - Real prefix (like tw-)???
 // - CSS variant for dark: configurable
 // - Configurable preflight
+// - Structure containing scanned selectors (+ be able to add them manually + function to scan them)
 
 lazy_static! {
     static ref SPLIT_REGEX: Regex = Regex::new(r#"[\s'"`;>=]+"#).unwrap();
@@ -31,17 +32,19 @@ lazy_static! {
 const WILL_BE_REPLACED_BY_UNDERSCORE: &str = "WILL-BE-REPLACED-BY-UNDERSCORE";
 
 /// Convert an arbitrary value into a CSS value
+///
+///  -  `_` (underscores) are converted to ` ` (spaces) (not in `url`s)
 pub fn to_css_value(val: &str) -> String {
     // Don't replace `_` if it is a URL
+    //
+    // TODO: Do the same for values **containing** an url (e.g. 10px_5px_1px_2px_url('/hello/world.png'))
     if !Regex::new("^url\\(.*\\)$").unwrap().is_match(val) {
-        // Don't replace `_` if varianted by a `\`
+        // Don't replace `_` if prefixed by a `\`
         val.replace("\\_", WILL_BE_REPLACED_BY_UNDERSCORE)
             .replace('_', " ")
             .replace(WILL_BE_REPLACED_BY_UNDERSCORE, "_")
-            .trim()
-            .to_string()
     } else {
-        val.trim().to_string() // TODO: Prevent allocating
+        val.to_string() // TODO: Prevent allocating
     }
 
     // TODO: Add spaces around operators inside calc() that do not follow an operator
@@ -78,13 +81,13 @@ pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
     };
 
     if let Some(ref variant) = selector.variant {
-        let with_variant_version = if let Some(result) = VARIANTS.get(variant) {
+        let with_variant = if let Some(result) = VARIANTS.get(variant) {
             result
         } else {
             panic!("Unknown variant: {}", variant);
         };
 
-        with_variant_version
+        with_variant
             .replace("{class}", &css_selector)
             .replace("{css}", &css_content)
     } else {
@@ -94,27 +97,36 @@ pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
 
 // TODO: Safelist
 pub fn gen_css_from_files(files: impl Iterator<Item = PathBuf>) -> String {
-    let mut scanned_selectors_not_varianted: Vec<Selector> = vec![];
-    let mut scanned_selectors_varianted: Vec<Selector> = vec![];
+    let mut scanned_selectors_without_variant: Vec<Selector> = vec![];
+    let mut scanned_selectors_with_variant: Vec<Selector> = vec![];
 
     for file in files {
         let file_content = fs::read_to_string(file).expect("failed to read the file");
-        for val in SPLIT_REGEX.split(&file_content).filter(|m| FILTER_REGEX.is_match(m).unwrap()) {
+        for val in SPLIT_REGEX
+            .split(&file_content)
+            .filter(|m| FILTER_REGEX.is_match(m).unwrap())
+        {
             let selector = Selector::new(val);
 
             if selector.variant.is_some() {
-                if !scanned_selectors_varianted.contains(&selector) {
-                    scanned_selectors_varianted.push(selector);
+                if !scanned_selectors_with_variant.contains(&selector) {
+                    scanned_selectors_with_variant.push(selector);
                 }
-            } else if !scanned_selectors_not_varianted.contains(&selector) {
-                scanned_selectors_not_varianted.push(selector);
+            } else if !scanned_selectors_without_variant.contains(&selector) {
+                scanned_selectors_without_variant.push(selector);
             }
         }
     }
 
     let mut result = vec![];
 
-    'capture_loop: for selector in [scanned_selectors_not_varianted, scanned_selectors_varianted].iter().flatten() {
+    'capture_loop: for selector in [
+        scanned_selectors_without_variant,
+        scanned_selectors_with_variant,
+    ]
+    .iter()
+    .flatten()
+    {
         // Find the right plugin to handle this selector (if the resulting CSS is valid,
         // the plugin is good)
         for plugin in PLUGINS.iter() {
@@ -171,24 +183,33 @@ pub fn gen_css_from_files(files: impl Iterator<Item = PathBuf>) -> String {
 
 // TODO: Safelist
 pub fn gen_css_from_content<T: Into<String>>(content: T) -> String {
-    let mut scanned_selectors_not_varianted: Vec<Selector> = vec![];
-    let mut scanned_selectors_varianted: Vec<Selector> = vec![];
+    let mut scanned_selectors_without_variant: Vec<Selector> = vec![];
+    let mut scanned_selectors_with_variant: Vec<Selector> = vec![];
 
-    for val in SPLIT_REGEX.split(&content.into()).filter(|m| FILTER_REGEX.is_match(m).unwrap()) {
+    for val in SPLIT_REGEX
+        .split(&content.into())
+        .filter(|m| FILTER_REGEX.is_match(m).unwrap())
+    {
         let selector = Selector::new(val);
 
         if selector.variant.is_some() {
-            if !scanned_selectors_varianted.contains(&selector) {
-                scanned_selectors_varianted.push(selector);
+            if !scanned_selectors_with_variant.contains(&selector) {
+                scanned_selectors_with_variant.push(selector);
             }
-        } else if !scanned_selectors_not_varianted.contains(&selector) {
-            scanned_selectors_not_varianted.push(selector);
+        } else if !scanned_selectors_without_variant.contains(&selector) {
+            scanned_selectors_without_variant.push(selector);
         }
     }
 
     let mut result = vec![];
 
-    'capture_loop: for selector in [scanned_selectors_not_varianted, scanned_selectors_varianted].iter().flatten() {
+    'capture_loop: for selector in [
+        scanned_selectors_without_variant,
+        scanned_selectors_with_variant,
+    ]
+    .iter()
+    .flatten()
+    {
         // Find the right plugin to handle this selector (if the resulting CSS is valid,
         // the plugin is good)
         for plugin in PLUGINS.iter() {
@@ -285,7 +306,7 @@ mod tests {
     }
 
     #[test]
-    fn gen_varianted_selector_css_test() {
+    fn gen_with_variant_selector_css_test() {
         assert_eq!(
             gen_css_from_content("focus:w-full"),
             format!(

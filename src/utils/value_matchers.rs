@@ -50,10 +50,8 @@ lazy_static! {
         Regex::new(r"^(#[a-f\d]{3}|#[a-f\d]{6}|rgba?\(.+\)|hsla?\(.+\))$").unwrap();
     static ref LENGTH_REGEX: Regex =
         Regex::new(&format!("(?:{})", LENGTH_UNITS.join("|"))).unwrap();
-    static ref TIME_REGEX: Regex =
-        Regex::new(r"\d+m?s$").unwrap();
+    static ref TIME_REGEX: Regex = Regex::new(r"\d+m?s$").unwrap();
     static ref COMMA: fancy_regex::Regex = fancy_regex::Regex::new(r"\,(?![^(]*\))").unwrap();
-
 }
 
 // TODO: Support:

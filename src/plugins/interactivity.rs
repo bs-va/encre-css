@@ -17,7 +17,18 @@ impl Plugin for InteractivityCursorPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        if ["auto", "default", "pointer", "wait", "text", "move", "help", "not-allowed"].contains(&modifier) {
+        if [
+            "auto",
+            "default",
+            "pointer",
+            "wait",
+            "text",
+            "move",
+            "help",
+            "not-allowed",
+        ]
+        .contains(&modifier)
+        {
             Some(self.css_template_value(modifier))
         } else {
             None

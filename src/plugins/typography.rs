@@ -71,7 +71,10 @@ impl Plugin for TypographyFontFamilyPlugin {
     fn css_template_value(&self, val: &str) -> String {
         // NOTE: Not-compatible with TailwindCSS, it is not needed to add quotes to fonts
         // containing spaces, they are added later
-        format!("font-family: {maybe_quote}{val}{maybe_quote};", maybe_quote = if val.contains(' ') { "\"" } else { "" })
+        format!(
+            "font-family: {maybe_quote}{val}{maybe_quote};",
+            maybe_quote = if val.contains(' ') { "\"" } else { "" }
+        )
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -102,32 +105,71 @@ impl Plugin for TypographyFontSizePlugin {
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
         match modifier {
-            "xs" => Some("font-size: 0.75rem;
-  line-height: 1rem;".to_string()),
-            "sm" => Some("font-size: 0.875rem;
-  line-height: 1.25rem;".to_string()),
-            "base" => Some("font-size: 1rem;
-  line-height: 1.5rem;".to_string()),
-            "lg" => Some("font-size: 1.125rem;
-  line-height: 1.75rem;".to_string()),
-            "xl" => Some("font-size: 1.25rem;
-  line-height: 1.75rem;".to_string()),
-            "2xl" => Some("font-size: 1.5rem;
-  line-height: 2rem;".to_string()),
-            "3xl" => Some("font-size: 1.875rem;
-  line-height: 2.25rem;".to_string()),
-            "4xl" => Some("font-size: 2.25rem;
-  line-height: 2.5rem;".to_string()),
-            "5xl" => Some("font-size: 3rem;
-  line-height: 1;".to_string()),
-            "6xl" => Some("font-size: 3.75rem;
-  line-height: 1;".to_string()),
-            "7xl" => Some("font-size: 4.5rem;
-  line-height: 1;".to_string()),
-            "8xl" => Some("font-size: 6rem;
-  line-height: 1;".to_string()),
-            "9xl" => Some("font-size: 8rem;
-  line-height: 1;".to_string()),
+            "xs" => Some(
+                "font-size: 0.75rem;
+  line-height: 1rem;"
+                    .to_string(),
+            ),
+            "sm" => Some(
+                "font-size: 0.875rem;
+  line-height: 1.25rem;"
+                    .to_string(),
+            ),
+            "base" => Some(
+                "font-size: 1rem;
+  line-height: 1.5rem;"
+                    .to_string(),
+            ),
+            "lg" => Some(
+                "font-size: 1.125rem;
+  line-height: 1.75rem;"
+                    .to_string(),
+            ),
+            "xl" => Some(
+                "font-size: 1.25rem;
+  line-height: 1.75rem;"
+                    .to_string(),
+            ),
+            "2xl" => Some(
+                "font-size: 1.5rem;
+  line-height: 2rem;"
+                    .to_string(),
+            ),
+            "3xl" => Some(
+                "font-size: 1.875rem;
+  line-height: 2.25rem;"
+                    .to_string(),
+            ),
+            "4xl" => Some(
+                "font-size: 2.25rem;
+  line-height: 2.5rem;"
+                    .to_string(),
+            ),
+            "5xl" => Some(
+                "font-size: 3rem;
+  line-height: 1;"
+                    .to_string(),
+            ),
+            "6xl" => Some(
+                "font-size: 3.75rem;
+  line-height: 1;"
+                    .to_string(),
+            ),
+            "7xl" => Some(
+                "font-size: 4.5rem;
+  line-height: 1;"
+                    .to_string(),
+            ),
+            "8xl" => Some(
+                "font-size: 6rem;
+  line-height: 1;"
+                    .to_string(),
+            ),
+            "9xl" => Some(
+                "font-size: 8rem;
+  line-height: 1;"
+                    .to_string(),
+            ),
             _ => None,
         }
     }
@@ -142,7 +184,9 @@ impl Plugin for TypographyFontWeightPlugin {
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        ["normal", "bold", "lighter", "bolder"].contains(&val) || is_matching_number(val) || is_matching_var(val)
+        ["normal", "bold", "lighter", "bolder"].contains(&val)
+            || is_matching_number(val)
+            || is_matching_var(val)
     }
 
     fn css_template_value(&self, val: &str) -> String {
@@ -238,7 +282,10 @@ impl Plugin for TypographyLeadingPlugin {
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
         // https://developer.mozilla.org/en-US/docs/Web/CSS/line-height#values
-        val == "normal" || is_matching_float(val) || is_matching_length(val) || is_matching_percentage(val)
+        val == "normal"
+            || is_matching_float(val)
+            || is_matching_length(val)
+            || is_matching_percentage(val)
     }
 
     fn css_template_value(&self, val: &str) -> String {
@@ -306,11 +353,16 @@ impl Plugin for TypographyTextDecorationColorPlugin {
 
     fn css_template_value(&self, val: &str) -> String {
         if val.contains("--tw-opacity") {
-            format!("-webkit-text-decoration-color: {color};
-  text-decoration-color: {color};", color = val.replace(" / var(--tw-opacity)", ""))
+            format!(
+                "-webkit-text-decoration-color: {color};
+  text-decoration-color: {color};",
+                color = val.replace(" / var(--tw-opacity)", "")
+            )
         } else {
-            format!("-webkit-text-decoration-color: {val};
-  text-decoration-color: {val};")
+            format!(
+                "-webkit-text-decoration-color: {val};
+  text-decoration-color: {val};"
+            )
         }
     }
 
@@ -349,7 +401,11 @@ impl Plugin for TypographyTextDecorationThicknessPlugin {
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || hint == "percentage" || ["auto", "from-font"].contains(&val) || is_matching_length(val) || is_matching_percentage(val)
+        hint == "length"
+            || hint == "percentage"
+            || ["auto", "from-font"].contains(&val)
+            || is_matching_length(val)
+            || is_matching_percentage(val)
     }
 
     fn css_template_value(&self, val: &str) -> String {
@@ -380,7 +436,11 @@ impl Plugin for TypographyTextDecorationOffsetPlugin {
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
         // TODO: Is it useful to match the hint against `length` AND `percentage`?
-        hint == "length" || hint == "percentage" || val == "auto" || is_matching_length(val) || is_matching_percentage(val)
+        hint == "length"
+            || hint == "percentage"
+            || val == "auto"
+            || is_matching_length(val)
+            || is_matching_percentage(val)
     }
 
     fn css_template_value(&self, val: &str) -> String {
@@ -401,6 +461,33 @@ impl Plugin for TypographyTextDecorationOffsetPlugin {
     }
 }
 
+#[derive(Debug)]
+pub struct TypographyContentPlugin;
+
+impl Plugin for TypographyContentPlugin {
+    fn namespace(&self) -> String {
+        "content".to_string()
+    }
+
+    fn is_matching_value(&self, _hint: &str, _val: &str) -> bool {
+        true
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        // NOTE: Not-compatible with TailwindCSS, it is not needed to add quotes to `content`
+        // containing spaces, they are added later
+        format!("content: \"{val}\";")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if modifier == "none" {
+            Some(self.css_template_value("none"))
+        } else {
+            None
+        }
+    }
+}
+
 /*pub fn init(selectors: &mut SelectorList) {
     selectors.register(
         "antialiased",
@@ -414,8 +501,6 @@ impl Plugin for TypographyTextDecorationOffsetPlugin {
 -moz-osx-font-smoothing: auto;"
             .to_string(),
     );
-    selectors.register("italic", "font-style: italic;".to_string());
-    selectors.register("not-italic", "font-style: normal;".to_string());
     selectors.register("normal-nums", "font-variant-numeric: normal;".to_string());
     selectors.register("ordinal", "font-variant-numeric: ordinal;".to_string());
     selectors.register(

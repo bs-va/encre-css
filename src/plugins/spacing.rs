@@ -351,8 +351,10 @@ impl Plugin for SpacingSpaceXPlugin {
     }
 
     fn css_template_value(&self, val: &str) -> String {
-        format!("margin-left: calc({val} * calc(1 - var(--tw-space-x-reverse)));
-  margin-right: calc({val} * var(--tw-space-x-reverse));")
+        format!(
+            "margin-left: calc({val} * calc(1 - var(--tw-space-x-reverse)));
+  margin-right: calc({val} * var(--tw-space-x-reverse));"
+        )
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -361,8 +363,13 @@ impl Plugin for SpacingSpaceXPlugin {
             return Some("--tw-space-x-reverse: 1;".to_string());
         }
 
-        default_lengths::get_basic(modifier).map(|c| format!("--tw-space-x-reverse: 1;
-  {}", self.css_template_value(&c)))
+        default_lengths::get_basic(modifier).map(|c| {
+            format!(
+                "--tw-space-x-reverse: 1;
+  {}",
+                self.css_template_value(&c)
+            )
+        })
     }
 }
 
@@ -379,8 +386,10 @@ impl Plugin for SpacingSpaceYPlugin {
     }
 
     fn css_template_value(&self, val: &str) -> String {
-        format!("margin-top: calc({val} * calc(1 - var(--tw-space-y-reverse)));
-  margin-bottom: calc({val} * var(--tw-space-y-reverse));")
+        format!(
+            "margin-top: calc({val} * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc({val} * var(--tw-space-y-reverse));"
+        )
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -389,8 +398,13 @@ impl Plugin for SpacingSpaceYPlugin {
             return Some("--tw-space-y-reverse: 1;".to_string());
         }
 
-        default_lengths::get_basic(modifier).map(|c| format!("--tw-space-y-reverse: 1;
-  {}", self.css_template_value(&c)))
+        default_lengths::get_basic(modifier).map(|c| {
+            format!(
+                "--tw-space-y-reverse: 1;
+  {}",
+                self.css_template_value(&c)
+            )
+        })
     }
 }
 

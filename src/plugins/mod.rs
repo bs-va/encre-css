@@ -39,11 +39,15 @@ pub trait Plugin: fmt::Debug {
     /// By default, arbitrary values are disallowed
     ///
     /// The `hint` argument can be ignored, for example if the namespace contains a single plugin
-    ///
-    /// TODO: Remove this function in favor of checking get_css_for_modifier != None
     fn is_matching_value(&self, _hint: &str, _val: &str) -> bool {
         false
     }
+
+    /// Get the template for an arbitrary associated with the plugin
+    ///
+    /// NOTE: This function is called after [to_css_value], so, `_` (underscores) are already converted to ` ` (spaces)
+    ///
+    /// [to_css_value]: crate::to_css_value
     fn css_template_value(&self, _val: &str) -> String {
         String::new()
     }
@@ -94,6 +98,7 @@ lazy_static! {
         &typography::TypographyTextDecorationStylePlugin,
         &typography::TypographyTextDecorationThicknessPlugin,
         &typography::TypographyTextDecorationOffsetPlugin,
+        &typography::TypographyContentPlugin,
         &sizing::SizingWidthPlugin,
         &sizing::SizingMinWidthPlugin,
         &sizing::SizingMaxWidthPlugin,

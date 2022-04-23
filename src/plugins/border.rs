@@ -77,8 +77,10 @@ impl Plugin for BorderWidthXPlugin {
     }
 
     fn css_template_value(&self, val: &str) -> String {
-        format!("border-left-width: {val};
-  border-right-width: {val};")
+        format!(
+            "border-left-width: {val};
+  border-right-width: {val};"
+        )
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -108,8 +110,10 @@ impl Plugin for BorderWidthYPlugin {
     }
 
     fn css_template_value(&self, val: &str) -> String {
-        format!("border-top-width: {val};
-  border-bottom-width: {val};")
+        format!(
+            "border-top-width: {val};
+  border-bottom-width: {val};"
+        )
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -273,7 +277,8 @@ impl Plugin for BorderRadiusPlugin {
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        val.split('_').all(|v| is_matching_length(v) || is_matching_percentage(v))
+        val.split('_')
+            .all(|v| is_matching_length(v) || is_matching_percentage(v))
     }
 
     fn css_template_value(&self, val: &str) -> String {

@@ -31,8 +31,7 @@ impl Selector {
 
         let arbitrary_value = {
             if let Some(opening_index) = data.find('[') {
-                data
-                    .find(']')
+                data.find(']')
                     .map(|closing_index| data[opening_index + 1..closing_index].to_string())
             } else {
                 None
@@ -70,9 +69,24 @@ impl Selector {
     /// Get the modifier of the selector from the namespace of a plugin
     pub fn get_modifier(&self, namespace: &str) -> String {
         if namespace.is_empty() {
-            format!("{}{}", if self.is_negative { "-" } else { "" }, self.content)
+            format!(
+                "{}{}",
+                if self.is_negative { "-" } else { "" },
+                self.content
+            )
         } else {
-            format!("{}{}", if self.is_negative { "-" } else { "" }, self.content.replace(&format!("{}{}", namespace, if self.content.contains('-') { "-" } else { "" }), ""))
+            format!(
+                "{}{}",
+                if self.is_negative { "-" } else { "" },
+                self.content.replace(
+                    &format!(
+                        "{}{}",
+                        namespace,
+                        if self.content.contains('-') { "-" } else { "" }
+                    ),
+                    ""
+                )
+            )
         }
     }
 
@@ -102,9 +116,23 @@ impl Selector {
 impl fmt::Display for Selector {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if let Some(ref variant) = self.variant {
-            write!(f, "{}{}{}{}{}", if self.is_important { "!" } else { "" }, if self.is_negative { "-" } else { "" }, variant, VARIANT_SEPARATOR, self.content)
+            write!(
+                f,
+                "{}{}{}{}{}",
+                if self.is_important { "!" } else { "" },
+                if self.is_negative { "-" } else { "" },
+                variant,
+                VARIANT_SEPARATOR,
+                self.content
+            )
         } else {
-            write!(f, "{}{}{}", if self.is_important { "!" } else { "" }, if self.is_negative { "-" } else { "" }, self.content)
+            write!(
+                f,
+                "{}{}{}",
+                if self.is_important { "!" } else { "" },
+                if self.is_negative { "-" } else { "" },
+                self.content
+            )
         }
     }
 }
