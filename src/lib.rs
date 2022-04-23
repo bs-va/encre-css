@@ -19,12 +19,18 @@ use selector::Selector;
 // - Variant stacking (instead let prefix = split.next()..., reverse the iterator and collect all
 // the prefixes)
 // - Negative values for free for all selectors
-// - Use hierarchy plugin, modifier, + variant
 // - Find changed files (using timestamp of generated files and timestamp of source files)
 // - Real prefix (like tw-)???
+// - CSS prefix for dark: configurable
 //
 // Fixes:
 // - Rename prefix -> variant
+
+lazy_static! {
+    static ref SPLIT_REGEX: Regex = Regex::new(r#"[\s'"`;>=]+"#).unwrap();
+    static ref FILTER_REGEX: fancy_regex::Regex =
+        fancy_regex::Regex::new(r"(?!\d|-{2}|-\d)[a-zA-Z0-9\u00A0-\uFFFF-_:%-?']").unwrap();
+}
 
 const WILL_BE_REPLACED_BY_UNDERSCORE: &str = "WILL-BE-REPLACED-BY-UNDERSCORE";
 
@@ -83,12 +89,6 @@ pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
 ///
 /// TODO: Safelist
 pub fn gen_css_from_files(files: impl Iterator<Item = PathBuf>) -> String {
-    lazy_static! {
-        static ref SPLIT_REGEX: Regex = Regex::new(r#"[\s'"`;>=]+"#).unwrap();
-        static ref FILTER_REGEX: fancy_regex::Regex =
-            fancy_regex::Regex::new(r"(?!\d|-{2}|-\d)[a-zA-Z0-9\u00A0-\uFFFF-_:%-?']").unwrap();
-    }
-
     let mut scanned_selectors_not_prefixed: Vec<Selector> = vec![];
     let mut scanned_selectors_prefixed: Vec<Selector> = vec![];
 
@@ -164,7 +164,81 @@ pub fn gen_css_from_files(files: impl Iterator<Item = PathBuf>) -> String {
     format!("{}{}", TAILWIND_PREFLIGHT_CSS, result.join("\n\n"),)
 }
 
-// TODO: Function for generating the CSS from the content of a file
+/// Scan a file and return all the selectors found
+///
+/// TODO: Safelist
+pub fn gen_css_from_content<T: Into<String>>(content: T) -> String {
+    let mut scanned_selectors_not_prefixed: Vec<Selector> = vec![];
+    let mut scanned_selectors_prefixed: Vec<Selector> = vec![];
+
+    for val in SPLIT_REGEX.split(&content.into()).filter(|m| FILTER_REGEX.is_match(m).unwrap()) {
+        let selector = Selector::new(val);
+
+        if selector.prefix.is_some() {
+            if !scanned_selectors_prefixed.contains(&selector) {
+                scanned_selectors_prefixed.push(selector);
+            }
+        } else if !scanned_selectors_not_prefixed.contains(&selector) {
+            scanned_selectors_not_prefixed.push(selector);
+        }
+    }
+
+    let mut result = vec![];
+
+    'capture_loop: for selector in [scanned_selectors_not_prefixed, scanned_selectors_prefixed].iter().flatten() {
+        // Find the right plugin to handle this selector (if the resulting CSS is valid,
+        // the plugin is good)
+        for plugin in PLUGINS.iter() {
+            if selector.check_namespace(&plugin.namespace()) {
+                let arbitrary_value = if let Some(ref arbitrary_value) = selector.arbitrary_value {
+                    let mut split = arbitrary_value.split(':');
+                    let maybe_hint = split.next().unwrap();
+
+                    if maybe_hint == arbitrary_value {
+                        // No plugin hint
+                        Some(("", maybe_hint))
+                    } else {
+                        let val = split.next();
+
+                        if let Some(val) = val {
+                            if VALID_PLUGIN_HINT.contains(&maybe_hint) {
+                                // Valid! Return (hint, stripped arbitrary value)
+                                Some((maybe_hint, val))
+                            } else {
+                                // Unknown plugin hint (like `bg-[sth:#333]`)
+                                // TODO: Display a warning
+                                Some(("", val))
+                            }
+                        } else {
+                            // Malformed arbitrary value (like just `bg-[color:]`)
+                            // TODO: Display a warning
+                            Some(("", maybe_hint))
+                        }
+                    }
+                } else {
+                    None
+                };
+
+                if let Some(arbitrary_value) = arbitrary_value {
+                    if plugin.is_matching_value(arbitrary_value.0, arbitrary_value.1) {
+                        result.push(gen_css_rule(
+                            selector,
+                            &plugin.css_template_value(&to_css_value(arbitrary_value.1)),
+                        ));
+                        continue 'capture_loop;
+                    }
+                } else if let Some(css_content) =
+                    plugin.get_css_for_modifier(&selector.get_modifier(&plugin.namespace()))
+                {
+                    result.push(gen_css_rule(selector, &css_content));
+                    continue 'capture_loop;
+                }
+            }
+        }
+    }
+
+    format!("{}{}", TAILWIND_PREFLIGHT_CSS, result.join("\n\n"),)
+}
 
 /*#[cfg(test)]
 mod tests {
