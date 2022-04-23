@@ -8,43 +8,38 @@ pub struct Selector {
     pub variant: Option<String>,
     pub content: String,                 // FIXME: Remove this pub!!!
     pub arbitrary_value: Option<String>, // FIXME: Remove this pub!!!
+    pub is_negative: bool,
+    pub is_important: bool,
 }
 
 impl Selector {
     pub fn new<T: Into<String>>(data: T) -> Self {
         let data = data.into();
+
+        // Strip the important flag before the negative one
+        let (data, is_important) = if let Some(data) = data.strip_prefix('!') {
+            (data, true)
+        } else {
+            (data.as_str(), false)
+        };
+
+        let (data, is_negative) = if let Some(data) = data.strip_prefix('-') {
+            (data, true)
+        } else {
+            (data, false)
+        };
+
         let arbitrary_value = {
-            let modifier = if data.contains('-') {
-                let mut iter = data.split('-');
-                iter.next();
-
-                if data.starts_with('-') {
-                    // Negative value
-                    iter.next();
-                    Some(format!("-{}", iter.collect::<Vec<&str>>().join("-")))
-                } else {
-                    // Positive value
-                    Some(iter.collect::<Vec<&str>>().join("-"))
-                }
-            } else {
-                // No modifier
-                None
-            };
-
-            if let Some(ref modifier) = modifier {
-                if let Some(opening_index) = modifier.find('[') {
-                    modifier
-                        .find(']')
-                        .map(|closing_index| modifier[opening_index + 1..closing_index].to_string())
-                } else {
-                    None
-                }
+            if let Some(opening_index) = data.find('[') {
+                data
+                    .find(']')
+                    .map(|closing_index| data[opening_index + 1..closing_index].to_string())
             } else {
                 None
             }
         };
 
-        if Regex::new(r"^[^\[]*:").unwrap().is_match(&data) {
+        if Regex::new(r"^[^\[]*:").unwrap().is_match(data) {
             let mut split = data.split(VARIANT_SEPARATOR);
             let variant = split.next().unwrap();
             let content = split.next().unwrap();
@@ -53,12 +48,16 @@ impl Selector {
                 variant: Some(variant.to_string()),
                 content: content.to_string(),
                 arbitrary_value,
+                is_negative,
+                is_important,
             }
         } else {
             Self {
                 variant: None,
-                content: data,
+                content: data.to_string(), // TODO: Prevent
                 arbitrary_value,
+                is_negative,
+                is_important,
             }
         }
     }
@@ -71,9 +70,9 @@ impl Selector {
     /// Get the modifier of the selector from the namespace of a plugin
     pub fn get_modifier(&self, namespace: &str) -> String {
         if namespace.is_empty() {
-            self.content.clone()
+            format!("{}{}", if self.is_negative { "-" } else { "" }, self.content)
         } else {
-            self.content.replace(&format!("{}{}", namespace, if self.content.contains('-') { "-" } else { "" }), "")
+            format!("{}{}", if self.is_negative { "-" } else { "" }, self.content.replace(&format!("{}{}", namespace, if self.content.contains('-') { "-" } else { "" }), ""))
         }
     }
 
@@ -103,9 +102,9 @@ impl Selector {
 impl fmt::Display for Selector {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if let Some(ref variant) = self.variant {
-            write!(f, "{}{}{}", variant, VARIANT_SEPARATOR, self.content)
+            write!(f, "{}{}{}{}{}", if self.is_important { "!" } else { "" }, if self.is_negative { "-" } else { "" }, variant, VARIANT_SEPARATOR, self.content)
         } else {
-            write!(f, "{}", self.content)
+            write!(f, "{}{}{}", if self.is_important { "!" } else { "" }, if self.is_negative { "-" } else { "" }, self.content)
         }
     }
 }

@@ -19,22 +19,17 @@ impl Plugin for FlexboxOrderPlugin {
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
         match modifier {
-            "first" => Some(self.css_template_value("-9999")),
-            "last" => Some(self.css_template_value("9999")),
-            "none" => Some(self.css_template_value("0")),
-            "1" => Some(self.css_template_value("1")),
-            "2" => Some(self.css_template_value("2")),
-            "3" => Some(self.css_template_value("3")),
-            "4" => Some(self.css_template_value("4")),
-            "5" => Some(self.css_template_value("5")),
-            "6" => Some(self.css_template_value("6")),
-            "7" => Some(self.css_template_value("7")),
-            "8" => Some(self.css_template_value("8")),
-            "9" => Some(self.css_template_value("9")),
-            "10" => Some(self.css_template_value("10")),
-            "11" => Some(self.css_template_value("11")),
-            "12" => Some(self.css_template_value("12")),
-            _ => None,
+            "first" => return Some(self.css_template_value("-9999")),
+            "last" => return Some(self.css_template_value("9999")),
+            "none" => return Some(self.css_template_value("0")),
+            _ => (),
+        }
+
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        if modifier.parse::<f32>().is_ok() {
+            Some(self.css_template_value(modifier))
+        } else {
+            None
         }
     }
 }

@@ -1,6 +1,13 @@
 // TODO: Negative values
 pub fn get_basic(val: &str) -> Option<String> {
-    match val {
+    // TODO: Duplicated with src/selector.rs:17-21
+    let (val, is_negative) = if let Some(val) = val.strip_prefix('-') {
+        (val, true)
+    } else {
+        (val, false)
+    };
+
+    let absolute_result = match val {
         "px" => Some("1px".to_string()),
         "0" => Some("0px".to_string()),
         "0.5" => Some("0.125rem".to_string()),
@@ -36,12 +43,25 @@ pub fn get_basic(val: &str) -> Option<String> {
         "72" => Some("18rem".to_string()),
         "80" => Some("20rem".to_string()),
         "96" => Some("24rem".to_string()),
-        _ => None,
+        _ => return None,
+    };
+
+    if is_negative {
+        Some("-".to_string() + &absolute_result.unwrap())
+    } else {
+        Some(absolute_result.unwrap())
     }
 }
 
 pub fn get_fraction(val: &str) -> Option<String> {
-    match val {
+    // TODO: Duplicated with src/selector.rs:17-21
+    let (val, is_negative) = if let Some(val) = val.strip_prefix('-') {
+        (val, true)
+    } else {
+        (val, false)
+    };
+
+    let absolute_result = match val {
         "1/2" => Some("50%".to_string()),
         "1/3" => Some("33.333333%".to_string()),
         "2/3" => Some("66.666667%".to_string()),
@@ -68,7 +88,13 @@ pub fn get_fraction(val: &str) -> Option<String> {
         "9/12" => Some("75%".to_string()),
         "10/12" => Some("83.333333%".to_string()),
         "11/12" => Some("91.666667%".to_string()),
-        _ => None,
+        _ => return None,
+    };
+
+    if is_negative {
+        Some("-".to_string() + &absolute_result.unwrap())
+    } else {
+        Some(absolute_result.unwrap())
     }
 }
 

@@ -14,11 +14,9 @@ use preflight::TAILWIND_PREFLIGHT_CSS;
 use selector::Selector;
 
 // TODO features:
-// - Important
 // - Cache (dedup directly by scanning in all files at once (+ use rayon later))
 // - Variant stacking (instead let variant = split.next()..., reverse the iterator and collect all
 // variants)
-// - Negative values for free for all selectors
 // - Find changed files (using timestamp of generated files and timestamp of source files)
 // - Real prefix (like tw-)???
 // - CSS variant for dark: configurable
@@ -70,14 +68,25 @@ pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
         .replace('#', "\\#")
         .replace(':', "\\:")
         .replace(',', r"\2c ")
-        .replace('.', "\\.");
+        .replace('.', "\\.")
+        .replace('!', "\\!");
+
+    let css_content = if selector.is_important {
+        css_content.replace(';', " !important;")
+    } else {
+        css_content.to_string() // TODO: Prevent?
+    };
 
     if let Some(ref variant) = selector.variant {
-        let varianted_version = VARIANTS.get(variant).expect("variant not defined?");
+        let with_variant_version = if let Some(result) = VARIANTS.get(variant) {
+            result
+        } else {
+            panic!("Unknown variant: {}", variant);
+        };
 
-        varianted_version
+        with_variant_version
             .replace("{class}", &css_selector)
-            .replace("{css}", css_content)
+            .replace("{css}", &css_content)
     } else {
         format!(".{} {{\n  {}\n}}", css_selector, &css_content)
     }
