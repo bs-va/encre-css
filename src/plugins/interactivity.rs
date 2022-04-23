@@ -1,15 +1,34 @@
+use super::Plugin;
+
+#[derive(Debug)]
+pub struct InteractivityCursorPlugin;
+
+impl Plugin for InteractivityCursorPlugin {
+    fn namespace(&self) -> String {
+        "cursor".to_string()
+    }
+
+    fn is_matching_value(&self, _hint: &str, _val: &str) -> bool {
+        true
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("cursor: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if ["auto", "default", "pointer", "wait", "text", "move", "help", "not-allowed"].contains(&modifier) {
+            Some(self.css_template_value(modifier))
+        } else {
+            None
+        }
+    }
+}
+
 /*use super::SelectorList;
 
 pub fn init(selectors: &mut SelectorList) {
     selectors.register("appearance-none", "appearance: none;".to_string());
-    selectors.register("cursor-auto", "cursor: auto;".to_string());
-    selectors.register("cursor-default", "cursor: default;".to_string());
-    selectors.register("cursor-pointer", "cursor: pointer;".to_string());
-    selectors.register("cursor-wait", "cursor: wait;".to_string());
-    selectors.register("cursor-text", "cursor: text;".to_string());
-    selectors.register("cursor-move", "cursor: move;".to_string());
-    selectors.register("cursor-help", "cursor: help;".to_string());
-    selectors.register("cursor-not-allowed", "cursor: not-allowed;".to_string());
     selectors.register("outline-none", "outline: 0;".to_string());
     selectors.register(
         "outline-white",

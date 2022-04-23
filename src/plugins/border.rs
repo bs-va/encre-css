@@ -26,7 +26,223 @@ impl Plugin for BorderColorPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if modifier == "inherit" {
+            return Some(self.css_template_value("inherit"));
+        }
+
         default_colors::get(modifier).map(|c| self.css_template_value(&c))
+    }
+}
+
+#[derive(Debug)]
+pub struct BorderWidthPlugin;
+
+impl Plugin for BorderWidthPlugin {
+    fn namespace(&self) -> String {
+        "border".to_string()
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        hint == "length" || is_matching_length(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("border-width: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if modifier.is_empty() {
+            return Some(self.css_template_value("1px"));
+        }
+
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        if let Ok(width) = modifier.parse::<usize>() {
+            Some(self.css_template_value(&format!("{width}px")))
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct BorderWidthXPlugin;
+
+impl Plugin for BorderWidthXPlugin {
+    fn namespace(&self) -> String {
+        "border-x".to_string()
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        hint == "length" || is_matching_length(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("border-left-width: {val};
+  border-right-width: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if modifier.is_empty() {
+            return Some(self.css_template_value("1px"));
+        }
+
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        if let Ok(width) = modifier.parse::<usize>() {
+            Some(self.css_template_value(&format!("{width}px")))
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct BorderWidthYPlugin;
+
+impl Plugin for BorderWidthYPlugin {
+    fn namespace(&self) -> String {
+        "border-y".to_string()
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        hint == "length" || is_matching_length(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("border-top-width: {val};
+  border-bottom-width: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if modifier.is_empty() {
+            return Some(self.css_template_value("1px"));
+        }
+
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        if let Ok(width) = modifier.parse::<usize>() {
+            Some(self.css_template_value(&format!("{width}px")))
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct BorderWidthTopPlugin;
+
+impl Plugin for BorderWidthTopPlugin {
+    fn namespace(&self) -> String {
+        "border-t".to_string()
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        hint == "length" || is_matching_length(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("border-top-width: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if modifier.is_empty() {
+            return Some(self.css_template_value("1px"));
+        }
+
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        if let Ok(width) = modifier.parse::<usize>() {
+            Some(self.css_template_value(&format!("{width}px")))
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct BorderWidthBottomPlugin;
+
+impl Plugin for BorderWidthBottomPlugin {
+    fn namespace(&self) -> String {
+        "border-b".to_string()
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        hint == "length" || is_matching_length(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("border-bottom-width: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if modifier.is_empty() {
+            return Some(self.css_template_value("1px"));
+        }
+
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        if let Ok(width) = modifier.parse::<usize>() {
+            Some(self.css_template_value(&format!("{width}px")))
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct BorderWidthLeftPlugin;
+
+impl Plugin for BorderWidthLeftPlugin {
+    fn namespace(&self) -> String {
+        "border-l".to_string()
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        hint == "length" || is_matching_length(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("border-left-width: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if modifier.is_empty() {
+            return Some(self.css_template_value("1px"));
+        }
+
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        if let Ok(width) = modifier.parse::<usize>() {
+            Some(self.css_template_value(&format!("{width}px")))
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct BorderWidthRightPlugin;
+
+impl Plugin for BorderWidthRightPlugin {
+    fn namespace(&self) -> String {
+        "border-r".to_string()
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        hint == "length" || is_matching_length(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("border-right-width: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if modifier.is_empty() {
+            return Some(self.css_template_value("1px"));
+        }
+
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        if let Ok(width) = modifier.parse::<usize>() {
+            Some(self.css_template_value(&format!("{width}px")))
+        } else {
+            None
+        }
     }
 }
 
@@ -177,6 +393,10 @@ impl Plugin for DivideColorPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if modifier == "inherit" {
+            return Some(self.css_template_value("inherit"));
+        }
+
         default_colors::get(modifier).map(|c| self.css_template_value(&c))
     }
 }
@@ -186,7 +406,7 @@ pub struct DivideOpacityPlugin;
 
 impl Plugin for DivideOpacityPlugin {
     fn namespace(&self) -> String {
-        "divide".to_string()
+        "divide-opacity".to_string()
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -224,6 +444,10 @@ impl Plugin for RingColorPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if modifier == "inherit" {
+            return Some(self.css_template_value("inherit"));
+        }
+
         default_colors::get(modifier).map(|c| self.css_template_value(&c))
     }
 }
@@ -233,7 +457,7 @@ pub struct RingOpacityPlugin;
 
 impl Plugin for RingOpacityPlugin {
     fn namespace(&self) -> String {
-        "ring".to_string()
+        "ring-opacity".to_string()
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -271,6 +495,10 @@ impl Plugin for RingOffsetColorPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if modifier == "inherit" {
+            return Some(self.css_template_value("inherit"));
+        }
+
         default_colors::get(modifier).map(|c| self.css_template_value(&c))
     }
 }
@@ -280,7 +508,7 @@ pub struct RingOffsetOpacityPlugin;
 
 impl Plugin for RingOffsetOpacityPlugin {
     fn namespace(&self) -> String {
-        "ring-offset".to_string()
+        "ring-offset-opacity".to_string()
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {

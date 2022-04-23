@@ -4,10 +4,6 @@ use super::Plugin;
 pub struct FilterPlugin;
 
 impl Plugin for FilterPlugin {
-    fn namespace(&self) -> String {
-        "".to_string()
-    }
-
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
         match modifier {
             "filter" => Some("".to_string()),

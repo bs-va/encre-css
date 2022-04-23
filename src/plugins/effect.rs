@@ -1,4 +1,5 @@
 use super::Plugin;
+use crate::utils::{default_colors, value_matchers::*};
 
 #[derive(Debug)]
 pub struct EffectMixBlendModePlugin;
@@ -31,6 +32,69 @@ impl Plugin for EffectMixBlendModePlugin {
     }
 }
 
+#[derive(Debug)]
+pub struct EffectBoxShadowPlugin;
+
+impl Plugin for EffectBoxShadowPlugin {
+    fn namespace(&self) -> String {
+        "shadow".to_string()
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        is_matching_shadow(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("box-shadow: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "" => Some(self.css_template_value("0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);")),
+            "sm" => Some(self.css_template_value("0 1px 2px 0 rgba(0, 0, 0, 0.05)")),
+            "md" => Some(self.css_template_value("0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)")),
+            "lg" => Some(self.css_template_value("0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)")),
+            "xl" => Some(self.css_template_value("0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)")),
+            "2xl" => Some(self.css_template_value("0 25px 50px -12px rgba(0, 0, 0, 0.25)")),
+            "inner" => Some(self.css_template_value("inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)")),
+            "none" => Some(self.css_template_value("none")),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct EffectBoxShadowColorPlugin;
+
+impl Plugin for EffectBoxShadowColorPlugin {
+    fn namespace(&self) -> String {
+        "shadow".to_string()
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        hint == "color" || is_matching_color(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        if val.contains("--tw-opacity") {
+            format!(
+                "--tw-shadow-color: {};",
+                val.replace("/ var(--tw-opacity)", "")
+            )
+        } else {
+            format!("--tw-shadow-color: {val};")
+        }
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if modifier == "inherit" {
+            return Some(self.css_template_value("inherit"));
+        }
+
+        default_colors::get(modifier).map(|c| self.css_template_value(&c))
+    }
+}
+
 /*use super::SelectorList;
 
 pub fn init(selectors: &mut SelectorList) {
@@ -38,42 +102,6 @@ pub fn init(selectors: &mut SelectorList) {
         "shadow-xs",
         "box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);".to_string(),
     );
-    selectors.register(
-        "shadow-sm",
-        "box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);".to_string(),
-    );
-    selectors.register(
-        "shadow",
-        "box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);".to_string(),
-    );
-    selectors.register(
-        "shadow-md",
-        "box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);"
-            .to_string(),
-    );
-    selectors.register(
-        "shadow-lg",
-        "box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);"
-            .to_string(),
-    );
-    selectors.register(
-        "shadow-xl",
-        "box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);"
-            .to_string(),
-    );
-    selectors.register(
-        "shadow-2xl",
-        "box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);".to_string(),
-    );
-    selectors.register(
-        "shadow-inner",
-        "box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);".to_string(),
-    );
-    selectors.register(
-        "shadow-outline",
-        "box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);".to_string(),
-    );
-    selectors.register("shadow-none", "box-shadow: none;".to_string());
     selectors.register("opacity-0", "opacity: 0;".to_string());
     selectors.register("opacity-5", "opacity: 0.05;".to_string());
     selectors.register("opacity-10", "opacity: 0.1;".to_string());

@@ -19,7 +19,12 @@ pub mod transition;
 pub mod typography;
 
 pub trait Plugin: fmt::Debug {
-    fn namespace(&self) -> String;
+    /// Returns the namespace containing the plugin
+    ///
+    /// By default, the plugin does not belong to a namespace
+    fn namespace(&self) -> String {
+        String::new()
+    }
 
     /// Get the CSS code from a modifier
     ///
@@ -45,6 +50,10 @@ pub trait Plugin: fmt::Debug {
 }
 
 lazy_static! {
+    // TODO: Remove the scope of the plugin in the structure name (e.g. `background::BackgroundColorPlugin` ->
+    // `background::ColorPlugin`)
+    // TODO: Better sorting (colors and lengths after all the other utilities (because they have
+    // hints))
     pub static ref PLUGINS: &'static [&'static (dyn Plugin + Sync)] = &[
         &background::BackgroundColorPlugin,
         &background::BackgroundAttachmentPlugin,
@@ -59,6 +68,13 @@ lazy_static! {
         &background::BackgroundSizePlugin,
         &border::BorderColorPlugin,
         &border::BorderRadiusPlugin,
+        &border::BorderWidthPlugin,
+        &border::BorderWidthXPlugin,
+        &border::BorderWidthYPlugin,
+        &border::BorderWidthTopPlugin,
+        &border::BorderWidthBottomPlugin,
+        &border::BorderWidthLeftPlugin,
+        &border::BorderWidthRightPlugin,
         &border::BorderOpacityPlugin,
         &border::DivideColorPlugin,
         &border::DivideOpacityPlugin,
@@ -72,6 +88,12 @@ lazy_static! {
         &typography::TypographyFontSizePlugin,
         &typography::TypographyFontWeightPlugin,
         &typography::TypographyTextAlignmentPlugin,
+        &typography::TypographyTrackingPlugin,
+        &typography::TypographyLeadingPlugin,
+        &typography::TypographyTextDecorationColorPlugin,
+        &typography::TypographyTextDecorationStylePlugin,
+        &typography::TypographyTextDecorationThicknessPlugin,
+        &typography::TypographyTextDecorationOffsetPlugin,
         &sizing::SizingWidthPlugin,
         &sizing::SizingMinWidthPlugin,
         &sizing::SizingMaxWidthPlugin,
@@ -92,6 +114,8 @@ lazy_static! {
         &spacing::SpacingMarginRightPlugin,
         &spacing::SpacingMarginTopPlugin,
         &spacing::SpacingMarginBottomPlugin,
+        &spacing::SpacingSpaceXPlugin,
+        &spacing::SpacingSpaceYPlugin,
         &flexbox::FlexboxOrderPlugin,
         &flexbox::FlexboxDirectionPlugin,
         &flexbox::FlexboxWrapPlugin,
@@ -122,6 +146,9 @@ lazy_static! {
         &grid::GridColumnsPlugin,
         &grid::GridRowsPlugin,
         &grid::GridGapPlugin,
+        &interactivity::InteractivityCursorPlugin,
+        &effect::EffectBoxShadowPlugin,
+        &effect::EffectBoxShadowColorPlugin,
 
         // It is better to include the following plugins at the end because they match the "" namespace
         &layout::LayoutDisplayPlugin,
@@ -129,5 +156,7 @@ lazy_static! {
         &layout::LayoutVisibilityPlugin,
         &filter::FilterPlugin,
         &typography::TypographyTextTransformPlugin,
+        &typography::TypographyItalicPlugin,
+        &typography::TypographyTextDecorationPlugin,
     ];
 }

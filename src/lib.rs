@@ -89,27 +89,27 @@ pub fn gen_css_from_files(files: impl Iterator<Item = PathBuf>) -> String {
             fancy_regex::Regex::new(r"(?!\d|-{2}|-\d)[a-zA-Z0-9\u00A0-\uFFFF-_:%-?']").unwrap();
     }
 
-    let mut scanned_selectors = files
-        .flat_map(|f| {
-            // Find all selectors used in all files
-            let file_content = fs::read_to_string(f).expect("failed to read the file");
-            SPLIT_REGEX
-                .split(&file_content)
-                .filter(|m| FILTER_REGEX.is_match(m).unwrap())
-                .map(|m| m.to_string())
-                .collect::<Vec<String>>()
-        })
-        .collect::<Vec<String>>();
+    let mut scanned_selectors_not_prefixed: Vec<Selector> = vec![];
+    let mut scanned_selectors_prefixed: Vec<Selector> = vec![];
 
-    // TODO: Do this when scanning, not after
-    scanned_selectors.sort();
-    scanned_selectors.dedup();
+    for file in files {
+        let file_content = fs::read_to_string(file).expect("failed to read the file");
+        for val in SPLIT_REGEX.split(&file_content).filter(|m| FILTER_REGEX.is_match(m).unwrap()) {
+            let selector = Selector::new(val);
+
+            if selector.prefix.is_some() {
+                if !scanned_selectors_prefixed.contains(&selector) {
+                    scanned_selectors_prefixed.push(selector);
+                }
+            } else if !scanned_selectors_not_prefixed.contains(&selector) {
+                scanned_selectors_not_prefixed.push(selector);
+            }
+        }
+    }
 
     let mut result = vec![];
 
-    'capture_loop: for scan in scanned_selectors {
-        let selector = Selector::new(scan);
-
+    'capture_loop: for selector in [scanned_selectors_not_prefixed, scanned_selectors_prefixed].iter().flatten() {
         // Find the right plugin to handle this selector (if the resulting CSS is valid,
         // the plugin is good)
         for plugin in PLUGINS.iter() {
@@ -146,7 +146,7 @@ pub fn gen_css_from_files(files: impl Iterator<Item = PathBuf>) -> String {
                 if let Some(arbitrary_value) = arbitrary_value {
                     if plugin.is_matching_value(arbitrary_value.0, arbitrary_value.1) {
                         result.push(gen_css_rule(
-                            &selector,
+                            selector,
                             &plugin.css_template_value(&to_css_value(arbitrary_value.1)),
                         ));
                         continue 'capture_loop;
@@ -154,7 +154,7 @@ pub fn gen_css_from_files(files: impl Iterator<Item = PathBuf>) -> String {
                 } else if let Some(css_content) =
                     plugin.get_css_for_modifier(&selector.get_modifier(&plugin.namespace()))
                 {
-                    result.push(gen_css_rule(&selector, &css_content));
+                    result.push(gen_css_rule(selector, &css_content));
                     continue 'capture_loop;
                 }
             }

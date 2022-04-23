@@ -338,6 +338,56 @@ impl Plugin for SpacingMarginBottomPlugin {
     }
 }
 
+#[derive(Debug)]
+pub struct SpacingSpaceXPlugin;
+
+impl Plugin for SpacingSpaceXPlugin {
+    fn namespace(&self) -> String {
+        "space-x".to_string()
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        hint == "length" || is_matching_length(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("margin-left: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if modifier == "reverse" {
+            return Some("--tw-space-x-reverse: 1;".to_string());
+        }
+
+        default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
+    }
+}
+
+#[derive(Debug)]
+pub struct SpacingSpaceYPlugin;
+
+impl Plugin for SpacingSpaceYPlugin {
+    fn namespace(&self) -> String {
+        "space-y".to_string()
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        hint == "length" || is_matching_length(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("margin-top: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if modifier == "reverse" {
+            return Some("--tw-space-y-reverse: 1;".to_string());
+        }
+
+        default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
+    }
+}
+
 /*pub fn init(selectors: &mut SelectorList) {
     selectors.register("-m-0", "".to_string());
     selectors.register("-m-0.5", "".to_string());
@@ -581,163 +631,4 @@ impl Plugin for SpacingMarginBottomPlugin {
     selectors.register("-mr-px", "".to_string());
     selectors.register("-mb-px", "".to_string());
     selectors.register("-ml-px", "".to_string());
-    selectors.register("m-auto", "margin: auto;".to_string());
-    selectors.register(
-        "mx-auto",
-        "margin-left: auto;
-margin-right: auto;"
-            .to_string(),
-    );
-    selectors.register(
-        "my-auto",
-        "margin-top: auto;
-margin-botom: auto;"
-            .to_string(),
-    );
-    selectors.register("mt-auto", "margin-top: auto;".to_string());
-    selectors.register("mr-auto", "margin-right: auto;".to_string());
-    selectors.register("mb-auto", "margin-bottom: auto;".to_string());
-    selectors.register("ml-auto", "margin-left: auto;".to_string());
-    selectors.register("space-x-0", "margin-left: 0;".to_string());
-    selectors.register("space-x-0.5", "margin-left: 0.125rem;".to_string());
-    selectors.register("space-x-1", "margin-left: 0.25rem;".to_string());
-    selectors.register("space-x-1.5", "margin-left: 0.375rem;".to_string());
-    selectors.register("space-x-2", "margin-left: 0.5rem;".to_string());
-    selectors.register("space-x-2.5", "margin-left: 0.625rem;".to_string());
-    selectors.register("space-x-3", "margin-left: 0.75rem;".to_string());
-    selectors.register("space-x-3", "margin-left: 0.875rem;".to_string());
-    selectors.register("space-x-4", "margin-left: 1rem;".to_string());
-    selectors.register("space-x-5", "margin-left: 1.25rem;".to_string());
-    selectors.register("space-x-6", "margin-left: 1.5rem;".to_string());
-    selectors.register("space-x-7", "margin-left: 1.75rem;".to_string());
-    selectors.register("space-x-8", "margin-left: 2rem;".to_string());
-    selectors.register("space-x-9", "margin-left: 2.25rem;".to_string());
-    selectors.register("space-x-10", "margin-left: 2.5rem;".to_string());
-    selectors.register("space-x-11", "margin-left: 2.75rem;".to_string());
-    selectors.register("space-x-12", "margin-left: 3rem;".to_string());
-    selectors.register("space-x-14", "margin-left: 3.5rem;".to_string());
-    selectors.register("space-x-16", "margin-left: 4rem;".to_string());
-    selectors.register("space-x-20", "margin-left: 5rem;".to_string());
-    selectors.register("space-x-24", "margin-left: 6rem;".to_string());
-    selectors.register("space-x-28", "margin-left: 7rem;".to_string());
-    selectors.register("space-x-32", "margin-left: 8rem;".to_string());
-    selectors.register("space-x-36", "margin-left: 9rem;".to_string());
-    selectors.register("space-x-40", "10rem".to_string());
-    selectors.register("space-x-44", "margin-left: 11rem;".to_string());
-    selectors.register("space-x-48", "margin-left: 12rem;".to_string());
-    selectors.register("space-x-52", "margin-left: 13rem;".to_string());
-    selectors.register("space-x-56", "margin-left: 14rem;".to_string());
-    selectors.register("space-x-60", "margin-left: 15rem;".to_string());
-    selectors.register("space-x-64", "margin-left: 16rem;".to_string());
-    selectors.register("space-x-72", "margin-left: 18rem;".to_string());
-    selectors.register("space-x-80", "margin-left: 20rem;".to_string());
-    selectors.register("space-x-96", "margin-left: 24rem;".to_string());
-    selectors.register("space-x-px", "margin-left: 1px;".to_string());
-    selectors.register("-space-x-0", "margin-left: 0;".to_string());
-    selectors.register("-space-x-0.5", "margin-left: -0.125rem;".to_string());
-    selectors.register("-space-x-1", "margin-left: -0.25rem;".to_string());
-    selectors.register("-space-x-1.5", "margin-left: -0.375rem;".to_string());
-    selectors.register("-space-x-2", "margin-left: -0.5rem;".to_string());
-    selectors.register("-space-x-2.5", "margin-left: -0.625rem;".to_string());
-    selectors.register("-space-x-3", "margin-left: -0.75rem;".to_string());
-    selectors.register("-space-x-3.5", "margin-left: -0.875rem;".to_string());
-    selectors.register("-space-x-4", "margin-left: -1rem;".to_string());
-    selectors.register("-space-x-5", "margin-left: -1.25rem;".to_string());
-    selectors.register("-space-x-6", "margin-left: -1.5rem;".to_string());
-    selectors.register("-space-x-7", "margin-left: -1.75rem;".to_string());
-    selectors.register("-space-x-8", "margin-left: -2rem;".to_string());
-    selectors.register("-space-x-9", "margin-left: -2.25rem;".to_string());
-    selectors.register("-space-x-10", "margin-left: -2.5rem;".to_string());
-    selectors.register("-space-x-11", "margin-left: -2.75rem;".to_string());
-    selectors.register("-space-x-12", "margin-left: -3rem;".to_string());
-    selectors.register("-space-x-14", "margin-left: -3.5rem;".to_string());
-    selectors.register("-space-x-16", "margin-left: -4rem;".to_string());
-    selectors.register("-space-x-20", "margin-left: -5rem;".to_string());
-    selectors.register("-space-x-24", "margin-left: -6rem;".to_string());
-    selectors.register("-space-x-28", "margin-left: -7rem;".to_string());
-    selectors.register("-space-x-32", "margin-left: -8rem;".to_string());
-    selectors.register("-space-x-36", "margin-left: -9rem;".to_string());
-    selectors.register("-space-x-40", "margin-left: -10rem;".to_string());
-    selectors.register("-space-x-44", "margin-left: -11rem;".to_string());
-    selectors.register("-space-x-48", "margin-left: -12rem;".to_string());
-    selectors.register("-space-x-52", "margin-left: -13rem;".to_string());
-    selectors.register("-space-x-56", "margin-left: -14rem;".to_string());
-    selectors.register("-space-x-60", "margin-left: -15rem;".to_string());
-    selectors.register("-space-x-64", "margin-left: -16rem;".to_string());
-    selectors.register("-space-x-72", "margin-left: -18rem;".to_string());
-    selectors.register("-space-x-80", "margin-left: -20rem;".to_string());
-    selectors.register("-space-x-96", "margin-left: -24rem;".to_string());
-    selectors.register("-space-x-px", "margin-left: -1px;".to_string());
-    selectors.register("space-y-0", "margin-top: 0;".to_string());
-    selectors.register("space-y-0.5", "margin-top: 0.125rem;".to_string());
-    selectors.register("space-y-1", "margin-top: 0.25rem;".to_string());
-    selectors.register("space-y-1.5", "margin-top: 0.375rem;".to_string());
-    selectors.register("space-y-2", "margin-top: 0.5rem;".to_string());
-    selectors.register("space-y-2.5", "margin-top: 0.625rem;".to_string());
-    selectors.register("space-y-3", "margin-top: 0.75rem;".to_string());
-    selectors.register("space-y-3.5", "margin-top: 0.875rem;".to_string());
-    selectors.register("space-y-4", "margin-top: 1rem;".to_string());
-    selectors.register("space-y-5", "margin-top: 1.25rem;".to_string());
-    selectors.register("space-y-6", "margin-top: 1.5rem;".to_string());
-    selectors.register("space-y-7", "margin-top: 1.75rem;".to_string());
-    selectors.register("space-y-8", "margin-top: 2rem;".to_string());
-    selectors.register("space-y-9", "margin-top: 2.25rem;".to_string());
-    selectors.register("space-y-10", "margin-top: 2.5rem;".to_string());
-    selectors.register("space-y-11", "margin-top: 2.75rem;".to_string());
-    selectors.register("space-y-12", "margin-top: 3rem;".to_string());
-    selectors.register("space-y-14", "margin-top: 3.5rem;".to_string());
-    selectors.register("space-y-16", "margin-top: 4rem;".to_string());
-    selectors.register("space-y-20", "margin-top: 5rem;".to_string());
-    selectors.register("space-y-24", "margin-top: 6rem;".to_string());
-    selectors.register("space-y-28", "margin-top: 7rem;".to_string());
-    selectors.register("space-y-32", "margin-top: 8rem;".to_string());
-    selectors.register("space-y-36", "margin-top: 9rem;".to_string());
-    selectors.register("space-y-40", "margin-top: 10rem;".to_string());
-    selectors.register("space-y-44", "margin-top: 11rem;".to_string());
-    selectors.register("space-y-48", "margin-top: 12rem;".to_string());
-    selectors.register("space-y-52", "margin-top: 13rem;".to_string());
-    selectors.register("space-y-56", "margin-top: 14rem;".to_string());
-    selectors.register("space-y-60", "margin-top: 15rem;".to_string());
-    selectors.register("space-y-64", "margin-top: 16rem;".to_string());
-    selectors.register("space-y-72", "margin-top: 18rem;".to_string());
-    selectors.register("space-y-80", "margin-top: 20rem;".to_string());
-    selectors.register("space-y-96", "margin-top: 24rem;".to_string());
-    selectors.register("space-y-px", "margin-top: 1px;".to_string());
-    selectors.register("-space-y-0", "".to_string());
-    selectors.register("-space-y-0.5", "".to_string());
-    selectors.register("-space-y-1", "".to_string());
-    selectors.register("-space-y-1.5", "".to_string());
-    selectors.register("-space-y-2", "".to_string());
-    selectors.register("-space-y-2.5", "".to_string());
-    selectors.register("-space-y-3", "".to_string());
-    selectors.register("-space-y-3", "".to_string());
-    selectors.register("-space-y-4", "".to_string());
-    selectors.register("-space-y-5", "".to_string());
-    selectors.register("-space-y-6", "".to_string());
-    selectors.register("-space-y-7", "".to_string());
-    selectors.register("-space-y-8", "".to_string());
-    selectors.register("-space-y-9", "".to_string());
-    selectors.register("-space-y-10", "".to_string());
-    selectors.register("-space-y-11", "".to_string());
-    selectors.register("-space-y-12", "".to_string());
-    selectors.register("-space-y-14", "".to_string());
-    selectors.register("-space-y-16", "".to_string());
-    selectors.register("-space-y-20", "".to_string());
-    selectors.register("-space-y-24", "".to_string());
-    selectors.register("-space-y-28", "".to_string());
-    selectors.register("-space-y-32", "".to_string());
-    selectors.register("-space-y-36", "".to_string());
-    selectors.register("-space-y-40", "".to_string());
-    selectors.register("-space-y-44", "".to_string());
-    selectors.register("-space-y-48", "".to_string());
-    selectors.register("-space-y-52", "".to_string());
-    selectors.register("-space-y-56", "".to_string());
-    selectors.register("-space-y-60", "".to_string());
-    selectors.register("-space-y-64", "".to_string());
-    selectors.register("-space-y-72", "".to_string());
-    selectors.register("-space-y-80", "".to_string());
-    selectors.register("-space-y-96", "".to_string());
-    selectors.register("-space-y-px", "".to_string());
-    selectors.register("space-x-reverse", "".to_string());
-    selectors.register("space-y-reverse", "".to_string());
 }*/

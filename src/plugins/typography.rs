@@ -188,10 +188,6 @@ impl Plugin for TypographyTextAlignmentPlugin {
 pub struct TypographyTextTransformPlugin;
 
 impl Plugin for TypographyTextTransformPlugin {
-    fn namespace(&self) -> String {
-        "".to_string()
-    }
-
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
         match modifier {
             "uppercase" => Some("text-transform: uppercase;".to_string()),
@@ -199,6 +195,208 @@ impl Plugin for TypographyTextTransformPlugin {
             "capitalize" => Some("text-transform: capitalize;".to_string()),
             "normal-case" => Some("text-transform: none;".to_string()),
             _ => None,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct TypographyTrackingPlugin;
+
+impl Plugin for TypographyTrackingPlugin {
+    fn namespace(&self) -> String {
+        "tracking".to_string()
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        val == "normal" || is_matching_length(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("letter-spacing: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "tighter" => Some(self.css_template_value("-0.05em")),
+            "tight" => Some(self.css_template_value("-0.025em")),
+            "normal" => Some(self.css_template_value("0")),
+            "wide" => Some(self.css_template_value("0.025em")),
+            "wider" => Some(self.css_template_value("0.05em")),
+            "widest" => Some(self.css_template_value("0.1em")),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct TypographyLeadingPlugin;
+
+impl Plugin for TypographyLeadingPlugin {
+    fn namespace(&self) -> String {
+        "leading".to_string()
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        // https://developer.mozilla.org/en-US/docs/Web/CSS/line-height#values
+        val == "normal" || is_matching_float(val) || is_matching_length(val) || is_matching_percentage(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("line-height: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "none" => Some(self.css_template_value("1")),
+            "tight" => Some(self.css_template_value("1.25")),
+            "snug" => Some(self.css_template_value("1.375")),
+            "normal" => Some(self.css_template_value("1.5")),
+            "relaxed" => Some(self.css_template_value("1.625")),
+            "loose" => Some(self.css_template_value("2")),
+            "3" => Some(self.css_template_value(".75rem")),
+            "4" => Some(self.css_template_value("1rem")),
+            "5" => Some(self.css_template_value("1.25rem")),
+            "6" => Some(self.css_template_value("1.5rem")),
+            "7" => Some(self.css_template_value("1.75rem")),
+            "8" => Some(self.css_template_value("2rem")),
+            "9" => Some(self.css_template_value("2.25rem")),
+            "10" => Some(self.css_template_value("2.5rem")),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct TypographyItalicPlugin;
+
+impl Plugin for TypographyItalicPlugin {
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        match modifier {
+            "italic" => Some("font-style: italic;".to_string()),
+            "no-italic" => Some("font-style: normal;".to_string()),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct TypographyTextDecorationPlugin;
+
+impl Plugin for TypographyTextDecorationPlugin {
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if ["underline", "overline", "line-through", "no-underline"].contains(&modifier) {
+            Some(format!("text-decoration-line: {modifier};"))
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct TypographyTextDecorationColorPlugin;
+
+impl Plugin for TypographyTextDecorationColorPlugin {
+    fn namespace(&self) -> String {
+        "decoration".to_string()
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        hint == "color" || is_matching_color(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        if val.contains("--tw-opacity") {
+            format!("-webkit-text-decoration-color: {color};
+  text-decoration-color: {color};", color = val.replace(" / var(--tw-opacity)", ""))
+        } else {
+            format!("-webkit-text-decoration-color: {val};
+  text-decoration-color: {val};")
+        }
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if modifier == "inherit" {
+            return Some(self.css_template_value("inherit"));
+        }
+
+        default_colors::get(modifier).map(|c| self.css_template_value(&c))
+    }
+}
+
+#[derive(Debug)]
+pub struct TypographyTextDecorationStylePlugin;
+
+impl Plugin for TypographyTextDecorationStylePlugin {
+    fn namespace(&self) -> String {
+        "decoration".to_string()
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if ["solid", "double", "dotted", "dashed", "wavy"].contains(&modifier) {
+            Some(format!("text-decoration-style: {modifier};"))
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct TypographyTextDecorationThicknessPlugin;
+
+impl Plugin for TypographyTextDecorationThicknessPlugin {
+    fn namespace(&self) -> String {
+        "decoration".to_string()
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        hint == "length" || hint == "percentage" || ["auto", "from-font"].contains(&val) || is_matching_length(val) || is_matching_percentage(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("text-decoration-thickness: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if ["auto", "from-font"].contains(&modifier) {
+            return Some(self.css_template_value(modifier));
+        }
+
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        if let Ok(thickness) = modifier.parse::<usize>() {
+            Some(self.css_template_value(&format!("{thickness}px")))
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct TypographyTextDecorationOffsetPlugin;
+
+impl Plugin for TypographyTextDecorationOffsetPlugin {
+    fn namespace(&self) -> String {
+        "underline".to_string()
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        // TODO: Is it useful to match the hint against `length` AND `percentage`?
+        hint == "length" || hint == "percentage" || val == "auto" || is_matching_length(val) || is_matching_percentage(val)
+    }
+
+    fn css_template_value(&self, val: &str) -> String {
+        format!("text-underline-offset: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+        if modifier == "auto" {
+            return Some(self.css_template_value("auto"));
+        }
+
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        if let Ok(offset) = modifier.parse::<usize>() {
+            Some(self.css_template_value(&format!("{offset}px")))
+        } else {
+            None
         }
     }
 }
@@ -248,26 +446,6 @@ impl Plugin for TypographyTextTransformPlugin {
         "stacked-fractions",
         "font-variant-numeric: stacked-fractions;".to_string(),
     );
-    selectors.register("tracking-tighter", "letter-spacing: -0.05em;".to_string());
-    selectors.register("tracking-tight", "letter-spacing: -0.025em;".to_string());
-    selectors.register("tracking-normal", "letter-spacing: 0;".to_string());
-    selectors.register("tracking-wide", "letter-spacing: 0.025em;".to_string());
-    selectors.register("tracking-wider", "letter-spacing: 0.05em;".to_string());
-    selectors.register("tracking-widest", "letter-spacing: 0.1em;".to_string());
-    selectors.register("leading-none", "line-height: 1;".to_string());
-    selectors.register("leading-tight", "line-height: 1.25;".to_string());
-    selectors.register("leading-snug", "line-height: 1.375;".to_string());
-    selectors.register("leading-normal", "line-height: 1.5;".to_string());
-    selectors.register("leading-relaxed", "line-height: 1.625;".to_string());
-    selectors.register("leading-loose", "line-height: 2;".to_string());
-    selectors.register("leading-3", "line-height: .75rem;".to_string());
-    selectors.register("leading-4", "line-height: 1rem;".to_string());
-    selectors.register("leading-5", "line-height: 1.25rem;".to_string());
-    selectors.register("leading-6", "line-height: 1.5rem;".to_string());
-    selectors.register("leading-7", "line-height: 1.75rem;".to_string());
-    selectors.register("leading-8", "line-height: 2rem;".to_string());
-    selectors.register("leading-9", "line-height: 2.25rem;".to_string());
-    selectors.register("leading-10", "line-height: 2.5rem;".to_string());
     selectors.register("list-none", "list-style-type: none;".to_string());
     selectors.register("list-disc", "list-style-type: disc;".to_string());
     selectors.register("list-decimal", "list-style-type: decimal;".to_string());

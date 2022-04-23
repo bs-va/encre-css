@@ -52,6 +52,8 @@ lazy_static! {
         Regex::new(&format!("(?:{})", LENGTH_UNITS.join("|"))).unwrap();
     static ref TIME_REGEX: Regex =
         Regex::new(r"\d+m?s$").unwrap();
+    static ref COMMA: fancy_regex::Regex = fancy_regex::Regex::new(r"\,(?![^(]*\))").unwrap();
+
 }
 
 // TODO: Support:
@@ -102,6 +104,13 @@ pub fn is_matching_number(val: &str) -> bool {
             .any(|f| Regex::new(&format!(r"^{}\(.+?", f)).unwrap().is_match(val))
 }
 
+pub fn is_matching_float(val: &str) -> bool {
+    val.parse::<f32>().is_ok()
+        || CSS_FUNCTIONS
+            .iter()
+            .any(|f| Regex::new(&format!(r"^{}\(.+?", f)).unwrap().is_match(val))
+}
+
 pub fn is_matching_percentage(val: &str) -> bool {
     val.ends_with('%')
         || CSS_FUNCTIONS
@@ -114,6 +123,7 @@ pub fn is_matching_time(val: &str) -> bool {
 }
 
 pub fn is_matching_shadow(val: &str) -> bool {
+    // TODO: \,(?![^(]*\)) -> prevent splitting rgba(12,12,12,0.2)
     val.split(',').all(|shadow| {
         let value = shadow.trim();
         let mut parts = value.split('_');

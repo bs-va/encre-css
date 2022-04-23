@@ -5,10 +5,6 @@ use crate::utils::{default_lengths, value_matchers::*};
 pub struct LayoutPositionPlugin;
 
 impl Plugin for LayoutPositionPlugin {
-    fn namespace(&self) -> String {
-        "".to_string()
-    }
-
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
         if ["static", "fixed", "absolute", "relative", "sticky"].contains(&modifier) {
             Some(format!("position: {modifier};"))
@@ -22,10 +18,6 @@ impl Plugin for LayoutPositionPlugin {
 pub struct LayoutDisplayPlugin;
 
 impl Plugin for LayoutDisplayPlugin {
-    fn namespace(&self) -> String {
-        "".to_string()
-    }
-
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
         match modifier {
             "hidden" => Some("display: none;".to_string()),
@@ -58,10 +50,6 @@ impl Plugin for LayoutDisplayPlugin {
 pub struct LayoutVisibilityPlugin;
 
 impl Plugin for LayoutVisibilityPlugin {
-    fn namespace(&self) -> String {
-        "".to_string()
-    }
-
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
         match modifier {
             "visible" => Some("visibility: visible;".to_string()),
@@ -75,10 +63,6 @@ impl Plugin for LayoutVisibilityPlugin {
 pub struct LayoutIsolationPlugin;
 
 impl Plugin for LayoutIsolationPlugin {
-    fn namespace(&self) -> String {
-        "".to_string()
-    }
-
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
         match modifier {
             "isolate" => Some("isolation: isolate;".to_string()),

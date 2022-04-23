@@ -67,16 +67,11 @@ impl Plugin for TransitionDurationPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        match modifier {
-            "75" => Some(self.css_template_value("75ms")),
-            "100" => Some(self.css_template_value("100ms")),
-            "150" => Some(self.css_template_value("150ms")),
-            "200" => Some(self.css_template_value("200ms")),
-            "300" => Some(self.css_template_value("300ms")),
-            "500" => Some(self.css_template_value("500ms")),
-            "700" => Some(self.css_template_value("700ms")),
-            "1000" => Some(self.css_template_value("1000ms")),
-            _ => None,
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        if let Ok(duration) = modifier.parse::<usize>() {
+            Some(self.css_template_value(&format!("{duration}ms")))
+        } else {
+            None
         }
     }
 }
