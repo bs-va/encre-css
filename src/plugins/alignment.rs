@@ -1,5 +1,7 @@
 use super::Plugin;
 
+use std::fmt::{Result, Write};
+
 #[derive(Debug)]
 pub struct AlignItemsPlugin;
 
@@ -8,14 +10,14 @@ impl Plugin for AlignItemsPlugin {
         "items"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "stretch" => Some("align-items: stretch;".to_string()),
-            "start" => Some("align-items: flex-start;".to_string()),
-            "center" => Some("align-items: center;".to_string()),
-            "end" => Some("align-items: flex-end;".to_string()),
-            "baseline" => Some("align-items: baseline;".to_string()),
-            _ => None,
+            "stretch" => write!(css_content, "align-items: stretch;"),
+            "start" => write!(css_content, "align-items: flex-start;"),
+            "center" => write!(css_content, "align-items: center;"),
+            "end" => write!(css_content, "align-items: flex-end;"),
+            "baseline" => write!(css_content, "align-items: baseline;"),
+            _ => Ok(()),
         }
     }
 }
@@ -28,15 +30,15 @@ impl Plugin for JustifyContentPlugin {
         "justify"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "start" => Some("justify-content: flex-start;".to_string()),
-            "center" => Some("justify-content: center;".to_string()),
-            "end" => Some("justify-content: flex-end;".to_string()),
-            "between" => Some("justify-content: space-between;".to_string()),
-            "around" => Some("justify-content: space-around;".to_string()),
-            "evenly" => Some("justify-content: space-evenly;".to_string()),
-            _ => None,
+            "start" => write!(css_content, "justify-content: flex-start;"),
+            "center" => write!(css_content, "justify-content: center;"),
+            "end" => write!(css_content, "justify-content: flex-end;"),
+            "between" => write!(css_content, "justify-content: space-between;"),
+            "around" => write!(css_content, "justify-content: space-around;"),
+            "evenly" => write!(css_content, "justify-content: space-evenly;"),
+            _ => Ok(()),
         }
     }
 }

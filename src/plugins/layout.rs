@@ -1,15 +1,17 @@
 use super::Plugin;
 use crate::utils::{default_lengths, value_matchers::*};
 
+use std::fmt::{Result, Write};
+
 #[derive(Debug)]
 pub struct PositionPlugin;
 
 impl Plugin for PositionPlugin {
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if ["static", "fixed", "absolute", "relative", "sticky"].contains(&modifier) {
-            Some(format!("position: {modifier};"))
+            write!(css_content, "position: {modifier};")
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -18,30 +20,30 @@ impl Plugin for PositionPlugin {
 pub struct DisplayPlugin;
 
 impl Plugin for DisplayPlugin {
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "hidden" => Some("display: none;".to_string()),
-            "contents" => Some("display: contents;".to_string()),
-            "list-item" => Some("display: list-item;".to_string()),
-            "block" => Some("display: block;".to_string()),
-            "inline-block" => Some("display: inline-block;".to_string()),
-            "flex" => Some("display: flex;".to_string()),
-            "inline-flex" => Some("display: inline-flex;".to_string()),
-            "inline" => Some("display: inline;".to_string()),
-            "table" => Some("display: table;".to_string()),
-            "inline-table" => Some("display: inline-table;".to_string()),
-            "table-cell" => Some("display: table-cell;".to_string()),
-            "table-caption" => Some("display: table-caption;".to_string()),
-            "table-column" => Some("display: table-column;".to_string()),
-            "table-column-group" => Some("display: table-column-group;".to_string()),
-            "table-footer-group" => Some("display: table-footer-group;".to_string()),
-            "table-header-group" => Some("display: table-header-group;".to_string()),
-            "table-row-group" => Some("display: table-row-group;".to_string()),
-            "table-row" => Some("display: table-row;".to_string()),
-            "flow-root" => Some("display: flow-root;".to_string()),
-            "grid" => Some("display: grid;".to_string()),
-            "inline-grid" => Some("display: inline-grid;".to_string()),
-            _ => None,
+            "hidden" => write!(css_content, "display: none;"),
+            "contents" => write!(css_content, "display: contents;"),
+            "list-item" => write!(css_content, "display: list-item;"),
+            "block" => write!(css_content, "display: block;"),
+            "inline-block" => write!(css_content, "display: inline-block;"),
+            "flex" => write!(css_content, "display: flex;"),
+            "inline-flex" => write!(css_content, "display: inline-flex;"),
+            "inline" => write!(css_content, "display: inline;"),
+            "table" => write!(css_content, "display: table;"),
+            "inline-table" => write!(css_content, "display: inline-table;"),
+            "table-cell" => write!(css_content, "display: table-cell;"),
+            "table-caption" => write!(css_content, "display: table-caption;"),
+            "table-column" => write!(css_content, "display: table-column;"),
+            "table-column-group" => write!(css_content, "display: table-column-group;"),
+            "table-footer-group" => write!(css_content, "display: table-footer-group;"),
+            "table-header-group" => write!(css_content, "display: table-header-group;"),
+            "table-row-group" => write!(css_content, "display: table-row-group;"),
+            "table-row" => write!(css_content, "display: table-row;"),
+            "flow-root" => write!(css_content, "display: flow-root;"),
+            "grid" => write!(css_content, "display: grid;"),
+            "inline-grid" => write!(css_content, "display: inline-grid;"),
+            _ => Ok(()),
         }
     }
 }
@@ -50,11 +52,11 @@ impl Plugin for DisplayPlugin {
 pub struct VisibilityPlugin;
 
 impl Plugin for VisibilityPlugin {
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "visible" => Some("visibility: visible;".to_string()),
-            "invisible" => Some("visibility: hidden;".to_string()),
-            _ => None,
+            "visible" => write!(css_content, "visibility: visible;"),
+            "invisible" => write!(css_content, "visibility: hidden;"),
+            _ => Ok(()),
         }
     }
 }
@@ -63,11 +65,11 @@ impl Plugin for VisibilityPlugin {
 pub struct IsolationPlugin;
 
 impl Plugin for IsolationPlugin {
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "isolate" => Some("isolation: isolate;".to_string()),
-            "isolation-auto" => Some("isolation: auto;".to_string()),
-            _ => None,
+            "isolate" => write!(css_content, "isolation: isolate;"),
+            "isolation-auto" => write!(css_content, "isolation: auto;"),
+            _ => Ok(()),
         }
     }
 }
@@ -84,8 +86,8 @@ impl Plugin for InsetPlugin {
         is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!(
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content,
             "top: {val};
   right: {val};
   bottom: {val};
@@ -93,8 +95,12 @@ impl Plugin for InsetPlugin {
         )
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_lengths::get_extended(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(length) = default_lengths::get_extended(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -110,15 +116,19 @@ impl Plugin for InsetXPlugin {
         is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!(
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content,
             "left: {val};
   right: {val};"
         )
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_lengths::get_extended(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(length) = default_lengths::get_extended(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -134,15 +144,19 @@ impl Plugin for InsetYPlugin {
         is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!(
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content,
             "top: {val};
   bottom: {val};"
         )
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_lengths::get_extended(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(length) = default_lengths::get_extended(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -158,12 +172,16 @@ impl Plugin for TopPlugin {
         is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("top: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "top: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_lengths::get_extended(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(length) = default_lengths::get_extended(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -179,12 +197,16 @@ impl Plugin for BottomPlugin {
         is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("bottom: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "bottom: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_lengths::get_extended(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(length) = default_lengths::get_extended(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -200,12 +222,16 @@ impl Plugin for LeftPlugin {
         is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("left: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "left: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_lengths::get_extended(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(length) = default_lengths::get_extended(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -221,12 +247,16 @@ impl Plugin for RightPlugin {
         is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("right: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "right: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_lengths::get_extended(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(length) = default_lengths::get_extended(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -238,12 +268,12 @@ impl Plugin for ZIndexPlugin {
         "z"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if modifier.parse::<f32>().is_ok() || is_matching_auto(modifier) {
-            Some(format!("z-index: {modifier};"))
+            write!(css_content, "z-index: {modifier};")
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -256,15 +286,15 @@ impl Plugin for ContainerPlugin {
         "container"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "none" => Some("width: 100%;".to_string()),
-            "sm" => Some("max-width: 640px;".to_string()),
-            "md" => Some("max-width: 768px;".to_string()),
-            "lg" => Some("max-width: 1024px;".to_string()),
-            "xl" => Some("max-width: 1280px;".to_string()),
-            "2xl" => Some("max-width: 1536px;".to_string()),
-            _ => None,
+            "none" => write!(css_content, "width: 100%;"),
+            "sm" => write!(css_content, "max-width: 640px;"),
+            "md" => write!(css_content, "max-width: 768px;"),
+            "lg" => write!(css_content, "max-width: 1024px;"),
+            "xl" => write!(css_content, "max-width: 1280px;"),
+            "2xl" => write!(css_content, "max-width: 1536px;"),
+            _ => Ok(()),
         }
     }
 }
@@ -277,11 +307,11 @@ impl Plugin for BoxDecorationBreakPlugin {
         "decoration"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if ["slice", "clone"].contains(&modifier) {
-            Some(format!("box-decoration-break: {modifier};"))
+            write!(css_content, "box-decoration-break: {modifier};")
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -294,11 +324,11 @@ impl Plugin for BoxSizingPlugin {
         "box"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if ["border", "content"].contains(&modifier) {
-            Some(format!("box-sizing: {modifier}-box;"))
+            write!(css_content, "box-sizing: {modifier}-box;")
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -311,11 +341,11 @@ impl Plugin for FloatPlugin {
         "float"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if ["left", "right", "none"].contains(&modifier) {
-            Some(format!("float: {modifier};"))
+            write!(css_content, "float: {modifier};")
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -328,11 +358,11 @@ impl Plugin for ClearPlugin {
         "clear"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if ["left", "right", "both", "none"].contains(&modifier) {
-            Some(format!("clear: {modifier};"))
+            write!(css_content, "clear: {modifier};")
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -345,11 +375,11 @@ impl Plugin for ObjectFitPlugin {
         "object"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if ["contain", "cover", "fill", "none", "scale-down"].contains(&modifier) {
-            Some(format!("object-fit: {modifier};"))
+            write!(css_content, "object-fit: {modifier};")
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -366,22 +396,22 @@ impl Plugin for ObjectPositionPlugin {
         val.split('_').all(is_matching_position)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("object-position: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "object-position: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "bottom" => Some(self.css_template_value("bottom")),
-            "center" => Some(self.css_template_value("center")),
-            "left" => Some(self.css_template_value("left")),
-            "left-bottom" => Some(self.css_template_value("left bottom")),
-            "left-top" => Some(self.css_template_value("left top")),
-            "right" => Some(self.css_template_value("right")),
-            "right-bottom" => Some(self.css_template_value("right bottom")),
-            "right-top" => Some(self.css_template_value("right top")),
-            "top" => Some(self.css_template_value("top")),
-            _ => None,
+            "bottom" => self.css_template_value("bottom", css_content),
+            "center" => self.css_template_value("center", css_content),
+            "left" => self.css_template_value("left", css_content),
+            "left-bottom" => self.css_template_value("left bottom", css_content),
+            "left-top" => self.css_template_value("left top", css_content),
+            "right" => self.css_template_value("right", css_content),
+            "right-bottom" => self.css_template_value("right bottom", css_content),
+            "right-top" => self.css_template_value("right top", css_content),
+            "top" => self.css_template_value("top", css_content),
+            _ => Ok(()),
         }
     }
 }
@@ -394,21 +424,21 @@ impl Plugin for OverflowPlugin {
         "overflow"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "auto" => Some("overflow: auto;".to_string()),
-            "x-auto" => Some("overflow-x: auto;".to_string()),
-            "y-auto" => Some("overflow-y: auto;".to_string()),
-            "hidden" => Some("overflow: hidden;".to_string()),
-            "x-hidden" => Some("overflow-x: hidden;".to_string()),
-            "y-hidden" => Some("overflow-y: hidden;".to_string()),
-            "visible" => Some("overflow: visible;".to_string()),
-            "x-visible" => Some("overflow-x: visible;".to_string()),
-            "y-visible" => Some("overflow-y: visible;".to_string()),
-            "scroll" => Some("overflow: scroll;".to_string()),
-            "x-scroll" => Some("overflow-x: scroll;".to_string()),
-            "y-scroll" => Some("overflow-y: scroll;".to_string()),
-            _ => None,
+            "auto" => write!(css_content, "overflow: auto;"),
+            "x-auto" => write!(css_content, "overflow-x: auto;"),
+            "y-auto" => write!(css_content, "overflow-y: auto;"),
+            "hidden" => write!(css_content, "overflow: hidden;"),
+            "x-hidden" => write!(css_content, "overflow-x: hidden;"),
+            "y-hidden" => write!(css_content, "overflow-y: hidden;"),
+            "visible" => write!(css_content, "overflow: visible;"),
+            "x-visible" => write!(css_content, "overflow-x: visible;"),
+            "y-visible" => write!(css_content, "overflow-y: visible;"),
+            "scroll" => write!(css_content, "overflow: scroll;"),
+            "x-scroll" => write!(css_content, "overflow-x: scroll;"),
+            "y-scroll" => write!(css_content, "overflow-y: scroll;"),
+            _ => Ok(()),
         }
     }
 }
@@ -421,18 +451,18 @@ impl Plugin for OverscrollPlugin {
         "overscroll"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "auto" => Some("overscroll-behavior: auto;".to_string()),
-            "y-auto" => Some("overscroll-behavior-y: auto;".to_string()),
-            "x-auto" => Some("overscroll-behavior-x: auto;".to_string()),
-            "contain" => Some("overscroll-behavior: contain;".to_string()),
-            "y-contain" => Some("overscroll-behavior-y: contain;".to_string()),
-            "x-contain" => Some("overscroll-behavior-x: contain;".to_string()),
-            "none" => Some("overscroll-behavior: none;".to_string()),
-            "y-none" => Some("overscroll-behavior-y: none;".to_string()),
-            "x-none" => Some("overscroll-behavior-x: none;".to_string()),
-            _ => None,
+            "auto" => write!(css_content, "overscroll-behavior: auto;"),
+            "y-auto" => write!(css_content, "overscroll-behavior-y: auto;"),
+            "x-auto" => write!(css_content, "overscroll-behavior-x: auto;"),
+            "contain" => write!(css_content, "overscroll-behavior: contain;"),
+            "y-contain" => write!(css_content, "overscroll-behavior-y: contain;"),
+            "x-contain" => write!(css_content, "overscroll-behavior-x: contain;"),
+            "none" => write!(css_content, "overscroll-behavior: none;"),
+            "y-none" => write!(css_content, "overscroll-behavior-y: none;"),
+            "x-none" => write!(css_content, "overscroll-behavior-x: none;"),
+            _ => Ok(()),
         }
     }
 }

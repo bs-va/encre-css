@@ -1,6 +1,8 @@
 use super::Plugin;
 use crate::utils::{default_lengths, value_matchers::*};
 
+use std::fmt::{Result, Write};
+
 #[derive(Debug)]
 pub struct WidthPlugin;
 
@@ -13,12 +15,16 @@ impl Plugin for WidthPlugin {
         is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("width: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "width: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_lengths::get_extended_size(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(length) = default_lengths::get_extended_size(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -34,18 +40,18 @@ impl Plugin for MinWidthPlugin {
         is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("min-width: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "min-width: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "0" => Some(self.css_template_value("0")),
-            "full" => Some(self.css_template_value("100%")),
-            "min" => Some(self.css_template_value("min-content")),
-            "max" => Some(self.css_template_value("max-content")),
-            "fit" => Some(self.css_template_value("fit-content")),
-            _ => None,
+            "0" => self.css_template_value("0", css_content),
+            "full" => self.css_template_value("100%", css_content),
+            "min" => self.css_template_value("min-content", css_content),
+            "max" => self.css_template_value("max-content", css_content),
+            "fit" => self.css_template_value("fit-content", css_content),
+            _ => Ok(()),
         }
     }
 }
@@ -62,36 +68,36 @@ impl Plugin for MaxWidthPlugin {
         is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("max-width: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "max-width: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "0" => Some(self.css_template_value("0rem")),
-            "none" => Some(self.css_template_value("none")),
-            "xs" => Some(self.css_template_value("20rem")),
-            "sm" => Some(self.css_template_value("24rem")),
-            "md" => Some(self.css_template_value("28rem")),
-            "lg" => Some(self.css_template_value("32rem")),
-            "xl" => Some(self.css_template_value("36rem")),
-            "2xl" => Some(self.css_template_value("42rem")),
-            "3xl" => Some(self.css_template_value("48rem")),
-            "4xl" => Some(self.css_template_value("56rem")),
-            "5xl" => Some(self.css_template_value("64rem")),
-            "6xl" => Some(self.css_template_value("72rem")),
-            "7xl" => Some(self.css_template_value("80rem")),
-            "full" => Some(self.css_template_value("100%")),
-            "min" => Some(self.css_template_value("min-content")),
-            "max" => Some(self.css_template_value("max-content")),
-            "fit" => Some(self.css_template_value("fit-content")),
-            "prose" => Some(self.css_template_value("65ch")),
-            "screen-sm" => Some(self.css_template_value("640px")),
-            "screen-md" => Some(self.css_template_value("768px")),
-            "screen-lg" => Some(self.css_template_value("1024px")),
-            "screen-xl" => Some(self.css_template_value("1280px")),
-            "screen-2xl" => Some(self.css_template_value("1536px")),
-            _ => None,
+            "0" => self.css_template_value("0rem", css_content),
+            "none" => self.css_template_value("none", css_content),
+            "xs" => self.css_template_value("20rem", css_content),
+            "sm" => self.css_template_value("24rem", css_content),
+            "md" => self.css_template_value("28rem", css_content),
+            "lg" => self.css_template_value("32rem", css_content),
+            "xl" => self.css_template_value("36rem", css_content),
+            "2xl" => self.css_template_value("42rem", css_content),
+            "3xl" => self.css_template_value("48rem", css_content),
+            "4xl" => self.css_template_value("56rem", css_content),
+            "5xl" => self.css_template_value("64rem", css_content),
+            "6xl" => self.css_template_value("72rem", css_content),
+            "7xl" => self.css_template_value("80rem", css_content),
+            "full" => self.css_template_value("100%", css_content),
+            "min" => self.css_template_value("min-content", css_content),
+            "max" => self.css_template_value("max-content", css_content),
+            "fit" => self.css_template_value("fit-content", css_content),
+            "prose" => self.css_template_value("65ch", css_content),
+            "screen-sm" => self.css_template_value("640px", css_content),
+            "screen-md" => self.css_template_value("768px", css_content),
+            "screen-lg" => self.css_template_value("1024px", css_content),
+            "screen-xl" => self.css_template_value("1280px", css_content),
+            "screen-2xl" => self.css_template_value("1536px", css_content),
+            _ => Ok(()),
         }
     }
 }
@@ -110,12 +116,16 @@ impl Plugin for HeightPlugin {
         is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("height: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "height: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_lengths::get_extended_size(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(length) = default_lengths::get_extended_size(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -131,19 +141,19 @@ impl Plugin for MinHeightPlugin {
         is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("min-height: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "min-height: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "0" => Some(self.css_template_value("0")),
-            "full" => Some(self.css_template_value("100%")),
-            "min" => Some(self.css_template_value("min-content")),
-            "max" => Some(self.css_template_value("max-content")),
-            "fit" => Some(self.css_template_value("fit-content")),
-            "screen" => Some(self.css_template_value("100vh")),
-            _ => None,
+            "0" => self.css_template_value("0", css_content),
+            "full" => self.css_template_value("100%", css_content),
+            "min" => self.css_template_value("min-content", css_content),
+            "max" => self.css_template_value("max-content", css_content),
+            "fit" => self.css_template_value("fit-content", css_content),
+            "screen" => self.css_template_value("100vh", css_content),
+            _ => Ok(()),
         }
     }
 }
@@ -160,31 +170,31 @@ impl Plugin for MaxHeightPlugin {
         is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("max-height: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "max-height: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "0" => Some(self.css_template_value("0rem")),
-            "none" => Some(self.css_template_value("none")),
-            "xs" => Some(self.css_template_value("20rem")),
-            "sm" => Some(self.css_template_value("24rem")),
-            "md" => Some(self.css_template_value("28rem")),
-            "lg" => Some(self.css_template_value("32rem")),
-            "xl" => Some(self.css_template_value("36rem")),
-            "2xl" => Some(self.css_template_value("42rem")),
-            "3xl" => Some(self.css_template_value("48rem")),
-            "4xl" => Some(self.css_template_value("56rem")),
-            "5xl" => Some(self.css_template_value("64rem")),
-            "6xl" => Some(self.css_template_value("72rem")),
-            "7xl" => Some(self.css_template_value("80rem")),
-            "full" => Some(self.css_template_value("100%")),
-            "min" => Some(self.css_template_value("min-content")),
-            "max" => Some(self.css_template_value("max-content")),
-            "screen" => Some(self.css_template_value("100vh")),
-            "fit" => Some(self.css_template_value("fit-content")),
-            _ => None,
+            "0" => self.css_template_value("0rem", css_content),
+            "none" => self.css_template_value("none", css_content),
+            "xs" => self.css_template_value("20rem", css_content),
+            "sm" => self.css_template_value("24rem", css_content),
+            "md" => self.css_template_value("28rem", css_content),
+            "lg" => self.css_template_value("32rem", css_content),
+            "xl" => self.css_template_value("36rem", css_content),
+            "2xl" => self.css_template_value("42rem", css_content),
+            "3xl" => self.css_template_value("48rem", css_content),
+            "4xl" => self.css_template_value("56rem", css_content),
+            "5xl" => self.css_template_value("64rem", css_content),
+            "6xl" => self.css_template_value("72rem", css_content),
+            "7xl" => self.css_template_value("80rem", css_content),
+            "full" => self.css_template_value("100%", css_content),
+            "min" => self.css_template_value("min-content", css_content),
+            "max" => self.css_template_value("max-content", css_content),
+            "screen" => self.css_template_value("100vh", css_content),
+            "fit" => self.css_template_value("fit-content", css_content),
+            _ => Ok(()),
         }
     }
 }

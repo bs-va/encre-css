@@ -1,5 +1,7 @@
 use super::Plugin;
 
+use std::fmt::{Result, Write};
+
 #[derive(Debug)]
 pub struct CursorPlugin;
 
@@ -12,11 +14,11 @@ impl Plugin for CursorPlugin {
         true
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("cursor: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "cursor: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if [
             "auto",
             "default",
@@ -29,9 +31,9 @@ impl Plugin for CursorPlugin {
         ]
         .contains(&modifier)
         {
-            Some(self.css_template_value(modifier))
+            self.css_template_value(modifier, css_content)
         } else {
-            None
+            Ok(())
         }
     }
 }

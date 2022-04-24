@@ -1,6 +1,8 @@
 use super::Plugin;
 use crate::utils::{default_colors, value_matchers::*};
 
+use std::fmt::{Result, Write};
+
 #[derive(Debug)]
 pub struct ColorPlugin;
 
@@ -13,20 +15,24 @@ impl Plugin for ColorPlugin {
         hint == "color" || is_matching_color(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         if val.contains("--tw-opacity") {
-            format!(
+            write!(css_content,
                 "--tw-border-opacity: 1;
   border-color: {};",
                 val.replace("--tw-opacity", "--tw-border-opacity")
             )
         } else {
-            format!("border-color: {val};")
+            write!(css_content, "border-color: {val};")
         }
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_colors::get(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(color) = default_colors::get(modifier) {
+            self.css_template_value(&color, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -42,20 +48,20 @@ impl Plugin for WidthPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("border-width: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "border-width: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if modifier.is_empty() {
-            return Some(self.css_template_value("1px"));
+            return self.css_template_value("1px", css_content);
         }
 
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(width) = modifier.parse::<usize>() {
-            Some(self.css_template_value(&format!("{width}px")))
+            self.css_template_value(&format!("{width}px"), css_content)
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -72,23 +78,23 @@ impl Plugin for WidthXPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!(
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content,
             "border-left-width: {val};
   border-right-width: {val};"
         )
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if modifier.is_empty() {
-            return Some(self.css_template_value("1px"));
+            return self.css_template_value("1px", css_content);
         }
 
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(width) = modifier.parse::<usize>() {
-            Some(self.css_template_value(&format!("{width}px")))
+            self.css_template_value(&format!("{width}px"), css_content)
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -105,23 +111,23 @@ impl Plugin for WidthYPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!(
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content,
             "border-top-width: {val};
   border-bottom-width: {val};"
         )
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if modifier.is_empty() {
-            return Some(self.css_template_value("1px"));
+            return self.css_template_value("1px", css_content);
         }
 
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(width) = modifier.parse::<usize>() {
-            Some(self.css_template_value(&format!("{width}px")))
+            self.css_template_value(&format!("{width}px"), css_content)
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -138,20 +144,20 @@ impl Plugin for WidthTopPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("border-top-width: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "border-top-width: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if modifier.is_empty() {
-            return Some(self.css_template_value("1px"));
+            return self.css_template_value("1px", css_content);
         }
 
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(width) = modifier.parse::<usize>() {
-            Some(self.css_template_value(&format!("{width}px")))
+            self.css_template_value(&format!("{width}px"), css_content)
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -168,20 +174,20 @@ impl Plugin for WidthBottomPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("border-bottom-width: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "border-bottom-width: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if modifier.is_empty() {
-            return Some(self.css_template_value("1px"));
+            return self.css_template_value("1px", css_content);
         }
 
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(width) = modifier.parse::<usize>() {
-            Some(self.css_template_value(&format!("{width}px")))
+            self.css_template_value(&format!("{width}px"), css_content)
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -198,20 +204,20 @@ impl Plugin for WidthLeftPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("border-left-width: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "border-left-width: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if modifier.is_empty() {
-            return Some(self.css_template_value("1px"));
+            return self.css_template_value("1px", css_content);
         }
 
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(width) = modifier.parse::<usize>() {
-            Some(self.css_template_value(&format!("{width}px")))
+            self.css_template_value(&format!("{width}px"), css_content)
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -228,20 +234,20 @@ impl Plugin for WidthRightPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("border-right-width: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "border-right-width: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if modifier.is_empty() {
-            return Some(self.css_template_value("1px"));
+            return self.css_template_value("1px", css_content);
         }
 
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(width) = modifier.parse::<usize>() {
-            Some(self.css_template_value(&format!("{width}px")))
+            self.css_template_value(&format!("{width}px"), css_content)
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -254,12 +260,12 @@ impl Plugin for OpacityPlugin {
         "border-opacity"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.parse::<f32>() {
-            Some(format!("--tw-border-opacity: {};", opacity_value / 100.))
+            write!(css_content, "--tw-border-opacity: {};", opacity_value / 100.)
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -277,94 +283,94 @@ impl Plugin for RadiusPlugin {
             .all(|v| is_matching_length(v) || is_matching_percentage(v))
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("border-radius: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "border-radius: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "" => Some(self.css_template_value("0.25rem")),
-            "none" => Some(self.css_template_value("0")),
-            "sm" => Some(self.css_template_value("0.125rem")),
-            "md" => Some(self.css_template_value("0.375rem")),
-            "lg" => Some(self.css_template_value("0.5rem")),
-            "xl" => Some(self.css_template_value("0.75rem")),
-            "2xl" => Some(self.css_template_value("1rem")),
-            "3xl" => Some(self.css_template_value("1.5rem")),
-            "full" => Some(self.css_template_value("9999px")),
-            "t-none" => Some(self.css_template_value("")),
-            "r-none" => Some(self.css_template_value("")),
-            "b-none" => Some(self.css_template_value("")),
-            "l-none" => Some(self.css_template_value("")),
-            "t-sm" => Some(self.css_template_value("")),
-            "r-sm" => Some(self.css_template_value("")),
-            "b-sm" => Some(self.css_template_value("")),
-            "l-sm" => Some(self.css_template_value("")),
-            "t" => Some(self.css_template_value("")),
-            "r" => Some(self.css_template_value("")),
-            "b" => Some(self.css_template_value("")),
-            "l" => Some(self.css_template_value("")),
-            "t-md" => Some(self.css_template_value("")),
-            "r-md" => Some(self.css_template_value("")),
-            "b-md" => Some(self.css_template_value("")),
-            "l-md" => Some(self.css_template_value("")),
-            "t-lg" => Some(self.css_template_value("")),
-            "r-lg" => Some(self.css_template_value("")),
-            "b-lg" => Some(self.css_template_value("")),
-            "l-lg" => Some(self.css_template_value("")),
-            "t-xl" => Some(self.css_template_value("")),
-            "r-xl" => Some(self.css_template_value("")),
-            "b-xl" => Some(self.css_template_value("")),
-            "l-xl" => Some(self.css_template_value("")),
-            "t-2xl" => Some(self.css_template_value("")),
-            "r-2xl" => Some(self.css_template_value("")),
-            "b-2xl" => Some(self.css_template_value("")),
-            "l-2xl" => Some(self.css_template_value("")),
-            "t-3xl" => Some(self.css_template_value("")),
-            "r-3xl" => Some(self.css_template_value("")),
-            "b-3xl" => Some(self.css_template_value("")),
-            "l-3xl" => Some(self.css_template_value("")),
-            "t-full" => Some(self.css_template_value("")),
-            "r-full" => Some(self.css_template_value("")),
-            "b-full" => Some(self.css_template_value("")),
-            "l-full" => Some(self.css_template_value("")),
-            "tl-none" => Some(self.css_template_value("")),
-            "tr-none" => Some(self.css_template_value("")),
-            "br-none" => Some(self.css_template_value("")),
-            "bl-none" => Some(self.css_template_value("")),
-            "tl-sm" => Some(self.css_template_value("")),
-            "tr-sm" => Some(self.css_template_value("")),
-            "br-sm" => Some(self.css_template_value("")),
-            "bl-sm" => Some(self.css_template_value("")),
-            "tl" => Some(self.css_template_value("")),
-            "tr" => Some(self.css_template_value("")),
-            "br" => Some(self.css_template_value("")),
-            "bl" => Some(self.css_template_value("")),
-            "tl-md" => Some(self.css_template_value("")),
-            "tr-md" => Some(self.css_template_value("")),
-            "br-md" => Some(self.css_template_value("")),
-            "bl-md" => Some(self.css_template_value("")),
-            "tl-lg" => Some(self.css_template_value("")),
-            "tr-lg" => Some(self.css_template_value("")),
-            "br-lg" => Some(self.css_template_value("")),
-            "bl-lg" => Some(self.css_template_value("")),
-            "tl-xl" => Some(self.css_template_value("")),
-            "tr-xl" => Some(self.css_template_value("")),
-            "br-xl" => Some(self.css_template_value("")),
-            "bl-xl" => Some(self.css_template_value("")),
-            "tl-2xl" => Some(self.css_template_value("")),
-            "tr-2xl" => Some(self.css_template_value("")),
-            "br-2xl" => Some(self.css_template_value("")),
-            "bl-2xl" => Some(self.css_template_value("")),
-            "tl-3xl" => Some(self.css_template_value("")),
-            "tr-3xl" => Some(self.css_template_value("")),
-            "br-3xl" => Some(self.css_template_value("")),
-            "bl-3xl" => Some(self.css_template_value("")),
-            "tl-full" => Some(self.css_template_value("")),
-            "tr-full" => Some(self.css_template_value("")),
-            "br-full" => Some(self.css_template_value("")),
-            "bl-full" => Some(self.css_template_value("")),
-            _ => None,
+            "" => self.css_template_value("0.25rem", css_content),
+            "none" => self.css_template_value("0", css_content),
+            "sm" => self.css_template_value("0.125rem", css_content),
+            "md" => self.css_template_value("0.375rem", css_content),
+            "lg" => self.css_template_value("0.5rem", css_content),
+            "xl" => self.css_template_value("0.75rem", css_content),
+            "2xl" => self.css_template_value("1rem", css_content),
+            "3xl" => self.css_template_value("1.5rem", css_content),
+            "full" => self.css_template_value("9999px", css_content),
+            "t-none" => self.css_template_value("", css_content),
+            "r-none" => self.css_template_value("", css_content),
+            "b-none" => self.css_template_value("", css_content),
+            "l-none" => self.css_template_value("", css_content),
+            "t-sm" => self.css_template_value("", css_content),
+            "r-sm" => self.css_template_value("", css_content),
+            "b-sm" => self.css_template_value("", css_content),
+            "l-sm" => self.css_template_value("", css_content),
+            "t" => self.css_template_value("", css_content),
+            "r" => self.css_template_value("", css_content),
+            "b" => self.css_template_value("", css_content),
+            "l" => self.css_template_value("", css_content),
+            "t-md" => self.css_template_value("", css_content),
+            "r-md" => self.css_template_value("", css_content),
+            "b-md" => self.css_template_value("", css_content),
+            "l-md" => self.css_template_value("", css_content),
+            "t-lg" => self.css_template_value("", css_content),
+            "r-lg" => self.css_template_value("", css_content),
+            "b-lg" => self.css_template_value("", css_content),
+            "l-lg" => self.css_template_value("", css_content),
+            "t-xl" => self.css_template_value("", css_content),
+            "r-xl" => self.css_template_value("", css_content),
+            "b-xl" => self.css_template_value("", css_content),
+            "l-xl" => self.css_template_value("", css_content),
+            "t-2xl" => self.css_template_value("", css_content),
+            "r-2xl" => self.css_template_value("", css_content),
+            "b-2xl" => self.css_template_value("", css_content),
+            "l-2xl" => self.css_template_value("", css_content),
+            "t-3xl" => self.css_template_value("", css_content),
+            "r-3xl" => self.css_template_value("", css_content),
+            "b-3xl" => self.css_template_value("", css_content),
+            "l-3xl" => self.css_template_value("", css_content),
+            "t-full" => self.css_template_value("", css_content),
+            "r-full" => self.css_template_value("", css_content),
+            "b-full" => self.css_template_value("", css_content),
+            "l-full" => self.css_template_value("", css_content),
+            "tl-none" => self.css_template_value("", css_content),
+            "tr-none" => self.css_template_value("", css_content),
+            "br-none" => self.css_template_value("", css_content),
+            "bl-none" => self.css_template_value("", css_content),
+            "tl-sm" => self.css_template_value("", css_content),
+            "tr-sm" => self.css_template_value("", css_content),
+            "br-sm" => self.css_template_value("", css_content),
+            "bl-sm" => self.css_template_value("", css_content),
+            "tl" => self.css_template_value("", css_content),
+            "tr" => self.css_template_value("", css_content),
+            "br" => self.css_template_value("", css_content),
+            "bl" => self.css_template_value("", css_content),
+            "tl-md" => self.css_template_value("", css_content),
+            "tr-md" => self.css_template_value("", css_content),
+            "br-md" => self.css_template_value("", css_content),
+            "bl-md" => self.css_template_value("", css_content),
+            "tl-lg" => self.css_template_value("", css_content),
+            "tr-lg" => self.css_template_value("", css_content),
+            "br-lg" => self.css_template_value("", css_content),
+            "bl-lg" => self.css_template_value("", css_content),
+            "tl-xl" => self.css_template_value("", css_content),
+            "tr-xl" => self.css_template_value("", css_content),
+            "br-xl" => self.css_template_value("", css_content),
+            "bl-xl" => self.css_template_value("", css_content),
+            "tl-2xl" => self.css_template_value("", css_content),
+            "tr-2xl" => self.css_template_value("", css_content),
+            "br-2xl" => self.css_template_value("", css_content),
+            "bl-2xl" => self.css_template_value("", css_content),
+            "tl-3xl" => self.css_template_value("", css_content),
+            "tr-3xl" => self.css_template_value("", css_content),
+            "br-3xl" => self.css_template_value("", css_content),
+            "bl-3xl" => self.css_template_value("", css_content),
+            "tl-full" => self.css_template_value("", css_content),
+            "tr-full" => self.css_template_value("", css_content),
+            "br-full" => self.css_template_value("", css_content),
+            "bl-full" => self.css_template_value("", css_content),
+            _ => Ok(()),
         }
     }
 }
@@ -381,20 +387,24 @@ impl Plugin for DivideColorPlugin {
         hint == "color" || is_matching_color(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         if val.contains("--tw-opacity") {
-            format!(
+            write!(css_content,
                 "--tw-divide-opacity: 1;
   border-color: {};",
                 val.replace("--tw-opacity", "--tw-divide-opacity")
             )
         } else {
-            format!("border-color: {val};")
+            write!(css_content, "border-color: {val};")
         }
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_colors::get(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(color) = default_colors::get(modifier) {
+            self.css_template_value(&color, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -406,12 +416,12 @@ impl Plugin for DivideOpacityPlugin {
         "divide-opacity"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.parse::<f32>() {
-            Some(format!("--tw-divide-opacity: {};", opacity_value / 100.))
+            write!(css_content, "--tw-divide-opacity: {};", opacity_value / 100.)
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -428,20 +438,24 @@ impl Plugin for RingColorPlugin {
         hint == "color" || is_matching_color(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         if val.contains("--tw-opacity") {
-            format!(
+            write!(css_content,
                 "--tw-ring-opacity: 1;
   --ring-color: {};",
                 val.replace("--tw-opacity", "--tw-ring-opacity")
             )
         } else {
-            format!("--ring-color: {val};")
+            write!(css_content, "--ring-color: {val};")
         }
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_colors::get(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(color) = default_colors::get(modifier) {
+            self.css_template_value(&color, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -453,12 +467,12 @@ impl Plugin for RingOpacityPlugin {
         "ring-opacity"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.parse::<f32>() {
-            Some(format!("--tw-ring-opacity: {};", opacity_value / 100.))
+            write!(css_content, "--tw-ring-opacity: {};", opacity_value / 100.)
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -475,20 +489,24 @@ impl Plugin for RingOffsetColorPlugin {
         hint == "color" || is_matching_color(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         if val.contains("--tw-opacity") {
-            format!(
+            write!(css_content,
                 "--tw-ring-offset-opacity: 1;
   --ring-offset-color: {};",
                 val.replace("--tw-opacity", "--tw-ring-offset-opacity")
             )
         } else {
-            format!("--ring-offset-color: {val};")
+            write!(css_content, "--ring-offset-color: {val};")
         }
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_colors::get(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(color) = default_colors::get(modifier) {
+            self.css_template_value(&color, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -500,15 +518,16 @@ impl Plugin for RingOffsetOpacityPlugin {
         "ring-offset-opacity"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.parse::<f32>() {
-            Some(format!(
+            write!(
+                css_content,
                 "--tw-ring-offset-opacity: {};",
                 opacity_value / 100.
-            ))
+            )
         } else {
-            None
+            Ok(())
         }
     }
 }

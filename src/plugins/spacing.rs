@@ -1,6 +1,8 @@
 use super::Plugin;
 use crate::utils::{default_lengths, value_matchers::*};
 
+use std::fmt::{Result, Write};
+
 // TODO: Boilerplate generator (just one structure for padding and another for margin)
 #[derive(Debug)]
 pub struct PaddingPlugin;
@@ -14,12 +16,16 @@ impl Plugin for PaddingPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("padding: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "padding: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(length) = default_lengths::get_basic(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -35,15 +41,19 @@ impl Plugin for PaddingXPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!(
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content,
             "padding-left: {val};
   padding-right: {val};"
         )
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(length) = default_lengths::get_basic(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -59,15 +69,19 @@ impl Plugin for PaddingYPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!(
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content,
             "padding-top: {val};
   padding-bottom: {val};"
         )
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(length) = default_lengths::get_basic(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -83,12 +97,16 @@ impl Plugin for PaddingLeftPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("padding-left: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "padding-left: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(length) = default_lengths::get_basic(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -104,12 +122,16 @@ impl Plugin for PaddingRightPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("padding-right: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "padding-right: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(length) = default_lengths::get_basic(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -125,12 +147,16 @@ impl Plugin for PaddingTopPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("padding-top: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "padding-top: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(length) = default_lengths::get_basic(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -146,12 +172,16 @@ impl Plugin for PaddingBottomPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("padding-bottom: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "padding-bottom: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(length) = default_lengths::get_basic(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -169,16 +199,20 @@ impl Plugin for MarginPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("margin: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "margin: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if is_matching_auto(modifier) {
-            return Some(self.css_template_value("auto"));
+            return self.css_template_value("auto", css_content);
         }
 
-        default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
+        if let Some(length) = default_lengths::get_basic(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -194,19 +228,23 @@ impl Plugin for MarginXPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!(
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content,
             "margin-left: {val};
   margin-right: {val};"
         )
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if is_matching_auto(modifier) {
-            return Some(self.css_template_value("auto"));
+            return self.css_template_value("auto", css_content);
         }
 
-        default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
+        if let Some(length) = default_lengths::get_basic(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -222,19 +260,23 @@ impl Plugin for MarginYPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!(
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content,
             "margin-top: {val};
   margin-bottom: {val};"
         )
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if is_matching_auto(modifier) {
-            return Some(self.css_template_value("auto"));
+            return self.css_template_value("auto", css_content);
         }
 
-        default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
+        if let Some(length) = default_lengths::get_basic(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -250,16 +292,20 @@ impl Plugin for MarginLeftPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("margin-left: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "margin-left: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if is_matching_auto(modifier) {
-            return Some(self.css_template_value("auto"));
+            return self.css_template_value("auto", css_content);
         }
 
-        default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
+        if let Some(length) = default_lengths::get_basic(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -275,16 +321,20 @@ impl Plugin for MarginRightPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("margin-right: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "margin-right: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if is_matching_auto(modifier) {
-            return Some(self.css_template_value("auto"));
+            return self.css_template_value("auto", css_content);
         }
 
-        default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
+        if let Some(length) = default_lengths::get_basic(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -300,16 +350,20 @@ impl Plugin for MarginTopPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("margin-top: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "margin-top: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if is_matching_auto(modifier) {
-            return Some(self.css_template_value("auto"));
+            return self.css_template_value("auto", css_content);
         }
 
-        default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
+        if let Some(length) = default_lengths::get_basic(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -325,16 +379,20 @@ impl Plugin for MarginBottomPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("margin-bottom: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "margin-bottom: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if is_matching_auto(modifier) {
-            return Some(self.css_template_value("auto"));
+            return self.css_template_value("auto", css_content);
         }
 
-        default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
+        if let Some(length) = default_lengths::get_basic(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -350,26 +408,29 @@ impl Plugin for SpaceXPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!(
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        if !css_content.contains("--tw-space-x-reverse") {
+            write!(css_content, "--tw-space-x-reverse: 0;\n  ")?;
+        }
+
+        write!(css_content,
             "margin-left: calc({val} * calc(1 - var(--tw-space-x-reverse)));
   margin-right: calc({val} * var(--tw-space-x-reverse));"
         )
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         // TODO: class with `> :not([hidden]) ~ :not([hidden])`
         if modifier == "reverse" {
-            return Some("--tw-space-x-reverse: 1;".to_string());
+            return write!(css_content, "--tw-space-x-reverse: 1;");
         }
 
-        default_lengths::get_basic(modifier).map(|c| {
-            format!(
-                "--tw-space-x-reverse: 1;
-  {}",
-                self.css_template_value(&c)
-            )
-        })
+        if let Some(length) = default_lengths::get_basic(modifier) {
+            write!(css_content, "--tw-space-x-reverse: 0;\n  ")?;
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -385,26 +446,29 @@ impl Plugin for SpaceYPlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!(
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        if !css_content.contains("--tw-space-y-reverse") {
+            write!(css_content, "--tw-space-y-reverse: 0;\n  ")?;
+        }
+
+        write!(css_content,
             "margin-top: calc({val} * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc({val} * var(--tw-space-y-reverse));"
         )
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         // TODO: class with `> :not([hidden]) ~ :not([hidden])`
         if modifier == "reverse" {
-            return Some("--tw-space-y-reverse: 1;".to_string());
+            return write!(css_content, "--tw-space-y-reverse: 1;");
         }
 
-        default_lengths::get_basic(modifier).map(|c| {
-            format!(
-                "--tw-space-y-reverse: 1;
-  {}",
-                self.css_template_value(&c)
-            )
-        })
+        if let Some(length) = default_lengths::get_basic(modifier) {
+            write!(css_content, "--tw-space-y-reverse: 0;\n  ")?;
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 

@@ -1,6 +1,8 @@
 use super::Plugin;
 use crate::utils::{default_lengths, value_matchers::*};
 
+use std::fmt::{Result, Write};
+
 #[derive(Debug)]
 pub struct ColumnsPlugin;
 
@@ -13,20 +15,20 @@ impl Plugin for ColumnsPlugin {
         is_matching_all(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("grid-template-columns: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "grid-template-columns: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if modifier == "none" {
-            return Some(self.css_template_value("none"));
+            return self.css_template_value("none", css_content);
         }
 
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(num_cols) = modifier.parse::<usize>() {
-            Some(self.css_template_value(&format!("repeat({num_cols}, minmax(0, 1fr))")))
+            self.css_template_value(&format!("repeat({num_cols}, minmax(0, 1fr))"), css_content)
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -43,20 +45,20 @@ impl Plugin for RowsPlugin {
         is_matching_all(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("grid-template-rows: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "grid-template-rows: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if modifier == "none" {
-            return Some(self.css_template_value("none"));
+            return self.css_template_value("none", css_content);
         }
 
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(num_cols) = modifier.parse::<usize>() {
-            Some(self.css_template_value(&format!("repeat({num_cols}, minmax(0, 1fr))")))
+            self.css_template_value(&format!("repeat({num_cols}, minmax(0, 1fr))"), css_content)
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -73,12 +75,16 @@ impl Plugin for GapPlugin {
         is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("gap: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "gap: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_lengths::get_basic(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(length) = default_lengths::get_basic(modifier) {
+            self.css_template_value(&length, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 

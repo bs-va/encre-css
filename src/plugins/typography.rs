@@ -3,6 +3,7 @@ use crate::utils::{default_colors, value_matchers::*};
 
 use lazy_static::lazy_static;
 use regex::Regex;
+use std::fmt::{Result, Write};
 
 lazy_static! {
     static ref START_WITH_INT_REGEX: Regex = Regex::new(r"(?-u)^\d").unwrap();
@@ -20,20 +21,24 @@ impl Plugin for TypographyColorPlugin {
         hint == "color" || is_matching_color(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         if val.contains("--tw-opacity") {
-            format!(
+            write!(css_content,
                 "--tw-text-opacity: 1;
   color: {};",
                 val.replace("--tw-opacity", "--tw-text-opacity")
             )
         } else {
-            format!("color: {val};")
+            write!(css_content, "color: {val};")
         }
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_colors::get(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(color) = default_colors::get(modifier) {
+            self.css_template_value(&color, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -45,12 +50,12 @@ impl Plugin for TypographyOpacityPlugin {
         "text-opacity"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.parse::<f32>() {
-            Some(format!("--tw-text-opacity: {};", opacity_value / 100.))
+            write!(css_content, "--tw-text-opacity: {};", opacity_value / 100.)
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -73,21 +78,21 @@ impl Plugin for TypographyFontFamilyPlugin {
         })
     }
 
-    fn css_template_value(&self, val: &str) -> String {
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         // NOTE: Not-compatible with TailwindCSS, it is not needed to add quotes to fonts
         // containing spaces, they are added later
-        format!(
+        write!(css_content,
             "font-family: {maybe_quote}{val}{maybe_quote};",
             maybe_quote = if val.contains(' ') { "\"" } else { "" }
         )
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "sans" => Some(r#"font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";"#.to_string()),
-            "serif" => Some(r#"font-family: Georgia, Cambria, "Times New Roman", Times, serif;"#.to_string()),
-            "mono" => Some(r#"font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;"#.to_string()),
-            _ => None,
+            "sans" => write!(css_content, r#"font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";"#),
+            "serif" => write!(css_content, r#"font-family: Georgia, Cambria, "Times New Roman", Times, serif;"#),
+            "mono" => write!(css_content, r#"font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;"#),
+            _ => Ok(()),
         }
     }
 }
@@ -104,78 +109,65 @@ impl Plugin for TypographyFontSizePlugin {
         hint == "length" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("font-size: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "font-size: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "xs" => Some(
+            "xs" => write!(css_content,
                 "font-size: 0.75rem;
   line-height: 1rem;"
-                    .to_string(),
             ),
-            "sm" => Some(
+            "sm" => write!(css_content,
                 "font-size: 0.875rem;
   line-height: 1.25rem;"
-                    .to_string(),
             ),
-            "base" => Some(
+            "base" => write!(css_content,
                 "font-size: 1rem;
   line-height: 1.5rem;"
-                    .to_string(),
             ),
-            "lg" => Some(
+            "lg" => write!(css_content,
                 "font-size: 1.125rem;
   line-height: 1.75rem;"
-                    .to_string(),
             ),
-            "xl" => Some(
+            "xl" => write!(css_content,
                 "font-size: 1.25rem;
   line-height: 1.75rem;"
-                    .to_string(),
             ),
-            "2xl" => Some(
+            "2xl" => write!(css_content,
                 "font-size: 1.5rem;
   line-height: 2rem;"
-                    .to_string(),
             ),
-            "3xl" => Some(
+            "3xl" => write!(css_content,
                 "font-size: 1.875rem;
   line-height: 2.25rem;"
-                    .to_string(),
             ),
-            "4xl" => Some(
+            "4xl" => write!(css_content,
                 "font-size: 2.25rem;
   line-height: 2.5rem;"
-                    .to_string(),
             ),
-            "5xl" => Some(
+            "5xl" => write!(css_content,
                 "font-size: 3rem;
   line-height: 1;"
-                    .to_string(),
             ),
-            "6xl" => Some(
+            "6xl" => write!(css_content,
                 "font-size: 3.75rem;
   line-height: 1;"
-                    .to_string(),
             ),
-            "7xl" => Some(
+            "7xl" => write!(css_content,
                 "font-size: 4.5rem;
   line-height: 1;"
-                    .to_string(),
             ),
-            "8xl" => Some(
+            "8xl" => write!(css_content,
                 "font-size: 6rem;
   line-height: 1;"
-                    .to_string(),
             ),
-            "9xl" => Some(
+            "9xl" => write!(css_content,
                 "font-size: 8rem;
   line-height: 1;"
-                    .to_string(),
             ),
-            _ => None,
+            _ => Ok(()),
         }
     }
 }
@@ -194,22 +186,22 @@ impl Plugin for TypographyFontWeightPlugin {
             || is_matching_var(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("font-weight: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "font-weight: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "thin" => Some(self.css_template_value("100")),
-            "extralight" => Some(self.css_template_value("200")),
-            "light" => Some(self.css_template_value("300")),
-            "normal" => Some(self.css_template_value("400")),
-            "medium" => Some(self.css_template_value("500")),
-            "semibold" => Some(self.css_template_value("600")),
-            "bold" => Some(self.css_template_value("700")),
-            "extrabold" => Some(self.css_template_value("800")),
-            "black" => Some(self.css_template_value("900")),
-            _ => None,
+            "thin" => self.css_template_value("100", css_content),
+            "extralight" => self.css_template_value("200", css_content),
+            "light" => self.css_template_value("300", css_content),
+            "normal" => self.css_template_value("400", css_content),
+            "medium" => self.css_template_value("500", css_content),
+            "semibold" => self.css_template_value("600", css_content),
+            "bold" => self.css_template_value("700", css_content),
+            "extrabold" => self.css_template_value("800", css_content),
+            "black" => self.css_template_value("900", css_content),
+            _ => Ok(()),
         }
     }
 }
@@ -222,13 +214,13 @@ impl Plugin for TypographyTextAlignmentPlugin {
         "text"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "left" => Some("text-align: left;".to_string()),
-            "center" => Some("text-align: center;".to_string()),
-            "right" => Some("text-align: right;".to_string()),
-            "justify" => Some("text-align: justify;".to_string()),
-            _ => None,
+            "left" => write!(css_content, "text-align: left;"),
+            "center" => write!(css_content, "text-align: center;"),
+            "right" => write!(css_content, "text-align: right;"),
+            "justify" => write!(css_content, "text-align: justify;"),
+            _ => Ok(()),
         }
     }
 }
@@ -237,13 +229,13 @@ impl Plugin for TypographyTextAlignmentPlugin {
 pub struct TypographyTextTransformPlugin;
 
 impl Plugin for TypographyTextTransformPlugin {
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "uppercase" => Some("text-transform: uppercase;".to_string()),
-            "lowercase" => Some("text-transform: lowercase;".to_string()),
-            "capitalize" => Some("text-transform: capitalize;".to_string()),
-            "normal-case" => Some("text-transform: none;".to_string()),
-            _ => None,
+            "uppercase" => write!(css_content, "text-transform: uppercase;"),
+            "lowercase" => write!(css_content, "text-transform: lowercase;"),
+            "capitalize" => write!(css_content, "text-transform: capitalize;"),
+            "normal-case" => write!(css_content, "text-transform: none;"),
+            _ => Ok(()),
         }
     }
 }
@@ -260,19 +252,19 @@ impl Plugin for TypographyTrackingPlugin {
         val == "normal" || is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("letter-spacing: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "letter-spacing: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "tighter" => Some(self.css_template_value("-0.05em")),
-            "tight" => Some(self.css_template_value("-0.025em")),
-            "normal" => Some(self.css_template_value("0")),
-            "wide" => Some(self.css_template_value("0.025em")),
-            "wider" => Some(self.css_template_value("0.05em")),
-            "widest" => Some(self.css_template_value("0.1em")),
-            _ => None,
+            "tighter" => self.css_template_value("-0.05em", css_content),
+            "tight" => self.css_template_value("-0.025em", css_content),
+            "normal" => self.css_template_value("0", css_content),
+            "wide" => self.css_template_value("0.025em", css_content),
+            "wider" => self.css_template_value("0.05em", css_content),
+            "widest" => self.css_template_value("0.1em", css_content),
+            _ => Ok(()),
         }
     }
 }
@@ -293,27 +285,27 @@ impl Plugin for TypographyLeadingPlugin {
             || is_matching_percentage(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("line-height: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "line-height: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "none" => Some(self.css_template_value("1")),
-            "tight" => Some(self.css_template_value("1.25")),
-            "snug" => Some(self.css_template_value("1.375")),
-            "normal" => Some(self.css_template_value("1.5")),
-            "relaxed" => Some(self.css_template_value("1.625")),
-            "loose" => Some(self.css_template_value("2")),
-            "3" => Some(self.css_template_value(".75rem")),
-            "4" => Some(self.css_template_value("1rem")),
-            "5" => Some(self.css_template_value("1.25rem")),
-            "6" => Some(self.css_template_value("1.5rem")),
-            "7" => Some(self.css_template_value("1.75rem")),
-            "8" => Some(self.css_template_value("2rem")),
-            "9" => Some(self.css_template_value("2.25rem")),
-            "10" => Some(self.css_template_value("2.5rem")),
-            _ => None,
+            "none" => self.css_template_value("1", css_content),
+            "tight" => self.css_template_value("1.25", css_content),
+            "snug" => self.css_template_value("1.375", css_content),
+            "normal" => self.css_template_value("1.5", css_content),
+            "relaxed" => self.css_template_value("1.625", css_content),
+            "loose" => self.css_template_value("2", css_content),
+            "3" => self.css_template_value(".75rem", css_content),
+            "4" => self.css_template_value("1rem", css_content),
+            "5" => self.css_template_value("1.25rem", css_content),
+            "6" => self.css_template_value("1.5rem", css_content),
+            "7" => self.css_template_value("1.75rem", css_content),
+            "8" => self.css_template_value("2rem", css_content),
+            "9" => self.css_template_value("2.25rem", css_content),
+            "10" => self.css_template_value("2.5rem", css_content),
+            _ => Ok(()),
         }
     }
 }
@@ -322,11 +314,11 @@ impl Plugin for TypographyLeadingPlugin {
 pub struct TypographyItalicPlugin;
 
 impl Plugin for TypographyItalicPlugin {
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "italic" => Some("font-style: italic;".to_string()),
-            "no-italic" => Some("font-style: normal;".to_string()),
-            _ => None,
+            "italic" => write!(css_content, "font-style: italic;"),
+            "no-italic" => write!(css_content, "font-style: normal;"),
+            _ => Ok(()),
         }
     }
 }
@@ -335,11 +327,11 @@ impl Plugin for TypographyItalicPlugin {
 pub struct TypographyTextDecorationPlugin;
 
 impl Plugin for TypographyTextDecorationPlugin {
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if ["underline", "overline", "line-through", "no-underline"].contains(&modifier) {
-            Some(format!("text-decoration-line: {modifier};"))
+            write!(css_content, "text-decoration-line: {modifier};")
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -356,23 +348,27 @@ impl Plugin for TypographyTextDecorationColorPlugin {
         hint == "color" || is_matching_color(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         if val.contains("--tw-opacity") {
-            format!(
+            write!(css_content,
                 "-webkit-text-decoration-color: {color};
   text-decoration-color: {color};",
                 color = val.replace(" / var(--tw-opacity)", "")
             )
         } else {
-            format!(
+            write!(css_content,
                 "-webkit-text-decoration-color: {val};
   text-decoration-color: {val};"
             )
         }
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_colors::get(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(color) = default_colors::get(modifier) {
+            self.css_template_value(&color, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -384,11 +380,11 @@ impl Plugin for TypographyTextDecorationStylePlugin {
         "decoration"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if ["solid", "double", "dotted", "dashed", "wavy"].contains(&modifier) {
-            Some(format!("text-decoration-style: {modifier};"))
+            write!(css_content, "text-decoration-style: {modifier};")
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -409,20 +405,20 @@ impl Plugin for TypographyTextDecorationThicknessPlugin {
             || is_matching_percentage(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("text-decoration-thickness: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "text-decoration-thickness: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if ["auto", "from-font"].contains(&modifier) {
-            return Some(self.css_template_value(modifier));
+            return self.css_template_value(modifier, css_content);
         }
 
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(thickness) = modifier.parse::<usize>() {
-            Some(self.css_template_value(&format!("{thickness}px")))
+            self.css_template_value(&format!("{thickness}px"), css_content)
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -444,20 +440,20 @@ impl Plugin for TypographyTextDecorationOffsetPlugin {
             || is_matching_percentage(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("text-underline-offset: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "text-underline-offset: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if modifier == "auto" {
-            return Some(self.css_template_value("auto"));
+            return self.css_template_value("auto", css_content);
         }
 
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(offset) = modifier.parse::<usize>() {
-            Some(self.css_template_value(&format!("{offset}px")))
+            self.css_template_value(&format!("{offset}px"), css_content)
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -474,17 +470,17 @@ impl Plugin for TypographyContentPlugin {
         true
     }
 
-    fn css_template_value(&self, val: &str) -> String {
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         // NOTE: Not-compatible with TailwindCSS, it is not needed to add quotes to `content`
         // containing spaces, they are added later
-        format!("content: \"{val}\";")
+        write!(css_content, "content: \"{val}\";")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if modifier == "none" {
-            Some(self.css_template_value("none"))
+            self.css_template_value("none", css_content)
         } else {
-            None
+            Ok(())
         }
     }
 }

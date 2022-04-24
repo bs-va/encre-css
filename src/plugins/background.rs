@@ -1,8 +1,9 @@
-use lazy_static::lazy_static;
-use regex::Regex;
-
 use super::Plugin;
 use crate::utils::{default_colors, value_matchers::*};
+
+use lazy_static::lazy_static;
+use regex::Regex;
+use std::fmt::{Result, Write};
 
 lazy_static! {
     static ref OPACITY_IN_RGB_REGEX: Regex = Regex::new(r"/.*\)").unwrap();
@@ -20,20 +21,24 @@ impl Plugin for ColorPlugin {
         hint == "color" || is_matching_color(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         if val.contains("--tw-opacity") {
-            format!(
+            write!(css_content,
                 "--tw-bg-opacity: 1;
   background-color: {};",
                 val.replace("--tw-opacity", "--tw-bg-opacity")
             )
         } else {
-            format!("background-color: {val};")
+            write!(css_content, "background-color: {val};")
         }
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_colors::get(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(color) = default_colors::get(modifier) {
+            self.css_template_value(&color, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -45,12 +50,12 @@ impl Plugin for AttachmentPlugin {
         "bg"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "fixed" => Some("background-attachment: fixed;".to_string()),
-            "local" => Some("background-attachment: local;".to_string()),
-            "scroll" => Some("background-attachment: scroll;".to_string()),
-            _ => None,
+            "fixed" => write!(css_content, "background-attachment: fixed;"),
+            "local" => write!(css_content, "background-attachment: local;"),
+            "scroll" => write!(css_content, "background-attachment: scroll;"),
+            _ => Ok(()),
         }
     }
 }
@@ -63,13 +68,13 @@ impl Plugin for ClipPlugin {
         "bg-clip"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "border" => Some("background-clip: border-box;".to_string()),
-            "padding" => Some("background-clip: padding-box;".to_string()),
-            "content" => Some("background-clip: content-box;".to_string()),
-            "text" => Some("background-clip: text;".to_string()),
-            _ => None,
+            "border" => write!(css_content, "background-clip: border-box;"),
+            "padding" => write!(css_content, "background-clip: padding-box;"),
+            "content" => write!(css_content, "background-clip: content-box;"),
+            "text" => write!(css_content, "background-clip: text;"),
+            _ => Ok(()),
         }
     }
 }
@@ -82,12 +87,12 @@ impl Plugin for OpacityPlugin {
         "bg-opacity"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.parse::<f32>() {
-            Some(format!("--tw-bg-opacity: {};", opacity_value / 100.))
+            write!(css_content, "--tw-bg-opacity: {};", opacity_value / 100.)
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -105,42 +110,22 @@ impl Plugin for ImagePlugin {
         hint == "list" || is_matching_image(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("background-image: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "background-image: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "bg-none" => Some(self.css_template_value("none")),
-            "gradient-to-t" => {
-                Some(self.css_template_value("linear-gradient(to top, var(--tw-gradient-stops))"))
-            }
-            "gradient-to-tr" => Some(
-                self.css_template_value("linear-gradient(to top right, var(--tw-gradient-stops))"),
-            ),
-            "gradient-to-r" => {
-                Some(self.css_template_value("linear-gradient(to right, var(--tw-gradient-stops))"))
-            }
-            "gradient-to-br" => {
-                Some(self.css_template_value(
-                    "linear-gradient(to bottom right, var(--tw-gradient-stops))",
-                ))
-            }
-            "gradient-to-b" => Some(
-                self.css_template_value("linear-gradient(to bottom, var(--tw-gradient-stops))"),
-            ),
-            "gradient-to-bl" => {
-                Some(self.css_template_value(
-                    "linear-gradient(to bottom left, var(--tw-gradient-stops))",
-                ))
-            }
-            "gradient-to-l" => {
-                Some(self.css_template_value("linear-gradient(to left, var(--tw-gradient-stops))"))
-            }
-            "gradient-to-tl" => Some(
-                self.css_template_value("linear-gradient(to top left, var(--tw-gradient-stops))"),
-            ),
-            _ => None,
+            "bg-none" => self.css_template_value("none", css_content),
+            "gradient-to-t" => self.css_template_value("linear-gradient(to top, var(--tw-gradient-stops))", css_content),
+            "gradient-to-tr" => self.css_template_value("linear-gradient(to top right, var(--tw-gradient-stops))", css_content),
+            "gradient-to-r" => self.css_template_value("linear-gradient(to right, var(--tw-gradient-stops))", css_content),
+            "gradient-to-br" => self.css_template_value("linear-gradient(to bottom right, var(--tw-gradient-stops))", css_content),
+            "gradient-to-b" => self.css_template_value("linear-gradient(to bottom, var(--tw-gradient-stops))", css_content),
+            "gradient-to-bl" => self.css_template_value("linear-gradient(to bottom left, var(--tw-gradient-stops))", css_content),
+            "gradient-to-l" => self.css_template_value("linear-gradient(to left, var(--tw-gradient-stops))", css_content),
+            "gradient-to-tl" => self.css_template_value("linear-gradient(to top left, var(--tw-gradient-stops))", css_content),
+            _ => Ok(()),
         }
     }
 }
@@ -157,7 +142,7 @@ impl Plugin for GradientFromPlugin {
         is_matching_color(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         // TODO: Prevent `.to_string()`ing
         let default_to = if val == "inherit" || val == "currentColor" {
             "rgb(255 255 255 / 0)".to_string()
@@ -171,14 +156,18 @@ impl Plugin for GradientFromPlugin {
             val.to_string()
         };
 
-        format!(
+        write!(css_content,
             "--tw-gradient-from: {val};
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, {default_to});"
         )
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_colors::get(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(color) = default_colors::get(modifier) {
+            self.css_template_value(&color, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -194,7 +183,7 @@ impl Plugin for GradientViaPlugin {
         is_matching_color(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         // TODO: Prevent `.to_string()`ing
         let default_to = if val == "inherit" || val == "currentColor" {
             "rgb(255 255 255 / 0)".to_string()
@@ -208,14 +197,18 @@ impl Plugin for GradientViaPlugin {
             val.to_string()
         };
 
-        format!(
+        write!(css_content,
             "--tw-gradient-stops: var(--tw-gradient-from), {}, var(--tw-gradient-to, {});",
             val, default_to
         )
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_colors::get(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(color) = default_colors::get(modifier) {
+            self.css_template_value(&color, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -231,7 +224,7 @@ impl Plugin for GradientToPlugin {
         is_matching_color(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         // TODO: Prevent `.to_string()`ing
         let val = if val.contains("--tw-opacity") {
             val.replace(" / var(--tw-opacity)", "")
@@ -239,11 +232,15 @@ impl Plugin for GradientToPlugin {
             val.to_string()
         };
 
-        format!("--tw-gradient-to: {val};")
+        write!(css_content, "--tw-gradient-to: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_colors::get(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(color) = default_colors::get(modifier) {
+            self.css_template_value(&color, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -264,22 +261,22 @@ impl Plugin for PositionPlugin {
                 .all(|v| v.split('_').all(is_matching_position))
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("background-position: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "background-position: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "bottom" => Some(self.css_template_value("bottom")),
-            "center" => Some(self.css_template_value("center")),
-            "left" => Some(self.css_template_value("left")),
-            "left-bottom" => Some(self.css_template_value("left-bottom")),
-            "left-top" => Some(self.css_template_value("left-top")),
-            "right" => Some(self.css_template_value("right")),
-            "right-bottom" => Some(self.css_template_value("right-bottom")),
-            "right-top" => Some(self.css_template_value("right-top")),
-            "top" => Some(self.css_template_value("top")),
-            _ => None,
+            "bottom" => self.css_template_value("bottom", css_content),
+            "center" => self.css_template_value("center", css_content),
+            "left" => self.css_template_value("left", css_content),
+            "left-bottom" => self.css_template_value("left-bottom", css_content),
+            "left-top" => self.css_template_value("left-top", css_content),
+            "right" => self.css_template_value("right", css_content),
+            "right-bottom" => self.css_template_value("right-bottom", css_content),
+            "right-top" => self.css_template_value("right-top", css_content),
+            "top" => self.css_template_value("top", css_content),
+            _ => Ok(()),
         }
     }
 }
@@ -292,15 +289,15 @@ impl Plugin for RepeatPlugin {
         "bg"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "repeat" => Some("background-repeat: repeat;".to_string()),
-            "no-repeat" => Some("background-repeat: no-repeat;".to_string()),
-            "repeat-x" => Some("background-repeat: repeat-x;".to_string()),
-            "repeat-y" => Some("background-repeat: repeat-y;".to_string()),
-            "repeat-round" => Some("background-repeat: round;".to_string()),
-            "repeat-space" => Some("background-repeat: spacet;".to_string()),
-            _ => None,
+            "repeat" => write!(css_content, "background-repeat: repeat;"),
+            "no-repeat" => write!(css_content, "background-repeat: no-repeat;"),
+            "repeat-x" => write!(css_content, "background-repeat: repeat-x;"),
+            "repeat-y" => write!(css_content, "background-repeat: repeat-y;"),
+            "repeat-round" => write!(css_content, "background-repeat: round;"),
+            "repeat-space" => write!(css_content, "background-repeat: space;"),
+            _ => Ok(()),
         }
     }
 }
@@ -325,16 +322,16 @@ impl Plugin for SizePlugin {
             })
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("background-size: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "background-size: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "auto" => Some(self.css_template_value("auto")),
-            "cover" => Some(self.css_template_value("cover")),
-            "contain" => Some(self.css_template_value("contain")),
-            _ => None,
+            "auto" => self.css_template_value("auto", css_content),
+            "cover" => self.css_template_value("cover", css_content),
+            "contain" => self.css_template_value("contain", css_content),
+            _ => Ok(()),
         }
     }
 }

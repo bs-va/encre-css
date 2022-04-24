@@ -26,12 +26,6 @@ pub trait Plugin: fmt::Debug {
         ""
     }
 
-    /// Get the CSS code from a modifier
-    ///
-    /// If `None` is returned, the result of the plugin will be ignored
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String>; // TODO: Custom type for modifier
-                                                                      // TODO: fn custom_css(&self) -> String; (custom CSS added only if plugin used at least once, e.g. for animations)
-
     /// Returns whether of not the plugin can handle a specific arbitrary value
     ///
     /// Used to distinguish plugins inside the same namespace
@@ -48,9 +42,16 @@ pub trait Plugin: fmt::Debug {
     /// NOTE: This function is called after [to_css_value], so, `_` (underscores) are already converted to ` ` (spaces)
     ///
     /// [to_css_value]: crate::to_css_value
-    fn css_template_value(&self, _val: &str) -> String {
-        String::new()
+    fn css_template_value(&self, _val: &str, _css_content: &mut String) -> fmt::Result {
+        Ok(())
     }
+
+    /// Get the CSS code from a modifier
+    ///
+    /// If nothing is written to the `result` buffer, the result of the plugin will be ignored
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> fmt::Result; // TODO: Custom type for modifier
+
+    // TODO: fn custom_css(&self) -> String; (custom CSS added only if plugin used at least once, e.g. for animations)
 }
 
 lazy_static! {

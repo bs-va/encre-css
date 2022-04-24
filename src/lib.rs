@@ -188,6 +188,8 @@ impl TailwindGenerator {
         .map(|v| *v)
         .flatten()
         .filter_map(|selector| {
+            let mut css_content = String::new();
+
             // Find the right plugin to handle this selector (if the resulting CSS is valid,
             // the plugin is good)
             for plugin in PLUGINS.iter() {
@@ -225,15 +227,18 @@ impl TailwindGenerator {
 
                     if let Some(arbitrary_value) = arbitrary_value {
                         if plugin.is_matching_value(arbitrary_value.0, arbitrary_value.1) {
-                            return Some(gen_css_rule(
-                                selector,
-                                &plugin.css_template_value(&to_css_value(arbitrary_value.1)),
-                            ));
+                            plugin.css_template_value(&to_css_value(arbitrary_value.1), &mut css_content).expect("failed to get the CSS from the modifier");
+
+                            if !css_content.is_empty() {
+                                return Some(gen_css_rule(selector, &css_content));
+                            }
                         }
-                    } else if let Some(css_content) =
-                        plugin.get_css_for_modifier(&selector.get_modifier(plugin.namespace()))
-                    {
-                        return Some(gen_css_rule(selector, &css_content));
+                    } else {
+                        plugin.get_css_for_modifier(&selector.get_modifier(plugin.namespace()), &mut css_content).expect("failed to get the CSS from the modifier");
+
+                        if !css_content.is_empty() {
+                            return Some(gen_css_rule(selector, &css_content));
+                        }
                     }
                 }
             }

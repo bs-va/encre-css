@@ -3,6 +3,7 @@ use crate::utils::value_matchers::*;
 
 use lazy_static::lazy_static;
 use regex::Regex;
+use std::fmt::{Result, Write};
 
 lazy_static! {
     static ref PROPERTY_REGEX: Regex = Regex::new(r"[^\d]+").unwrap();
@@ -20,32 +21,32 @@ impl Plugin for PropertyPlugin {
         PROPERTY_REGEX.is_match(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("transition-property: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "transition-property: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "" => Some("transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+            "" => write!(css_content, "transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;".to_string()),
-            "none" => Some("transition-property: none;".to_string()),
-            "all" => Some("transition-property: all;
+  transition-duration: 150ms;"),
+            "none" => write!(css_content, "transition-property: none;"),
+            "all" => write!(css_content, "transition-property: all;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;".to_string()),
-            "colors" => Some("transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-duration: 150ms;"),
+            "colors" => write!(css_content, "transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
   transition-timing-function: cubic-bezier(0.4, 0, 0);
-  transition-duration: 150ms;".to_string()),
-            "opacity" => Some("transition-property: opacity;
+  transition-duration: 150ms;"),
+            "opacity" => write!(css_content, "transition-property: opacity;
   transition-timing-function: cubic-bezier(0.4, 0, 0);
-  transition-duration: 150ms;".to_string()),
-            "shadow" => Some("transition-property: box-shadow;
+  transition-duration: 150ms;"),
+            "shadow" => write!(css_content, "transition-property: box-shadow;
   transition-timing-function: cubic-bezier(0.4, 0, 0);
-  transition-duration: 150ms;".to_string()),
-            "transform" => Some("transition-property: transform;
+  transition-duration: 150ms;"),
+            "transform" => write!(css_content, "transition-property: transform;
   transition-timing-function: cubic-bezier(0.4, 0, 0);
-  transition-duration: 150ms;".to_string()),
-            _ => None,
+  transition-duration: 150ms;"),
+            _ => Ok(()),
         }
     }
 }
@@ -62,16 +63,16 @@ impl Plugin for DurationPlugin {
         is_matching_time(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("transition-duration: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "transition-duration: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(duration) = modifier.parse::<usize>() {
-            Some(self.css_template_value(&format!("{duration}ms")))
+            self.css_template_value(&format!("{duration}ms"), css_content)
         } else {
-            None
+            Ok(())
         }
     }
 }

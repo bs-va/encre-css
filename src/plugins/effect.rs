@@ -1,6 +1,8 @@
 use super::Plugin;
 use crate::utils::{default_colors, value_matchers::*};
 
+use std::fmt::{Result, Write};
+
 #[derive(Debug)]
 pub struct MixBlendModePlugin;
 
@@ -9,25 +11,25 @@ impl Plugin for MixBlendModePlugin {
         "mix-blend"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "normal" => Some("mix-blend-mode: normal;".to_string()),
-            "multiply" => Some("mix-blend-mode: multiply;".to_string()),
-            "screen" => Some("mix-blend-mode: screen;".to_string()),
-            "overlay" => Some("mix-blend-mode: overlay;".to_string()),
-            "darken" => Some("mix-blend-mode: darken;".to_string()),
-            "lighten" => Some("mix-blend-mode: lighten;".to_string()),
-            "color-dodge" => Some("mix-blend-mode: color-dodge;".to_string()),
-            "color-burn" => Some("mix-blend-mode: color-burn;".to_string()),
-            "hard-light" => Some("mix-blend-mode: hard-light;".to_string()),
-            "soft-light" => Some("mix-blend-mode: soft-light;".to_string()),
-            "difference" => Some("mix-blend-mode: difference;".to_string()),
-            "exclusion" => Some("mix-blend-mode: exclusion;".to_string()),
-            "hue" => Some("mix-blend-mode: hue;".to_string()),
-            "saturation" => Some("mix-blend-mode: saturation;".to_string()),
-            "color" => Some("mix-blend-mode: color;".to_string()),
-            "luminosity" => Some("mix-blend-mode: luminosity;".to_string()),
-            _ => None,
+            "normal" => write!(css_content, "mix-blend-mode: normal;"),
+            "multiply" => write!(css_content, "mix-blend-mode: multiply;"),
+            "screen" => write!(css_content, "mix-blend-mode: screen;"),
+            "overlay" => write!(css_content, "mix-blend-mode: overlay;"),
+            "darken" => write!(css_content, "mix-blend-mode: darken;"),
+            "lighten" => write!(css_content, "mix-blend-mode: lighten;"),
+            "color-dodge" => write!(css_content, "mix-blend-mode: color-dodge;"),
+            "color-burn" => write!(css_content, "mix-blend-mode: color-burn;"),
+            "hard-light" => write!(css_content, "mix-blend-mode: hard-light;"),
+            "soft-light" => write!(css_content, "mix-blend-mode: soft-light;"),
+            "difference" => write!(css_content, "mix-blend-mode: difference;"),
+            "exclusion" => write!(css_content, "mix-blend-mode: exclusion;"),
+            "hue" => write!(css_content, "mix-blend-mode: hue;"),
+            "saturation" => write!(css_content, "mix-blend-mode: saturation;"),
+            "color" => write!(css_content, "mix-blend-mode: color;"),
+            "luminosity" => write!(css_content, "mix-blend-mode: luminosity;"),
+            _ => Ok(()),
         }
     }
 }
@@ -44,29 +46,29 @@ impl Plugin for BoxShadowPlugin {
         is_matching_shadow(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("box-shadow: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "box-shadow: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "" => Some(self.css_template_value(
+            "" => self.css_template_value(
                 "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);",
-            )),
-            "sm" => Some(self.css_template_value("0 1px 2px 0 rgba(0, 0, 0, 0.05)")),
-            "md" => Some(self.css_template_value(
+            css_content),
+            "sm" => self.css_template_value("0 1px 2px 0 rgba(0, 0, 0, 0.05)", css_content),
+            "md" => self.css_template_value(
                 "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-            )),
-            "lg" => Some(self.css_template_value(
+            css_content),
+            "lg" => self.css_template_value(
                 "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-            )),
-            "xl" => Some(self.css_template_value(
+            css_content),
+            "xl" => self.css_template_value(
                 "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-            )),
-            "2xl" => Some(self.css_template_value("0 25px 50px -12px rgba(0, 0, 0, 0.25)")),
-            "inner" => Some(self.css_template_value("inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)")),
-            "none" => Some(self.css_template_value("none")),
-            _ => None,
+            css_content),
+            "2xl" => self.css_template_value("0 25px 50px -12px rgba(0, 0, 0, 0.25)", css_content),
+            "inner" => self.css_template_value("inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)", css_content),
+            "none" => self.css_template_value("none", css_content),
+            _ => Ok(()),
         }
     }
 }
@@ -83,19 +85,23 @@ impl Plugin for BoxShadowColorPlugin {
         hint == "color" || is_matching_color(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         if val.contains("--tw-opacity") {
-            format!(
+            write!(css_content,
                 "--tw-shadow-color: {};",
                 val.replace("/ var(--tw-opacity)", "")
             )
         } else {
-            format!("--tw-shadow-color: {val};")
+            write!(css_content, "--tw-shadow-color: {val};")
         }
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
-        default_colors::get(modifier).map(|c| self.css_template_value(&c))
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(color) = default_colors::get(modifier) {
+            self.css_template_value(&color, css_content)
+        } else {
+            Ok(())
+        }
     }
 }
 

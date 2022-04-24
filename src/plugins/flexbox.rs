@@ -1,6 +1,8 @@
 use super::Plugin;
 use crate::utils::value_matchers::*;
 
+use std::fmt::{Result, Write};
+
 #[derive(Debug)]
 pub struct OrderPlugin;
 
@@ -13,23 +15,23 @@ impl Plugin for OrderPlugin {
         is_matching_number(val)
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("order: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "order: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "first" => return Some(self.css_template_value("-9999")),
-            "last" => return Some(self.css_template_value("9999")),
-            "none" => return Some(self.css_template_value("0")),
+            "first" => return self.css_template_value("-9999", css_content),
+            "last" => return self.css_template_value("9999", css_content),
+            "none" => return self.css_template_value("0", css_content),
             _ => (),
         }
 
         // NOTE: Not-compatible with TailwindCSS, support all values
         if modifier.parse::<f32>().is_ok() {
-            Some(self.css_template_value(modifier))
+            self.css_template_value(modifier, css_content)
         } else {
-            None
+            Ok(())
         }
     }
 }
@@ -42,13 +44,13 @@ impl Plugin for DirectionPlugin {
         "flex"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "row" => Some("flex-direction: row;".to_string()),
-            "row-reverse" => Some("flex-direction: row-reverse;".to_string()),
-            "col" => Some("flex-direction: column;".to_string()),
-            "col-reverse" => Some("flex-direction: column-reverse;".to_string()),
-            _ => None,
+            "row" => write!(css_content, "flex-direction: row;"),
+            "row-reverse" => write!(css_content, "flex-direction: row-reverse;"),
+            "col" => write!(css_content, "flex-direction: column;"),
+            "col-reverse" => write!(css_content, "flex-direction: column-reverse;"),
+            _ => Ok(()),
         }
     }
 }
@@ -61,12 +63,12 @@ impl Plugin for WrapPlugin {
         "flex"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "nowrap" => Some("flex-wrap: nowrap;".to_string()),
-            "wrap" => Some("flex-wrap: wrap;".to_string()),
-            "wrap-reverse" => Some("flex-wrap: wrap-reverse;".to_string()),
-            _ => None,
+            "nowrap" => write!(css_content, "flex-wrap: nowrap;"),
+            "wrap" => write!(css_content, "flex-wrap: wrap;"),
+            "wrap-reverse" => write!(css_content, "flex-wrap: wrap-reverse;"),
+            _ => Ok(()),
         }
     }
 }
@@ -114,21 +116,21 @@ impl Plugin for GrowShrinkBasisPlugin {
         is_matching.0 && is_matching.1 && is_matching.2
     }
 
-    fn css_template_value(&self, val: &str) -> String {
-        format!("flex: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "flex: {val};")
     }
 
-    fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "flex-1" => Some(self.css_template_value("1 1 0%")),
-            "flex-auto" => Some(self.css_template_value("1 1 auto")),
-            "flex-initial" => Some(self.css_template_value("0 1 auto")),
-            "flex-none" => Some(self.css_template_value("none")),
-            "flex-grow" => Some("flex-grow: 1;".to_string()),
-            "flex-grow-0" => Some("flex-grow: 0;".to_string()),
-            "flex-shrink" => Some("flex-shrink: 1;".to_string()),
-            "flex-shrink-0" => Some("flex-shrink: 0;".to_string()),
-            _ => None,
+            "flex-1" => self.css_template_value("1 1 0%", css_content),
+            "flex-auto" => self.css_template_value("1 1 auto", css_content),
+            "flex-initial" => self.css_template_value("0 1 auto", css_content),
+            "flex-none" => self.css_template_value("none", css_content),
+            "flex-grow" => write!(css_content, "flex-grow: 1;"),
+            "flex-grow-0" => write!(css_content, "flex-grow: 0;"),
+            "flex-shrink" => write!(css_content, "flex-shrink: 1;"),
+            "flex-shrink-0" => write!(css_content, "flex-shrink: 0;"),
+            _ => Ok(()),
         }
     }
 }
