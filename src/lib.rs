@@ -1,3 +1,18 @@
+//! A TailwindCSS compatible CSS generation library written in Rust
+//!
+//! # Example
+//!
+//! ```rust
+//! use tailwind_rs::TailwindGenerator;
+//!
+//! let mut generator = TailwindGenerator::new();
+//! generator.scan_content(r#"class="bg-red-500""#);
+//!
+//! assert!(generator.generate().contains(r#".bg-red-500 {
+//!   --tw-bg-opacity: 1;
+//!   background-color: rgb(239 68 68 / var(--tw-bg-opacity));
+//! }"#));
+//! ```
 pub mod plugins;
 pub mod preflight;
 pub mod selector;
@@ -22,7 +37,6 @@ use variant::VARIANTS;
 // - Real prefix (like tw-)???
 // - CSS variant for dark: configurable
 // - Configurable preflight
-// - Structure containing scanned selectors (+ be able to add them manually + function to scan them)
 // - Support a safelist in the configuration file
 //
 // Performances:
@@ -63,9 +77,11 @@ pub fn to_css_value(val: &str) -> String {
     }*/*/*/
 }
 
-/// https://v2.tailwindcss.com/docs/just-in-time-mode#arbitrary-value-support
+/// <https://v2.tailwindcss.com/docs/just-in-time-mode#arbitrary-value-support>
 pub const VALID_PLUGIN_HINT: [&str; 4] = ["color", "length", "angle", "list"];
 
+/// Generate a complete CSS rule (with a class selector, a rule content and, if requested, some
+/// pseudo-elements or `@media` queries)
 pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
     let css_selector = selector
         .to_string()
@@ -103,175 +119,130 @@ pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
     }
 }
 
-pub fn gen_css_from_files(files: impl Iterator<Item = PathBuf>) -> String {
-    let mut scanned_selectors_without_variant: Vec<Selector> = vec![];
-    let mut scanned_selectors_with_variant: Vec<Selector> = vec![];
-    let mut file_content: String = String::new();
+/// Main structure used to generate CSS from selectors
+#[derive(Default)]
+pub struct TailwindGenerator {
+    scanned_selectors_without_variant: Vec<Selector>,
+    scanned_selectors_with_variant: Vec<Selector>,
+}
 
-    for file in files {
-        let mut file = fs::File::open(file).unwrap();
-        file_content.clear();
-        file.read_to_string(&mut file_content).unwrap();
-
-        for val in SPLIT_REGEX
-            .split(&file_content)
-            .filter(|m| FILTER_REGEX.is_match(m).unwrap())
-        {
-            let selector = Selector::new(val);
-
-            if selector.get_variant().is_some() {
-                if !scanned_selectors_with_variant.contains(&selector) {
-                    scanned_selectors_with_variant.push(selector);
-                }
-            } else if !scanned_selectors_without_variant.contains(&selector) {
-                scanned_selectors_without_variant.push(selector);
-            }
+impl TailwindGenerator {
+    pub fn new() -> Self {
+        Self {
+            scanned_selectors_without_variant: vec![],
+            scanned_selectors_with_variant: vec![],
         }
     }
 
-    let result = [
-        scanned_selectors_without_variant,
-        scanned_selectors_with_variant,
-    ]
-    .par_iter()
-    .flatten()
-    .filter_map(|selector| {
-        // Find the right plugin to handle this selector (if the resulting CSS is valid,
-        // the plugin is good)
-        for plugin in PLUGINS.iter() {
-            if selector.check_namespace(plugin.namespace()) {
-                let maybe_arbitrary_value = selector.get_arbitrary_value();
-                let arbitrary_value =
-                    if let Some(ref arbitrary_value) = maybe_arbitrary_value {
-                        let mut split = arbitrary_value.split(':');
-                        let maybe_hint = split.next().unwrap();
-
-                        if maybe_hint == arbitrary_value {
-                            // No plugin hint
-                            Some(("", maybe_hint))
-                        } else {
-                            let val = split.next();
-
-                            if let Some(val) = val {
-                                if VALID_PLUGIN_HINT.contains(&maybe_hint) {
-                                    // Valid! Return (hint, stripped arbitrary value)
-                                    Some((maybe_hint, val))
-                                } else {
-                                    // Unknown plugin hint (like `bg-[sth:#333]`)
-                                    // TODO: Display a warning
-                                    Some(("", val))
-                                }
-                            } else {
-                                // Malformed arbitrary value (like just `bg-[color:]`)
-                                // TODO: Display a warning
-                                Some(("", maybe_hint))
-                            }
-                        }
-                    } else {
-                        None
-                    };
-
-                if let Some(arbitrary_value) = arbitrary_value {
-                    if plugin.is_matching_value(arbitrary_value.0, arbitrary_value.1) {
-                        return Some(gen_css_rule(
-                            selector,
-                            &plugin.css_template_value(&to_css_value(arbitrary_value.1)),
-                        ));
-                    }
-                } else if let Some(css_content) =
-                    plugin.get_css_for_modifier(&selector.get_modifier(plugin.namespace()))
-                {
-                    return Some(gen_css_rule(selector, &css_content));
-                }
-            }
-        }
-
-        None
-    }).collect::<Vec<String>>();
-
-    format!("{}{}", TAILWIND_PREFLIGHT_CSS, result.join("\n\n"))
-}
-
-pub fn gen_css_from_content<T: Into<String>>(content: T) -> String {
-    let mut scanned_selectors_without_variant: Vec<Selector> = vec![];
-    let mut scanned_selectors_with_variant: Vec<Selector> = vec![];
-
-    for val in SPLIT_REGEX
-        .split(&content.into())
-        .filter(|m| FILTER_REGEX.is_match(m).unwrap())
-    {
+    /// Add a new selector which will have its CSS generated
+    ///
+    /// This function automatically handles duplicated selectors
+    pub fn add_selector(&mut self, val: &str) {
         let selector = Selector::new(val);
 
         if selector.get_variant().is_some() {
-            if !scanned_selectors_with_variant.contains(&selector) {
-                scanned_selectors_with_variant.push(selector);
+            if !self.scanned_selectors_with_variant.contains(&selector) {
+                self.scanned_selectors_with_variant.push(selector);
             }
-        } else if !scanned_selectors_without_variant.contains(&selector) {
-            scanned_selectors_without_variant.push(selector);
+        } else if !self.scanned_selectors_without_variant.contains(&selector) {
+            self.scanned_selectors_without_variant.push(selector);
         }
     }
 
-    let result = [
-        scanned_selectors_without_variant,
-        scanned_selectors_with_variant,
-    ]
-    .par_iter()
-    .flatten()
-    .filter_map(|selector| {
-        // Find the right plugin to handle this selector (if the resulting CSS is valid,
-        // the plugin is good)
-        for plugin in PLUGINS.iter() {
-            if selector.check_namespace(plugin.namespace()) {
-                let maybe_arbitrary_value = selector.get_arbitrary_value();
-                let arbitrary_value =
-                    if let Some(ref arbitrary_value) = maybe_arbitrary_value {
-                        let mut split = arbitrary_value.split(':');
-                        let maybe_hint = split.next().unwrap();
+    /// Scan the content of a file and store all the selectors found
+    pub fn scan_content(&mut self, content: &str) {
+        for val in SPLIT_REGEX
+            .split(content)
+            .filter(|m| FILTER_REGEX.is_match(m).unwrap())
+        {
+            self.add_selector(val);
+        }
+    }
 
-                        if maybe_hint == arbitrary_value {
-                            // No plugin hint
-                            Some(("", maybe_hint))
-                        } else {
-                            let val = split.next();
+    /// Scan all files given and store all the selectors found
+    pub fn scan_files(&mut self, files: impl Iterator<Item = PathBuf>) {
+        let mut file_content: String = String::new();
 
-                            if let Some(val) = val {
-                                if VALID_PLUGIN_HINT.contains(&maybe_hint) {
-                                    // Valid! Return (hint, stripped arbitrary value)
-                                    Some((maybe_hint, val))
-                                } else {
-                                    // Unknown plugin hint (like `bg-[sth:#333]`)
-                                    // TODO: Display a warning
-                                    Some(("", val))
-                                }
-                            } else {
-                                // Malformed arbitrary value (like just `bg-[color:]`)
-                                // TODO: Display a warning
+        for file in files {
+            let mut file = fs::File::open(file).unwrap();
+            file_content.clear();
+            file.read_to_string(&mut file_content).unwrap();
+            self.scan_content(&file_content);
+        }
+    }
+
+    /// Generate the CSS styles needed based on the scanned selectors
+    ///
+    /// NOTE: Don't forget to scan selectors using either [scan_files] or [scan_content] or by
+    /// adding individual selectors using [add_selector]
+    ///
+    /// [scan_files]: TailwindGenerator::scan_files
+    /// [scan_content]: TailwindGenerator::scan_content
+    /// [add_selector]: TailwindGenerator::add_selector
+    pub fn generate(&self) -> String {
+        let result = [
+            &self.scanned_selectors_without_variant,
+            &self.scanned_selectors_with_variant,
+        ]
+        .par_iter()
+        .map(|v| *v)
+        .flatten()
+        .filter_map(|selector| {
+            // Find the right plugin to handle this selector (if the resulting CSS is valid,
+            // the plugin is good)
+            for plugin in PLUGINS.iter() {
+                if selector.check_namespace(plugin.namespace()) {
+                    let maybe_arbitrary_value = selector.get_arbitrary_value();
+                    let arbitrary_value =
+                        if let Some(ref arbitrary_value) = maybe_arbitrary_value {
+                            let mut split = arbitrary_value.split(':');
+                            let maybe_hint = split.next().unwrap();
+
+                            if maybe_hint == arbitrary_value {
+                                // No plugin hint
                                 Some(("", maybe_hint))
-                            }
-                        }
-                    } else {
-                        None
-                    };
+                            } else {
+                                let val = split.next();
 
-                if let Some(arbitrary_value) = arbitrary_value {
-                    if plugin.is_matching_value(arbitrary_value.0, arbitrary_value.1) {
-                        return Some(gen_css_rule(
-                            selector,
-                            &plugin.css_template_value(&to_css_value(arbitrary_value.1)),
-                        ));
+                                if let Some(val) = val {
+                                    if VALID_PLUGIN_HINT.contains(&maybe_hint) {
+                                        // Valid! Return (hint, stripped arbitrary value)
+                                        Some((maybe_hint, val))
+                                    } else {
+                                        // Unknown plugin hint (like `bg-[sth:#333]`)
+                                        // TODO: Display a warning
+                                        Some(("", val))
+                                    }
+                                } else {
+                                    // Malformed arbitrary value (like just `bg-[color:]`)
+                                    // TODO: Display a warning
+                                    Some(("", maybe_hint))
+                                }
+                            }
+                        } else {
+                            None
+                        };
+
+                    if let Some(arbitrary_value) = arbitrary_value {
+                        if plugin.is_matching_value(arbitrary_value.0, arbitrary_value.1) {
+                            return Some(gen_css_rule(
+                                selector,
+                                &plugin.css_template_value(&to_css_value(arbitrary_value.1)),
+                            ));
+                        }
+                    } else if let Some(css_content) =
+                        plugin.get_css_for_modifier(&selector.get_modifier(plugin.namespace()))
+                    {
+                        return Some(gen_css_rule(selector, &css_content));
                     }
-                } else if let Some(css_content) =
-                    plugin.get_css_for_modifier(&selector.get_modifier(plugin.namespace()))
-                {
-                    return Some(gen_css_rule(selector, &css_content));
                 }
             }
-        }
 
-        None
-    }).collect::<Vec<String>>();
+            None
+        }).collect::<Vec<String>>();
 
-    format!("{}{}", TAILWIND_PREFLIGHT_CSS, result.join("\n\n"))
+        format!("{}{}", TAILWIND_PREFLIGHT_CSS, result.join("\n\n"))
+    }
 }
 
 /*#[cfg(test)]
