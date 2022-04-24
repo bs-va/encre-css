@@ -76,8 +76,8 @@ impl Plugin for IsolationPlugin {
 pub struct InsetPlugin;
 
 impl Plugin for InsetPlugin {
-    fn namespace(&self) -> String {
-        "inset".to_string()
+    fn namespace(&self) -> &str {
+        "inset"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -102,8 +102,8 @@ impl Plugin for InsetPlugin {
 pub struct InsetXPlugin;
 
 impl Plugin for InsetXPlugin {
-    fn namespace(&self) -> String {
-        "inset-x".to_string()
+    fn namespace(&self) -> &str {
+        "inset-x"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -126,8 +126,8 @@ impl Plugin for InsetXPlugin {
 pub struct InsetYPlugin;
 
 impl Plugin for InsetYPlugin {
-    fn namespace(&self) -> String {
-        "inset-y".to_string()
+    fn namespace(&self) -> &str {
+        "inset-y"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -150,8 +150,8 @@ impl Plugin for InsetYPlugin {
 pub struct TopPlugin;
 
 impl Plugin for TopPlugin {
-    fn namespace(&self) -> String {
-        "top".to_string()
+    fn namespace(&self) -> &str {
+        "top"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -171,8 +171,8 @@ impl Plugin for TopPlugin {
 pub struct BottomPlugin;
 
 impl Plugin for BottomPlugin {
-    fn namespace(&self) -> String {
-        "bottom".to_string()
+    fn namespace(&self) -> &str {
+        "bottom"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -192,8 +192,8 @@ impl Plugin for BottomPlugin {
 pub struct LeftPlugin;
 
 impl Plugin for LeftPlugin {
-    fn namespace(&self) -> String {
-        "left".to_string()
+    fn namespace(&self) -> &str {
+        "left"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -213,8 +213,8 @@ impl Plugin for LeftPlugin {
 pub struct RightPlugin;
 
 impl Plugin for RightPlugin {
-    fn namespace(&self) -> String {
-        "right".to_string()
+    fn namespace(&self) -> &str {
+        "right"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -234,8 +234,8 @@ impl Plugin for RightPlugin {
 pub struct ZIndexPlugin;
 
 impl Plugin for ZIndexPlugin {
-    fn namespace(&self) -> String {
-        "z".to_string()
+    fn namespace(&self) -> &str {
+        "z"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -252,8 +252,8 @@ impl Plugin for ZIndexPlugin {
 pub struct ContainerPlugin;
 
 impl Plugin for ContainerPlugin {
-    fn namespace(&self) -> String {
-        "container".to_string()
+    fn namespace(&self) -> &str {
+        "container"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -273,8 +273,8 @@ impl Plugin for ContainerPlugin {
 pub struct BoxDecorationBreakPlugin;
 
 impl Plugin for BoxDecorationBreakPlugin {
-    fn namespace(&self) -> String {
-        "decoration".to_string()
+    fn namespace(&self) -> &str {
+        "decoration"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -290,8 +290,8 @@ impl Plugin for BoxDecorationBreakPlugin {
 pub struct BoxSizingPlugin;
 
 impl Plugin for BoxSizingPlugin {
-    fn namespace(&self) -> String {
-        "box".to_string()
+    fn namespace(&self) -> &str {
+        "box"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -307,8 +307,8 @@ impl Plugin for BoxSizingPlugin {
 pub struct FloatPlugin;
 
 impl Plugin for FloatPlugin {
-    fn namespace(&self) -> String {
-        "float".to_string()
+    fn namespace(&self) -> &str {
+        "float"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -324,8 +324,8 @@ impl Plugin for FloatPlugin {
 pub struct ClearPlugin;
 
 impl Plugin for ClearPlugin {
-    fn namespace(&self) -> String {
-        "clear".to_string()
+    fn namespace(&self) -> &str {
+        "clear"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -341,8 +341,8 @@ impl Plugin for ClearPlugin {
 pub struct ObjectFitPlugin;
 
 impl Plugin for ObjectFitPlugin {
-    fn namespace(&self) -> String {
-        "object".to_string()
+    fn namespace(&self) -> &str {
+        "object"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -358,8 +358,8 @@ impl Plugin for ObjectFitPlugin {
 pub struct ObjectPositionPlugin;
 
 impl Plugin for ObjectPositionPlugin {
-    fn namespace(&self) -> String {
-        "object".to_string()
+    fn namespace(&self) -> &str {
+        "object"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -390,8 +390,8 @@ impl Plugin for ObjectPositionPlugin {
 pub struct OverflowPlugin;
 
 impl Plugin for OverflowPlugin {
-    fn namespace(&self) -> String {
-        "overflow".to_string()
+    fn namespace(&self) -> &str {
+        "overflow"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -417,8 +417,8 @@ impl Plugin for OverflowPlugin {
 pub struct OverscrollPlugin;
 
 impl Plugin for OverscrollPlugin {
-    fn namespace(&self) -> String {
-        "overscroll".to_string()
+    fn namespace(&self) -> &str {
+        "overscroll"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {

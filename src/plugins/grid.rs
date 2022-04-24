@@ -5,8 +5,8 @@ use crate::utils::{default_lengths, value_matchers::*};
 pub struct ColumnsPlugin;
 
 impl Plugin for ColumnsPlugin {
-    fn namespace(&self) -> String {
-        "grid-cols".to_string()
+    fn namespace(&self) -> &str {
+        "grid-cols"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -35,8 +35,8 @@ impl Plugin for ColumnsPlugin {
 pub struct RowsPlugin;
 
 impl Plugin for RowsPlugin {
-    fn namespace(&self) -> String {
-        "grid-rows".to_string()
+    fn namespace(&self) -> &str {
+        "grid-rows"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -65,8 +65,8 @@ impl Plugin for RowsPlugin {
 pub struct GapPlugin;
 
 impl Plugin for GapPlugin {
-    fn namespace(&self) -> String {
-        "gap".to_string()
+    fn namespace(&self) -> &str {
+        "gap"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {

@@ -4,8 +4,8 @@ use super::Plugin;
 pub struct CursorPlugin;
 
 impl Plugin for CursorPlugin {
-    fn namespace(&self) -> String {
-        "cursor".to_string()
+    fn namespace(&self) -> &str {
+        "cursor"
     }
 
     fn is_matching_value(&self, _hint: &str, _val: &str) -> bool {

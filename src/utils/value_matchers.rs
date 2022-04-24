@@ -3,7 +3,6 @@ use lazy_static::lazy_static;
 use regex::Regex;
 
 const AUTO_KEYWORD: &str = "auto";
-const CSS_FUNCTIONS: [&str; 4] = ["min", "max", "clamp", "calc"];
 const LENGTH_UNITS: [&str; 16] = [
     "cm", "mm", "Q", "in", "pc", "pt", "px", "em", "ex", "ch", "rem", "lh", "vw", "vh", "vmin",
     "vmax",
@@ -47,11 +46,29 @@ const RELATIVE_SIZES: [&str; 2] = ["larger", "smaller"];
 
 lazy_static! {
     static ref COLOR_REGEX: Regex =
-        Regex::new(r"^(#[a-f\d]{3}|#[a-f\d]{6}|rgba?\(.+\)|hsla?\(.+\))$").unwrap();
+        Regex::new(r"(?-u)^(#[a-f\d]{3}|#[a-f\d]{6}|rgba?\([\d,_\.]+\)|hsla?\([\d,_\.]+\))$")
+            .unwrap();
     static ref LENGTH_REGEX: Regex =
-        Regex::new(&format!("(?:{})", LENGTH_UNITS.join("|"))).unwrap();
-    static ref TIME_REGEX: Regex = Regex::new(r"\d+m?s$").unwrap();
-    static ref COMMA: fancy_regex::Regex = fancy_regex::Regex::new(r"\,(?![^(]*\))").unwrap();
+        Regex::new(&format!("(?-u)(?:{})$", LENGTH_UNITS.join("|"))).unwrap();
+    static ref TIME_REGEX: Regex = Regex::new(r"(?-u)\d+m?s$").unwrap();
+    static ref NUMBER_CSS_FUNCTIONS_REGEXES: [Regex; 4] = [
+        Regex::new(r"^min\(.+?").unwrap(),
+        Regex::new(r"^max\(.+?").unwrap(),
+        Regex::new(r"^clamp\(.+?").unwrap(),
+        Regex::new(r"^calc\(.+?").unwrap(),
+    ];
+    static ref PERCENTAGE_CSS_FUNCTIONS_REGEXES: [Regex; 4] = [
+        Regex::new(r"^min\(.+?%").unwrap(),
+        Regex::new(r"^max\(.+?%").unwrap(),
+        Regex::new(r"^clamp\(.+?%").unwrap(),
+        Regex::new(r"^calc\(.+?%").unwrap(),
+    ];
+    static ref LENGTH_CSS_FUNCTIONS_REGEXES: [Regex; 4] = [
+        Regex::new(&format!(r"^min\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
+        Regex::new(&format!(r"^max\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
+        Regex::new(&format!(r"^clamp\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
+        Regex::new(&format!(r"^calc\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
+    ];
 }
 
 // TODO: Support:
@@ -83,37 +100,24 @@ pub fn is_matching_color(val: &str) -> bool {
 pub fn is_matching_length(val: &str) -> bool {
     val.split('_').all(|v| {
         v == "0"
-            // TODO: Static regexes
-            || Regex::new(&format!("{}$", *LENGTH_REGEX))
-                .unwrap()
-                .is_match(v)
-            || CSS_FUNCTIONS.iter().any(|f| {
-                Regex::new(&format!(r"^{}\(.+?{}", f, *LENGTH_REGEX))
-                    .unwrap()
-                    .is_match(val)
-            })
+            || LENGTH_REGEX.is_match(v)
+            || LENGTH_CSS_FUNCTIONS_REGEXES.iter().any(|r| r.is_match(val))
     })
 }
 
 pub fn is_matching_number(val: &str) -> bool {
-    val.parse::<usize>().is_ok()
-        || CSS_FUNCTIONS
-            .iter()
-            .any(|f| Regex::new(&format!(r"^{}\(.+?", f)).unwrap().is_match(val))
+    val.parse::<usize>().is_ok() || NUMBER_CSS_FUNCTIONS_REGEXES.iter().any(|r| r.is_match(val))
 }
 
 pub fn is_matching_float(val: &str) -> bool {
-    val.parse::<f32>().is_ok()
-        || CSS_FUNCTIONS
-            .iter()
-            .any(|f| Regex::new(&format!(r"^{}\(.+?", f)).unwrap().is_match(val))
+    val.parse::<f32>().is_ok() || NUMBER_CSS_FUNCTIONS_REGEXES.iter().any(|r| r.is_match(val))
 }
 
 pub fn is_matching_percentage(val: &str) -> bool {
     val.ends_with('%')
-        || CSS_FUNCTIONS
+        || PERCENTAGE_CSS_FUNCTIONS_REGEXES
             .iter()
-            .any(|f| Regex::new(&format!(r"^{}\(.+?%", f)).unwrap().is_match(val))
+            .any(|r| r.is_match(val))
 }
 
 pub fn is_matching_time(val: &str) -> bool {

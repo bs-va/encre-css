@@ -2,7 +2,7 @@ use lazy_static::lazy_static;
 use regex::Regex;
 
 lazy_static! {
-    static ref OPACITY_SUFFIX_REGEX: Regex = Regex::new(r"/(\d*)$").unwrap();
+    static ref OPACITY_SUFFIX_REGEX: Regex = Regex::new(r"(?-u)/(\d*)$").unwrap();
 }
 
 lazy_static! {

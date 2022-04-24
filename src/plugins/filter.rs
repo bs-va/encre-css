@@ -75,8 +75,13 @@ impl Plugin for FilterPlugin {
             _ => None,
         };
 
-        result.map(|result| format!("{}
-  {}", result, CSS_FILTER))
+        result.map(|result| {
+            format!(
+                "{}
+  {}",
+                result, CSS_FILTER
+            )
+        })
     }
 }
 
@@ -84,8 +89,8 @@ impl Plugin for FilterPlugin {
 pub struct BackdropFilterPlugin;
 
 impl Plugin for BackdropFilterPlugin {
-    fn namespace(&self) -> String {
-        "backdrop".to_string()
+    fn namespace(&self) -> &str {
+        "backdrop"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -155,7 +160,12 @@ impl Plugin for BackdropFilterPlugin {
             _ => None,
         };
 
-        result.map(|result| format!("{}
-  {}", result, CSS_BACKDROP_FILTER))
+        result.map(|result| {
+            format!(
+                "{}
+  {}",
+                result, CSS_BACKDROP_FILTER
+            )
+        })
     }
 }

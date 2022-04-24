@@ -5,8 +5,8 @@ use crate::utils::{default_lengths, value_matchers::*};
 pub struct WidthPlugin;
 
 impl Plugin for WidthPlugin {
-    fn namespace(&self) -> String {
-        "w".to_string()
+    fn namespace(&self) -> &str {
+        "w"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -26,8 +26,8 @@ impl Plugin for WidthPlugin {
 pub struct MinWidthPlugin;
 
 impl Plugin for MinWidthPlugin {
-    fn namespace(&self) -> String {
-        "min-w".to_string()
+    fn namespace(&self) -> &str {
+        "min-w"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -54,8 +54,8 @@ impl Plugin for MinWidthPlugin {
 pub struct MaxWidthPlugin;
 
 impl Plugin for MaxWidthPlugin {
-    fn namespace(&self) -> String {
-        "max-w".to_string()
+    fn namespace(&self) -> &str {
+        "max-w"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -102,8 +102,8 @@ impl Plugin for MaxWidthPlugin {
 pub struct HeightPlugin;
 
 impl Plugin for HeightPlugin {
-    fn namespace(&self) -> String {
-        "h".to_string()
+    fn namespace(&self) -> &str {
+        "h"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -123,8 +123,8 @@ impl Plugin for HeightPlugin {
 pub struct MinHeightPlugin;
 
 impl Plugin for MinHeightPlugin {
-    fn namespace(&self) -> String {
-        "min-h".to_string()
+    fn namespace(&self) -> &str {
+        "min-h"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -152,8 +152,8 @@ impl Plugin for MinHeightPlugin {
 pub struct MaxHeightPlugin;
 
 impl Plugin for MaxHeightPlugin {
-    fn namespace(&self) -> String {
-        "max-h".to_string()
+    fn namespace(&self) -> &str {
+        "max-h"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {

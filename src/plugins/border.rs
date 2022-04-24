@@ -5,8 +5,8 @@ use crate::utils::{default_colors, value_matchers::*};
 pub struct ColorPlugin;
 
 impl Plugin for ColorPlugin {
-    fn namespace(&self) -> String {
-        "border".to_string()
+    fn namespace(&self) -> &str {
+        "border"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -34,8 +34,8 @@ impl Plugin for ColorPlugin {
 pub struct WidthPlugin;
 
 impl Plugin for WidthPlugin {
-    fn namespace(&self) -> String {
-        "border".to_string()
+    fn namespace(&self) -> &str {
+        "border"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -64,8 +64,8 @@ impl Plugin for WidthPlugin {
 pub struct WidthXPlugin;
 
 impl Plugin for WidthXPlugin {
-    fn namespace(&self) -> String {
-        "border-x".to_string()
+    fn namespace(&self) -> &str {
+        "border-x"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -97,8 +97,8 @@ impl Plugin for WidthXPlugin {
 pub struct WidthYPlugin;
 
 impl Plugin for WidthYPlugin {
-    fn namespace(&self) -> String {
-        "border-y".to_string()
+    fn namespace(&self) -> &str {
+        "border-y"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -130,8 +130,8 @@ impl Plugin for WidthYPlugin {
 pub struct WidthTopPlugin;
 
 impl Plugin for WidthTopPlugin {
-    fn namespace(&self) -> String {
-        "border-t".to_string()
+    fn namespace(&self) -> &str {
+        "border-t"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -160,8 +160,8 @@ impl Plugin for WidthTopPlugin {
 pub struct WidthBottomPlugin;
 
 impl Plugin for WidthBottomPlugin {
-    fn namespace(&self) -> String {
-        "border-b".to_string()
+    fn namespace(&self) -> &str {
+        "border-b"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -190,8 +190,8 @@ impl Plugin for WidthBottomPlugin {
 pub struct WidthLeftPlugin;
 
 impl Plugin for WidthLeftPlugin {
-    fn namespace(&self) -> String {
-        "border-l".to_string()
+    fn namespace(&self) -> &str {
+        "border-l"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -220,8 +220,8 @@ impl Plugin for WidthLeftPlugin {
 pub struct WidthRightPlugin;
 
 impl Plugin for WidthRightPlugin {
-    fn namespace(&self) -> String {
-        "border-r".to_string()
+    fn namespace(&self) -> &str {
+        "border-r"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -250,8 +250,8 @@ impl Plugin for WidthRightPlugin {
 pub struct OpacityPlugin;
 
 impl Plugin for OpacityPlugin {
-    fn namespace(&self) -> String {
-        "border-opacity".to_string()
+    fn namespace(&self) -> &str {
+        "border-opacity"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -268,8 +268,8 @@ impl Plugin for OpacityPlugin {
 pub struct RadiusPlugin;
 
 impl Plugin for RadiusPlugin {
-    fn namespace(&self) -> String {
-        "rounded".to_string()
+    fn namespace(&self) -> &str {
+        "rounded"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -373,8 +373,8 @@ impl Plugin for RadiusPlugin {
 pub struct DivideColorPlugin;
 
 impl Plugin for DivideColorPlugin {
-    fn namespace(&self) -> String {
-        "divide".to_string()
+    fn namespace(&self) -> &str {
+        "divide"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -402,8 +402,8 @@ impl Plugin for DivideColorPlugin {
 pub struct DivideOpacityPlugin;
 
 impl Plugin for DivideOpacityPlugin {
-    fn namespace(&self) -> String {
-        "divide-opacity".to_string()
+    fn namespace(&self) -> &str {
+        "divide-opacity"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -420,8 +420,8 @@ impl Plugin for DivideOpacityPlugin {
 pub struct RingColorPlugin;
 
 impl Plugin for RingColorPlugin {
-    fn namespace(&self) -> String {
-        "ring".to_string()
+    fn namespace(&self) -> &str {
+        "ring"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -449,8 +449,8 @@ impl Plugin for RingColorPlugin {
 pub struct RingOpacityPlugin;
 
 impl Plugin for RingOpacityPlugin {
-    fn namespace(&self) -> String {
-        "ring-opacity".to_string()
+    fn namespace(&self) -> &str {
+        "ring-opacity"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -467,8 +467,8 @@ impl Plugin for RingOpacityPlugin {
 pub struct RingOffsetColorPlugin;
 
 impl Plugin for RingOffsetColorPlugin {
-    fn namespace(&self) -> String {
-        "ring-offset".to_string()
+    fn namespace(&self) -> &str {
+        "ring-offset"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -496,8 +496,8 @@ impl Plugin for RingOffsetColorPlugin {
 pub struct RingOffsetOpacityPlugin;
 
 impl Plugin for RingOffsetOpacityPlugin {
-    fn namespace(&self) -> String {
-        "ring-offset-opacity".to_string()
+    fn namespace(&self) -> &str {
+        "ring-offset-opacity"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {

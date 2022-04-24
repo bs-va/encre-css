@@ -4,8 +4,8 @@ use super::Plugin;
 pub struct AlignItemsPlugin;
 
 impl Plugin for AlignItemsPlugin {
-    fn namespace(&self) -> String {
-        "items".to_string()
+    fn namespace(&self) -> &str {
+        "items"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -24,8 +24,8 @@ impl Plugin for AlignItemsPlugin {
 pub struct JustifyContentPlugin;
 
 impl Plugin for JustifyContentPlugin {
-    fn namespace(&self) -> String {
-        "justify".to_string()
+    fn namespace(&self) -> &str {
+        "justify"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {

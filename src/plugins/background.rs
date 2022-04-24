@@ -12,8 +12,8 @@ lazy_static! {
 pub struct ColorPlugin;
 
 impl Plugin for ColorPlugin {
-    fn namespace(&self) -> String {
-        "bg".to_string()
+    fn namespace(&self) -> &str {
+        "bg"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -41,8 +41,8 @@ impl Plugin for ColorPlugin {
 pub struct AttachmentPlugin;
 
 impl Plugin for AttachmentPlugin {
-    fn namespace(&self) -> String {
-        "bg".to_string()
+    fn namespace(&self) -> &str {
+        "bg"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -59,8 +59,8 @@ impl Plugin for AttachmentPlugin {
 pub struct ClipPlugin;
 
 impl Plugin for ClipPlugin {
-    fn namespace(&self) -> String {
-        "bg-clip".to_string()
+    fn namespace(&self) -> &str {
+        "bg-clip"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -78,8 +78,8 @@ impl Plugin for ClipPlugin {
 pub struct OpacityPlugin;
 
 impl Plugin for OpacityPlugin {
-    fn namespace(&self) -> String {
-        "bg-opacity".to_string()
+    fn namespace(&self) -> &str {
+        "bg-opacity"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -96,8 +96,8 @@ impl Plugin for OpacityPlugin {
 pub struct ImagePlugin;
 
 impl Plugin for ImagePlugin {
-    fn namespace(&self) -> String {
-        "bg".to_string()
+    fn namespace(&self) -> &str {
+        "bg"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -149,8 +149,8 @@ impl Plugin for ImagePlugin {
 pub struct GradientFromPlugin;
 
 impl Plugin for GradientFromPlugin {
-    fn namespace(&self) -> String {
-        "from".to_string()
+    fn namespace(&self) -> &str {
+        "from"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -186,8 +186,8 @@ impl Plugin for GradientFromPlugin {
 pub struct GradientViaPlugin;
 
 impl Plugin for GradientViaPlugin {
-    fn namespace(&self) -> String {
-        "via".to_string()
+    fn namespace(&self) -> &str {
+        "via"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -223,8 +223,8 @@ impl Plugin for GradientViaPlugin {
 pub struct GradientToPlugin;
 
 impl Plugin for GradientToPlugin {
-    fn namespace(&self) -> String {
-        "to".to_string()
+    fn namespace(&self) -> &str {
+        "to"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -251,8 +251,8 @@ impl Plugin for GradientToPlugin {
 pub struct PositionPlugin;
 
 impl Plugin for PositionPlugin {
-    fn namespace(&self) -> String {
-        "bg".to_string()
+    fn namespace(&self) -> &str {
+        "bg"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -288,8 +288,8 @@ impl Plugin for PositionPlugin {
 pub struct RepeatPlugin;
 
 impl Plugin for RepeatPlugin {
-    fn namespace(&self) -> String {
-        "bg".to_string()
+    fn namespace(&self) -> &str {
+        "bg"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -309,8 +309,8 @@ impl Plugin for RepeatPlugin {
 pub struct SizePlugin;
 
 impl Plugin for SizePlugin {
-    fn namespace(&self) -> String {
-        "bg".to_string()
+    fn namespace(&self) -> &str {
+        "bg"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {

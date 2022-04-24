@@ -1,26 +1,29 @@
+use lazy_static::lazy_static;
 use regex::Regex;
 use std::fmt;
 
 use crate::variant::VARIANT_SEPARATOR;
 
+lazy_static! {
+    static ref VARIANT_REGEX: Regex = Regex::new(r"^[^\[]*:").unwrap();
+}
+
 #[derive(Debug, PartialEq, Eq, Clone, Hash, PartialOrd, Ord)]
 pub struct Selector {
     variant: Option<String>,
-    content: String,                 // FIXME: Remove this pub!!!
-    arbitrary_value: Option<String>, // FIXME: Remove this pub!!!
+    content: String,
+    arbitrary_value: Option<String>,
     is_negative: bool,
     is_important: bool,
 }
 
 impl Selector {
-    pub fn new<T: Into<String>>(data: T) -> Self {
-        let data = data.into();
-
+    pub fn new(data: &str) -> Self {
         // Strip the important flag before the negative one
         let (data, is_important) = if let Some(data) = data.strip_prefix('!') {
             (data, true)
         } else {
-            (data.as_str(), false)
+            (data, false)
         };
 
         let (data, is_negative) = if let Some(data) = data.strip_prefix('-') {
@@ -38,7 +41,7 @@ impl Selector {
             }
         };
 
-        if Regex::new(r"^[^\[]*:").unwrap().is_match(data) {
+        if VARIANT_REGEX.is_match(data) {
             let mut split = data.split(VARIANT_SEPARATOR);
             let variant = split.next().unwrap();
             let content = split.next().unwrap();
@@ -93,8 +96,13 @@ impl Selector {
         &self.variant
     }
 
-    pub fn get_arbitrary_value(&self) -> &Option<String> {
-        &self.arbitrary_value
+    pub fn get_arbitrary_value(&self) -> Option<String> {
+        if let Some(opening_index) = self.content.find('[') {
+            self.content.find(']')
+                .map(|closing_index| self.content[opening_index + 1..closing_index].to_string())
+        } else {
+            None
+        }
     }
 
     pub fn is_important(&self) -> bool {

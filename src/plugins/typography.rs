@@ -1,14 +1,19 @@
 use super::Plugin;
 use crate::utils::{default_colors, value_matchers::*};
 
+use lazy_static::lazy_static;
 use regex::Regex;
+
+lazy_static! {
+    static ref START_WITH_INT_REGEX: Regex = Regex::new(r"(?-u)^\d").unwrap();
+}
 
 #[derive(Debug)]
 pub struct TypographyColorPlugin;
 
 impl Plugin for TypographyColorPlugin {
-    fn namespace(&self) -> String {
-        "text".to_string()
+    fn namespace(&self) -> &str {
+        "text"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -36,8 +41,8 @@ impl Plugin for TypographyColorPlugin {
 pub struct TypographyOpacityPlugin;
 
 impl Plugin for TypographyOpacityPlugin {
-    fn namespace(&self) -> String {
-        "text-opacity".to_string()
+    fn namespace(&self) -> &str {
+        "text-opacity"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -54,8 +59,8 @@ impl Plugin for TypographyOpacityPlugin {
 pub struct TypographyFontFamilyPlugin;
 
 impl Plugin for TypographyFontFamilyPlugin {
-    fn namespace(&self) -> String {
-        "font".to_string()
+    fn namespace(&self) -> &str {
+        "font"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -63,7 +68,7 @@ impl Plugin for TypographyFontFamilyPlugin {
             if is_matching_generic_name(v) || is_matching_var(v) {
                 true
             } else {
-                !Regex::new(r"^\d").unwrap().is_match(v)
+                !START_WITH_INT_REGEX.is_match(v)
             }
         })
     }
@@ -91,8 +96,8 @@ impl Plugin for TypographyFontFamilyPlugin {
 pub struct TypographyFontSizePlugin;
 
 impl Plugin for TypographyFontSizePlugin {
-    fn namespace(&self) -> String {
-        "text".to_string()
+    fn namespace(&self) -> &str {
+        "text"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -179,8 +184,8 @@ impl Plugin for TypographyFontSizePlugin {
 pub struct TypographyFontWeightPlugin;
 
 impl Plugin for TypographyFontWeightPlugin {
-    fn namespace(&self) -> String {
-        "font".to_string()
+    fn namespace(&self) -> &str {
+        "font"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -213,8 +218,8 @@ impl Plugin for TypographyFontWeightPlugin {
 pub struct TypographyTextAlignmentPlugin;
 
 impl Plugin for TypographyTextAlignmentPlugin {
-    fn namespace(&self) -> String {
-        "text".to_string()
+    fn namespace(&self) -> &str {
+        "text"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -247,8 +252,8 @@ impl Plugin for TypographyTextTransformPlugin {
 pub struct TypographyTrackingPlugin;
 
 impl Plugin for TypographyTrackingPlugin {
-    fn namespace(&self) -> String {
-        "tracking".to_string()
+    fn namespace(&self) -> &str {
+        "tracking"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -276,8 +281,8 @@ impl Plugin for TypographyTrackingPlugin {
 pub struct TypographyLeadingPlugin;
 
 impl Plugin for TypographyLeadingPlugin {
-    fn namespace(&self) -> String {
-        "leading".to_string()
+    fn namespace(&self) -> &str {
+        "leading"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -343,8 +348,8 @@ impl Plugin for TypographyTextDecorationPlugin {
 pub struct TypographyTextDecorationColorPlugin;
 
 impl Plugin for TypographyTextDecorationColorPlugin {
-    fn namespace(&self) -> String {
-        "decoration".to_string()
+    fn namespace(&self) -> &str {
+        "decoration"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -375,8 +380,8 @@ impl Plugin for TypographyTextDecorationColorPlugin {
 pub struct TypographyTextDecorationStylePlugin;
 
 impl Plugin for TypographyTextDecorationStylePlugin {
-    fn namespace(&self) -> String {
-        "decoration".to_string()
+    fn namespace(&self) -> &str {
+        "decoration"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -392,8 +397,8 @@ impl Plugin for TypographyTextDecorationStylePlugin {
 pub struct TypographyTextDecorationThicknessPlugin;
 
 impl Plugin for TypographyTextDecorationThicknessPlugin {
-    fn namespace(&self) -> String {
-        "decoration".to_string()
+    fn namespace(&self) -> &str {
+        "decoration"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -426,8 +431,8 @@ impl Plugin for TypographyTextDecorationThicknessPlugin {
 pub struct TypographyTextDecorationOffsetPlugin;
 
 impl Plugin for TypographyTextDecorationOffsetPlugin {
-    fn namespace(&self) -> String {
-        "underline".to_string()
+    fn namespace(&self) -> &str {
+        "underline"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -461,8 +466,8 @@ impl Plugin for TypographyTextDecorationOffsetPlugin {
 pub struct TypographyContentPlugin;
 
 impl Plugin for TypographyContentPlugin {
-    fn namespace(&self) -> String {
-        "content".to_string()
+    fn namespace(&self) -> &str {
+        "content"
     }
 
     fn is_matching_value(&self, _hint: &str, _val: &str) -> bool {

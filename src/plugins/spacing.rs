@@ -6,8 +6,8 @@ use crate::utils::{default_lengths, value_matchers::*};
 pub struct PaddingPlugin;
 
 impl Plugin for PaddingPlugin {
-    fn namespace(&self) -> String {
-        "p".to_string()
+    fn namespace(&self) -> &str {
+        "p"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -27,8 +27,8 @@ impl Plugin for PaddingPlugin {
 pub struct PaddingXPlugin;
 
 impl Plugin for PaddingXPlugin {
-    fn namespace(&self) -> String {
-        "px".to_string()
+    fn namespace(&self) -> &str {
+        "px"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -51,8 +51,8 @@ impl Plugin for PaddingXPlugin {
 pub struct PaddingYPlugin;
 
 impl Plugin for PaddingYPlugin {
-    fn namespace(&self) -> String {
-        "py".to_string()
+    fn namespace(&self) -> &str {
+        "py"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -75,8 +75,8 @@ impl Plugin for PaddingYPlugin {
 pub struct PaddingLeftPlugin;
 
 impl Plugin for PaddingLeftPlugin {
-    fn namespace(&self) -> String {
-        "pl".to_string()
+    fn namespace(&self) -> &str {
+        "pl"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -96,8 +96,8 @@ impl Plugin for PaddingLeftPlugin {
 pub struct PaddingRightPlugin;
 
 impl Plugin for PaddingRightPlugin {
-    fn namespace(&self) -> String {
-        "pr".to_string()
+    fn namespace(&self) -> &str {
+        "pr"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -117,8 +117,8 @@ impl Plugin for PaddingRightPlugin {
 pub struct PaddingTopPlugin;
 
 impl Plugin for PaddingTopPlugin {
-    fn namespace(&self) -> String {
-        "pt".to_string()
+    fn namespace(&self) -> &str {
+        "pt"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -138,8 +138,8 @@ impl Plugin for PaddingTopPlugin {
 pub struct PaddingBottomPlugin;
 
 impl Plugin for PaddingBottomPlugin {
-    fn namespace(&self) -> String {
-        "pb".to_string()
+    fn namespace(&self) -> &str {
+        "pb"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -161,8 +161,8 @@ impl Plugin for PaddingBottomPlugin {
 pub struct MarginPlugin;
 
 impl Plugin for MarginPlugin {
-    fn namespace(&self) -> String {
-        "m".to_string()
+    fn namespace(&self) -> &str {
+        "m"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -186,8 +186,8 @@ impl Plugin for MarginPlugin {
 pub struct MarginXPlugin;
 
 impl Plugin for MarginXPlugin {
-    fn namespace(&self) -> String {
-        "mx".to_string()
+    fn namespace(&self) -> &str {
+        "mx"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -214,8 +214,8 @@ impl Plugin for MarginXPlugin {
 pub struct MarginYPlugin;
 
 impl Plugin for MarginYPlugin {
-    fn namespace(&self) -> String {
-        "my".to_string()
+    fn namespace(&self) -> &str {
+        "my"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -242,8 +242,8 @@ impl Plugin for MarginYPlugin {
 pub struct MarginLeftPlugin;
 
 impl Plugin for MarginLeftPlugin {
-    fn namespace(&self) -> String {
-        "ml".to_string()
+    fn namespace(&self) -> &str {
+        "ml"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -267,8 +267,8 @@ impl Plugin for MarginLeftPlugin {
 pub struct MarginRightPlugin;
 
 impl Plugin for MarginRightPlugin {
-    fn namespace(&self) -> String {
-        "mr".to_string()
+    fn namespace(&self) -> &str {
+        "mr"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -292,8 +292,8 @@ impl Plugin for MarginRightPlugin {
 pub struct MarginTopPlugin;
 
 impl Plugin for MarginTopPlugin {
-    fn namespace(&self) -> String {
-        "mt".to_string()
+    fn namespace(&self) -> &str {
+        "mt"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -317,8 +317,8 @@ impl Plugin for MarginTopPlugin {
 pub struct MarginBottomPlugin;
 
 impl Plugin for MarginBottomPlugin {
-    fn namespace(&self) -> String {
-        "mb".to_string()
+    fn namespace(&self) -> &str {
+        "mb"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -342,8 +342,8 @@ impl Plugin for MarginBottomPlugin {
 pub struct SpaceXPlugin;
 
 impl Plugin for SpaceXPlugin {
-    fn namespace(&self) -> String {
-        "space-x".to_string()
+    fn namespace(&self) -> &str {
+        "space-x"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -377,8 +377,8 @@ impl Plugin for SpaceXPlugin {
 pub struct SpaceYPlugin;
 
 impl Plugin for SpaceYPlugin {
-    fn namespace(&self) -> String {
-        "space-y".to_string()
+    fn namespace(&self) -> &str {
+        "space-y"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {

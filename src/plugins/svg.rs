@@ -5,8 +5,8 @@ use crate::utils::{default_colors, value_matchers::*};
 pub struct FillPlugin;
 
 impl Plugin for FillPlugin {
-    fn namespace(&self) -> String {
-        "fill".to_string()
+    fn namespace(&self) -> &str {
+        "fill"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -15,10 +15,7 @@ impl Plugin for FillPlugin {
 
     fn css_template_value(&self, val: &str) -> String {
         if val.contains("--tw-opacity") {
-            format!(
-                "fill: {};",
-                val.replace("/ var(--tw-opacity)", "")
-            )
+            format!("fill: {};", val.replace("/ var(--tw-opacity)", ""))
         } else {
             format!("fill: {val};")
         }
@@ -33,8 +30,8 @@ impl Plugin for FillPlugin {
 pub struct StrokeColorPlugin;
 
 impl Plugin for StrokeColorPlugin {
-    fn namespace(&self) -> String {
-        "stroke".to_string()
+    fn namespace(&self) -> &str {
+        "stroke"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
@@ -43,10 +40,7 @@ impl Plugin for StrokeColorPlugin {
 
     fn css_template_value(&self, val: &str) -> String {
         if val.contains("--tw-opacity") {
-            format!(
-                "stroke: {};",
-                val.replace("/ var(--tw-opacity)", "")
-            )
+            format!("stroke: {};", val.replace("/ var(--tw-opacity)", ""))
         } else {
             format!("stroke: {val};")
         }
@@ -61,8 +55,8 @@ impl Plugin for StrokeColorPlugin {
 pub struct StrokeWidthPlugin;
 
 impl Plugin for StrokeWidthPlugin {
-    fn namespace(&self) -> String {
-        "stroke".to_string()
+    fn namespace(&self) -> &str {
+        "stroke"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {

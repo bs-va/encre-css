@@ -5,8 +5,8 @@ use crate::utils::{default_colors, value_matchers::*};
 pub struct MixBlendModePlugin;
 
 impl Plugin for MixBlendModePlugin {
-    fn namespace(&self) -> String {
-        "mix-blend".to_string()
+    fn namespace(&self) -> &str {
+        "mix-blend"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -36,8 +36,8 @@ impl Plugin for MixBlendModePlugin {
 pub struct BoxShadowPlugin;
 
 impl Plugin for BoxShadowPlugin {
-    fn namespace(&self) -> String {
-        "shadow".to_string()
+    fn namespace(&self) -> &str {
+        "shadow"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -75,8 +75,8 @@ impl Plugin for BoxShadowPlugin {
 pub struct BoxShadowColorPlugin;
 
 impl Plugin for BoxShadowColorPlugin {
-    fn namespace(&self) -> String {
-        "shadow".to_string()
+    fn namespace(&self) -> &str {
+        "shadow"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {

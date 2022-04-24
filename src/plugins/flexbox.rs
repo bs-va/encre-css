@@ -5,8 +5,8 @@ use crate::utils::value_matchers::*;
 pub struct OrderPlugin;
 
 impl Plugin for OrderPlugin {
-    fn namespace(&self) -> String {
-        "order".to_string()
+    fn namespace(&self) -> &str {
+        "order"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -38,8 +38,8 @@ impl Plugin for OrderPlugin {
 pub struct DirectionPlugin;
 
 impl Plugin for DirectionPlugin {
-    fn namespace(&self) -> String {
-        "flex".to_string()
+    fn namespace(&self) -> &str {
+        "flex"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -57,8 +57,8 @@ impl Plugin for DirectionPlugin {
 pub struct WrapPlugin;
 
 impl Plugin for WrapPlugin {
-    fn namespace(&self) -> String {
-        "flex".to_string()
+    fn namespace(&self) -> &str {
+        "flex"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -75,8 +75,8 @@ impl Plugin for WrapPlugin {
 pub struct GrowShrinkBasisPlugin;
 
 impl Plugin for GrowShrinkBasisPlugin {
-    fn namespace(&self) -> String {
-        "flex".to_string()
+    fn namespace(&self) -> &str {
+        "flex"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {

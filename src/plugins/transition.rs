@@ -12,8 +12,8 @@ lazy_static! {
 pub struct PropertyPlugin;
 
 impl Plugin for PropertyPlugin {
-    fn namespace(&self) -> String {
-        "transition".to_string()
+    fn namespace(&self) -> &str {
+        "transition"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
@@ -54,8 +54,8 @@ impl Plugin for PropertyPlugin {
 pub struct DurationPlugin;
 
 impl Plugin for DurationPlugin {
-    fn namespace(&self) -> String {
-        "duration".to_string()
+    fn namespace(&self) -> &str {
+        "duration"
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {

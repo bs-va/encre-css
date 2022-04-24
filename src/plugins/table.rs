@@ -4,8 +4,8 @@ use super::Plugin;
 pub struct BorderCollapsePlugin;
 
 impl Plugin for BorderCollapsePlugin {
-    fn namespace(&self) -> String {
-        "border".to_string()
+    fn namespace(&self) -> &str {
+        "border"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {
@@ -21,8 +21,8 @@ impl Plugin for BorderCollapsePlugin {
 pub struct TableLayoutPlugin;
 
 impl Plugin for TableLayoutPlugin {
-    fn namespace(&self) -> String {
-        "table".to_string()
+    fn namespace(&self) -> &str {
+        "table"
     }
 
     fn get_css_for_modifier(&self, modifier: &str) -> Option<String> {

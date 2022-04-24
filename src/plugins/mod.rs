@@ -22,8 +22,8 @@ pub trait Plugin: fmt::Debug {
     /// Returns the namespace containing the plugin
     ///
     /// By default, the plugin does not belong to a namespace
-    fn namespace(&self) -> String {
-        String::new()
+    fn namespace(&self) -> &str {
+        ""
     }
 
     /// Get the CSS code from a modifier
