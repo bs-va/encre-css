@@ -87,7 +87,8 @@ impl Plugin for InsetPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content,
+        write!(
+            css_content,
             "top: {val};
   right: {val};
   bottom: {val};
@@ -117,7 +118,8 @@ impl Plugin for InsetXPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content,
+        write!(
+            css_content,
             "left: {val};
   right: {val};"
         )
@@ -145,7 +147,8 @@ impl Plugin for InsetYPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content,
+        write!(
+            css_content,
             "top: {val};
   bottom: {val};"
         )

@@ -23,7 +23,8 @@ impl Plugin for ColorPlugin {
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         if val.contains("--tw-opacity") {
-            write!(css_content,
+            write!(
+                css_content,
                 "--tw-bg-opacity: 1;
   background-color: {};",
                 val.replace("--tw-opacity", "--tw-bg-opacity")
@@ -117,14 +118,38 @@ impl Plugin for ImagePlugin {
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
             "bg-none" => self.css_template_value("none", css_content),
-            "gradient-to-t" => self.css_template_value("linear-gradient(to top, var(--tw-gradient-stops))", css_content),
-            "gradient-to-tr" => self.css_template_value("linear-gradient(to top right, var(--tw-gradient-stops))", css_content),
-            "gradient-to-r" => self.css_template_value("linear-gradient(to right, var(--tw-gradient-stops))", css_content),
-            "gradient-to-br" => self.css_template_value("linear-gradient(to bottom right, var(--tw-gradient-stops))", css_content),
-            "gradient-to-b" => self.css_template_value("linear-gradient(to bottom, var(--tw-gradient-stops))", css_content),
-            "gradient-to-bl" => self.css_template_value("linear-gradient(to bottom left, var(--tw-gradient-stops))", css_content),
-            "gradient-to-l" => self.css_template_value("linear-gradient(to left, var(--tw-gradient-stops))", css_content),
-            "gradient-to-tl" => self.css_template_value("linear-gradient(to top left, var(--tw-gradient-stops))", css_content),
+            "gradient-to-t" => self.css_template_value(
+                "linear-gradient(to top, var(--tw-gradient-stops))",
+                css_content,
+            ),
+            "gradient-to-tr" => self.css_template_value(
+                "linear-gradient(to top right, var(--tw-gradient-stops))",
+                css_content,
+            ),
+            "gradient-to-r" => self.css_template_value(
+                "linear-gradient(to right, var(--tw-gradient-stops))",
+                css_content,
+            ),
+            "gradient-to-br" => self.css_template_value(
+                "linear-gradient(to bottom right, var(--tw-gradient-stops))",
+                css_content,
+            ),
+            "gradient-to-b" => self.css_template_value(
+                "linear-gradient(to bottom, var(--tw-gradient-stops))",
+                css_content,
+            ),
+            "gradient-to-bl" => self.css_template_value(
+                "linear-gradient(to bottom left, var(--tw-gradient-stops))",
+                css_content,
+            ),
+            "gradient-to-l" => self.css_template_value(
+                "linear-gradient(to left, var(--tw-gradient-stops))",
+                css_content,
+            ),
+            "gradient-to-tl" => self.css_template_value(
+                "linear-gradient(to top left, var(--tw-gradient-stops))",
+                css_content,
+            ),
             _ => Ok(()),
         }
     }
@@ -156,7 +181,8 @@ impl Plugin for GradientFromPlugin {
             val.to_string()
         };
 
-        write!(css_content,
+        write!(
+            css_content,
             "--tw-gradient-from: {val};
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, {default_to});"
         )
@@ -197,7 +223,8 @@ impl Plugin for GradientViaPlugin {
             val.to_string()
         };
 
-        write!(css_content,
+        write!(
+            css_content,
             "--tw-gradient-stops: var(--tw-gradient-from), {}, var(--tw-gradient-to, {});",
             val, default_to
         )

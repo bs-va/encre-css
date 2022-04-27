@@ -20,9 +20,9 @@ pub mod utils;
 pub mod variant;
 
 use lazy_static::lazy_static;
+use rayon::prelude::*;
 use regex::Regex;
 use std::{fs, io::Read, path::PathBuf};
-use rayon::prelude::*;
 
 use plugins::PLUGINS;
 use preflight::TAILWIND_PREFLIGHT_CSS;
@@ -38,10 +38,6 @@ use variant::VARIANTS;
 // - CSS variant for dark: configurable
 // - Configurable preflight
 // - Support a safelist in the configuration file
-//
-// Performances:
-// - Use the std::write macro and pass a Formatter (instead of returning a String) in
-// css_template_value (for preventing .to_string()ing)
 
 lazy_static! {
     static ref SPLIT_REGEX: Regex = Regex::new(r#"(?-u)[\s'"`;>=]+"#).unwrap();
@@ -195,46 +191,55 @@ impl TailwindGenerator {
             for plugin in PLUGINS.iter() {
                 if selector.check_namespace(plugin.namespace()) {
                     let maybe_arbitrary_value = selector.get_arbitrary_value();
-                    let arbitrary_value =
-                        if let Some(ref arbitrary_value) = maybe_arbitrary_value {
-                            let mut split = arbitrary_value.split(':');
-                            let maybe_hint = split.next().unwrap();
+                    let arbitrary_value = if let Some(ref arbitrary_value) = maybe_arbitrary_value {
+                        let mut split = arbitrary_value.split(':');
+                        let maybe_hint = split.next().unwrap();
 
-                            if maybe_hint == arbitrary_value {
-                                // No plugin hint
-                                Some(("", maybe_hint))
-                            } else {
-                                let val = split.next();
-
-                                if let Some(val) = val {
-                                    if VALID_PLUGIN_HINT.contains(&maybe_hint) {
-                                        // Valid! Return (hint, stripped arbitrary value)
-                                        Some((maybe_hint, val))
-                                    } else {
-                                        // Unknown plugin hint (like `bg-[sth:#333]`)
-                                        // TODO: Display a warning
-                                        Some(("", val))
-                                    }
-                                } else {
-                                    // Malformed arbitrary value (like just `bg-[color:]`)
-                                    // TODO: Display a warning
-                                    Some(("", maybe_hint))
-                                }
-                            }
+                        if maybe_hint == arbitrary_value {
+                            // No plugin hint
+                            Some(("", maybe_hint))
                         } else {
-                            None
-                        };
+                            let val = split.next();
+
+                            if let Some(val) = val {
+                                if VALID_PLUGIN_HINT.contains(&maybe_hint) {
+                                    // Valid! Return (hint, stripped arbitrary value)
+                                    Some((maybe_hint, val))
+                                } else {
+                                    // Unknown plugin hint (like `bg-[sth:#333]`)
+                                    // TODO: Display a warning
+                                    Some(("", val))
+                                }
+                            } else {
+                                // Malformed arbitrary value (like just `bg-[color:]`)
+                                // TODO: Display a warning
+                                Some(("", maybe_hint))
+                            }
+                        }
+                    } else {
+                        None
+                    };
 
                     if let Some(arbitrary_value) = arbitrary_value {
                         if plugin.is_matching_value(arbitrary_value.0, arbitrary_value.1) {
-                            plugin.css_template_value(&to_css_value(arbitrary_value.1), &mut css_content).expect("failed to get the CSS from the modifier");
+                            plugin
+                                .css_template_value(
+                                    &to_css_value(arbitrary_value.1),
+                                    &mut css_content,
+                                )
+                                .expect("failed to get the CSS from the modifier");
 
                             if !css_content.is_empty() {
                                 return Some(gen_css_rule(selector, &css_content));
                             }
                         }
                     } else {
-                        plugin.get_css_for_modifier(&selector.get_modifier(plugin.namespace()), &mut css_content).expect("failed to get the CSS from the modifier");
+                        plugin
+                            .get_css_for_modifier(
+                                &selector.get_modifier(plugin.namespace()),
+                                &mut css_content,
+                            )
+                            .expect("failed to get the CSS from the modifier");
 
                         if !css_content.is_empty() {
                             return Some(gen_css_rule(selector, &css_content));
@@ -244,7 +249,8 @@ impl TailwindGenerator {
             }
 
             None
-        }).collect::<Vec<String>>();
+        })
+        .collect::<Vec<String>>();
 
         format!("{}{}", TAILWIND_PREFLIGHT_CSS, result.join("\n\n"))
     }

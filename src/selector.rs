@@ -98,7 +98,8 @@ impl Selector {
 
     pub fn get_arbitrary_value(&self) -> Option<String> {
         if let Some(opening_index) = self.content.find('[') {
-            self.content.find(']')
+            self.content
+                .find(']')
                 .map(|closing_index| self.content[opening_index + 1..closing_index].to_string())
         } else {
             None

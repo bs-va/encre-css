@@ -3,6 +3,8 @@ use crate::utils::{default_colors, value_matchers::*};
 
 use std::fmt::{Result, Write};
 
+const CSS_RING_OFFSET_SHADOW: &str = "--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);";
+
 #[derive(Debug)]
 pub struct ColorPlugin;
 
@@ -17,7 +19,8 @@ impl Plugin for ColorPlugin {
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         if val.contains("--tw-opacity") {
-            write!(css_content,
+            write!(
+                css_content,
                 "--tw-border-opacity: 1;
   border-color: {};",
                 val.replace("--tw-opacity", "--tw-border-opacity")
@@ -30,6 +33,332 @@ impl Plugin for ColorPlugin {
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if let Some(color) = default_colors::get(modifier) {
             self.css_template_value(&color, css_content)
+        } else {
+            Ok(())
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct RadiusPlugin;
+
+impl Plugin for RadiusPlugin {
+    fn namespace(&self) -> &str {
+        "rounded"
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        val.split('_')
+            .all(|v| is_matching_length(v) || is_matching_percentage(v))
+    }
+
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "border-radius: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        match modifier {
+            "" => self.css_template_value("0.25rem", css_content),
+            "none" => self.css_template_value("0", css_content),
+            "sm" => self.css_template_value("0.125rem", css_content),
+            "md" => self.css_template_value("0.375rem", css_content),
+            "lg" => self.css_template_value("0.5rem", css_content),
+            "xl" => self.css_template_value("0.75rem", css_content),
+            "2xl" => self.css_template_value("1rem", css_content),
+            "3xl" => self.css_template_value("1.5rem", css_content),
+            "full" => self.css_template_value("9999px", css_content),
+            _ => Ok(()),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct RadiusTopPlugin;
+
+impl Plugin for RadiusTopPlugin {
+    fn namespace(&self) -> &str {
+        "rounded-t"
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        val.split('_')
+            .all(|v| is_matching_length(v) || is_matching_percentage(v))
+    }
+
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(
+            css_content,
+            "border-top-left-radius: {val};\n  border-top-right-radius: {val};"
+        )
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        match modifier {
+            "" => self.css_template_value("0.25rem", css_content),
+            "none" => self.css_template_value("0", css_content),
+            "sm" => self.css_template_value("0.125rem", css_content),
+            "md" => self.css_template_value("0.375rem", css_content),
+            "lg" => self.css_template_value("0.5rem", css_content),
+            "xl" => self.css_template_value("0.75rem", css_content),
+            "2xl" => self.css_template_value("1rem", css_content),
+            "3xl" => self.css_template_value("1.5rem", css_content),
+            "full" => self.css_template_value("9999px", css_content),
+            _ => Ok(()),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct RadiusBottomPlugin;
+
+impl Plugin for RadiusBottomPlugin {
+    fn namespace(&self) -> &str {
+        "rounded-b"
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        val.split('_')
+            .all(|v| is_matching_length(v) || is_matching_percentage(v))
+    }
+
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(
+            css_content,
+            "border-bottom-left-radius: {val};\n  border-bottom-right-radius: {val};"
+        )
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        match modifier {
+            "" => self.css_template_value("0.25rem", css_content),
+            "none" => self.css_template_value("0", css_content),
+            "sm" => self.css_template_value("0.125rem", css_content),
+            "md" => self.css_template_value("0.375rem", css_content),
+            "lg" => self.css_template_value("0.5rem", css_content),
+            "xl" => self.css_template_value("0.75rem", css_content),
+            "2xl" => self.css_template_value("1rem", css_content),
+            "3xl" => self.css_template_value("1.5rem", css_content),
+            "full" => self.css_template_value("9999px", css_content),
+            _ => Ok(()),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct RadiusLeftPlugin;
+
+impl Plugin for RadiusLeftPlugin {
+    fn namespace(&self) -> &str {
+        "rounded-l"
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        val.split('_')
+            .all(|v| is_matching_length(v) || is_matching_percentage(v))
+    }
+
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(
+            css_content,
+            "border-top-left-radius: {val};\n  border-bottom-left-radius: {val};"
+        )
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        match modifier {
+            "" => self.css_template_value("0.25rem", css_content),
+            "none" => self.css_template_value("0", css_content),
+            "sm" => self.css_template_value("0.125rem", css_content),
+            "md" => self.css_template_value("0.375rem", css_content),
+            "lg" => self.css_template_value("0.5rem", css_content),
+            "xl" => self.css_template_value("0.75rem", css_content),
+            "2xl" => self.css_template_value("1rem", css_content),
+            "3xl" => self.css_template_value("1.5rem", css_content),
+            "full" => self.css_template_value("9999px", css_content),
+            _ => Ok(()),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct RadiusRightPlugin;
+
+impl Plugin for RadiusRightPlugin {
+    fn namespace(&self) -> &str {
+        "rounded-r"
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        val.split('_')
+            .all(|v| is_matching_length(v) || is_matching_percentage(v))
+    }
+
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(
+            css_content,
+            "border-top-right-radius: {val};\n  border-bottom-right-radius: {val};"
+        )
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        match modifier {
+            "" => self.css_template_value("0.25rem", css_content),
+            "none" => self.css_template_value("0", css_content),
+            "sm" => self.css_template_value("0.125rem", css_content),
+            "md" => self.css_template_value("0.375rem", css_content),
+            "lg" => self.css_template_value("0.5rem", css_content),
+            "xl" => self.css_template_value("0.75rem", css_content),
+            "2xl" => self.css_template_value("1rem", css_content),
+            "3xl" => self.css_template_value("1.5rem", css_content),
+            "full" => self.css_template_value("9999px", css_content),
+            _ => Ok(()),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct RadiusTopLeftPlugin;
+
+impl Plugin for RadiusTopLeftPlugin {
+    fn namespace(&self) -> &str {
+        "rounded-tl"
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        val.split('_')
+            .all(|v| is_matching_length(v) || is_matching_percentage(v))
+    }
+
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "border-top-left-radius: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        match modifier {
+            "" => self.css_template_value("0.25rem", css_content),
+            "none" => self.css_template_value("0", css_content),
+            "sm" => self.css_template_value("0.125rem", css_content),
+            "md" => self.css_template_value("0.375rem", css_content),
+            "lg" => self.css_template_value("0.5rem", css_content),
+            "xl" => self.css_template_value("0.75rem", css_content),
+            "2xl" => self.css_template_value("1rem", css_content),
+            "3xl" => self.css_template_value("1.5rem", css_content),
+            "full" => self.css_template_value("9999px", css_content),
+            _ => Ok(()),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct RadiusBottomLeftPlugin;
+
+impl Plugin for RadiusBottomLeftPlugin {
+    fn namespace(&self) -> &str {
+        "rounded-bl"
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        val.split('_')
+            .all(|v| is_matching_length(v) || is_matching_percentage(v))
+    }
+
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "border-bottom-left-radius: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        match modifier {
+            "" => self.css_template_value("0.25rem", css_content),
+            "none" => self.css_template_value("0", css_content),
+            "sm" => self.css_template_value("0.125rem", css_content),
+            "md" => self.css_template_value("0.375rem", css_content),
+            "lg" => self.css_template_value("0.5rem", css_content),
+            "xl" => self.css_template_value("0.75rem", css_content),
+            "2xl" => self.css_template_value("1rem", css_content),
+            "3xl" => self.css_template_value("1.5rem", css_content),
+            "full" => self.css_template_value("9999px", css_content),
+            _ => Ok(()),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct RadiusBottomRightPlugin;
+
+impl Plugin for RadiusBottomRightPlugin {
+    fn namespace(&self) -> &str {
+        "rounded-br"
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        val.split('_')
+            .all(|v| is_matching_length(v) || is_matching_percentage(v))
+    }
+
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "border-bottom-right-radius: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        match modifier {
+            "" => self.css_template_value("0.25rem", css_content),
+            "none" => self.css_template_value("0", css_content),
+            "sm" => self.css_template_value("0.125rem", css_content),
+            "md" => self.css_template_value("0.375rem", css_content),
+            "lg" => self.css_template_value("0.5rem", css_content),
+            "xl" => self.css_template_value("0.75rem", css_content),
+            "2xl" => self.css_template_value("1rem", css_content),
+            "3xl" => self.css_template_value("1.5rem", css_content),
+            "full" => self.css_template_value("9999px", css_content),
+            _ => Ok(()),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct RadiusTopRightPlugin;
+
+impl Plugin for RadiusTopRightPlugin {
+    fn namespace(&self) -> &str {
+        "rounded-tr"
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        val.split('_')
+            .all(|v| is_matching_length(v) || is_matching_percentage(v))
+    }
+
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "border-top-right-radius: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        match modifier {
+            "" => self.css_template_value("", css_content),
+            "none" => self.css_template_value("", css_content),
+            "sm" => self.css_template_value("", css_content),
+            "md" => self.css_template_value("", css_content),
+            "lg" => self.css_template_value("", css_content),
+            "xl" => self.css_template_value("", css_content),
+            "2xl" => self.css_template_value("", css_content),
+            "3xl" => self.css_template_value("", css_content),
+            "full" => self.css_template_value("", css_content),
+            _ => Ok(()),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct StylePlugin;
+
+impl Plugin for StylePlugin {
+    fn namespace(&self) -> &str {
+        "border"
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if ["solid", "dashed", "dotted", "double", "none"].contains(&modifier) {
+            write!(css_content, "border-style: {};", modifier)
         } else {
             Ok(())
         }
@@ -79,7 +408,8 @@ impl Plugin for WidthXPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content,
+        write!(
+            css_content,
             "border-left-width: {val};
   border-right-width: {val};"
         )
@@ -112,7 +442,8 @@ impl Plugin for WidthYPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content,
+        write!(
+            css_content,
             "border-top-width: {val};
   border-bottom-width: {val};"
         )
@@ -263,114 +594,13 @@ impl Plugin for OpacityPlugin {
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.parse::<f32>() {
-            write!(css_content, "--tw-border-opacity: {};", opacity_value / 100.)
+            write!(
+                css_content,
+                "--tw-border-opacity: {};",
+                opacity_value / 100.
+            )
         } else {
             Ok(())
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct RadiusPlugin;
-
-impl Plugin for RadiusPlugin {
-    fn namespace(&self) -> &str {
-        "rounded"
-    }
-
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        val.split('_')
-            .all(|v| is_matching_length(v) || is_matching_percentage(v))
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content, "border-radius: {val};")
-    }
-
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
-        match modifier {
-            "" => self.css_template_value("0.25rem", css_content),
-            "none" => self.css_template_value("0", css_content),
-            "sm" => self.css_template_value("0.125rem", css_content),
-            "md" => self.css_template_value("0.375rem", css_content),
-            "lg" => self.css_template_value("0.5rem", css_content),
-            "xl" => self.css_template_value("0.75rem", css_content),
-            "2xl" => self.css_template_value("1rem", css_content),
-            "3xl" => self.css_template_value("1.5rem", css_content),
-            "full" => self.css_template_value("9999px", css_content),
-            "t-none" => self.css_template_value("", css_content),
-            "r-none" => self.css_template_value("", css_content),
-            "b-none" => self.css_template_value("", css_content),
-            "l-none" => self.css_template_value("", css_content),
-            "t-sm" => self.css_template_value("", css_content),
-            "r-sm" => self.css_template_value("", css_content),
-            "b-sm" => self.css_template_value("", css_content),
-            "l-sm" => self.css_template_value("", css_content),
-            "t" => self.css_template_value("", css_content),
-            "r" => self.css_template_value("", css_content),
-            "b" => self.css_template_value("", css_content),
-            "l" => self.css_template_value("", css_content),
-            "t-md" => self.css_template_value("", css_content),
-            "r-md" => self.css_template_value("", css_content),
-            "b-md" => self.css_template_value("", css_content),
-            "l-md" => self.css_template_value("", css_content),
-            "t-lg" => self.css_template_value("", css_content),
-            "r-lg" => self.css_template_value("", css_content),
-            "b-lg" => self.css_template_value("", css_content),
-            "l-lg" => self.css_template_value("", css_content),
-            "t-xl" => self.css_template_value("", css_content),
-            "r-xl" => self.css_template_value("", css_content),
-            "b-xl" => self.css_template_value("", css_content),
-            "l-xl" => self.css_template_value("", css_content),
-            "t-2xl" => self.css_template_value("", css_content),
-            "r-2xl" => self.css_template_value("", css_content),
-            "b-2xl" => self.css_template_value("", css_content),
-            "l-2xl" => self.css_template_value("", css_content),
-            "t-3xl" => self.css_template_value("", css_content),
-            "r-3xl" => self.css_template_value("", css_content),
-            "b-3xl" => self.css_template_value("", css_content),
-            "l-3xl" => self.css_template_value("", css_content),
-            "t-full" => self.css_template_value("", css_content),
-            "r-full" => self.css_template_value("", css_content),
-            "b-full" => self.css_template_value("", css_content),
-            "l-full" => self.css_template_value("", css_content),
-            "tl-none" => self.css_template_value("", css_content),
-            "tr-none" => self.css_template_value("", css_content),
-            "br-none" => self.css_template_value("", css_content),
-            "bl-none" => self.css_template_value("", css_content),
-            "tl-sm" => self.css_template_value("", css_content),
-            "tr-sm" => self.css_template_value("", css_content),
-            "br-sm" => self.css_template_value("", css_content),
-            "bl-sm" => self.css_template_value("", css_content),
-            "tl" => self.css_template_value("", css_content),
-            "tr" => self.css_template_value("", css_content),
-            "br" => self.css_template_value("", css_content),
-            "bl" => self.css_template_value("", css_content),
-            "tl-md" => self.css_template_value("", css_content),
-            "tr-md" => self.css_template_value("", css_content),
-            "br-md" => self.css_template_value("", css_content),
-            "bl-md" => self.css_template_value("", css_content),
-            "tl-lg" => self.css_template_value("", css_content),
-            "tr-lg" => self.css_template_value("", css_content),
-            "br-lg" => self.css_template_value("", css_content),
-            "bl-lg" => self.css_template_value("", css_content),
-            "tl-xl" => self.css_template_value("", css_content),
-            "tr-xl" => self.css_template_value("", css_content),
-            "br-xl" => self.css_template_value("", css_content),
-            "bl-xl" => self.css_template_value("", css_content),
-            "tl-2xl" => self.css_template_value("", css_content),
-            "tr-2xl" => self.css_template_value("", css_content),
-            "br-2xl" => self.css_template_value("", css_content),
-            "bl-2xl" => self.css_template_value("", css_content),
-            "tl-3xl" => self.css_template_value("", css_content),
-            "tr-3xl" => self.css_template_value("", css_content),
-            "br-3xl" => self.css_template_value("", css_content),
-            "bl-3xl" => self.css_template_value("", css_content),
-            "tl-full" => self.css_template_value("", css_content),
-            "tr-full" => self.css_template_value("", css_content),
-            "br-full" => self.css_template_value("", css_content),
-            "bl-full" => self.css_template_value("", css_content),
-            _ => Ok(()),
         }
     }
 }
@@ -389,7 +619,8 @@ impl Plugin for DivideColorPlugin {
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         if val.contains("--tw-opacity") {
-            write!(css_content,
+            write!(
+                css_content,
                 "--tw-divide-opacity: 1;
   border-color: {};",
                 val.replace("--tw-opacity", "--tw-divide-opacity")
@@ -409,6 +640,112 @@ impl Plugin for DivideColorPlugin {
 }
 
 #[derive(Debug)]
+pub struct DivideXPlugin;
+
+impl Plugin for DivideXPlugin {
+    fn namespace(&self) -> &str {
+        "divide-x"
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        hint == "length" || is_matching_length(val)
+    }
+
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        if !css_content.contains("--tw-divide-x-reverse") {
+            write!(css_content, "--tw-divide-x-reverse: 0;\n  ")?;
+        }
+
+        write!(
+            css_content,
+            "border-left-width: calc({val} * calc(1 - var(--tw-divide-x-reverse)));
+  border-right-width: calc({val} * var(--tw-divide-x-reverse));"
+        )
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        // TODO: class with `> :not([hidden]) ~ :not([hidden])`
+        if modifier.is_empty() {
+            write!(css_content, "--tw-divide-x-reverse: 0;\n  ")?;
+            return self.css_template_value("1px", css_content);
+        } else if modifier == "reverse" {
+            return write!(css_content, "--tw-divide-x-reverse: 1;");
+        }
+
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        if modifier.parse::<usize>().is_ok() {
+            write!(css_content, "--tw-divide-x-reverse: 0;\n  ")?;
+            self.css_template_value(&format!("{}px", modifier), css_content)
+        } else {
+            Ok(())
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct DivideYPlugin;
+
+impl Plugin for DivideYPlugin {
+    fn namespace(&self) -> &str {
+        "divide-y"
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        hint == "length" || is_matching_length(val)
+    }
+
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        if !css_content.contains("--tw-divide-y-reverse") {
+            write!(css_content, "--tw-divide-y-reverse: 0;\n  ")?;
+        }
+
+        write!(
+            css_content,
+            "border-top-width: calc({val} * calc(1 - var(--tw-divide-y-reverse)));
+  border-bottom-width: calc({val} * var(--tw-divide-y-reverse));"
+        )
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        // TODO: class with `> :not([hidden]) ~ :not([hidden])`
+        if modifier.is_empty() {
+            write!(css_content, "--tw-divide-y-reverse: 0;\n  ")?;
+            return self.css_template_value("1px", css_content);
+        } else if modifier == "reverse" {
+            return write!(css_content, "--tw-divide-y-reverse: 1;");
+        }
+
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        if modifier.parse::<usize>().is_ok() {
+            write!(css_content, "--tw-divide-y-reverse: 0;\n  ")?;
+            self.css_template_value(&format!("{}px", modifier), css_content)
+        } else {
+            Ok(())
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct DivideStylePlugin;
+
+impl Plugin for DivideStylePlugin {
+    fn namespace(&self) -> &str {
+        "divide"
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        match modifier {
+            "solid" => write!(css_content, "border-style: solid;"),
+            "dashed" => write!(css_content, "border-style: dashed;"),
+            "dotted" => write!(css_content, "border-style: dotted;"),
+            "double" => write!(css_content, "border-style: double;"),
+            "none" => write!(css_content, "border-style: none;"),
+            _ => Ok(()),
+        }
+    }
+}
+
+#[derive(Debug)]
 pub struct DivideOpacityPlugin;
 
 impl Plugin for DivideOpacityPlugin {
@@ -419,7 +756,11 @@ impl Plugin for DivideOpacityPlugin {
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.parse::<f32>() {
-            write!(css_content, "--tw-divide-opacity: {};", opacity_value / 100.)
+            write!(
+                css_content,
+                "--tw-divide-opacity: {};",
+                opacity_value / 100.
+            )
         } else {
             Ok(())
         }
@@ -440,7 +781,8 @@ impl Plugin for RingColorPlugin {
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         if val.contains("--tw-opacity") {
-            write!(css_content,
+            write!(
+                css_content,
                 "--tw-ring-opacity: 1;
   --ring-color: {};",
                 val.replace("--tw-opacity", "--tw-ring-opacity")
@@ -453,6 +795,40 @@ impl Plugin for RingColorPlugin {
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if let Some(color) = default_colors::get(modifier) {
             self.css_template_value(&color, css_content)
+        } else {
+            Ok(())
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct RingWidthPlugin;
+
+impl Plugin for RingWidthPlugin {
+    fn namespace(&self) -> &str {
+        "ring"
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        hint == "length" || is_matching_length(val)
+    }
+
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "{}
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc({val} + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);", CSS_RING_OFFSET_SHADOW)
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if modifier.is_empty() {
+            return self.css_template_value("3px", css_content);
+        } else if modifier == "inset" {
+            return write!(css_content, "--tw-ring-inset: inset;");
+        }
+
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        if modifier.parse::<usize>().is_ok() {
+            self.css_template_value(&format!("{}px", modifier), css_content)
         } else {
             Ok(())
         }
@@ -491,7 +867,8 @@ impl Plugin for RingOffsetColorPlugin {
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         if val.contains("--tw-opacity") {
-            write!(css_content,
+            write!(
+                css_content,
                 "--tw-ring-offset-opacity: 1;
   --ring-offset-color: {};",
                 val.replace("--tw-opacity", "--tw-ring-offset-opacity")
@@ -532,64 +909,28 @@ impl Plugin for RingOffsetOpacityPlugin {
     }
 }
 
-/*pub fn init(selectors: &mut SelectorList) {
-    selectors.register("border", "border-width: 1px;".to_string());
-    selectors.register("border-0", "border-width: 0;".to_string());
-    selectors.register("border-2", "border-width: 2px;".to_string());
-    selectors.register("border-4", "border-width: 4px;".to_string());
-    selectors.register("border-8", "border-width: 8px;".to_string());
-    selectors.register("border-t", "border-top-width: 1px;".to_string());
-    selectors.register("border-t-0", "border-top-width: 0;".to_string());
-    selectors.register("border-t-2", "border-top-width: 2px;".to_string());
-    selectors.register("border-t-4", "border-top-width: 4px;".to_string());
-    selectors.register("border-t-8", "border-top-width: 8px;".to_string());
-    selectors.register("border-r", "border-right-width: 1px;".to_string());
-    selectors.register("border-r-0", "border-right-width: 0;".to_string());
-    selectors.register("border-r-2", "border-right-width: 2px;".to_string());
-    selectors.register("border-r-4", "border-right-width: 4px;".to_string());
-    selectors.register("border-r-8", "border-right-width: 8px;".to_string());
-    selectors.register("border-b", "border-bottom-width: 1px;".to_string());
-    selectors.register("border-b-0", "border-bottom-width: 0;".to_string());
-    selectors.register("border-b-2", "border-bottom-width: 2px;".to_string());
-    selectors.register("border-b-4", "border-bottom-width: 4px;".to_string());
-    selectors.register("border-b-8", "border-bottom-width: 8px;".to_string());
-    selectors.register("border-l", "border-left-width: 1px;".to_string());
-    selectors.register("border-l-0", "border-left-width: 0;".to_string());
-    selectors.register("border-l-2", "border-left-width: 2px;".to_string());
-    selectors.register("border-l-4", "border-left-width: 4px;".to_string());
-    selectors.register("border-l-8", "border-left-width: 8px;".to_string());
-    selectors.register("border-solid", "".to_string());
-    selectors.register("border-dashed", "".to_string());
-    selectors.register("border-dotted", "".to_string());
-    selectors.register("border-double", "".to_string());
-    selectors.register("border-none", "".to_string());
-    selectors.register("divide-x-0", "".to_string());
-    selectors.register("divide-x-2", "".to_string());
-    selectors.register("divide-x-4", "".to_string());
-    selectors.register("divide-x-8", "".to_string());
-    selectors.register("divide-x", "".to_string());
-    selectors.register("divide-y-0", "".to_string());
-    selectors.register("divide-y-2", "".to_string());
-    selectors.register("divide-y-4", "".to_string());
-    selectors.register("divide-y-8", "".to_string());
-    selectors.register("divide-y", "".to_string());
-    selectors.register("divide-x-reverse", "".to_string());
-    selectors.register("divide-y-reverse", "".to_string());
-    selectors.register("divide-solid", "".to_string());
-    selectors.register("divide-dashed", "".to_string());
-    selectors.register("divide-dotted", "".to_string());
-    selectors.register("divide-double", "".to_string());
-    selectors.register("divide-none", "".to_string());
-    selectors.register("ring-0", "box-shadow: var(--tw-ring-inset) 0 0 0 calc(0px + var(--tw-ring-offset-width)) var(--tw-ring-color);".to_string());
-    selectors.register("ring-1", "box-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);".to_string());
-    selectors.register("ring-2", "box-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);".to_string());
-    selectors.register("ring-4", "box-shadow: var(--tw-ring-inset) 0 0 0 calc(4px + var(--tw-ring-offset-width)) var(--tw-ring-color);".to_string());
-    selectors.register("ring-8", "box-shadow: var(--tw-ring-inset) 0 0 0 calc(8px + var(--tw-ring-offset-width)) var(--tw-ring-color);".to_string());
-    selectors.register("ring", "box-shadow: var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color);".to_string());
-    selectors.register("ring-inset", "--tw-ring-inset: inset;".to_string());
-    selectors.register("ring-offset-0", "".to_string());
-    selectors.register("ring-offset-1", "".to_string());
-    selectors.register("ring-offset-2", "".to_string());
-    selectors.register("ring-offset-4", "".to_string());
-    selectors.register("ring-offset-8", "".to_string());
-}*/
+#[derive(Debug)]
+pub struct RingOffsetWidthPlugin;
+
+impl Plugin for RingOffsetWidthPlugin {
+    fn namespace(&self) -> &str {
+        "ring-offset"
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        hint == "length" || is_matching_length(val)
+    }
+
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "--tw-ring-offset-width: {val};",)
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        if modifier.parse::<usize>().is_ok() {
+            self.css_template_value(&format!("{}px", modifier), css_content)
+        } else {
+            Ok(())
+        }
+    }
+}

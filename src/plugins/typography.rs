@@ -23,7 +23,8 @@ impl Plugin for TypographyColorPlugin {
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         if val.contains("--tw-opacity") {
-            write!(css_content,
+            write!(
+                css_content,
                 "--tw-text-opacity: 1;
   color: {};",
                 val.replace("--tw-opacity", "--tw-text-opacity")
@@ -81,7 +82,8 @@ impl Plugin for TypographyFontFamilyPlugin {
     fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         // NOTE: Not-compatible with TailwindCSS, it is not needed to add quotes to fonts
         // containing spaces, they are added later
-        write!(css_content,
+        write!(
+            css_content,
             "font-family: {maybe_quote}{val}{maybe_quote};",
             maybe_quote = if val.contains(' ') { "\"" } else { "" }
         )
@@ -89,9 +91,18 @@ impl Plugin for TypographyFontFamilyPlugin {
 
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "sans" => write!(css_content, r#"font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";"#),
-            "serif" => write!(css_content, r#"font-family: Georgia, Cambria, "Times New Roman", Times, serif;"#),
-            "mono" => write!(css_content, r#"font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;"#),
+            "sans" => write!(
+                css_content,
+                r#"font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";"#
+            ),
+            "serif" => write!(
+                css_content,
+                r#"font-family: Georgia, Cambria, "Times New Roman", Times, serif;"#
+            ),
+            "mono" => write!(
+                css_content,
+                r#"font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;"#
+            ),
             _ => Ok(()),
         }
     }
@@ -115,55 +126,68 @@ impl Plugin for TypographyFontSizePlugin {
 
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
-            "xs" => write!(css_content,
+            "xs" => write!(
+                css_content,
                 "font-size: 0.75rem;
   line-height: 1rem;"
             ),
-            "sm" => write!(css_content,
+            "sm" => write!(
+                css_content,
                 "font-size: 0.875rem;
   line-height: 1.25rem;"
             ),
-            "base" => write!(css_content,
+            "base" => write!(
+                css_content,
                 "font-size: 1rem;
   line-height: 1.5rem;"
             ),
-            "lg" => write!(css_content,
+            "lg" => write!(
+                css_content,
                 "font-size: 1.125rem;
   line-height: 1.75rem;"
             ),
-            "xl" => write!(css_content,
+            "xl" => write!(
+                css_content,
                 "font-size: 1.25rem;
   line-height: 1.75rem;"
             ),
-            "2xl" => write!(css_content,
+            "2xl" => write!(
+                css_content,
                 "font-size: 1.5rem;
   line-height: 2rem;"
             ),
-            "3xl" => write!(css_content,
+            "3xl" => write!(
+                css_content,
                 "font-size: 1.875rem;
   line-height: 2.25rem;"
             ),
-            "4xl" => write!(css_content,
+            "4xl" => write!(
+                css_content,
                 "font-size: 2.25rem;
   line-height: 2.5rem;"
             ),
-            "5xl" => write!(css_content,
+            "5xl" => write!(
+                css_content,
                 "font-size: 3rem;
   line-height: 1;"
             ),
-            "6xl" => write!(css_content,
+            "6xl" => write!(
+                css_content,
                 "font-size: 3.75rem;
   line-height: 1;"
             ),
-            "7xl" => write!(css_content,
+            "7xl" => write!(
+                css_content,
                 "font-size: 4.5rem;
   line-height: 1;"
             ),
-            "8xl" => write!(css_content,
+            "8xl" => write!(
+                css_content,
                 "font-size: 6rem;
   line-height: 1;"
             ),
-            "9xl" => write!(css_content,
+            "9xl" => write!(
+                css_content,
                 "font-size: 8rem;
   line-height: 1;"
             ),
@@ -350,13 +374,15 @@ impl Plugin for TypographyTextDecorationColorPlugin {
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         if val.contains("--tw-opacity") {
-            write!(css_content,
+            write!(
+                css_content,
                 "-webkit-text-decoration-color: {color};
   text-decoration-color: {color};",
                 color = val.replace(" / var(--tw-opacity)", "")
             )
         } else {
-            write!(css_content,
+            write!(
+                css_content,
                 "-webkit-text-decoration-color: {val};
   text-decoration-color: {val};"
             )

@@ -54,19 +54,25 @@ impl Plugin for BoxShadowPlugin {
         match modifier {
             "" => self.css_template_value(
                 "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);",
-            css_content),
+                css_content,
+            ),
             "sm" => self.css_template_value("0 1px 2px 0 rgba(0, 0, 0, 0.05)", css_content),
             "md" => self.css_template_value(
                 "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-            css_content),
+                css_content,
+            ),
             "lg" => self.css_template_value(
                 "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-            css_content),
+                css_content,
+            ),
             "xl" => self.css_template_value(
                 "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-            css_content),
+                css_content,
+            ),
             "2xl" => self.css_template_value("0 25px 50px -12px rgba(0, 0, 0, 0.25)", css_content),
-            "inner" => self.css_template_value("inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)", css_content),
+            "inner" => {
+                self.css_template_value("inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)", css_content)
+            }
             "none" => self.css_template_value("none", css_content),
             _ => Ok(()),
         }
@@ -87,7 +93,8 @@ impl Plugin for BoxShadowColorPlugin {
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         if val.contains("--tw-opacity") {
-            write!(css_content,
+            write!(
+                css_content,
                 "--tw-shadow-color: {};",
                 val.replace("/ var(--tw-opacity)", "")
             )
@@ -108,10 +115,6 @@ impl Plugin for BoxShadowColorPlugin {
 /*use super::SelectorList;
 
 pub fn init(selectors: &mut SelectorList) {
-    selectors.register(
-        "shadow-xs",
-        "box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);".to_string(),
-    );
     selectors.register("opacity-0", "opacity: 0;".to_string());
     selectors.register("opacity-5", "opacity: 0.05;".to_string());
     selectors.register("opacity-10", "opacity: 0.1;".to_string());
