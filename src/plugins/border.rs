@@ -357,7 +357,7 @@ impl Plugin for StylePlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
-        if ["solid", "dashed", "dotted", "double", "none"].contains(&modifier) {
+        if ["solid", "dashed", "dotted", "double", "hidden", "none"].contains(&modifier) {
             write!(css_content, "border-style: {};", modifier)
         } else {
             Ok(())
@@ -640,9 +640,9 @@ impl Plugin for DivideColorPlugin {
 }
 
 #[derive(Debug)]
-pub struct DivideXPlugin;
+pub struct DivideWidthXPlugin;
 
-impl Plugin for DivideXPlugin {
+impl Plugin for DivideWidthXPlugin {
     fn namespace(&self) -> &str {
         "divide-x"
     }
@@ -683,9 +683,9 @@ impl Plugin for DivideXPlugin {
 }
 
 #[derive(Debug)]
-pub struct DivideYPlugin;
+pub struct DivideWidthYPlugin;
 
-impl Plugin for DivideYPlugin {
+impl Plugin for DivideWidthYPlugin {
     fn namespace(&self) -> &str {
         "divide-y"
     }
@@ -869,40 +869,17 @@ impl Plugin for RingOffsetColorPlugin {
         if val.contains("--tw-opacity") {
             write!(
                 css_content,
-                "--tw-ring-offset-opacity: 1;
-  --ring-offset-color: {};",
-                val.replace("--tw-opacity", "--tw-ring-offset-opacity")
+                "--tw-ring-offset-color: {};",
+                val.replace("/ var(--tw-opacity)", "")
             )
         } else {
-            write!(css_content, "--ring-offset-color: {val};")
+            write!(css_content, "--tw-ring-offset-color: {val};")
         }
     }
 
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if let Some(color) = default_colors::get(modifier) {
             self.css_template_value(&color, css_content)
-        } else {
-            Ok(())
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct RingOffsetOpacityPlugin;
-
-impl Plugin for RingOffsetOpacityPlugin {
-    fn namespace(&self) -> &str {
-        "ring-offset-opacity"
-    }
-
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
-        // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(opacity_value) = modifier.parse::<f32>() {
-            write!(
-                css_content,
-                "--tw-ring-offset-opacity: {};",
-                opacity_value / 100.
-            )
         } else {
             Ok(())
         }
@@ -923,6 +900,119 @@ impl Plugin for RingOffsetWidthPlugin {
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
         write!(css_content, "--tw-ring-offset-width: {val};",)
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        if modifier.parse::<usize>().is_ok() {
+            self.css_template_value(&format!("{}px", modifier), css_content)
+        } else {
+            Ok(())
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct OutlineColorPlugin;
+
+impl Plugin for OutlineColorPlugin {
+    fn namespace(&self) -> &str {
+        "outline"
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        hint == "color" || is_matching_color(val)
+    }
+
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        if val.contains("--tw-opacity") {
+            write!(
+                css_content,
+                "outline-color: {};",
+                val.replace(" / var(--tw-opacity)", "")
+            )
+        } else {
+            write!(css_content, "outline-color: {val};")
+        }
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if let Some(color) = default_colors::get(modifier) {
+            self.css_template_value(&color, css_content)
+        } else {
+            Ok(())
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct OutlineWidthPlugin;
+
+impl Plugin for OutlineWidthPlugin {
+    fn namespace(&self) -> &str {
+        "outline"
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        hint == "length" || is_matching_length(val)
+    }
+
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(
+            css_content,
+            "outline-width: {val};",
+        )
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        if modifier.parse::<usize>().is_ok() {
+            self.css_template_value(&format!("{}px", modifier), css_content)
+        } else {
+            Ok(())
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct OutlineStylePlugin;
+
+impl Plugin for OutlineStylePlugin {
+    fn namespace(&self) -> &str {
+        "outline"
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        match modifier {
+            "" => write!(css_content, "outline-style: solid;"),
+            "none" => write!(css_content, "outline: 2px solid transparent;
+  outline-offset: 2px;"),
+            "dashed" => write!(css_content, "outline-style: dashed;"),
+            "dotted" => write!(css_content, "outline-style: dotted;"),
+            "double" => write!(css_content, "outline-style: double;"),
+            "hidden" => write!(css_content, "outline-style: hidden;"),
+            _ => Ok(()),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct OutlineOffsetPlugin;
+
+impl Plugin for OutlineOffsetPlugin {
+    fn namespace(&self) -> &str {
+        "outline-offset"
+    }
+
+    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
+        hint == "length" || is_matching_length(val)
+    }
+
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(
+            css_content,
+            "outline-offset: {val};",
+        )
     }
 
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
