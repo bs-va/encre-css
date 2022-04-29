@@ -17,6 +17,7 @@ pub mod table;
 pub mod transform;
 pub mod transition;
 pub mod typography;
+pub mod accessibility;
 
 pub trait Plugin: fmt::Debug {
     /// Returns the namespace containing the plugin
@@ -200,5 +201,6 @@ lazy_static! {
         &typography::TypographyTextTransformPlugin,
         &typography::TypographyItalicPlugin,
         &typography::TypographyTextDecorationPlugin,
+        &accessibility::ScreenReaderPlugin,
     ];
 }
