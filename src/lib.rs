@@ -149,7 +149,7 @@ impl TailwindGenerator {
     pub fn scan_content(&mut self, content: &str) {
         for val in SPLIT_REGEX
             .split(content)
-            .filter(|m| FILTER_REGEX.is_match(m).unwrap())
+            .filter(|m| FILTER_REGEX.is_match(m).unwrap() && *m != "class" && *m != "className" && !m.contains('<') && !m.contains('>'))
         {
             self.add_selector(val);
         }
