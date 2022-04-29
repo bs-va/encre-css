@@ -80,7 +80,7 @@ impl Plugin for StartEndSpanColumnPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
-        if modifier == "auto" {
+        if is_matching_auto(modifier) {
             return self.css_template_value("auto", css_content);
         }
 
@@ -94,7 +94,7 @@ impl Plugin for StartEndSpanColumnPlugin {
                 return self.css_template_value(&format!("span {span_num} / span {span_num}"), css_content);
             }
         } else if let Some(val) = modifier.strip_prefix("start-") {
-            if val == "auto" {
+            if is_matching_auto(val) {
                 return write!(css_content, "grid-column-start: auto;");
             }
 
@@ -103,7 +103,7 @@ impl Plugin for StartEndSpanColumnPlugin {
                 return write!(css_content, "grid-column-start: {val};");
             }
         } else if let Some(val) = modifier.strip_prefix("end-") {
-            if val == "auto" {
+            if is_matching_auto(val) {
                 return write!(css_content, "grid-column-end: auto;");
             }
 
@@ -134,7 +134,7 @@ impl Plugin for StartEndSpanRowPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
-        if modifier == "auto" {
+        if is_matching_auto(modifier) {
             return self.css_template_value("auto", css_content);
         }
 
@@ -148,7 +148,7 @@ impl Plugin for StartEndSpanRowPlugin {
                 return self.css_template_value(&format!("span {span_num} / span {span_num}"), css_content);
             }
         } else if let Some(val) = modifier.strip_prefix("start-") {
-            if val == "auto" {
+            if is_matching_auto(val) {
                 return write!(css_content, "grid-row-start: auto;");
             }
 
@@ -157,7 +157,7 @@ impl Plugin for StartEndSpanRowPlugin {
                 return write!(css_content, "grid-row-start: {val};");
             }
         } else if let Some(val) = modifier.strip_prefix("end-") {
-            if val == "auto" {
+            if is_matching_auto(val) {
                 return write!(css_content, "grid-row-end: auto;");
             }
 

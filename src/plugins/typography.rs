@@ -461,7 +461,7 @@ impl Plugin for TypographyTextDecorationOffsetPlugin {
         // TODO: Is it useful to match the hint against `length` AND `percentage`?
         hint == "length"
             || hint == "percentage"
-            || val == "auto"
+            || is_matching_auto(val)
             || is_matching_length(val)
             || is_matching_percentage(val)
     }
@@ -471,7 +471,7 @@ impl Plugin for TypographyTextDecorationOffsetPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
-        if modifier == "auto" {
+        if is_matching_auto(modifier) {
             return self.css_template_value("auto", css_content);
         }
 
