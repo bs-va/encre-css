@@ -42,7 +42,7 @@ use variant::VARIANTS;
 lazy_static! {
     static ref SPLIT_REGEX: Regex = Regex::new(r#"(?-u)[\s'"`;>=]+"#).unwrap();
     static ref FILTER_REGEX: fancy_regex::Regex =
-        fancy_regex::Regex::new(r"(?!\d|-{2}|-\d)[a-zA-Z0-9\u00A0-\uFFFF-_:%-?']").unwrap();
+        fancy_regex::Regex::new(r"(?!\d|-{2}|-\d)[a-zA-Z0-9\u00A0-\uFFFF-:%&'()*+,_./:]").unwrap();
     static ref URL_REGEX: Regex = Regex::new("^url\\(.*\\)$").unwrap();
 }
 
@@ -149,7 +149,8 @@ impl TailwindGenerator {
     pub fn scan_content(&mut self, content: &str) {
         for val in SPLIT_REGEX
             .split(content)
-            .filter(|m| FILTER_REGEX.is_match(m).unwrap() && *m != "class" && *m != "className" && !m.contains('<') && !m.contains('>'))
+            // The shortest selector is `w-0`, so 3 characters long
+            .filter(|m| FILTER_REGEX.is_match(m).unwrap() && m.len() > 3 && !m.starts_with("class"))
         {
             self.add_selector(val);
         }
