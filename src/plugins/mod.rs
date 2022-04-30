@@ -179,6 +179,8 @@ lazy_static! {
         &effect::BoxShadowPlugin,
         &effect::BoxShadowColorPlugin,
         &transition::DurationPlugin,
+        &transition::DelayPlugin,
+        &transition::EasePlugin,
         &transition::PropertyPlugin,
         &grid::ColumnsPlugin,
         &grid::RowsPlugin,

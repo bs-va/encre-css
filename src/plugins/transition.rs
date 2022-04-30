@@ -77,33 +77,62 @@ impl Plugin for DurationPlugin {
     }
 }
 
+#[derive(Debug)]
+pub struct DelayPlugin;
+
+impl Plugin for DelayPlugin {
+    fn namespace(&self) -> &str {
+        "delay"
+    }
+
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        is_matching_time(val)
+    }
+
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "transition-delay: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        if let Ok(delay) = modifier.parse::<usize>() {
+            self.css_template_value(&format!("{delay}ms"), css_content)
+        } else {
+            Ok(())
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct EasePlugin;
+
+impl Plugin for EasePlugin {
+    fn namespace(&self) -> &str {
+        "ease"
+    }
+
+    fn is_matching_value(&self, _hint: &str, _val: &str) -> bool {
+        true
+    }
+
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "transition-timing-function: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        match modifier {
+            "linear" => self.css_template_value("linear", css_content),
+            "in" => self.css_template_value("cubic-bezier(0.4, 0, 1, 1)", css_content),
+            "out" => self.css_template_value("cubic-bezier(0, 0, 0.2, 1)", css_content),
+            "in-out" => self.css_template_value("cubic-bezier(0.4, 0, 0.2, 1)", css_content),
+            _ => Ok(()),
+        }
+    }
+}
+
 /*use super::SelectorList;
 
 pub fn init(selectors: &mut SelectorList) {
-    selectors.register("delay-75", "transition-delay: 75ms;".to_string());
-    selectors.register("delay-100", "transition-delay: 100ms;".to_string());
-    selectors.register("delay-150", "transition-delay: 150ms;".to_string());
-    selectors.register("delay-200", "transition-delay: 200ms;".to_string());
-    selectors.register("delay-300", "transition-delay: 300ms;".to_string());
-    selectors.register("delay-500", "transition-delay: 500ms;".to_string());
-    selectors.register("delay-700", "transition-delay: 700ms;".to_string());
-    selectors.register("delay-1000", "transition-delay: 1000ms;".to_string());
-    selectors.register(
-        "ease-linear",
-        "transition-timing-function: linear;".to_string(),
-    );
-    selectors.register(
-        "ease-in",
-        "transition-timing-function: cubic-bezier(0.4, 0, 1, 1);".to_string(),
-    );
-    selectors.register(
-        "ease-out",
-        "transition-timing-function: cubic-bezier(0, 0, 0.2, 1);".to_string(),
-    );
-    selectors.register(
-        "ease-in-out",
-        "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);".to_string(),
-    );
     selectors.register("animate-none", "animation: none;".to_string());
     selectors.register("animate-spin", "".to_string()); // TODO
     selectors.register("animate-ping", "".to_string()); // TODO
