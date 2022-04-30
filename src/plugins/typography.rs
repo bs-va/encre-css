@@ -5,14 +5,16 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use std::fmt::{Result, Write};
 
+pub const CSS_FONT_VARIANT_NUMERIC: &str = "font-variant-numeric: var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction);";
+
 lazy_static! {
     static ref START_WITH_INT_REGEX: Regex = Regex::new(r"(?-u)^\d").unwrap();
 }
 
 #[derive(Debug)]
-pub struct TypographyColorPlugin;
+pub struct ColorPlugin;
 
-impl Plugin for TypographyColorPlugin {
+impl Plugin for ColorPlugin {
     fn namespace(&self) -> &str {
         "text"
     }
@@ -44,9 +46,9 @@ impl Plugin for TypographyColorPlugin {
 }
 
 #[derive(Debug)]
-pub struct TypographyOpacityPlugin;
+pub struct OpacityPlugin;
 
-impl Plugin for TypographyOpacityPlugin {
+impl Plugin for OpacityPlugin {
     fn namespace(&self) -> &str {
         "text-opacity"
     }
@@ -62,9 +64,9 @@ impl Plugin for TypographyOpacityPlugin {
 }
 
 #[derive(Debug)]
-pub struct TypographyFontFamilyPlugin;
+pub struct FontFamilyPlugin;
 
-impl Plugin for TypographyFontFamilyPlugin {
+impl Plugin for FontFamilyPlugin {
     fn namespace(&self) -> &str {
         "font"
     }
@@ -109,9 +111,9 @@ impl Plugin for TypographyFontFamilyPlugin {
 }
 
 #[derive(Debug)]
-pub struct TypographyFontSizePlugin;
+pub struct FontSizePlugin;
 
-impl Plugin for TypographyFontSizePlugin {
+impl Plugin for FontSizePlugin {
     fn namespace(&self) -> &str {
         "text"
     }
@@ -197,9 +199,9 @@ impl Plugin for TypographyFontSizePlugin {
 }
 
 #[derive(Debug)]
-pub struct TypographyFontWeightPlugin;
+pub struct FontWeightPlugin;
 
-impl Plugin for TypographyFontWeightPlugin {
+impl Plugin for FontWeightPlugin {
     fn namespace(&self) -> &str {
         "font"
     }
@@ -231,9 +233,9 @@ impl Plugin for TypographyFontWeightPlugin {
 }
 
 #[derive(Debug)]
-pub struct TypographyTextAlignmentPlugin;
+pub struct TextAlignmentPlugin;
 
-impl Plugin for TypographyTextAlignmentPlugin {
+impl Plugin for TextAlignmentPlugin {
     fn namespace(&self) -> &str {
         "text"
     }
@@ -250,9 +252,9 @@ impl Plugin for TypographyTextAlignmentPlugin {
 }
 
 #[derive(Debug)]
-pub struct TypographyTextTransformPlugin;
+pub struct TextTransformPlugin;
 
-impl Plugin for TypographyTextTransformPlugin {
+impl Plugin for TextTransformPlugin {
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
             "uppercase" => write!(css_content, "text-transform: uppercase;"),
@@ -265,9 +267,9 @@ impl Plugin for TypographyTextTransformPlugin {
 }
 
 #[derive(Debug)]
-pub struct TypographyTrackingPlugin;
+pub struct TrackingPlugin;
 
-impl Plugin for TypographyTrackingPlugin {
+impl Plugin for TrackingPlugin {
     fn namespace(&self) -> &str {
         "tracking"
     }
@@ -294,9 +296,9 @@ impl Plugin for TypographyTrackingPlugin {
 }
 
 #[derive(Debug)]
-pub struct TypographyLeadingPlugin;
+pub struct LeadingPlugin;
 
-impl Plugin for TypographyLeadingPlugin {
+impl Plugin for LeadingPlugin {
     fn namespace(&self) -> &str {
         "leading"
     }
@@ -335,9 +337,9 @@ impl Plugin for TypographyLeadingPlugin {
 }
 
 #[derive(Debug)]
-pub struct TypographyItalicPlugin;
+pub struct ItalicPlugin;
 
-impl Plugin for TypographyItalicPlugin {
+impl Plugin for ItalicPlugin {
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         match modifier {
             "italic" => write!(css_content, "font-style: italic;"),
@@ -348,9 +350,9 @@ impl Plugin for TypographyItalicPlugin {
 }
 
 #[derive(Debug)]
-pub struct TypographyTextDecorationPlugin;
+pub struct TextDecorationPlugin;
 
-impl Plugin for TypographyTextDecorationPlugin {
+impl Plugin for TextDecorationPlugin {
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
         if ["underline", "overline", "line-through", "no-underline"].contains(&modifier) {
             write!(css_content, "text-decoration-line: {modifier};")
@@ -361,9 +363,9 @@ impl Plugin for TypographyTextDecorationPlugin {
 }
 
 #[derive(Debug)]
-pub struct TypographyTextDecorationColorPlugin;
+pub struct TextDecorationColorPlugin;
 
-impl Plugin for TypographyTextDecorationColorPlugin {
+impl Plugin for TextDecorationColorPlugin {
     fn namespace(&self) -> &str {
         "decoration"
     }
@@ -399,9 +401,9 @@ impl Plugin for TypographyTextDecorationColorPlugin {
 }
 
 #[derive(Debug)]
-pub struct TypographyTextDecorationStylePlugin;
+pub struct TextDecorationStylePlugin;
 
-impl Plugin for TypographyTextDecorationStylePlugin {
+impl Plugin for TextDecorationStylePlugin {
     fn namespace(&self) -> &str {
         "decoration"
     }
@@ -416,9 +418,9 @@ impl Plugin for TypographyTextDecorationStylePlugin {
 }
 
 #[derive(Debug)]
-pub struct TypographyTextDecorationThicknessPlugin;
+pub struct TextDecorationThicknessPlugin;
 
-impl Plugin for TypographyTextDecorationThicknessPlugin {
+impl Plugin for TextDecorationThicknessPlugin {
     fn namespace(&self) -> &str {
         "decoration"
     }
@@ -450,9 +452,9 @@ impl Plugin for TypographyTextDecorationThicknessPlugin {
 }
 
 #[derive(Debug)]
-pub struct TypographyTextDecorationOffsetPlugin;
+pub struct TextDecorationOffsetPlugin;
 
-impl Plugin for TypographyTextDecorationOffsetPlugin {
+impl Plugin for TextDecorationOffsetPlugin {
     fn namespace(&self) -> &str {
         "underline"
     }
@@ -485,9 +487,9 @@ impl Plugin for TypographyTextDecorationOffsetPlugin {
 }
 
 #[derive(Debug)]
-pub struct TypographyContentPlugin;
+pub struct ContentPlugin;
 
-impl Plugin for TypographyContentPlugin {
+impl Plugin for ContentPlugin {
     fn namespace(&self) -> &str {
         "content"
     }
@@ -511,86 +513,168 @@ impl Plugin for TypographyContentPlugin {
     }
 }
 
-/*pub fn init(selectors: &mut SelectorList) {
-    selectors.register(
-        "antialiased",
-        "-webkit-font-smoothing: antialiased;
--moz-osx-font-smoothing: grayscale;"
-            .to_string(),
-    );
-    selectors.register(
-        "subpixel-antialiased",
-        "-webkit-font-smoothing: auto;
--moz-osx-font-smoothing: auto;"
-            .to_string(),
-    );
-    selectors.register("normal-nums", "font-variant-numeric: normal;".to_string());
-    selectors.register("ordinal", "font-variant-numeric: ordinal;".to_string());
-    selectors.register(
-        "slashed-zero",
-        "font-variant-numeric: slashed-zero;".to_string(),
-    );
-    selectors.register(
-        "lining-nums",
-        "font-variant-numeric: lining-nums;".to_string(),
-    );
-    selectors.register(
-        "oldstyle-nums",
-        "font-variant-numeric: oldstyle-nums;".to_string(),
-    );
-    selectors.register(
-        "proportional-nums",
-        "font-variant-numeric: proportional-nums;".to_string(),
-    );
-    selectors.register(
-        "tabular-nums",
-        "font-variant-numeric: tabular-nums;".to_string(),
-    );
-    selectors.register(
-        "diagonal-fractions",
-        "font-variant-numeric: diagonal-fractions;".to_string(),
-    );
-    selectors.register(
-        "stacked-fractions",
-        "font-variant-numeric: stacked-fractions;".to_string(),
-    );
-    selectors.register("list-none", "list-style-type: none;".to_string());
-    selectors.register("list-disc", "list-style-type: disc;".to_string());
-    selectors.register("list-decimal", "list-style-type: decimal;".to_string());
-    selectors.register("list-inside", "list-style-position: inside;".to_string());
-    selectors.register("list-outside", "list-style-position: outside;".to_string());
-    selectors.register("underline", "text-decoration: underline;".to_string());
-    selectors.register("line-through", "text-decoration: line-through;".to_string());
-    selectors.register("no-underline", "text-decoration: none;".to_string());
-    selectors.register(
-        "truncate",
-        "overflow: hidden;
-text-overflow: ellipsis;
-white-space: nowrap;"
-            .to_string(),
-    );
-    selectors.register("overflow-ellipsis", "text-overflow: ellipsis;".to_string());
-    selectors.register("overflow-clip", "text-overflow: clip;".to_string());
-    selectors.register("align-baseline", "vertical-align: baseline;".to_string());
-    selectors.register("align-top", "vertical-align: top;".to_string());
-    selectors.register("align-middle", "vertical-align: middle;".to_string());
-    selectors.register("align-bottom", "vertical-align: bottom;".to_string());
-    selectors.register("align-text-top", "vertical-align: text-top;".to_string());
-    selectors.register(
-        "align-text-bottom",
-        "vertical-align: text-bottom;".to_string(),
-    );
-    selectors.register("whitespace-normal", "white-space: normal;".to_string());
-    selectors.register("whitespace-nowrap", "white-space: nowrap;".to_string());
-    selectors.register("whitespace-pre", "white-space: pre;".to_string());
-    selectors.register("whitespace-pre-line", "white-space: pre-line;".to_string());
-    selectors.register("whitespace-pre-wrap", "white-space: pre-wrap;".to_string());
-    selectors.register(
-        "break-normal",
-        "overflow-wrap: normal;
-word-break: normal;"
-            .to_string(),
-    );
-    selectors.register("break-words", "overflow-wrap: break-word;".to_string());
-    selectors.register("break-all", "word-break: break-all;".to_string());
-}*/
+#[derive(Debug)]
+pub struct FontVariantNumericPlugin;
+
+impl Plugin for FontVariantNumericPlugin {
+    fn namespace(&self) -> &str {
+        ""
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        match modifier {
+            "normal-nums" => write!(css_content, "font-variant-numeric: normal;"),
+            "ordinal" => write!(css_content, "--tw-ordinal: ordinal;
+  {}", CSS_FONT_VARIANT_NUMERIC),
+            "slashed-zero" => write!(css_content, "--tw-slashed-zero: slashed-zero;
+  {}", CSS_FONT_VARIANT_NUMERIC),
+            "lining-nums" => write!(css_content, "--tw-numeric-figure: lining-nums;
+  {}", CSS_FONT_VARIANT_NUMERIC),
+            "oldstyle-nums" => write!(css_content, "--tw-numeric-figure: oldstyle-nums;
+  {}", CSS_FONT_VARIANT_NUMERIC),
+            "proportional-nums" => write!(css_content, "--tw-numeric-spacing: proportional-nums;
+  {}", CSS_FONT_VARIANT_NUMERIC),
+            "tabular-nums" => write!(css_content, "--tw-numeric-spacing: tabular-nums;
+  {}", CSS_FONT_VARIANT_NUMERIC),
+            "diagonal-fractions" => write!(css_content, "--tw-numeric-fraction: diagonal-fractions;
+  {}", CSS_FONT_VARIANT_NUMERIC),
+            "stacked-fractions" => write!(css_content, "--tw-numeric-fraction: stacked-fractions;
+  {}", CSS_FONT_VARIANT_NUMERIC),
+            _ => Ok(()),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct FontSmoothingPlugin;
+
+impl Plugin for FontSmoothingPlugin {
+    fn namespace(&self) -> &str {
+        ""
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        match modifier {
+            "antialised" => write!(css_content, "-webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;"),
+            "subpixel-antialised" => write!(css_content, "-webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;"),
+            _ => Ok(()),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct ListStyleTypePlugin;
+
+impl Plugin for ListStyleTypePlugin {
+    fn namespace(&self) -> &str {
+        "list"
+    }
+
+    fn is_matching_value(&self, _hint: &str, _val: &str) -> bool {
+        true
+    }
+
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+        write!(css_content, "list-style-type: {val};")
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if ["none", "disc", "decimal"].contains(&modifier) {
+            self.css_template_value("none", css_content)
+        } else {
+            Ok(())
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct ListStylePositionPlugin;
+
+impl Plugin for ListStylePositionPlugin {
+    fn namespace(&self) -> &str {
+        "list"
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if ["inside", "outside"].contains(&modifier) {
+            write!(css_content, "list-style-position: {modifier};")
+        } else {
+            Ok(())
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct VerticalAlignPlugin;
+
+impl Plugin for VerticalAlignPlugin {
+    fn namespace(&self) -> &str {
+        "align"
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if ["baseline", "top", "middle", "bottom", "text-top", "text-bottom", "sub", "super"].contains(&modifier) {
+            write!(css_content, "vertical-align: {modifier};")
+        } else {
+            Ok(())
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct TextOverflowPlugin;
+
+impl Plugin for TextOverflowPlugin {
+    fn namespace(&self) -> &str {
+        ""
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        match modifier {
+            "truncate" => write!(css_content, "overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;"),
+            "text-ellipsis" => write!(css_content, "text-overflow: ellipsis;"),
+            "text-clip" => write!(css_content, "text-overflow: clip;"),
+            _ => Ok(()),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct WhitespacePlugin;
+
+impl Plugin for WhitespacePlugin {
+    fn namespace(&self) -> &str {
+        "whitespace"
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        if ["normal", "nowrap", "pre", "pre-line", "pre-wrap"].contains(&modifier) {
+            write!(css_content, "white-space: {modifier};")
+        } else {
+            Ok(())
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct WordBreakPlugin;
+
+impl Plugin for WordBreakPlugin {
+    fn namespace(&self) -> &str {
+        "break"
+    }
+
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+        match modifier {
+            "normal" => write!(css_content, "overflow-wrap: normal;
+  word-break: normal;"),
+            "words" => write!(css_content, "overflow-wrap: break-word;"),
+            "all" => write!(css_content, "word-break: break-all;"),
+            _ => Ok(()),
+        }
+    }
+}
