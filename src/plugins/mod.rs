@@ -52,7 +52,7 @@ pub trait Plugin: fmt::Debug {
     /// If nothing is written to the `result` buffer, the result of the plugin will be ignored
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> fmt::Result; // TODO: Custom type for modifier
 
-    // TODO: fn custom_css(&self) -> String; (custom CSS added only if plugin used at least once, e.g. for animations)
+    // TODO: fn custom_css(&self) -> String; (custom CSS added only if plugin used at least once, e.g. for animations or for filters and transforms (avoid repeat CSS_FILTER))
 }
 
 lazy_static! {
@@ -217,6 +217,7 @@ lazy_static! {
         &svg::StrokeWidthPlugin,
         &table::BorderCollapsePlugin,
         &table::TableLayoutPlugin,
+        &transform::OriginPlugin,
 
         // It is better to include the following plugins at the end because they match the "" namespace
         &layout::DisplayPlugin,
@@ -228,5 +229,6 @@ lazy_static! {
         &typography::TypographyItalicPlugin,
         &typography::TypographyTextDecorationPlugin,
         &accessibility::ScreenReaderPlugin,
+        &transform::TranslateRotateScaleSkewPlugin,
     ];
 }

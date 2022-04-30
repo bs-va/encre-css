@@ -664,7 +664,6 @@ impl Plugin for ScrollSnapTypePlugin {
     }
 }
 
-
 #[derive(Debug)]
 pub struct TouchActionPlugin;
 
