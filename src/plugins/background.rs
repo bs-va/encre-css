@@ -3,7 +3,7 @@ use crate::utils::{default_colors, value_matchers::*};
 
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::fmt::{Result, Write};
+use std::fmt::Write;
 
 lazy_static! {
     static ref OPACITY_IN_RGB_REGEX: Regex = Regex::new(r"/.*\)").unwrap();
@@ -21,7 +21,7 @@ impl Plugin for ColorPlugin {
         hint == "color" || is_matching_color(val)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
         if val.contains("--tw-opacity") {
             write!(
                 css_content,
@@ -29,16 +29,17 @@ impl Plugin for ColorPlugin {
   background-color: {};",
                 val.replace("--tw-opacity", "--tw-bg-opacity")
             )
+            .is_ok()
         } else {
-            write!(css_content, "background-color: {val};")
+            write!(css_content, "background-color: {val};").is_ok()
         }
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         if let Some(color) = default_colors::get(modifier) {
             self.css_template_value(&color, css_content)
         } else {
-            Ok(())
+            false
         }
     }
 }
@@ -51,12 +52,12 @@ impl Plugin for AttachmentPlugin {
         "bg"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
-            "fixed" => write!(css_content, "background-attachment: fixed;"),
-            "local" => write!(css_content, "background-attachment: local;"),
-            "scroll" => write!(css_content, "background-attachment: scroll;"),
-            _ => Ok(()),
+            "fixed" => write!(css_content, "background-attachment: fixed;").is_ok(),
+            "local" => write!(css_content, "background-attachment: local;").is_ok(),
+            "scroll" => write!(css_content, "background-attachment: scroll;").is_ok(),
+            _ => false,
         }
     }
 }
@@ -69,13 +70,13 @@ impl Plugin for ClipPlugin {
         "bg-clip"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
-            "border" => write!(css_content, "background-clip: border-box;"),
-            "padding" => write!(css_content, "background-clip: padding-box;"),
-            "content" => write!(css_content, "background-clip: content-box;"),
-            "text" => write!(css_content, "background-clip: text;"),
-            _ => Ok(()),
+            "border" => write!(css_content, "background-clip: border-box;").is_ok(),
+            "padding" => write!(css_content, "background-clip: padding-box;").is_ok(),
+            "content" => write!(css_content, "background-clip: content-box;").is_ok(),
+            "text" => write!(css_content, "background-clip: text;").is_ok(),
+            _ => false,
         }
     }
 }
@@ -88,12 +89,12 @@ impl Plugin for OpacityPlugin {
         "bg-opacity"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.parse::<f32>() {
-            write!(css_content, "--tw-bg-opacity: {};", opacity_value / 100.)
+            write!(css_content, "--tw-bg-opacity: {};", opacity_value / 100.).is_ok()
         } else {
-            Ok(())
+            false
         }
     }
 }
@@ -111,11 +112,11 @@ impl Plugin for ImagePlugin {
         hint == "list" || is_matching_image(val)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content, "background-image: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
+        write!(css_content, "background-image: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
             "bg-none" => self.css_template_value("none", css_content),
             "gradient-to-t" => self.css_template_value(
@@ -150,7 +151,7 @@ impl Plugin for ImagePlugin {
                 "linear-gradient(to top left, var(--tw-gradient-stops))",
                 css_content,
             ),
-            _ => Ok(()),
+            _ => false,
         }
     }
 }
@@ -167,7 +168,7 @@ impl Plugin for GradientFromPlugin {
         is_matching_color(val)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
         // TODO: Prevent `.to_string()`ing
         let default_to = if val == "inherit" || val == "currentColor" {
             "rgb(255 255 255 / 0)".to_string()
@@ -186,13 +187,14 @@ impl Plugin for GradientFromPlugin {
             "--tw-gradient-from: {val};
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, {default_to});"
         )
+        .is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         if let Some(color) = default_colors::get(modifier) {
             self.css_template_value(&color, css_content)
         } else {
-            Ok(())
+            false
         }
     }
 }
@@ -209,7 +211,7 @@ impl Plugin for GradientViaPlugin {
         is_matching_color(val)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
         // TODO: Prevent `.to_string()`ing
         let default_to = if val == "inherit" || val == "currentColor" {
             "rgb(255 255 255 / 0)".to_string()
@@ -228,13 +230,14 @@ impl Plugin for GradientViaPlugin {
             "--tw-gradient-stops: var(--tw-gradient-from), {}, var(--tw-gradient-to, {});",
             val, default_to
         )
+        .is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         if let Some(color) = default_colors::get(modifier) {
             self.css_template_value(&color, css_content)
         } else {
-            Ok(())
+            false
         }
     }
 }
@@ -251,7 +254,7 @@ impl Plugin for GradientToPlugin {
         is_matching_color(val)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
         // TODO: Prevent `.to_string()`ing
         let val = if val.contains("--tw-opacity") {
             val.replace(" / var(--tw-opacity)", "")
@@ -259,14 +262,14 @@ impl Plugin for GradientToPlugin {
             val.to_string()
         };
 
-        write!(css_content, "--tw-gradient-to: {val};")
+        write!(css_content, "--tw-gradient-to: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         if let Some(color) = default_colors::get(modifier) {
             self.css_template_value(&color, css_content)
         } else {
-            Ok(())
+            false
         }
     }
 }
@@ -288,11 +291,11 @@ impl Plugin for PositionPlugin {
                 .all(|v| v.split('_').all(is_matching_position))
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content, "background-position: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
+        write!(css_content, "background-position: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
             "bottom" => self.css_template_value("bottom", css_content),
             "center" => self.css_template_value("center", css_content),
@@ -303,7 +306,7 @@ impl Plugin for PositionPlugin {
             "right-bottom" => self.css_template_value("right-bottom", css_content),
             "right-top" => self.css_template_value("right-top", css_content),
             "top" => self.css_template_value("top", css_content),
-            _ => Ok(()),
+            _ => false,
         }
     }
 }
@@ -316,15 +319,15 @@ impl Plugin for RepeatPlugin {
         "bg"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
-            "repeat" => write!(css_content, "background-repeat: repeat;"),
-            "no-repeat" => write!(css_content, "background-repeat: no-repeat;"),
-            "repeat-x" => write!(css_content, "background-repeat: repeat-x;"),
-            "repeat-y" => write!(css_content, "background-repeat: repeat-y;"),
-            "repeat-round" => write!(css_content, "background-repeat: round;"),
-            "repeat-space" => write!(css_content, "background-repeat: space;"),
-            _ => Ok(()),
+            "repeat" => write!(css_content, "background-repeat: repeat;").is_ok(),
+            "no-repeat" => write!(css_content, "background-repeat: no-repeat;").is_ok(),
+            "repeat-x" => write!(css_content, "background-repeat: repeat-x;").is_ok(),
+            "repeat-y" => write!(css_content, "background-repeat: repeat-y;").is_ok(),
+            "repeat-round" => write!(css_content, "background-repeat: round;").is_ok(),
+            "repeat-space" => write!(css_content, "background-repeat: space;").is_ok(),
+            _ => false,
         }
     }
 }
@@ -349,16 +352,16 @@ impl Plugin for SizePlugin {
             })
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content, "background-size: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
+        write!(css_content, "background-size: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
             "auto" => self.css_template_value("auto", css_content),
             "cover" => self.css_template_value("cover", css_content),
             "contain" => self.css_template_value("contain", css_content),
-            _ => Ok(()),
+            _ => false,
         }
     }
 }

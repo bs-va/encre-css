@@ -1,7 +1,7 @@
 use super::Plugin;
 use crate::utils::{default_lengths, value_matchers::*};
 
-use std::fmt::{Result, Write};
+use std::fmt::Write;
 
 pub const CSS_TRANSFORM: &str = "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));";
 
@@ -17,18 +17,27 @@ impl Plugin for OriginPlugin {
         val.split('_').all(is_matching_position)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(
-            css_content,
-            "transform-origin: {val};"
-        )
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
+        write!(css_content, "transform-origin: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
-        if ["center", "top", "top-right", "right", "bottom-right", "bottom", "bottom-left", "left", "top-left"].contains(&modifier) {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
+        if [
+            "center",
+            "top",
+            "top-right",
+            "right",
+            "bottom-right",
+            "bottom",
+            "bottom-left",
+            "left",
+            "top-left",
+        ]
+        .contains(&modifier)
+        {
             self.css_template_value(&modifier.replace('-', ""), css_content)
         } else {
-            Ok(())
+            false
         }
     }
 }
@@ -41,19 +50,33 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
         ""
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         // TODO: Support negative values by creating a custom Modifier structure with a `negative`
         // field
+        let mut result = false;
+
         if let Some(val) = modifier.strip_prefix("translate-") {
             if let Some(val) = val.strip_prefix("x-") {
                 if let Some(length) = default_lengths::get_extended(val) {
-                    write!(css_content, "--tw-translate-x: {};
-  {}", length, CSS_TRANSFORM)?;
+                    write!(
+                        css_content,
+                        "--tw-translate-x: {};
+  {}",
+                        length, CSS_TRANSFORM
+                    )
+                    .ok();
+                    result = true;
                 }
             } else if let Some(val) = val.strip_prefix("y-") {
                 if let Some(length) = default_lengths::get_extended(val) {
-                    write!(css_content, "--tw-translate-y: {};
-  {}", length, CSS_TRANSFORM)?;
+                    write!(
+                        css_content,
+                        "--tw-translate-y: {};
+  {}",
+                        length, CSS_TRANSFORM
+                    )
+                    .ok();
+                    result = true;
                 }
             }
         }
@@ -62,26 +85,53 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
         if let Some(val) = modifier.strip_prefix("scale-") {
             if let Some(val) = val.strip_prefix("x-") {
                 if let Ok(scale_value) = val.parse::<f32>() {
-                    write!(css_content, "--tw-scale-x: {};
-  {}", scale_value / 100., CSS_TRANSFORM)?;
+                    write!(
+                        css_content,
+                        "--tw-scale-x: {};
+  {}",
+                        scale_value / 100.,
+                        CSS_TRANSFORM
+                    )
+                    .ok();
+                    result = true;
                 }
             } else if let Some(val) = val.strip_prefix("y-") {
                 if let Ok(scale_value) = val.parse::<f32>() {
-                    write!(css_content, "--tw-scale-y: {};
- {}", scale_value / 100., CSS_TRANSFORM)?;
+                    write!(
+                        css_content,
+                        "--tw-scale-y: {};
+ {}",
+                        scale_value / 100.,
+                        CSS_TRANSFORM
+                    )
+                    .ok();
+                    result = true;
                 }
             } else if let Ok(scale_value) = val.parse::<f32>() {
-                write!(css_content, "--tw-scale-x: {val};
+                write!(
+                    css_content,
+                    "--tw-scale-x: {val};
   --tw-scale-y: {val};
-  {}", CSS_TRANSFORM, val = scale_value / 100.)?;
+  {}",
+                    CSS_TRANSFORM,
+                    val = scale_value / 100.
+                )
+                .ok();
+                result = true;
             }
         }
 
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Some(val) = modifier.strip_prefix("rotate-") {
             if let Ok(rotate_value) = val.parse::<f32>() {
-                write!(css_content, "--tw-rotate: {rotate_value}deg;
-  {}", CSS_TRANSFORM)?;
+                write!(
+                    css_content,
+                    "--tw-rotate: {rotate_value}deg;
+  {}",
+                    CSS_TRANSFORM
+                )
+                .ok();
+                result = true;
             }
         }
 
@@ -89,17 +139,29 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
         if let Some(val) = modifier.strip_prefix("skew-") {
             if let Some(val) = val.strip_prefix("x-") {
                 if let Ok(skew_value) = val.parse::<f32>() {
-                    write!(css_content, "--tw-skew-x: {skew_value}deg;
-  {}", CSS_TRANSFORM)?;
+                    write!(
+                        css_content,
+                        "--tw-skew-x: {skew_value}deg;
+  {}",
+                        CSS_TRANSFORM
+                    )
+                    .ok();
+                    result = true;
                 }
             } else if let Some(val) = val.strip_prefix("y-") {
                 if let Ok(skew_value) = val.parse::<f32>() {
-                    write!(css_content, "--tw-skew-y: {skew_value}deg;
- {}", CSS_TRANSFORM)?;
+                    write!(
+                        css_content,
+                        "--tw-skew-y: {skew_value}deg;
+ {}",
+                        CSS_TRANSFORM
+                    )
+                    .ok();
+                    result = true;
                 }
             }
         }
 
-        Ok(())
+        result
     }
 }

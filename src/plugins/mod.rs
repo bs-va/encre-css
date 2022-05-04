@@ -1,6 +1,7 @@
 use lazy_static::lazy_static;
 use std::fmt;
 
+pub mod accessibility;
 pub mod alignment;
 pub mod background;
 pub mod border;
@@ -17,7 +18,6 @@ pub mod table;
 pub mod transform;
 pub mod transition;
 pub mod typography;
-pub mod accessibility;
 
 pub trait Plugin: fmt::Debug {
     /// Returns the namespace containing the plugin
@@ -40,17 +40,19 @@ pub trait Plugin: fmt::Debug {
 
     /// Get the template for an arbitrary associated with the plugin
     ///
+    /// Returns whether the function handled the modifier
+    ///
     /// NOTE: This function is called after [to_css_value], so, `_` (underscores) are already converted to ` ` (spaces)
     ///
     /// [to_css_value]: crate::to_css_value
-    fn css_template_value(&self, _val: &str, _css_content: &mut String) -> fmt::Result {
-        Ok(())
+    fn css_template_value(&self, _val: &str, _css_content: &mut String) -> bool {
+        false
     }
 
     /// Get the CSS code from a modifier
     ///
-    /// If nothing is written to the `result` buffer, the result of the plugin will be ignored
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> fmt::Result; // TODO: Custom type for modifier
+    /// Returns whether the function handled the modifier
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool; // TODO: Custom type for modifier
 
     // TODO: fn custom_css(&self) -> String; (custom CSS added only if plugin used at least once, e.g. for animations or for filters and transforms (avoid repeat CSS_FILTER))
 }

@@ -1,7 +1,7 @@
 use super::Plugin;
 use crate::utils::{default_lengths, value_matchers::*};
 
-use std::fmt::{Result, Write};
+use std::fmt::Write;
 
 #[derive(Debug)]
 pub struct ColumnsPlugin;
@@ -15,11 +15,11 @@ impl Plugin for ColumnsPlugin {
         is_matching_all(val)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content, "grid-template-columns: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
+        write!(css_content, "grid-template-columns: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         if modifier == "none" {
             return self.css_template_value("none", css_content);
         }
@@ -28,7 +28,7 @@ impl Plugin for ColumnsPlugin {
         if let Ok(num_cols) = modifier.parse::<usize>() {
             self.css_template_value(&format!("repeat({num_cols}, minmax(0, 1fr))"), css_content)
         } else {
-            Ok(())
+            false
         }
     }
 }
@@ -45,11 +45,11 @@ impl Plugin for RowsPlugin {
         is_matching_all(val)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content, "grid-template-rows: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
+        write!(css_content, "grid-template-rows: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         if modifier == "none" {
             return self.css_template_value("none", css_content);
         }
@@ -58,7 +58,7 @@ impl Plugin for RowsPlugin {
         if let Ok(num_cols) = modifier.parse::<usize>() {
             self.css_template_value(&format!("repeat({num_cols}, minmax(0, 1fr))"), css_content)
         } else {
-            Ok(())
+            false
         }
     }
 }
@@ -75,11 +75,11 @@ impl Plugin for StartEndSpanColumnPlugin {
         true
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content, "grid-column: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
+        write!(css_content, "grid-column: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         if is_matching_auto(modifier) {
             return self.css_template_value("auto", css_content);
         }
@@ -91,29 +91,32 @@ impl Plugin for StartEndSpanColumnPlugin {
 
             // NOTE: Not-compatible with TailwindCSS, support all values
             if let Ok(span_num) = val.parse::<usize>() {
-                return self.css_template_value(&format!("span {span_num} / span {span_num}"), css_content);
+                return self.css_template_value(
+                    &format!("span {span_num} / span {span_num}"),
+                    css_content,
+                );
             }
         } else if let Some(val) = modifier.strip_prefix("start-") {
             if is_matching_auto(val) {
-                return write!(css_content, "grid-column-start: auto;");
+                return write!(css_content, "grid-column-start: auto;").is_ok();
             }
 
             // NOTE: Not-compatible with TailwindCSS, support all values
             if val.parse::<usize>().is_ok() {
-                return write!(css_content, "grid-column-start: {val};");
+                return write!(css_content, "grid-column-start: {val};").is_ok();
             }
         } else if let Some(val) = modifier.strip_prefix("end-") {
             if is_matching_auto(val) {
-                return write!(css_content, "grid-column-end: auto;");
+                return write!(css_content, "grid-column-end: auto;").is_ok();
             }
 
             // NOTE: Not-compatible with TailwindCSS, support all values
             if val.parse::<usize>().is_ok() {
-                return write!(css_content, "grid-column-end: {val};");
+                return write!(css_content, "grid-column-end: {val};").is_ok();
             }
         }
 
-        Ok(())
+        false
     }
 }
 
@@ -129,11 +132,11 @@ impl Plugin for StartEndSpanRowPlugin {
         true
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content, "grid-row: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
+        write!(css_content, "grid-row: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         if is_matching_auto(modifier) {
             return self.css_template_value("auto", css_content);
         }
@@ -145,29 +148,32 @@ impl Plugin for StartEndSpanRowPlugin {
 
             // NOTE: Not-compatible with TailwindCSS, support all values
             if let Ok(span_num) = val.parse::<usize>() {
-                return self.css_template_value(&format!("span {span_num} / span {span_num}"), css_content);
+                return self.css_template_value(
+                    &format!("span {span_num} / span {span_num}"),
+                    css_content,
+                );
             }
         } else if let Some(val) = modifier.strip_prefix("start-") {
             if is_matching_auto(val) {
-                return write!(css_content, "grid-row-start: auto;");
+                return write!(css_content, "grid-row-start: auto;").is_ok();
             }
 
             // NOTE: Not-compatible with TailwindCSS, support all values
             if val.parse::<usize>().is_ok() {
-                return write!(css_content, "grid-row-start: {val};");
+                return write!(css_content, "grid-row-start: {val};").is_ok();
             }
         } else if let Some(val) = modifier.strip_prefix("end-") {
             if is_matching_auto(val) {
-                return write!(css_content, "grid-row-end: auto;");
+                return write!(css_content, "grid-row-end: auto;").is_ok();
             }
 
             // NOTE: Not-compatible with TailwindCSS, support all values
             if val.parse::<usize>().is_ok() {
-                return write!(css_content, "grid-row-end: {val};");
+                return write!(css_content, "grid-row-end: {val};").is_ok();
             }
         }
 
-        Ok(())
+        false
     }
 }
 
@@ -179,13 +185,13 @@ impl Plugin for AutoFlowPlugin {
         "grid-flow"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
-            "row" => write!(css_content, "grid-auto-flow: row;"),
-            "col" => write!(css_content, "grid-auto-flow: column;"),
-            "row-dense" => write!(css_content, "grid-auto-flow: row dense;"),
-            "col-dense" => write!(css_content, "grid-auto-flow: column dense;"),
-            _ => Ok(()),
+            "row" => write!(css_content, "grid-auto-flow: row;").is_ok(),
+            "col" => write!(css_content, "grid-auto-flow: column;").is_ok(),
+            "row-dense" => write!(css_content, "grid-auto-flow: row dense;").is_ok(),
+            "col-dense" => write!(css_content, "grid-auto-flow: column dense;").is_ok(),
+            _ => false,
         }
     }
 }
@@ -202,17 +208,17 @@ impl Plugin for AutoColumnsPlugin {
         true
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content, "grid-auto-columns: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
+        write!(css_content, "grid-auto-columns: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
             "auto" => self.css_template_value("auto", css_content),
             "min" => self.css_template_value("min-content", css_content),
             "max" => self.css_template_value("max-content", css_content),
             "fr" => self.css_template_value("minmax(0, 1fr)", css_content),
-            _ => Ok(()),
+            _ => false,
         }
     }
 }
@@ -229,17 +235,17 @@ impl Plugin for AutoRowsPlugin {
         true
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content, "grid-auto-rows: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
+        write!(css_content, "grid-auto-rows: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
             "auto" => self.css_template_value("auto", css_content),
             "min" => self.css_template_value("min-content", css_content),
             "max" => self.css_template_value("max-content", css_content),
             "fr" => self.css_template_value("minmax(0, 1fr)", css_content),
-            _ => Ok(()),
+            _ => false,
         }
     }
 }
@@ -256,15 +262,15 @@ impl Plugin for GapPlugin {
         is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content, "gap: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
+        write!(css_content, "gap: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         if let Some(length) = default_lengths::get_basic(modifier) {
             self.css_template_value(&length, css_content)
         } else {
-            Ok(())
+            false
         }
     }
 }
@@ -281,15 +287,15 @@ impl Plugin for GapXPlugin {
         is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content, "column-gap: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
+        write!(css_content, "column-gap: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         if let Some(length) = default_lengths::get_basic(modifier) {
             self.css_template_value(&length, css_content)
         } else {
-            Ok(())
+            false
         }
     }
 }
@@ -306,15 +312,15 @@ impl Plugin for GapYPlugin {
         is_matching_length(val)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content, "row-gap: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
+        write!(css_content, "row-gap: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         if let Some(length) = default_lengths::get_basic(modifier) {
             self.css_template_value(&length, css_content)
         } else {
-            Ok(())
+            false
         }
     }
 }

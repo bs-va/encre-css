@@ -3,7 +3,7 @@ use crate::utils::value_matchers::*;
 
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::fmt::{Result, Write};
+use std::fmt::Write;
 
 lazy_static! {
     static ref PROPERTY_REGEX: Regex = Regex::new(r"[^\d]+").unwrap();
@@ -21,32 +21,32 @@ impl Plugin for PropertyPlugin {
         PROPERTY_REGEX.is_match(val)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content, "transition-property: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
+        write!(css_content, "transition-property: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
             "" => write!(css_content, "transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;"),
-            "none" => write!(css_content, "transition-property: none;"),
+  transition-duration: 150ms;").is_ok(),
+            "none" => write!(css_content, "transition-property: none;").is_ok(),
             "all" => write!(css_content, "transition-property: all;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;"),
+  transition-duration: 150ms;").is_ok(),
             "colors" => write!(css_content, "transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
   transition-timing-function: cubic-bezier(0.4, 0, 0);
-  transition-duration: 150ms;"),
+  transition-duration: 150ms;").is_ok(),
             "opacity" => write!(css_content, "transition-property: opacity;
   transition-timing-function: cubic-bezier(0.4, 0, 0);
-  transition-duration: 150ms;"),
+  transition-duration: 150ms;").is_ok(),
             "shadow" => write!(css_content, "transition-property: box-shadow;
   transition-timing-function: cubic-bezier(0.4, 0, 0);
-  transition-duration: 150ms;"),
+  transition-duration: 150ms;").is_ok(),
             "transform" => write!(css_content, "transition-property: transform;
   transition-timing-function: cubic-bezier(0.4, 0, 0);
-  transition-duration: 150ms;"),
-            _ => Ok(()),
+  transition-duration: 150ms;").is_ok(),
+            _ => false,
         }
     }
 }
@@ -63,16 +63,16 @@ impl Plugin for DurationPlugin {
         is_matching_time(val)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content, "transition-duration: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
+        write!(css_content, "transition-duration: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(duration) = modifier.parse::<usize>() {
             self.css_template_value(&format!("{duration}ms"), css_content)
         } else {
-            Ok(())
+            false
         }
     }
 }
@@ -89,16 +89,16 @@ impl Plugin for DelayPlugin {
         is_matching_time(val)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content, "transition-delay: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
+        write!(css_content, "transition-delay: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(delay) = modifier.parse::<usize>() {
             self.css_template_value(&format!("{delay}ms"), css_content)
         } else {
-            Ok(())
+            false
         }
     }
 }
@@ -115,17 +115,17 @@ impl Plugin for EasePlugin {
         true
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> Result {
-        write!(css_content, "transition-timing-function: {val};")
+    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
+        write!(css_content, "transition-timing-function: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
             "linear" => self.css_template_value("linear", css_content),
             "in" => self.css_template_value("cubic-bezier(0.4, 0, 1, 1)", css_content),
             "out" => self.css_template_value("cubic-bezier(0, 0, 0.2, 1)", css_content),
             "in-out" => self.css_template_value("cubic-bezier(0.4, 0, 0.2, 1)", css_content),
-            _ => Ok(()),
+            _ => false,
         }
     }
 }

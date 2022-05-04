@@ -41,8 +41,6 @@ use variant::VARIANTS;
 
 lazy_static! {
     static ref SPLIT_REGEX: Regex = Regex::new(r#"(?-u)[\s'"`;>=]+"#).unwrap();
-    static ref FILTER_REGEX: fancy_regex::Regex =
-        fancy_regex::Regex::new(r"(?!\d|-{2}|-\d)[a-zA-Z0-9\u00A0-\uFFFF-:%&'()*+,_./:]").unwrap();
     static ref URL_REGEX: Regex = Regex::new("^url\\(.*\\)$").unwrap();
 }
 
@@ -147,11 +145,7 @@ impl TailwindGenerator {
 
     /// Scan the content of a file and store all the selectors found
     pub fn scan_content(&mut self, content: &str) {
-        for val in SPLIT_REGEX
-            .split(content)
-            // The shortest selector is `w-0`, so 3 characters long
-            .filter(|m| FILTER_REGEX.is_match(m).unwrap() && m.len() > 3 && !m.starts_with("class"))
-        {
+        for val in SPLIT_REGEX.split(content) {
             self.add_selector(val);
         }
     }
@@ -182,11 +176,8 @@ impl TailwindGenerator {
             &self.scanned_selectors_with_variant,
         ]
         .par_iter()
-        .map(|v| *v)
-        .flatten()
+        .flat_map(|v| *v)
         .filter_map(|selector| {
-            let mut css_content = String::new();
-
             // Find the right plugin to handle this selector (if the resulting CSS is valid,
             // the plugin is good)
             for plugin in PLUGINS.iter() {
@@ -222,27 +213,23 @@ impl TailwindGenerator {
                     };
 
                     if let Some(arbitrary_value) = arbitrary_value {
-                        if plugin.is_matching_value(arbitrary_value.0, arbitrary_value.1) {
-                            plugin
-                                .css_template_value(
-                                    &to_css_value(arbitrary_value.1),
-                                    &mut css_content,
-                                )
-                                .expect("failed to get the CSS from the modifier");
+                        let mut css_content = String::new();
 
-                            if !css_content.is_empty() {
-                                return Some(gen_css_rule(selector, &css_content));
-                            }
-                        }
-                    } else {
-                        plugin
-                            .get_css_for_modifier(
-                                &selector.get_modifier(plugin.namespace()),
+                        if plugin.is_matching_value(arbitrary_value.0, arbitrary_value.1)
+                            && plugin.css_template_value(
+                                &to_css_value(arbitrary_value.1),
                                 &mut css_content,
                             )
-                            .expect("failed to get the CSS from the modifier");
+                        {
+                            return Some(gen_css_rule(selector, &css_content));
+                        }
+                    } else {
+                        let mut css_content = String::new();
 
-                        if !css_content.is_empty() {
+                        if plugin.get_css_for_modifier(
+                            &selector.get_modifier(plugin.namespace()),
+                            &mut css_content,
+                        ) {
                             return Some(gen_css_rule(selector, &css_content));
                         }
                     }
@@ -269,17 +256,30 @@ mod tests {
             r#"<div class="w-full h-full absolute bg-blue-500 foo-bar sm:focus:ring hover:bg-black border-[#333] text-[color:var(--hello)]"></div>"#
         );
 
-        assert_eq!(generator.scanned_selectors_without_variant, vec![
-            Selector::new("w-full"),
-            Selector::new("h-full"),
-            Selector::new("absolute"),
-            Selector::new("bg-blue-500"),
-            Selector::new("foo-bar"),
-            Selector::new("border-[#333]"),
-            Selector::new("text-[color:var(--hello)]"),
-        ]);
+        assert_eq!(
+            generator.scanned_selectors_without_variant,
+            vec![
+                Selector::new("<div"),
+                Selector::new("class"),
+                Selector::new("w-full"),
+                Selector::new("h-full"),
+                Selector::new("absolute"),
+                Selector::new("bg-blue-500"),
+                Selector::new("foo-bar"),
+                Selector::new("border-[#333]"),
+                Selector::new("text-[color:var(--hello)]"),
+                Selector::new("</div"),
+                Selector::new(""), // TODO: Why?
+            ]
+        );
 
-        assert_eq!(generator.scanned_selectors_with_variant, vec![Selector::new("sm:focus:ring"), Selector::new("hover:bg-black")]);
+        assert_eq!(
+            generator.scanned_selectors_with_variant,
+            vec![
+                Selector::new("sm:focus:ring"),
+                Selector::new("hover:bg-black")
+            ]
+        );
     }
 
     #[test]

@@ -1,6 +1,6 @@
 use super::Plugin;
 
-use std::fmt::{Result, Write};
+use std::fmt::Write;
 
 #[derive(Debug)]
 pub struct BorderCollapsePlugin;
@@ -10,11 +10,11 @@ impl Plugin for BorderCollapsePlugin {
         "border"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
-            "collapse" => write!(css_content, "border-collapse: collapse;"),
-            "separate" => write!(css_content, "border-collapse: separate;"),
-            _ => Ok(()),
+            "collapse" => write!(css_content, "border-collapse: collapse;").is_ok(),
+            "separate" => write!(css_content, "border-collapse: separate;").is_ok(),
+            _ => false,
         }
     }
 }
@@ -27,11 +27,11 @@ impl Plugin for TableLayoutPlugin {
         "table"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
-            "auto" => write!(css_content, "table-layout: auto;"),
-            "fixed" => write!(css_content, "table-layout: fixed;"),
-            _ => Ok(()),
+            "auto" => write!(css_content, "table-layout: auto;").is_ok(),
+            "fixed" => write!(css_content, "table-layout: fixed;").is_ok(),
+            _ => false,
         }
     }
 }

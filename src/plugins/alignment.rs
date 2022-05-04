@@ -1,24 +1,24 @@
 use super::Plugin;
 
-use std::fmt::{Result, Write};
+use std::fmt::Write;
 
 #[derive(Debug)]
 pub struct AlignContentPlugin;
 
 impl Plugin for AlignContentPlugin {
     fn namespace(&self) -> &str {
-        "items"
+        "content"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
-            "start" => write!(css_content, "align-content: flex-start;"),
-            "center" => write!(css_content, "align-content: center;"),
-            "end" => write!(css_content, "align-content: flex-end;"),
-            "between" => write!(css_content, "align-content: space-between;"),
-            "around" => write!(css_content, "align-content: space-around;"),
-            "evenly" => write!(css_content, "align-content: space-evenly;"),
-            _ => Ok(()),
+            "start" => write!(css_content, "align-content: flex-start;").is_ok(),
+            "center" => write!(css_content, "align-content: center;").is_ok(),
+            "end" => write!(css_content, "align-content: flex-end;").is_ok(),
+            "between" => write!(css_content, "align-content: space-between;").is_ok(),
+            "around" => write!(css_content, "align-content: space-around;").is_ok(),
+            "evenly" => write!(css_content, "align-content: space-evenly;").is_ok(),
+            _ => false,
         }
     }
 }
@@ -31,14 +31,14 @@ impl Plugin for AlignItemsPlugin {
         "items"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
-            "stretch" => write!(css_content, "align-items: stretch;"),
-            "start" => write!(css_content, "align-items: flex-start;"),
-            "center" => write!(css_content, "align-items: center;"),
-            "end" => write!(css_content, "align-items: flex-end;"),
-            "baseline" => write!(css_content, "align-items: baseline;"),
-            _ => Ok(()),
+            "stretch" => write!(css_content, "align-items: stretch;").is_ok(),
+            "start" => write!(css_content, "align-items: flex-start;").is_ok(),
+            "center" => write!(css_content, "align-items: center;").is_ok(),
+            "end" => write!(css_content, "align-items: flex-end;").is_ok(),
+            "baseline" => write!(css_content, "align-items: baseline;").is_ok(),
+            _ => false,
         }
     }
 }
@@ -51,14 +51,14 @@ impl Plugin for AlignSelfPlugin {
         "self"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
-            "auto" => write!(css_content, "align-self: auto;"),
-            "start" => write!(css_content, "align-self: flex-start;"),
-            "center" => write!(css_content, "align-self: center;"),
-            "end" => write!(css_content, "align-self: flex-end;"),
-            "stretch" => write!(css_content, "align-self: stretch;"),
-            _ => Ok(()),
+            "auto" => write!(css_content, "align-self: auto;").is_ok(),
+            "start" => write!(css_content, "align-self: flex-start;").is_ok(),
+            "center" => write!(css_content, "align-self: center;").is_ok(),
+            "end" => write!(css_content, "align-self: flex-end;").is_ok(),
+            "stretch" => write!(css_content, "align-self: stretch;").is_ok(),
+            _ => false,
         }
     }
 }
@@ -71,15 +71,15 @@ impl Plugin for JustifyContentPlugin {
         "justify"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
-            "start" => write!(css_content, "justify-content: flex-start;"),
-            "center" => write!(css_content, "justify-content: center;"),
-            "end" => write!(css_content, "justify-content: flex-end;"),
-            "between" => write!(css_content, "justify-content: space-between;"),
-            "around" => write!(css_content, "justify-content: space-around;"),
-            "evenly" => write!(css_content, "justify-content: space-evenly;"),
-            _ => Ok(()),
+            "start" => write!(css_content, "justify-content: flex-start;").is_ok(),
+            "center" => write!(css_content, "justify-content: center;").is_ok(),
+            "end" => write!(css_content, "justify-content: flex-end;").is_ok(),
+            "between" => write!(css_content, "justify-content: space-between;").is_ok(),
+            "around" => write!(css_content, "justify-content: space-around;").is_ok(),
+            "evenly" => write!(css_content, "justify-content: space-evenly;").is_ok(),
+            _ => false,
         }
     }
 }
@@ -92,14 +92,14 @@ impl Plugin for JustifyItemsPlugin {
         "justify-items"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
-            "stretch" => write!(css_content, "justify-items: stretch;"),
-            "start" => write!(css_content, "justify-items: start;"),
-            "center" => write!(css_content, "justify-items: center;"),
-            "end" => write!(css_content, "justify-items: end;"),
-            "auto" => write!(css_content, "justify-items: auto;"),
-            _ => Ok(()),
+            "stretch" => write!(css_content, "justify-items: stretch;").is_ok(),
+            "start" => write!(css_content, "justify-items: start;").is_ok(),
+            "center" => write!(css_content, "justify-items: center;").is_ok(),
+            "end" => write!(css_content, "justify-items: end;").is_ok(),
+            "auto" => write!(css_content, "justify-items: auto;").is_ok(),
+            _ => false,
         }
     }
 }
@@ -112,14 +112,14 @@ impl Plugin for JustifySelfPlugin {
         "justify-self"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
-            "stretch" => write!(css_content, "justify-self: stretch;"),
-            "start" => write!(css_content, "justify-self: start;"),
-            "center" => write!(css_content, "justify-self: center;"),
-            "end" => write!(css_content, "justify-self: end;"),
-            "auto" => write!(css_content, "justify-self: auto;"),
-            _ => Ok(()),
+            "stretch" => write!(css_content, "justify-self: stretch;").is_ok(),
+            "start" => write!(css_content, "justify-self: start;").is_ok(),
+            "center" => write!(css_content, "justify-self: center;").is_ok(),
+            "end" => write!(css_content, "justify-self: end;").is_ok(),
+            "auto" => write!(css_content, "justify-self: auto;").is_ok(),
+            _ => false,
         }
     }
 }
@@ -132,15 +132,15 @@ impl Plugin for PlaceContentPlugin {
         "place-content"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
-            "start" => write!(css_content, "place-content: start;"),
-            "center" => write!(css_content, "place-content: center;"),
-            "end" => write!(css_content, "place-content: end;"),
-            "between" => write!(css_content, "place-content: space-between;"),
-            "around" => write!(css_content, "place-content: space-around;"),
-            "evenly" => write!(css_content, "place-content: space-evenly;"),
-            _ => Ok(()),
+            "start" => write!(css_content, "place-content: start;").is_ok(),
+            "center" => write!(css_content, "place-content: center;").is_ok(),
+            "end" => write!(css_content, "place-content: end;").is_ok(),
+            "between" => write!(css_content, "place-content: space-between;").is_ok(),
+            "around" => write!(css_content, "place-content: space-around;").is_ok(),
+            "evenly" => write!(css_content, "place-content: space-evenly;").is_ok(),
+            _ => false,
         }
     }
 }
@@ -153,13 +153,13 @@ impl Plugin for PlaceItemsPlugin {
         "place-items"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
-            "stretch" => write!(css_content, "place-items: stretch;"),
-            "start" => write!(css_content, "place-items: start;"),
-            "center" => write!(css_content, "place-items: center;"),
-            "end" => write!(css_content, "place-items: end;"),
-            _ => Ok(()),
+            "stretch" => write!(css_content, "place-items: stretch;").is_ok(),
+            "start" => write!(css_content, "place-items: start;").is_ok(),
+            "center" => write!(css_content, "place-items: center;").is_ok(),
+            "end" => write!(css_content, "place-items: end;").is_ok(),
+            _ => false,
         }
     }
 }
@@ -172,14 +172,14 @@ impl Plugin for PlaceSelfPlugin {
         "place-self"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> Result {
+    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
-            "self-auto" => write!(css_content, "place-self: auto;"),
-            "self-start" => write!(css_content, "place-self: start;"),
-            "self-center" => write!(css_content, "place-self: center;"),
-            "self-end" => write!(css_content, "place-self: end;"),
-            "self-stretch" => write!(css_content, "place-self: stretch;"),
-            _ => Ok(()),
+            "self-auto" => write!(css_content, "place-self: auto;").is_ok(),
+            "self-start" => write!(css_content, "place-self: start;").is_ok(),
+            "self-center" => write!(css_content, "place-self: center;").is_ok(),
+            "self-end" => write!(css_content, "place-self: end;").is_ok(),
+            "self-stretch" => write!(css_content, "place-self: stretch;").is_ok(),
+            _ => false,
         }
     }
 }
