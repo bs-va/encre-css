@@ -10,7 +10,8 @@ lazy_static! {
 
 #[derive(Debug, PartialEq, Eq, Clone, Hash, PartialOrd, Ord)]
 pub struct Selector {
-    variant: Option<String>,
+    full_name: String,
+    variants: Vec<String>,
     content: String,
     arbitrary_value: Option<String>,
     is_negative: bool,
@@ -42,20 +43,25 @@ impl Selector {
         };
 
         if VARIANT_REGEX.is_match(data) {
-            let mut split = data.split(VARIANT_SEPARATOR);
-            let variant = split.next().unwrap();
-            let content = split.next().unwrap();
+            // TODO: Escape `:` inside `[]`
+            let mut variants = data.split(VARIANT_SEPARATOR).map(|v| v.to_string()).collect::<Vec<String>>();
+            let content = variants.pop().unwrap();
+
+            // Used to be compatible with TailwindCSS
+            variants.reverse();
 
             Self {
-                variant: Some(variant.to_string()),
-                content: content.to_string(),
+                full_name: data.to_string(),
+                variants,
+                content,
                 arbitrary_value,
                 is_negative,
                 is_important,
             }
         } else {
             Self {
-                variant: None,
+                full_name: data.to_string(),
+                variants: vec![],
                 content: data.to_string(), // TODO: Prevent
                 arbitrary_value,
                 is_negative,
@@ -92,8 +98,8 @@ impl Selector {
         }
     }
 
-    pub fn get_variant(&self) -> &Option<String> {
-        &self.variant
+    pub fn get_variants(&self) -> &Vec<String> {
+        &self.variants
     }
 
     pub fn get_arbitrary_value(&self) -> Option<String> {
@@ -111,7 +117,7 @@ impl Selector {
     }
 
     pub fn contains(&self, other: &Selector) -> bool {
-        if self.variant != other.variant {
+        if self.variants != other.variants {
             return false;
         }
 
@@ -135,24 +141,6 @@ impl Selector {
 
 impl fmt::Display for Selector {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        if let Some(ref variant) = self.variant {
-            write!(
-                f,
-                "{}{}{}{}{}",
-                if self.is_important { "!" } else { "" },
-                if self.is_negative { "-" } else { "" },
-                variant,
-                VARIANT_SEPARATOR,
-                self.content
-            )
-        } else {
-            write!(
-                f,
-                "{}{}{}",
-                if self.is_important { "!" } else { "" },
-                if self.is_negative { "-" } else { "" },
-                self.content
-            )
-        }
+        write!(f, "{}", self.full_name)
     }
 }

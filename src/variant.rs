@@ -11,161 +11,65 @@ lazy_static! {
 
         // --- Pseudo element ---
 
-        variants.insert("first-letter", ".{class}::first-letter {
-  {css}
-}");
-        variants.insert("first-line", ".{class}::first-line {
-  {css}
-}");
-        variants.insert("marker", ".{class}::marker {
-  {css}
-}
-
-.{class} *::marker {
-  {css}
-}");
-        variants.insert("selection", ".{class}::selection {
-  {css}
-}
-
-.{class} *::selection {
-  {css}
-}");
-        variants.insert("file", ".{class}::file-selector-button {
-  {css}
-}");
-        variants.insert("placeholder", ".{class}::placeholder {
-  {css}
-}");
-        variants.insert("backdrop", ".{class}::backdrop {
-  {css}
-}");
-        variants.insert("before", ".{class}::before {
-  {css}
-}");
-        variants.insert("after", ".{class}::after {
-  {css}
-}");
+        variants.insert("first-letter", "&::first-letter");
+        variants.insert("first-line", "&::first-line");
+        variants.insert("marker", "&::marker\n& *::marker");
+        variants.insert("selection", "&::selection\n& *::selection");
+        variants.insert("file", "&::file-selector-button");
+        variants.insert("placeholder", "&::placeholder");
+        variants.insert("backdrop", "&::backdrop");
+        variants.insert("before", "&::before");
+        variants.insert("after", "&::after");
 
         // --- Pseudo class ---
 
         // Positional
-        variants.insert("first", ".{class}:first-child {
-  {css}
-}");
-        variants.insert("last", ".{class}:last-child {
-  {css}
-}");
-        variants.insert("only", ".{class}:only-child {
-  {css}
-}");
-        variants.insert("odd", ".{class}:nth-child(odd) {
-  {css}
-}");
-        variants.insert("even", ".{class}:nth-child(even) {
-  {css}
-}");
-        variants.insert("first-of-type", ".{class}:first-of-type {
-  {css}
-}");
-        variants.insert("last-of-type", ".{class}:last-of-type {
-  {css}
-}");
+        variants.insert("first", "&:first-child");
+        variants.insert("last", "&:last-child");
+        variants.insert("only", "&:only-child");
+        variants.insert("odd", "&:nth-child(odd)");
+        variants.insert("even", "&:nth-child(even)");
+        variants.insert("first-of-type", "&:first-of-type");
+        variants.insert("last-of-type", "&:last-of-type");
 
         // State
-        variants.insert("visited", ".{class}:visited {
-  {css}
-}");
-        variants.insert("target", ".{class}:target {
-  {css}
-}");
-        variants.insert("open", ".{class}[open] {
-  {css}
-}");
+        variants.insert("visited", "&:visited");
+        variants.insert("target", "&:target");
+        variants.insert("open", "&[open]");
 
         // Forms
-        variants.insert("default", ".{class}:default {
-  {css}
-}");
-        variants.insert("checked", ".{class}:checked {
-  {css}
-}");
-        variants.insert("indeterminate", ".{class}:indeterminate {
-  {css}
-}");
-        variants.insert("placeholder-shown", ".{class}:placeholder-shown {
-  {css}
-}");
-        variants.insert("autofill", ".{class}:autofill {
-  {css}
-}");
-        variants.insert("required", ".{class}:required {
-  {css}
-}");
-        variants.insert("valid", ".{class}:valid {
-  {css}
-}");
-        variants.insert("invalid", ".{class}:invalid {
-  {css}
-}");
-        variants.insert("in-range", ".{class}:in-range {
-  {css}
-}");
-        variants.insert("out-of-range", ".{class}:out-of-range {
-  {css}
-}");
-        variants.insert("read-only", ".{class}:read-only {
-  {css}
-}");
+        variants.insert("default", "&:default");
+        variants.insert("checked", "&:checked");
+        variants.insert("indeterminate", "&:indeterminate");
+        variants.insert("placeholder-shown", "&:placeholder-shown");
+        variants.insert("autofill", "&:autofill");
+        variants.insert("required", "&:required");
+        variants.insert("valid", "&:valid");
+        variants.insert("invalid", "&:invalid");
+        variants.insert("in-range", "&:in-range");
+        variants.insert("out-of-range", "&:out-of-range");
+        variants.insert("read-only", "&:read-only");
 
         // Content
-        variants.insert("empty", ".{class}:empty {
-  {css}
-}");
+        variants.insert("empty", "&:empty");
 
         // Interactive
-        variants.insert("focus-within", ".{class}:focus-within {
-  {css}
-}");
-        variants.insert("hover", ".{class}:hover {
-  {css}
-}");
-        variants.insert("focus", ".{class}:focus {
-  {css}
-}");
-        variants.insert("focus-visible", ".{class}:focus-visible {
-  {css}
-}");
-        variants.insert("active", ".{class}:active {
-  {css}
-}");
-        variants.insert("enabled", ".{class}:enabled {
-  {css}
-}");
-        variants.insert("disabled", ".{class}:disabled {
-  {css}
-}");
+        variants.insert("focus-within", "&:focus-within");
+        variants.insert("hover", "&:hover");
+        variants.insert("focus", "&:focus");
+        variants.insert("focus-visible", "&:focus-visible");
+        variants.insert("active", "&:active");
+        variants.insert("enabled", "&:enabled");
+        variants.insert("disabled", "&:disabled");
 
         // --- Direction ---
 
-        variants.insert("ltr", "[dir=\"ltr\"] .{class} {
-  {css}
-}");
-        variants.insert("rtl", "[dir=\"rtl\"] .{class} {
-  {css}
-}");
+        variants.insert("ltr", "[dir=\"ltr\"] &");
+        variants.insert("rtl", "[dir=\"rtl\"] &");
 
         // --- Reduced motion ---
-        variants.insert("motion-safe", "@media (prefers-reduced-motion: no-preference) {
-  .{class} {
-    {css}
-  }
-}");
-        variants.insert("motion-reduce", "@media (prefers-reduced-motion: reduce) {
-  .{class} {
-    {css}
-  }
-}");
+        variants.insert("motion-safe", "@media (prefers-reduced-motion: no-preference)");
+        variants.insert("motion-reduce", "@media (prefers-reduced-motion: reduce)");
 
         // --- Dark ---
 
@@ -176,53 +80,21 @@ lazy_static! {
 
         // --- Print ---
 
-        variants.insert("print", "@media print {
-  .{class} {
-    {css}
-  }
-}");
+        variants.insert("print", "@media print");
 
         // --- Screen ---
 
-        // TODO: Config file for screens
-        variants.insert("sm", "@media (min-width: 640px) {
-  .{class} {
-    {css}
-  }
-}");
-        variants.insert("md", "@media (min-width: 768px) {
-  .{class} {
-    {css}
-  }
-}");
-        variants.insert("lg", "@media (min-width: 1024px) {
-  .{class} {
-    {css}
-  }
-}");
-        variants.insert("xl", "@media (min-width: 1280px) {
-  .{class} {
-    {css}
-  }
-}");
-        variants.insert("2xl", "@media (min-width: 1536px) {
-  .{class} {
-    {css}
-  }
-}");
+        // TODO: Config file for screen breakpoints
+        variants.insert("sm", "@media (min-width: 640px)");
+        variants.insert("md", "@media (min-width: 768px)");
+        variants.insert("lg", "@media (min-width: 1024px)");
+        variants.insert("xl", "@media (min-width: 1280px)");
+        variants.insert("2xl", "@media (min-width: 1536px)");
 
         // --- Orientation ---
 
-        variants.insert("portrait", "@media (orientation: portrait) {
-  .{class} {
-    {css}
-  }
-}");
-        variants.insert("landscape", "@media (orientation: landscape) {
-  .{class} {
-    {css}
-  }
-}");
+        variants.insert("portrait", "@media (orientation: portrait)");
+        variants.insert("landscape", "@media (orientation: landscape)");
 
         variants
     };

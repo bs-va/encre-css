@@ -77,7 +77,7 @@ pub const VALID_PLUGIN_HINT: [&str; 4] = ["color", "length", "angle", "list"];
 /// Generate a complete CSS rule (with a class selector, a rule content and, if requested, some
 /// pseudo-elements or `@media` queries)
 pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
-    let css_selector = selector
+    let mut css_selector = selector
         .to_string()
         .replace('[', "\\[")
         .replace(']', "\\]")
@@ -98,16 +98,31 @@ pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
         css_content.to_string() // TODO: Prevent?
     };
 
-    if let Some(ref variant) = selector.get_variant() {
-        let with_variant = if let Some(result) = VARIANTS.get(variant.as_str()) {
-            result
-        } else {
-            panic!("Unknown variant: {}", variant);
-        };
+    let variants = selector.get_variants();
+    if !variants.is_empty() {
+        variants.iter().fold(String::new(), |acc, variant| {
+            let right_variant = if let Some(result) = VARIANTS.get(variant.as_str()) {
+                result
+            } else {
+                panic!("Unknown variant: {}", variant);
+            };
 
-        with_variant
-            .replace("{class}", &css_selector)
-            .replace("{css}", &css_content)
+            right_variant.split('\n').map(|v| {
+                if v.contains('&') {
+                    // Class-based variant
+                    css_selector = v.replace('&', &css_selector);
+                    format!(".{} {{\n  {}\n}}", css_selector, css_content)
+                } else {
+                    // Query-based variant (`@media`)
+                    // Indentation is automatically changed
+                    if acc.is_empty() {
+                        format!("{} {{\n  .{} {{\n    {}\n  }}\n}}", v, css_selector, css_content.replace('\n', "\n  "))
+                    } else {
+                        format!("{} {{\n  {}\n}}", v, acc.replace('\n', "\n  "))
+                    }
+                }
+            }).collect::<Vec<String>>().join("\n\n")
+        })
     } else {
         format!(".{} {{\n  {}\n}}", css_selector, &css_content)
     }
@@ -134,7 +149,7 @@ impl TailwindGenerator {
     pub fn add_selector(&mut self, val: &str) {
         let selector = Selector::new(val);
 
-        if selector.get_variant().is_some() {
+        if !selector.get_variants().is_empty() {
             if !self.scanned_selectors_with_variant.contains(&selector) {
                 self.scanned_selectors_with_variant.push(selector);
             }
