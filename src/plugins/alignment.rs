@@ -1,4 +1,5 @@
 use super::Plugin;
+use crate::selector::Modifier;
 
 use std::fmt::Write;
 
@@ -10,8 +11,8 @@ impl Plugin for AlignContentPlugin {
         "content"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "start" => write!(css_content, "align-content: flex-start;").is_ok(),
             "center" => write!(css_content, "align-content: center;").is_ok(),
             "end" => write!(css_content, "align-content: flex-end;").is_ok(),
@@ -31,8 +32,8 @@ impl Plugin for AlignItemsPlugin {
         "items"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "stretch" => write!(css_content, "align-items: stretch;").is_ok(),
             "start" => write!(css_content, "align-items: flex-start;").is_ok(),
             "center" => write!(css_content, "align-items: center;").is_ok(),
@@ -51,8 +52,8 @@ impl Plugin for AlignSelfPlugin {
         "self"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "auto" => write!(css_content, "align-self: auto;").is_ok(),
             "start" => write!(css_content, "align-self: flex-start;").is_ok(),
             "center" => write!(css_content, "align-self: center;").is_ok(),
@@ -71,8 +72,8 @@ impl Plugin for JustifyContentPlugin {
         "justify"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "start" => write!(css_content, "justify-content: flex-start;").is_ok(),
             "center" => write!(css_content, "justify-content: center;").is_ok(),
             "end" => write!(css_content, "justify-content: flex-end;").is_ok(),
@@ -92,8 +93,8 @@ impl Plugin for JustifyItemsPlugin {
         "justify-items"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "stretch" => write!(css_content, "justify-items: stretch;").is_ok(),
             "start" => write!(css_content, "justify-items: start;").is_ok(),
             "center" => write!(css_content, "justify-items: center;").is_ok(),
@@ -112,8 +113,8 @@ impl Plugin for JustifySelfPlugin {
         "justify-self"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "stretch" => write!(css_content, "justify-self: stretch;").is_ok(),
             "start" => write!(css_content, "justify-self: start;").is_ok(),
             "center" => write!(css_content, "justify-self: center;").is_ok(),
@@ -132,8 +133,8 @@ impl Plugin for PlaceContentPlugin {
         "place-content"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "start" => write!(css_content, "place-content: start;").is_ok(),
             "center" => write!(css_content, "place-content: center;").is_ok(),
             "end" => write!(css_content, "place-content: end;").is_ok(),
@@ -153,8 +154,8 @@ impl Plugin for PlaceItemsPlugin {
         "place-items"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "stretch" => write!(css_content, "place-items: stretch;").is_ok(),
             "start" => write!(css_content, "place-items: start;").is_ok(),
             "center" => write!(css_content, "place-items: center;").is_ok(),
@@ -172,8 +173,8 @@ impl Plugin for PlaceSelfPlugin {
         "place-self"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "self-auto" => write!(css_content, "place-self: auto;").is_ok(),
             "self-start" => write!(css_content, "place-self: start;").is_ok(),
             "self-center" => write!(css_content, "place-self: center;").is_ok(),

@@ -1,4 +1,5 @@
 use super::Plugin;
+use crate::selector::Modifier;
 use crate::utils::{default_colors, default_lengths, value_matchers::*};
 
 use std::fmt::Write;
@@ -28,8 +29,8 @@ impl Plugin for AccentColorPlugin {
         }
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if let Some(color) = default_colors::get(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if let Some(color) = default_colors::get(modifier.content()) {
             self.css_template_value(&color, css_content)
         } else {
             false
@@ -45,8 +46,8 @@ impl Plugin for AppearancePlugin {
         "appearance"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if modifier == "none" {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is("none") {
             write!(
                 css_content,
                 "-webkit-appearance: none;
@@ -68,16 +69,16 @@ impl Plugin for CursorPlugin {
         "cursor"
     }
 
-    fn is_matching_value(&self, _hint: &str, _val: &str) -> bool {
-        true
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        is_matching_all(val)
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
         write!(css_content, "cursor: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if [
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is_one_of(&[
             "auto",
             "default",
             "pointer",
@@ -114,10 +115,8 @@ impl Plugin for CursorPlugin {
             "nwse-resize",
             "zoom-in",
             "zoom-out",
-        ]
-        .contains(&modifier)
-        {
-            self.css_template_value(modifier, css_content)
+        ]) {
+            self.css_template_value(modifier.content(), css_content)
         } else {
             false
         }
@@ -149,8 +148,8 @@ impl Plugin for CaretColorPlugin {
         }
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if let Some(color) = default_colors::get(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if let Some(color) = default_colors::get(modifier.content()) {
             self.css_template_value(&color, css_content)
         } else {
             false
@@ -166,8 +165,8 @@ impl Plugin for PointerEventsPlugin {
         "pointer-events"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if ["none", "auto"].contains(&modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is_one_of(&["none", "auto"]) {
             write!(css_content, "pointer-events: {modifier};").is_ok()
         } else {
             false
@@ -183,8 +182,8 @@ impl Plugin for ResizePlugin {
         "resize"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "" => write!(css_content, "resize: both;").is_ok(),
             "none" => write!(css_content, "resize: none;").is_ok(),
             "x" => write!(css_content, "resize: horizontal;").is_ok(),
@@ -202,8 +201,8 @@ impl Plugin for ScrollBehaviorPlugin {
         "scroll"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if ["auto", "smooth"].contains(&modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is_one_of(&["auto", "smooth"]) {
             write!(css_content, "scroll-behavior: {modifier};").is_ok()
         } else {
             false
@@ -229,12 +228,12 @@ impl Plugin for ScrollMarginPlugin {
         write!(css_content, "scroll-margin: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if is_matching_auto(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is("auto") {
             return self.css_template_value("auto", css_content);
         }
 
-        if let Some(length) = default_lengths::get_basic(modifier) {
+        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -263,12 +262,12 @@ scroll-margin-right: {val};"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if is_matching_auto(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is("auto") {
             return self.css_template_value("auto", css_content);
         }
 
-        if let Some(length) = default_lengths::get_basic(modifier) {
+        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -297,12 +296,12 @@ scroll-margin-bottom: {val};"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if is_matching_auto(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is("auto") {
             return self.css_template_value("auto", css_content);
         }
 
-        if let Some(length) = default_lengths::get_basic(modifier) {
+        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -326,12 +325,12 @@ impl Plugin for ScrollMarginLeftPlugin {
         write!(css_content, "scroll-margin-left: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if is_matching_auto(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is("auto") {
             return self.css_template_value("auto", css_content);
         }
 
-        if let Some(length) = default_lengths::get_basic(modifier) {
+        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -355,12 +354,12 @@ impl Plugin for ScrollMarginRightPlugin {
         write!(css_content, "scroll-margin-right: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if is_matching_auto(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is("auto") {
             return self.css_template_value("auto", css_content);
         }
 
-        if let Some(length) = default_lengths::get_basic(modifier) {
+        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -384,12 +383,12 @@ impl Plugin for ScrollMarginTopPlugin {
         write!(css_content, "scroll-margin-top: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if is_matching_auto(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is("auto") {
             return self.css_template_value("auto", css_content);
         }
 
-        if let Some(length) = default_lengths::get_basic(modifier) {
+        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -413,12 +412,12 @@ impl Plugin for ScrollMarginBottomPlugin {
         write!(css_content, "scroll-margin-bottom: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if is_matching_auto(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is("auto") {
             return self.css_template_value("auto", css_content);
         }
 
-        if let Some(length) = default_lengths::get_basic(modifier) {
+        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -444,8 +443,8 @@ impl Plugin for ScrollPaddingPlugin {
         write!(css_content, "scroll-padding: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -474,8 +473,8 @@ scroll-padding-right: {val};"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -504,8 +503,8 @@ scroll-padding-bottom: {val};"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -529,8 +528,8 @@ impl Plugin for ScrollPaddingLeftPlugin {
         write!(css_content, "scroll-padding-left: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -554,8 +553,8 @@ impl Plugin for ScrollPaddingRightPlugin {
         write!(css_content, "scroll-padding-right: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -579,8 +578,8 @@ impl Plugin for ScrollPaddingTopPlugin {
         write!(css_content, "scroll-padding-top: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -604,8 +603,8 @@ impl Plugin for ScrollPaddingBottomPlugin {
         write!(css_content, "scroll-padding-bottom: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -621,8 +620,8 @@ impl Plugin for ScrollSnapAlignPlugin {
         "snap"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "start" => write!(css_content, "scroll-snap-align: start;").is_ok(),
             "end" => write!(css_content, "scroll-snap-align: end;").is_ok(),
             "center" => write!(css_content, "scroll-snap-align: center;").is_ok(),
@@ -640,8 +639,8 @@ impl Plugin for ScrollSnapStopPlugin {
         "snap"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "normal" => write!(css_content, "scroll-snap-stop: normal;").is_ok(),
             "always" => write!(css_content, "scroll-snap-stop: always;").is_ok(),
             _ => false,
@@ -657,8 +656,8 @@ impl Plugin for ScrollSnapTypePlugin {
         "snap"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "none" => write!(
                 css_content,
                 "-ms-scroll-snap-type: none;
@@ -698,8 +697,8 @@ impl Plugin for TouchActionPlugin {
         "touch"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if [
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is_one_of(&[
             "auto",
             "none",
             "pan-x",
@@ -710,9 +709,7 @@ impl Plugin for TouchActionPlugin {
             "pan-down",
             "pinch-zoom",
             "manipulation",
-        ]
-        .contains(&modifier)
-        {
+        ]) {
             write!(css_content, "touch-action: {modifier};").is_ok()
         } else {
             false
@@ -728,8 +725,8 @@ impl Plugin for UserSelectPlugin {
         "select"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if ["none", "text", "all", "auto"].contains(&modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is_one_of(&["none", "text", "all", "auto"]) {
             write!(css_content, "user-select: {modifier};").is_ok()
         } else {
             false
@@ -745,16 +742,16 @@ impl Plugin for WillChangePlugin {
         "will-change"
     }
 
-    fn is_matching_value(&self, _hint: &str, _val: &str) -> bool {
-        true
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        is_matching_all(val)
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
         write!(css_content, "will-change: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "auto" => self.css_template_value("auto", css_content),
             "scroll" => self.css_template_value("scroll-position", css_content),
             "contents" => self.css_template_value("contents", css_content),

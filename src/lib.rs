@@ -56,7 +56,7 @@ pub fn to_css_value(val: &str) -> String {
             .replace('_', " ")
             .replace(WILL_BE_REPLACED_BY_UNDERSCORE, "_")
     } else {
-        val.to_string() // TODO: Prevent allocating
+        val.to_string()
     }
 
     // TODO: Add spaces around operators inside calc() that do not follow an operator
@@ -106,7 +106,7 @@ pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
     let css_content = if selector.is_important() {
         css_content.replace(';', " !important;")
     } else {
-        css_content.to_string() // TODO: Prevent?
+        css_content.to_string()
     };
 
     let variants = selector.get_variants();
@@ -348,7 +348,7 @@ mod tests {
     }
 
     #[test]
-    fn gen_selector_css_test_variants() {
+    fn gen_selector_css_variants_test() {
         let mut generator = TailwindGenerator::new();
         generator.add_selector("sm:hover:bg-red-400");
         generator.add_selector("focus:hover:bg-red-600");
@@ -442,7 +442,44 @@ mod tests {
         );
     }
 
-    // TODO: Test dedup, test ::selection or ::marker
+    #[test]
+    fn gen_selector_css_negative_values_test() {
+        let mut generator = TailwindGenerator::new();
+        generator.add_selector("-translate-x-52");
+        generator.add_selector("-mb-8");
+        generator.add_selector("-hue-rotate-60");
+
+        assert_eq!(
+            generator.generate(),
+            format!(r#"{}.-translate-x-52 {{
+  --tw-translate-x: -13rem;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}}
+
+.-mb-8 {{
+  margin-bottom: -2rem;
+}}
+
+.-hue-rotate-60 {{
+  --tw-hue-rotate: hue-rotate(-60deg);
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}}"#, preflight::TAILWIND_PREFLIGHT_CSS));
+    }
+
+    #[test]
+    fn gen_selector_css_prevent_duplication_test() {
+        let mut generator = TailwindGenerator::new();
+        generator.add_selector("bg-red-500");
+        generator.add_selector("bg-red-500");
+        generator.add_selector("bg-red-500");
+
+        assert_eq!(
+            generator.generate(),
+            format!(r#"{}.bg-red-500 {{
+  --tw-bg-opacity: 1;
+  background-color: rgb(239 68 68 / var(--tw-bg-opacity));
+}}"#, preflight::TAILWIND_PREFLIGHT_CSS));
+    }
 
     /*#[test]
     fn gen_css_from_files_test() {

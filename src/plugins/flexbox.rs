@@ -1,4 +1,5 @@
 use super::Plugin;
+use crate::selector::Modifier;
 use crate::utils::value_matchers::*;
 
 use std::fmt::Write;
@@ -19,8 +20,8 @@ impl Plugin for OrderPlugin {
         write!(css_content, "order: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "first" => return self.css_template_value("-9999", css_content),
             "last" => return self.css_template_value("9999", css_content),
             "none" => return self.css_template_value("0", css_content),
@@ -28,8 +29,8 @@ impl Plugin for OrderPlugin {
         }
 
         // NOTE: Not-compatible with TailwindCSS, support all values
-        if modifier.parse::<f32>().is_ok() {
-            self.css_template_value(modifier, css_content)
+        if modifier.to_f32().is_ok() {
+            self.css_template_value(&modifier.to_string(), css_content)
         } else {
             false
         }
@@ -44,8 +45,8 @@ impl Plugin for DirectionPlugin {
         "flex"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "row" => write!(css_content, "flex-direction: row;").is_ok(),
             "row-reverse" => write!(css_content, "flex-direction: row-reverse;").is_ok(),
             "col" => write!(css_content, "flex-direction: column;").is_ok(),
@@ -63,8 +64,8 @@ impl Plugin for WrapPlugin {
         "flex"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "nowrap" => write!(css_content, "flex-wrap: nowrap;").is_ok(),
             "wrap" => write!(css_content, "flex-wrap: wrap;").is_ok(),
             "wrap-reverse" => write!(css_content, "flex-wrap: wrap-reverse;").is_ok(),
@@ -108,7 +109,7 @@ impl Plugin for GrowShrinkBasisPlugin {
         // flex-basis
         // https://developer.mozilla.org/en-US/docs/Web/CSS/flex-basis#values
         if let Some(val) = split.next() {
-            if is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val) {
+            if is_matching_length(val) || is_matching_percentage(val) || val == "auto" {
                 is_matching.2 = true;
             }
         }
@@ -120,8 +121,8 @@ impl Plugin for GrowShrinkBasisPlugin {
         write!(css_content, "flex: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "1" => self.css_template_value("1 1 0%", css_content),
             "auto" => self.css_template_value("1 1 auto", css_content),
             "initial" => self.css_template_value("0 1 auto", css_content),

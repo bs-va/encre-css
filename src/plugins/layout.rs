@@ -1,4 +1,5 @@
 use super::Plugin;
+use crate::selector::Modifier;
 use crate::utils::{default_lengths, value_matchers::*};
 
 use std::fmt::Write;
@@ -7,8 +8,8 @@ use std::fmt::Write;
 pub struct PositionPlugin;
 
 impl Plugin for PositionPlugin {
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if ["static", "fixed", "absolute", "relative", "sticky"].contains(&modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is_one_of(&["static", "fixed", "absolute", "relative", "sticky"]) {
             write!(css_content, "position: {modifier};").is_ok()
         } else {
             false
@@ -20,8 +21,8 @@ impl Plugin for PositionPlugin {
 pub struct DisplayPlugin;
 
 impl Plugin for DisplayPlugin {
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "hidden" => write!(css_content, "display: none;").is_ok(),
             "contents" => write!(css_content, "display: contents;").is_ok(),
             "list-item" => write!(css_content, "display: list-item;").is_ok(),
@@ -52,8 +53,8 @@ impl Plugin for DisplayPlugin {
 pub struct VisibilityPlugin;
 
 impl Plugin for VisibilityPlugin {
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "visible" => write!(css_content, "visibility: visible;").is_ok(),
             "invisible" => write!(css_content, "visibility: hidden;").is_ok(),
             _ => false,
@@ -65,8 +66,8 @@ impl Plugin for VisibilityPlugin {
 pub struct IsolationPlugin;
 
 impl Plugin for IsolationPlugin {
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "isolate" => write!(css_content, "isolation: isolate;").is_ok(),
             "isolation-auto" => write!(css_content, "isolation: auto;").is_ok(),
             _ => false,
@@ -83,7 +84,7 @@ impl Plugin for InsetPlugin {
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val)
+        is_matching_length(val) || is_matching_percentage(val) || val == "auto"
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
@@ -97,8 +98,8 @@ left: {val};"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_extended(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if let Some(length) = default_lengths::get_extended(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -115,7 +116,7 @@ impl Plugin for InsetXPlugin {
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val)
+        is_matching_length(val) || is_matching_percentage(val) || val == "auto"
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
@@ -127,8 +128,8 @@ right: {val};"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_extended(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if let Some(length) = default_lengths::get_extended(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -145,7 +146,7 @@ impl Plugin for InsetYPlugin {
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val)
+        is_matching_length(val) || is_matching_percentage(val) || val == "auto"
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
@@ -157,8 +158,8 @@ bottom: {val};"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_extended(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if let Some(length) = default_lengths::get_extended(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -175,15 +176,15 @@ impl Plugin for TopPlugin {
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val)
+        is_matching_length(val) || is_matching_percentage(val) || val == "auto"
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
         write!(css_content, "top: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_extended(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if let Some(length) = default_lengths::get_extended(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -200,15 +201,15 @@ impl Plugin for BottomPlugin {
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val)
+        is_matching_length(val) || is_matching_percentage(val) || val == "auto"
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
         write!(css_content, "bottom: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_extended(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if let Some(length) = default_lengths::get_extended(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -225,15 +226,15 @@ impl Plugin for LeftPlugin {
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val)
+        is_matching_length(val) || is_matching_percentage(val) || val == "auto"
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
         write!(css_content, "left: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_extended(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if let Some(length) = default_lengths::get_extended(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -250,15 +251,15 @@ impl Plugin for RightPlugin {
     }
 
     fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val) || is_matching_percentage(val) || is_matching_auto(val)
+        is_matching_length(val) || is_matching_percentage(val) || val == "auto"
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
         write!(css_content, "right: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_extended(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if let Some(length) = default_lengths::get_extended(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -274,9 +275,9 @@ impl Plugin for ZIndexPlugin {
         "z"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        if modifier.parse::<f32>().is_ok() || is_matching_auto(modifier) {
+        if modifier.to_f32().is_ok() || modifier.is("auto") {
             write!(css_content, "z-index: {modifier};").is_ok()
         } else {
             false
@@ -292,8 +293,8 @@ impl Plugin for ContainerPlugin {
         "container"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "none" => write!(css_content, "width: 100%;").is_ok(),
             "sm" => write!(css_content, "max-width: 640px;").is_ok(),
             "md" => write!(css_content, "max-width: 768px;").is_ok(),
@@ -313,8 +314,8 @@ impl Plugin for BoxDecorationBreakPlugin {
         "decoration"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if ["slice", "clone"].contains(&modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is_one_of(&["slice", "clone"]) {
             write!(css_content, "box-decoration-break: {modifier};").is_ok()
         } else {
             false
@@ -330,8 +331,8 @@ impl Plugin for BoxSizingPlugin {
         "box"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if ["border", "content"].contains(&modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is_one_of(&["border", "content"]) {
             write!(css_content, "box-sizing: {modifier}-box;").is_ok()
         } else {
             false
@@ -347,8 +348,8 @@ impl Plugin for FloatPlugin {
         "float"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if ["left", "right", "none"].contains(&modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is_one_of(&["left", "right", "none"]) {
             write!(css_content, "float: {modifier};").is_ok()
         } else {
             false
@@ -364,8 +365,8 @@ impl Plugin for ClearPlugin {
         "clear"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if ["left", "right", "both", "none"].contains(&modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is_one_of(&["left", "right", "both", "none"]) {
             write!(css_content, "clear: {modifier};").is_ok()
         } else {
             false
@@ -381,8 +382,8 @@ impl Plugin for ObjectFitPlugin {
         "object"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if ["contain", "cover", "fill", "none", "scale-down"].contains(&modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is_one_of(&["contain", "cover", "fill", "none", "scale-down"]) {
             write!(css_content, "object-fit: {modifier};").is_ok()
         } else {
             false
@@ -406,8 +407,8 @@ impl Plugin for ObjectPositionPlugin {
         write!(css_content, "object-position: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "bottom" => self.css_template_value("bottom", css_content),
             "center" => self.css_template_value("center", css_content),
             "left" => self.css_template_value("left", css_content),
@@ -430,8 +431,8 @@ impl Plugin for OverflowPlugin {
         "overflow"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "auto" => write!(css_content, "overflow: auto;").is_ok(),
             "x-auto" => write!(css_content, "overflow-x: auto;").is_ok(),
             "y-auto" => write!(css_content, "overflow-y: auto;").is_ok(),
@@ -457,8 +458,8 @@ impl Plugin for OverscrollPlugin {
         "overscroll"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "auto" => write!(css_content, "overscroll-behavior: auto;").is_ok(),
             "y-auto" => write!(css_content, "overscroll-behavior-y: auto;").is_ok(),
             "x-auto" => write!(css_content, "overscroll-behavior-x: auto;").is_ok(),

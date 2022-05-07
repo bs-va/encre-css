@@ -1,4 +1,5 @@
 use super::Plugin;
+use crate::selector::Modifier;
 use crate::utils::{default_lengths, value_matchers::*};
 
 use std::fmt::Write;
@@ -21,8 +22,8 @@ impl Plugin for OriginPlugin {
         write!(css_content, "transform-origin: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if [
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is_one_of(&[
             "center",
             "top",
             "top-right",
@@ -32,10 +33,8 @@ impl Plugin for OriginPlugin {
             "bottom-left",
             "left",
             "top-left",
-        ]
-        .contains(&modifier)
-        {
-            self.css_template_value(&modifier.replace('-', ""), css_content)
+        ]) {
+            self.css_template_value(modifier.content(), css_content)
         } else {
             false
         }
@@ -50,14 +49,12 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
         ""
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        // TODO: Support negative values by creating a custom Modifier structure with a `negative`
-        // field
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
         let mut result = false;
 
         if let Some(val) = modifier.strip_prefix("translate-") {
             if let Some(val) = val.strip_prefix("x-") {
-                if let Some(length) = default_lengths::get_extended(val) {
+                if let Some(length) = default_lengths::get_extended(val, modifier.is_negative()) {
                     write!(
                         css_content,
                         "--tw-translate-x: {};
@@ -68,7 +65,7 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
                     result = true;
                 }
             } else if let Some(val) = val.strip_prefix("y-") {
-                if let Some(length) = default_lengths::get_extended(val) {
+                if let Some(length) = default_lengths::get_extended(val, modifier.is_negative()) {
                     write!(
                         css_content,
                         "--tw-translate-y: {};

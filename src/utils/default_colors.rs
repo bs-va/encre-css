@@ -232,8 +232,6 @@ lazy_static! {
 
 /// Get a color from a modifier
 pub fn get(modifier: &str) -> Option<String> {
-    // TODO: Prevent `.to_string()`ing
-
     // Handle the new opacity syntax (e.g. `bg-red-500/25`)
     let (mut opacity, modifier) =
         if let Some(opacity_suffix) = OPACITY_SUFFIX_REGEX.captures(modifier) {

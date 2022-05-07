@@ -1,4 +1,5 @@
 use super::Plugin;
+use crate::selector::Modifier;
 use crate::utils::{default_colors, value_matchers::*};
 
 use lazy_static::lazy_static;
@@ -37,8 +38,8 @@ color: {};",
         }
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if let Some(color) = default_colors::get(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if let Some(color) = default_colors::get(modifier.content()) {
             self.css_template_value(&color, css_content)
         } else {
             false
@@ -54,9 +55,9 @@ impl Plugin for OpacityPlugin {
         "text-opacity"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(opacity_value) = modifier.parse::<f32>() {
+        if let Ok(opacity_value) = modifier.to_f32() {
             write!(css_content, "--tw-text-opacity: {};", opacity_value / 100.).is_ok()
         } else {
             false
@@ -93,8 +94,8 @@ impl Plugin for FontFamilyPlugin {
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "sans" => write!(
                 css_content,
                 r#"font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";"#
@@ -128,8 +129,8 @@ impl Plugin for FontSizePlugin {
         write!(css_content, "font-size: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "xs" => write!(
                 css_content,
                 "font-size: 0.75rem;
@@ -231,8 +232,8 @@ impl Plugin for FontWeightPlugin {
         write!(css_content, "font-weight: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "thin" => self.css_template_value("100", css_content),
             "extralight" => self.css_template_value("200", css_content),
             "light" => self.css_template_value("300", css_content),
@@ -255,8 +256,8 @@ impl Plugin for TextAlignmentPlugin {
         "text"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "left" => write!(css_content, "text-align: left;").is_ok(),
             "center" => write!(css_content, "text-align: center;").is_ok(),
             "right" => write!(css_content, "text-align: right;").is_ok(),
@@ -270,8 +271,8 @@ impl Plugin for TextAlignmentPlugin {
 pub struct TextTransformPlugin;
 
 impl Plugin for TextTransformPlugin {
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "uppercase" => write!(css_content, "text-transform: uppercase;").is_ok(),
             "lowercase" => write!(css_content, "text-transform: lowercase;").is_ok(),
             "capitalize" => write!(css_content, "text-transform: capitalize;").is_ok(),
@@ -297,8 +298,8 @@ impl Plugin for TrackingPlugin {
         write!(css_content, "letter-spacing: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "tighter" => self.css_template_value("-0.05em", css_content),
             "tight" => self.css_template_value("-0.025em", css_content),
             "normal" => self.css_template_value("0", css_content),
@@ -330,8 +331,8 @@ impl Plugin for LeadingPlugin {
         write!(css_content, "line-height: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "none" => self.css_template_value("1", css_content),
             "tight" => self.css_template_value("1.25", css_content),
             "snug" => self.css_template_value("1.375", css_content),
@@ -355,8 +356,8 @@ impl Plugin for LeadingPlugin {
 pub struct ItalicPlugin;
 
 impl Plugin for ItalicPlugin {
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "italic" => write!(css_content, "font-style: italic;").is_ok(),
             "no-italic" => write!(css_content, "font-style: normal;").is_ok(),
             _ => false,
@@ -368,8 +369,8 @@ impl Plugin for ItalicPlugin {
 pub struct TextDecorationPlugin;
 
 impl Plugin for TextDecorationPlugin {
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if ["underline", "overline", "line-through", "no-underline"].contains(&modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is_one_of(&["underline", "overline", "line-through", "no-underline"]) {
             write!(
                 css_content,
                 "-webkit-text-decoration-line: {modifier};
@@ -413,8 +414,8 @@ text-decoration-color: {val};"
         }
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if let Some(color) = default_colors::get(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if let Some(color) = default_colors::get(modifier.content()) {
             self.css_template_value(&color, css_content)
         } else {
             false
@@ -430,8 +431,8 @@ impl Plugin for TextDecorationStylePlugin {
         "decoration"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if ["solid", "double", "dotted", "dashed", "wavy"].contains(&modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is_one_of(&["solid", "double", "dotted", "dashed", "wavy"]) {
             write!(css_content, "text-decoration-style: {modifier};").is_ok()
         } else {
             false
@@ -459,13 +460,13 @@ impl Plugin for TextDecorationThicknessPlugin {
         write!(css_content, "text-decoration-thickness: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if ["auto", "from-font"].contains(&modifier) {
-            return self.css_template_value(modifier, css_content);
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is_one_of(&["auto", "from-font"]) {
+            return self.css_template_value(modifier.content(), css_content);
         }
 
         // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(thickness) = modifier.parse::<usize>() {
+        if let Ok(thickness) = modifier.to_usize() {
             self.css_template_value(&format!("{thickness}px"), css_content)
         } else {
             false
@@ -482,10 +483,9 @@ impl Plugin for TextDecorationOffsetPlugin {
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        // TODO: Is it useful to match the hint against `length` AND `percentage`?
         hint == "length"
             || hint == "percentage"
-            || is_matching_auto(val)
+            || val == "auto"
             || is_matching_length(val)
             || is_matching_percentage(val)
     }
@@ -494,13 +494,13 @@ impl Plugin for TextDecorationOffsetPlugin {
         write!(css_content, "text-underline-offset: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if is_matching_auto(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is("auto") {
             return self.css_template_value("auto", css_content);
         }
 
         // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(offset) = modifier.parse::<usize>() {
+        if let Ok(offset) = modifier.to_usize() {
             self.css_template_value(&format!("{offset}px"), css_content)
         } else {
             false
@@ -516,8 +516,8 @@ impl Plugin for ContentPlugin {
         "content"
     }
 
-    fn is_matching_value(&self, _hint: &str, _val: &str) -> bool {
-        true
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        is_matching_all(val)
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
@@ -531,8 +531,8 @@ content: var(--tw-content);"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if modifier == "none" {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is("none") {
             self.css_template_value("none", css_content)
         } else {
             false
@@ -548,8 +548,8 @@ impl Plugin for FontVariantNumericPlugin {
         ""
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "normal-nums" => write!(css_content, "font-variant-numeric: normal;").is_ok(),
             "ordinal" => write!(
                 css_content,
@@ -620,8 +620,8 @@ impl Plugin for FontSmoothingPlugin {
         ""
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "antialised" => write!(
                 css_content,
                 "-webkit-font-smoothing: antialiased;
@@ -647,16 +647,16 @@ impl Plugin for ListStyleTypePlugin {
         "list"
     }
 
-    fn is_matching_value(&self, _hint: &str, _val: &str) -> bool {
-        true
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        is_matching_all(val)
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
         write!(css_content, "list-style-type: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if ["none", "disc", "decimal"].contains(&modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is_one_of(&["none", "disc", "decimal"]) {
             self.css_template_value("none", css_content)
         } else {
             false
@@ -672,8 +672,8 @@ impl Plugin for ListStylePositionPlugin {
         "list"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if ["inside", "outside"].contains(&modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is_one_of(&["inside", "outside"]) {
             write!(css_content, "list-style-position: {modifier};").is_ok()
         } else {
             false
@@ -689,8 +689,8 @@ impl Plugin for VerticalAlignPlugin {
         "align"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if [
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is_one_of(&[
             "baseline",
             "top",
             "middle",
@@ -699,9 +699,7 @@ impl Plugin for VerticalAlignPlugin {
             "text-bottom",
             "sub",
             "super",
-        ]
-        .contains(&modifier)
-        {
+        ]) {
             write!(css_content, "vertical-align: {modifier};").is_ok()
         } else {
             false
@@ -717,8 +715,8 @@ impl Plugin for TextOverflowPlugin {
         ""
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "truncate" => write!(
                 css_content,
                 "overflow: hidden;
@@ -741,8 +739,8 @@ impl Plugin for WhitespacePlugin {
         "whitespace"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if ["normal", "nowrap", "pre", "pre-line", "pre-wrap"].contains(&modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is_one_of(&["normal", "nowrap", "pre", "pre-line", "pre-wrap"]) {
             write!(css_content, "white-space: {modifier};").is_ok()
         } else {
             false
@@ -758,8 +756,8 @@ impl Plugin for WordBreakPlugin {
         "break"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "normal" => write!(
                 css_content,
                 "overflow-wrap: normal;

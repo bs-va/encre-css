@@ -1,4 +1,5 @@
 use super::Plugin;
+use crate::selector::Modifier;
 use crate::utils::value_matchers::*;
 
 use lazy_static::lazy_static;
@@ -25,8 +26,8 @@ impl Plugin for PropertyPlugin {
         write!(css_content, "transition-property: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "" => write!(css_content, "transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
 transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 transition-duration: 150ms;").is_ok(),
@@ -67,9 +68,9 @@ impl Plugin for DurationPlugin {
         write!(css_content, "transition-duration: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(duration) = modifier.parse::<usize>() {
+        if let Ok(duration) = modifier.to_usize() {
             self.css_template_value(&format!("{duration}ms"), css_content)
         } else {
             false
@@ -93,9 +94,9 @@ impl Plugin for DelayPlugin {
         write!(css_content, "transition-delay: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(delay) = modifier.parse::<usize>() {
+        if let Ok(delay) = modifier.to_usize() {
             self.css_template_value(&format!("{delay}ms"), css_content)
         } else {
             false
@@ -111,16 +112,16 @@ impl Plugin for EasePlugin {
         "ease"
     }
 
-    fn is_matching_value(&self, _hint: &str, _val: &str) -> bool {
-        true
+    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
+        is_matching_all(val)
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
         write!(css_content, "transition-timing-function: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "linear" => self.css_template_value("linear", css_content),
             "in" => self.css_template_value("cubic-bezier(0.4, 0, 1, 1)", css_content),
             "out" => self.css_template_value("cubic-bezier(0, 0, 0.2, 1)", css_content),

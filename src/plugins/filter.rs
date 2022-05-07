@@ -1,4 +1,5 @@
 use super::Plugin;
+use crate::selector::Modifier;
 
 use std::fmt::Write;
 
@@ -10,15 +11,15 @@ const CSS_BACKDROP_FILTER: &str = "-webkit-backdrop-filter: var(--tw-backdrop-bl
 pub struct FilterPlugin;
 
 impl Plugin for FilterPlugin {
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if modifier == "filter" {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.content() == "filter" {
             return write!(css_content, "{}", CSS_FILTER).is_ok();
-        } else if modifier == "filter-none" {
+        } else if modifier.content() == "filter-none" {
             return write!(css_content, "filter: none;").is_ok();
         }
 
-        let result = match modifier {
-            // TODO: Better negative values + arbitrary values
+        let result = match modifier.content() {
+            // TODO: Better arbitrary values
             "blur-0" => write!(css_content, "--tw-blur: blur(0);").is_ok(),
             "blur-sm" => write!(css_content, "--tw-blur: blur(4px);").is_ok(),
             "blur" => write!(css_content, "--tw-blur: blur(8px);").is_ok(),
@@ -54,17 +55,12 @@ impl Plugin for FilterPlugin {
             "drop-shadow-none" => write!(css_content, "--tw-drop-shadow: drop-shadow: drop-shadow(0 0 #0000);").is_ok(),
             "grayscale-0" => write!(css_content, "--tw-grayscale: grayscale(0);").is_ok(),
             "grayscale" => write!(css_content, "--tw-grayscale: grayscale(100%);").is_ok(),
-            "-hue-rotate-180" => write!(css_content, "--tw-hue-rotate: hue-rotate(-180deg);").is_ok(),
-            "-hue-rotate-90" => write!(css_content, "--tw-hue-rotate: hue-rotate(-90deg);").is_ok(),
-            "-hue-rotate-60" => write!(css_content, "--tw-hue-rotate: hue-rotate(-60deg);").is_ok(),
-            "-hue-rotate-30" => write!(css_content, "--tw-hue-rotate: hue-rotate(-30deg);").is_ok(),
-            "-hue-rotate-15" => write!(css_content, "--tw-hue-rotate: hue-rotate(-15deg);").is_ok(),
             "hue-rotate-0" => write!(css_content, "--tw-hue-rotate: hue-rotate(0deg);").is_ok(),
-            "hue-rotate-15" => write!(css_content, "--tw-hue-rotate: hue-rotate(15deg);").is_ok(),
-            "hue-rotate-30" => write!(css_content, "--tw-hue-rotate: hue-rotate(30deg);").is_ok(),
-            "hue-rotate-60" => write!(css_content, "--tw-hue-rotate: hue-rotate(60deg);").is_ok(),
-            "hue-rotate-90" => write!(css_content, "--tw-hue-rotate: hue-rotate(90deg);").is_ok(),
-            "hue-rotate-180" => write!(css_content, "--tw-hue-rotate: hue-rotate(180deg);").is_ok(),
+            "hue-rotate-15" => write!(css_content, "--tw-hue-rotate: hue-rotate({}15deg);", if modifier.is_negative() { "-" } else { "" }).is_ok(),
+            "hue-rotate-30" => write!(css_content, "--tw-hue-rotate: hue-rotate({}30deg);", if modifier.is_negative() { "-" } else { "" }).is_ok(),
+            "hue-rotate-60" => write!(css_content, "--tw-hue-rotate: hue-rotate({}60deg);", if modifier.is_negative() { "-" } else { "" }).is_ok(),
+            "hue-rotate-90" => write!(css_content, "--tw-hue-rotate: hue-rotate({}90deg);", if modifier.is_negative() { "-" } else { "" }).is_ok(),
+            "hue-rotate-180" => write!(css_content, "--tw-hue-rotate: hue-rotate({}180deg);", if modifier.is_negative() { "-" } else { "" }).is_ok(),
             "invert-0" => write!(css_content, "--tw-invert: invert(0);").is_ok(),
             "invert" => write!(css_content, "--tw-invert: invert(100%);").is_ok(),
             "saturate-0" => write!(css_content, "--tw-saturate: saturate(0);").is_ok(),
@@ -89,14 +85,14 @@ impl Plugin for BackdropFilterPlugin {
         "backdrop"
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if modifier == "filter" {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.content() == "filter" {
             return write!(css_content, "{}", CSS_BACKDROP_FILTER).is_ok();
-        } else if modifier == "filter-none" {
+        } else if modifier.content() == "filter-none" {
             return write!(css_content, "filter: none;").is_ok();
         }
 
-        let result = match modifier {
+        let result = match modifier.content() {
             // TODO: Avoid duplication with the plugin above
             "blur-0" => write!(css_content, "--tw-backdrop-blur: blur(0);").is_ok(),
             "blur-sm" => write!(css_content, "--tw-backdrop-blur: blur(4px);").is_ok(),
@@ -133,17 +129,12 @@ impl Plugin for BackdropFilterPlugin {
             "drop-shadow-none" => write!(css_content, "--tw-backdrop-drop-shadow: drop-shadow: drop-shadow(0 0 #0000);").is_ok(),
             "grayscale-0" => write!(css_content, "--tw-backdrop-grayscale: grayscale(0);").is_ok(),
             "grayscale" => write!(css_content, "--tw-backdrop-grayscale: grayscale(100%);").is_ok(),
-            "-hue-rotate-180" => write!(css_content, "--tw-backdrop-hue-rotate: hue-rotate(-180deg);").is_ok(),
-            "-hue-rotate-90" => write!(css_content, "--tw-backdrop-hue-rotate: hue-rotate(-90deg);").is_ok(),
-            "-hue-rotate-60" => write!(css_content, "--tw-backdrop-hue-rotate: hue-rotate(-60deg);").is_ok(),
-            "-hue-rotate-30" => write!(css_content, "--tw-backdrop-hue-rotate: hue-rotate(-30deg);").is_ok(),
-            "-hue-rotate-15" => write!(css_content, "--tw-backdrop-hue-rotate: hue-rotate(-15deg);").is_ok(),
             "hue-rotate-0" => write!(css_content, "--tw-backdrop-hue-rotate: hue-rotate(0deg);").is_ok(),
-            "hue-rotate-15" => write!(css_content, "--tw-backdrop-hue-rotate: hue-rotate(15deg);").is_ok(),
-            "hue-rotate-30" => write!(css_content, "--tw-backdrop-hue-rotate: hue-rotate(30deg);").is_ok(),
-            "hue-rotate-60" => write!(css_content, "--tw-backdrop-hue-rotate: hue-rotate(60deg);").is_ok(),
-            "hue-rotate-90" => write!(css_content, "--tw-backdrop-hue-rotate: hue-rotate(90deg);").is_ok(),
-            "hue-rotate-180" => write!(css_content, "--tw-backdrop-hue-rotate: hue-rotate(180deg);").is_ok(),
+            "hue-rotate-15" => write!(css_content, "--tw-backdrop-hue-rotate: hue-rotate({}15deg);", if modifier.is_negative() { "-" } else { "" }).is_ok(),
+            "hue-rotate-30" => write!(css_content, "--tw-backdrop-hue-rotate: hue-rotate({}30deg);", if modifier.is_negative() { "-" } else { "" }).is_ok(),
+            "hue-rotate-60" => write!(css_content, "--tw-backdrop-hue-rotate: hue-rotate({}60deg);", if modifier.is_negative() { "-" } else { "" }).is_ok(),
+            "hue-rotate-90" => write!(css_content, "--tw-backdrop-hue-rotate: hue-rotate({}90deg);", if modifier.is_negative() { "-" } else { "" }).is_ok(),
+            "hue-rotate-180" => write!(css_content, "--tw-backdrop-hue-rotate: hue-rotate({}180deg);", if modifier.is_negative() { "-" } else { "" }).is_ok(),
             "invert-0" => write!(css_content, "--tw-backdrop-invert: invert(0);").is_ok(),
             "invert" => write!(css_content, "--tw-backdrop-invert: invert(100%);").is_ok(),
             "saturate-0" => write!(css_content, "--tw-backdrop-saturate: saturate(0);").is_ok(),

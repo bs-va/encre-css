@@ -1,12 +1,4 @@
-// TODO: Negative values
-pub fn get_basic(val: &str) -> Option<String> {
-    // TODO: Duplicated with src/selector.rs:17-21
-    let (val, is_negative) = if let Some(val) = val.strip_prefix('-') {
-        (val, true)
-    } else {
-        (val, false)
-    };
-
+pub fn get_basic(val: &str, is_negative: bool) -> Option<String> {
     let absolute_result = match val {
         "px" => Some("1px".to_string()),
         "0" => Some("0px".to_string()),
@@ -53,14 +45,7 @@ pub fn get_basic(val: &str) -> Option<String> {
     }
 }
 
-pub fn get_fraction(val: &str) -> Option<String> {
-    // TODO: Duplicated with src/selector.rs:17-21
-    let (val, is_negative) = if let Some(val) = val.strip_prefix('-') {
-        (val, true)
-    } else {
-        (val, false)
-    };
-
+pub fn get_fraction(val: &str, is_negative: bool) -> Option<String> {
     let absolute_result = match val {
         "1/2" => Some("50%".to_string()),
         "1/3" => Some("33.333333%".to_string()),
@@ -115,11 +100,11 @@ pub fn get_keyword(val: &str) -> Option<String> {
     }
 }
 
-pub fn get_extended(val: &str) -> Option<String> {
-    get_keyword(val).or_else(|| get_basic(val).or_else(|| get_fraction(val)))
+pub fn get_extended(val: &str, is_negative: bool) -> Option<String> {
+    get_keyword(val).or_else(|| get_basic(val, is_negative).or_else(|| get_fraction(val, is_negative)))
 }
 
-pub fn get_extended_size(val: &str) -> Option<String> {
+pub fn get_extended_size(val: &str, is_negative: bool) -> Option<String> {
     get_keyword(val)
-        .or_else(|| get_keyword_size(val).or_else(|| get_basic(val).or_else(|| get_fraction(val))))
+        .or_else(|| get_keyword_size(val).or_else(|| get_basic(val, is_negative).or_else(|| get_fraction(val, is_negative))))
 }

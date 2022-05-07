@@ -1,4 +1,5 @@
 use super::Plugin;
+use crate::selector::Modifier;
 
 use std::fmt::Write;
 
@@ -10,8 +11,8 @@ impl Plugin for ScreenReaderPlugin {
         ""
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "sr-only" => write!(
                 css_content,
                 "position: absolute;

@@ -1,4 +1,5 @@
 use super::Plugin;
+use crate::selector::Modifier;
 use crate::utils::{default_lengths, value_matchers::*};
 
 use std::fmt::Write;
@@ -19,8 +20,8 @@ impl Plugin for WidthPlugin {
         write!(css_content, "width: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_extended_size(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if let Some(length) = default_lengths::get_extended_size(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -44,8 +45,8 @@ impl Plugin for MinWidthPlugin {
         write!(css_content, "min-width: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "0" => self.css_template_value("0", css_content),
             "full" => self.css_template_value("100%", css_content),
             "min" => self.css_template_value("min-content", css_content),
@@ -72,8 +73,8 @@ impl Plugin for MaxWidthPlugin {
         write!(css_content, "max-width: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "0" => self.css_template_value("0rem", css_content),
             "none" => self.css_template_value("none", css_content),
             "xs" => self.css_template_value("20rem", css_content),
@@ -120,8 +121,8 @@ impl Plugin for HeightPlugin {
         write!(css_content, "height: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_extended_size(modifier) {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if let Some(length) = default_lengths::get_extended_size(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -145,8 +146,8 @@ impl Plugin for MinHeightPlugin {
         write!(css_content, "min-height: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "0" => self.css_template_value("0", css_content),
             "full" => self.css_template_value("100%", css_content),
             "min" => self.css_template_value("min-content", css_content),
@@ -174,8 +175,8 @@ impl Plugin for MaxHeightPlugin {
         write!(css_content, "max-height: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
+    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        match modifier.content() {
             "0" => self.css_template_value("0rem", css_content),
             "none" => self.css_template_value("none", css_content),
             "xs" => self.css_template_value("20rem", css_content),

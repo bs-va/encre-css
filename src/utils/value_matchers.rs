@@ -2,7 +2,6 @@ use color_name::Color;
 use lazy_static::lazy_static;
 use regex::Regex;
 
-const AUTO_KEYWORD: &str = "auto";
 const LENGTH_UNITS: [&str; 16] = [
     "cm", "mm", "Q", "in", "pc", "pt", "px", "em", "ex", "ch", "rem", "lh", "vw", "vh", "vmin",
     "vmax",
@@ -77,10 +76,6 @@ lazy_static! {
 
 pub fn is_matching_all(_val: &str) -> bool {
     true
-}
-
-pub fn is_matching_auto(val: &str) -> bool {
-    val == AUTO_KEYWORD
 }
 
 pub fn is_matching_url(val: &str) -> bool {
