@@ -523,8 +523,12 @@ impl Plugin for ContentPlugin {
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
         // NOTE: Not-compatible with TailwindCSS, it is not needed to add quotes to `content`
         // containing spaces, they are added later
-        write!(css_content, "--tw-content: \"{val}\";
-content: var(--tw-content);").is_ok()
+        write!(
+            css_content,
+            "--tw-content: \"{val}\";
+content: var(--tw-content);"
+        )
+        .is_ok()
     }
 
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {

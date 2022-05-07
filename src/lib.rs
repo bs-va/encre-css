@@ -142,11 +142,7 @@ pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
                         acc
                     }
                     Variant::AtRule(at_rule) => {
-                        format!(
-                            "{} {{\n  {}\n}}",
-                            at_rule,
-                            indent(acc),
-                        )
+                        format!("{} {{\n  {}\n}}", at_rule, indent(acc),)
                     }
                 }
             },
@@ -154,11 +150,7 @@ pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
 
         rule.replace(WILL_BE_REPLACED_BY_CSS_SELECTOR, &css_selector)
     } else {
-        format!(
-            "{} {{\n  {}\n}}",
-            css_selector,
-            indent(css_content),
-        )
+        format!("{} {{\n  {}\n}}", css_selector, indent(css_content),)
     }
 }
 

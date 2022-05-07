@@ -666,7 +666,7 @@ impl Plugin for DivideWidthXPlugin {
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
         if !css_content.contains("--tw-divide-x-reverse") {
-            write!(css_content, "--tw-divide-x-reverse: 0;\n").ok();
+            writeln!(css_content, "--tw-divide-x-reverse: 0;").ok();
         }
 
         write!(
@@ -680,7 +680,7 @@ border-right-width: calc({val} * var(--tw-divide-x-reverse));"
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         // TODO: class with `> :not([hidden]) ~ :not([hidden])`
         if modifier.is_empty() {
-            write!(css_content, "--tw-divide-x-reverse: 0;\n").ok();
+            writeln!(css_content, "--tw-divide-x-reverse: 0;").ok();
             return self.css_template_value("1px", css_content);
         } else if modifier == "reverse" {
             return write!(css_content, "--tw-divide-x-reverse: 1;").is_ok();
@@ -688,7 +688,7 @@ border-right-width: calc({val} * var(--tw-divide-x-reverse));"
 
         // NOTE: Not-compatible with TailwindCSS, support all values
         if modifier.parse::<usize>().is_ok() {
-            write!(css_content, "--tw-divide-x-reverse: 0;\n").ok();
+            writeln!(css_content, "--tw-divide-x-reverse: 0;").ok();
             self.css_template_value(&format!("{}px", modifier), css_content)
         } else {
             false
@@ -710,7 +710,7 @@ impl Plugin for DivideWidthYPlugin {
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
         if !css_content.contains("--tw-divide-y-reverse") {
-            write!(css_content, "--tw-divide-y-reverse: 0;\n").ok();
+            writeln!(css_content, "--tw-divide-y-reverse: 0;").ok();
         }
 
         write!(
@@ -724,7 +724,7 @@ impl Plugin for DivideWidthYPlugin {
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         // TODO: class with `> :not([hidden]) ~ :not([hidden])`
         if modifier.is_empty() {
-            write!(css_content, "--tw-divide-y-reverse: 0;\n").ok();
+            writeln!(css_content, "--tw-divide-y-reverse: 0;").ok();
             return self.css_template_value("1px", css_content);
         } else if modifier == "reverse" {
             return write!(css_content, "--tw-divide-y-reverse: 1;").is_ok();
@@ -732,7 +732,7 @@ impl Plugin for DivideWidthYPlugin {
 
         // NOTE: Not-compatible with TailwindCSS, support all values
         if modifier.parse::<usize>().is_ok() {
-            write!(css_content, "--tw-divide-y-reverse: 0;\n").ok();
+            writeln!(css_content, "--tw-divide-y-reverse: 0;").ok();
             self.css_template_value(&format!("{}px", modifier), css_content)
         } else {
             false
