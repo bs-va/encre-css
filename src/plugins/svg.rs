@@ -88,11 +88,11 @@ impl Plugin for StrokeWidthPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
-        match modifier {
-            "0" => write!(css_content, "stroke-width: 0;").is_ok(),
-            "1" => write!(css_content, "stroke-width: 1;").is_ok(),
-            "2" => write!(css_content, "stroke-width: 2;").is_ok(),
-            _ => false,
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        if modifier.parse::<f32>().is_ok() {
+            self.css_template_value(&format!("{}px", modifier), css_content)
+        } else {
+            false
         }
     }
 }

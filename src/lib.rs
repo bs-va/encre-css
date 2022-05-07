@@ -30,15 +30,11 @@ use selector::Selector;
 use variant::{Variant, VARIANTS};
 
 // TODO features:
-// - Cache (dedup directly by scanning in all files at once (+ use rayon later))
-// - Variant stacking (instead let variant = split.next()..., reverse the iterator and collect all
-// variants)
-// - Find changed files (using timestamp of generated files and timestamp of source files)
+// - Cache
 // - Real prefix (like tw-)???
 // - CSS variant for dark: configurable
 // - Configurable preflight
 // - Support a safelist in the configuration file
-// - Avoid `--tw-bg-opacity: 1;` (+ helper function for it)
 
 lazy_static! {
     static ref SPLIT_REGEX: Regex = Regex::new(r#"(?-u)[\s'"`;>=]+"#).unwrap();
