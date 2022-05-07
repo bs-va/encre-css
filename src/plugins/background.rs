@@ -26,7 +26,7 @@ impl Plugin for ColorPlugin {
             write!(
                 css_content,
                 "--tw-bg-opacity: 1;
-  background-color: {};",
+background-color: {};",
                 val.replace("--tw-opacity", "--tw-bg-opacity")
             )
             .is_ok()
@@ -185,7 +185,7 @@ impl Plugin for GradientFromPlugin {
         write!(
             css_content,
             "--tw-gradient-from: {val};
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, {default_to});"
+--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, {default_to});"
         )
         .is_ok()
     }

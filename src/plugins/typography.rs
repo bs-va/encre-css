@@ -28,7 +28,7 @@ impl Plugin for ColorPlugin {
             write!(
                 css_content,
                 "--tw-text-opacity: 1;
-  color: {};",
+color: {};",
                 val.replace("--tw-opacity", "--tw-text-opacity")
             )
             .is_ok()
@@ -133,79 +133,79 @@ impl Plugin for FontSizePlugin {
             "xs" => write!(
                 css_content,
                 "font-size: 0.75rem;
-  line-height: 1rem;"
+line-height: 1rem;"
             )
             .is_ok(),
             "sm" => write!(
                 css_content,
                 "font-size: 0.875rem;
-  line-height: 1.25rem;"
+line-height: 1.25rem;"
             )
             .is_ok(),
             "base" => write!(
                 css_content,
                 "font-size: 1rem;
-  line-height: 1.5rem;"
+line-height: 1.5rem;"
             )
             .is_ok(),
             "lg" => write!(
                 css_content,
                 "font-size: 1.125rem;
-  line-height: 1.75rem;"
+line-height: 1.75rem;"
             )
             .is_ok(),
             "xl" => write!(
                 css_content,
                 "font-size: 1.25rem;
-  line-height: 1.75rem;"
+line-height: 1.75rem;"
             )
             .is_ok(),
             "2xl" => write!(
                 css_content,
                 "font-size: 1.5rem;
-  line-height: 2rem;"
+line-height: 2rem;"
             )
             .is_ok(),
             "3xl" => write!(
                 css_content,
                 "font-size: 1.875rem;
-  line-height: 2.25rem;"
+line-height: 2.25rem;"
             )
             .is_ok(),
             "4xl" => write!(
                 css_content,
                 "font-size: 2.25rem;
-  line-height: 2.5rem;"
+line-height: 2.5rem;"
             )
             .is_ok(),
             "5xl" => write!(
                 css_content,
                 "font-size: 3rem;
-  line-height: 1;"
+line-height: 1;"
             )
             .is_ok(),
             "6xl" => write!(
                 css_content,
                 "font-size: 3.75rem;
-  line-height: 1;"
+line-height: 1;"
             )
             .is_ok(),
             "7xl" => write!(
                 css_content,
                 "font-size: 4.5rem;
-  line-height: 1;"
+line-height: 1;"
             )
             .is_ok(),
             "8xl" => write!(
                 css_content,
                 "font-size: 6rem;
-  line-height: 1;"
+line-height: 1;"
             )
             .is_ok(),
             "9xl" => write!(
                 css_content,
                 "font-size: 8rem;
-  line-height: 1;"
+line-height: 1;"
             )
             .is_ok(),
             _ => false,
@@ -370,7 +370,12 @@ pub struct TextDecorationPlugin;
 impl Plugin for TextDecorationPlugin {
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         if ["underline", "overline", "line-through", "no-underline"].contains(&modifier) {
-            write!(css_content, "text-decoration-line: {modifier};").is_ok()
+            write!(
+                css_content,
+                "-webkit-text-decoration-line: {modifier};
+text-decoration-line: {modifier};"
+            )
+            .is_ok()
         } else {
             false
         }
@@ -394,7 +399,7 @@ impl Plugin for TextDecorationColorPlugin {
             write!(
                 css_content,
                 "-webkit-text-decoration-color: {color};
-  text-decoration-color: {color};",
+text-decoration-color: {color};",
                 color = val.replace(" / var(--tw-opacity)", "")
             )
             .is_ok()
@@ -402,7 +407,7 @@ impl Plugin for TextDecorationColorPlugin {
             write!(
                 css_content,
                 "-webkit-text-decoration-color: {val};
-  text-decoration-color: {val};"
+text-decoration-color: {val};"
             )
             .is_ok()
         }
@@ -518,7 +523,8 @@ impl Plugin for ContentPlugin {
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
         // NOTE: Not-compatible with TailwindCSS, it is not needed to add quotes to `content`
         // containing spaces, they are added later
-        write!(css_content, "content: \"{val}\";").is_ok()
+        write!(css_content, "--tw-content: \"{val}\";
+content: var(--tw-content);").is_ok()
     }
 
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
@@ -544,56 +550,56 @@ impl Plugin for FontVariantNumericPlugin {
             "ordinal" => write!(
                 css_content,
                 "--tw-ordinal: ordinal;
-  {}",
+{}",
                 CSS_FONT_VARIANT_NUMERIC
             )
             .is_ok(),
             "slashed-zero" => write!(
                 css_content,
                 "--tw-slashed-zero: slashed-zero;
-  {}",
+{}",
                 CSS_FONT_VARIANT_NUMERIC
             )
             .is_ok(),
             "lining-nums" => write!(
                 css_content,
                 "--tw-numeric-figure: lining-nums;
-  {}",
+{}",
                 CSS_FONT_VARIANT_NUMERIC
             )
             .is_ok(),
             "oldstyle-nums" => write!(
                 css_content,
                 "--tw-numeric-figure: oldstyle-nums;
-  {}",
+{}",
                 CSS_FONT_VARIANT_NUMERIC
             )
             .is_ok(),
             "proportional-nums" => write!(
                 css_content,
                 "--tw-numeric-spacing: proportional-nums;
-  {}",
+{}",
                 CSS_FONT_VARIANT_NUMERIC
             )
             .is_ok(),
             "tabular-nums" => write!(
                 css_content,
                 "--tw-numeric-spacing: tabular-nums;
-  {}",
+{}",
                 CSS_FONT_VARIANT_NUMERIC
             )
             .is_ok(),
             "diagonal-fractions" => write!(
                 css_content,
                 "--tw-numeric-fraction: diagonal-fractions;
-  {}",
+{}",
                 CSS_FONT_VARIANT_NUMERIC
             )
             .is_ok(),
             "stacked-fractions" => write!(
                 css_content,
                 "--tw-numeric-fraction: stacked-fractions;
-  {}",
+{}",
                 CSS_FONT_VARIANT_NUMERIC
             )
             .is_ok(),
@@ -615,13 +621,13 @@ impl Plugin for FontSmoothingPlugin {
             "antialised" => write!(
                 css_content,
                 "-webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;"
+-moz-osx-font-smoothing: grayscale;"
             )
             .is_ok(),
             "subpixel-antialised" => write!(
                 css_content,
                 "-webkit-font-smoothing: auto;
-  -moz-osx-font-smoothing: auto;"
+-moz-osx-font-smoothing: auto;"
             )
             .is_ok(),
             _ => false,
@@ -712,8 +718,8 @@ impl Plugin for TextOverflowPlugin {
             "truncate" => write!(
                 css_content,
                 "overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;"
+text-overflow: ellipsis;
+white-space: nowrap;"
             )
             .is_ok(),
             "text-ellipsis" => write!(css_content, "text-overflow: ellipsis;").is_ok(),
@@ -753,7 +759,7 @@ impl Plugin for WordBreakPlugin {
             "normal" => write!(
                 css_content,
                 "overflow-wrap: normal;
-  word-break: normal;"
+word-break: normal;"
             )
             .is_ok(),
             "words" => write!(css_content, "overflow-wrap: break-word;").is_ok(),

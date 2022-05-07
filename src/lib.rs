@@ -27,7 +27,7 @@ use std::{fs, io::Read, path::PathBuf};
 use plugins::PLUGINS;
 use preflight::TAILWIND_PREFLIGHT_CSS;
 use selector::Selector;
-use variant::VARIANTS;
+use variant::{Variant, VARIANTS};
 
 // TODO features:
 // - Cache (dedup directly by scanning in all files at once (+ use rayon later))
@@ -38,6 +38,7 @@ use variant::VARIANTS;
 // - CSS variant for dark: configurable
 // - Configurable preflight
 // - Support a safelist in the configuration file
+// - Avoid `--tw-bg-opacity: 1;` (+ helper function for it)
 
 lazy_static! {
     static ref SPLIT_REGEX: Regex = Regex::new(r#"(?-u)[\s'"`;>=]+"#).unwrap();
@@ -74,6 +75,12 @@ pub fn to_css_value(val: &str) -> String {
 /// <https://v2.tailwindcss.com/docs/just-in-time-mode#arbitrary-value-support>
 pub const VALID_PLUGIN_HINT: [&str; 4] = ["color", "length", "angle", "list"];
 
+const WILL_BE_REPLACED_BY_CSS_SELECTOR: &str = "WILL_BE_REPLACED_BY_CSS_SELECTOR";
+
+pub fn indent(val: String) -> String {
+    val.replace('\n', "\n  ")
+}
+
 /// Generate a complete CSS rule (with a class selector, a rule content and, if requested, some
 /// pseudo-elements or `@media` queries)
 pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
@@ -92,6 +99,14 @@ pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
         .replace('.', "\\.")
         .replace('!', "\\!");
 
+    if css_selector.starts_with(char::is_numeric) {
+        // CSS classes are not supposed to start with a number, we need to escape it
+        css_selector.insert_str(0, "\\3");
+    }
+
+    // A CSS class starts with a `.`
+    css_selector.insert(0, '.');
+
     let css_content = if selector.is_important() {
         css_content.replace(';', " !important;")
     } else {
@@ -100,31 +115,50 @@ pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
 
     let variants = selector.get_variants();
     if !variants.is_empty() {
-        variants.iter().fold(String::new(), |acc, variant| {
-            let right_variant = if let Some(result) = VARIANTS.get(variant.as_str()) {
-                result
-            } else {
-                panic!("Unknown variant: {}", variant);
-            };
-
-            right_variant.split('\n').map(|v| {
-                if v.contains('&') {
-                    // Class-based variant
-                    css_selector = v.replace('&', &css_selector);
-                    format!(".{} {{\n  {}\n}}", css_selector, css_content)
+        let rule = variants.iter().fold(
+            format!(
+                "{} {{\n  {}\n}}",
+                WILL_BE_REPLACED_BY_CSS_SELECTOR,
+                indent(css_content),
+            ),
+            |acc, variant| {
+                let right_variant = if let Some(result) = VARIANTS.get(variant.as_str()) {
+                    result
                 } else {
-                    // Query-based variant (`@media`)
-                    // Indentation is automatically changed
-                    if acc.is_empty() {
-                        format!("{} {{\n  .{} {{\n    {}\n  }}\n}}", v, css_selector, css_content.replace('\n', "\n  "))
-                    } else {
-                        format!("{} {{\n  {}\n}}", v, acc.replace('\n', "\n  "))
+                    panic!("Unknown variant: {}", variant);
+                };
+
+                match right_variant {
+                    Variant::PseudoClass(name) => {
+                        css_selector.push_str(&format!(":{}", name));
+                        acc
+                    }
+                    Variant::PseudoElement(name) => {
+                        css_selector.push_str(&format!("::{}", name));
+                        acc
+                    }
+                    Variant::WrapSelector(template) => {
+                        css_selector = template.replace('&', &css_selector);
+                        acc
+                    }
+                    Variant::AtRule(at_rule) => {
+                        format!(
+                            "{} {{\n  {}\n}}",
+                            at_rule,
+                            indent(acc),
+                        )
                     }
                 }
-            }).collect::<Vec<String>>().join("\n\n")
-        })
+            },
+        );
+
+        rule.replace(WILL_BE_REPLACED_BY_CSS_SELECTOR, &css_selector)
     } else {
-        format!(".{} {{\n  {}\n}}", css_selector, &css_content)
+        format!(
+            "{} {{\n  {}\n}}",
+            css_selector,
+            indent(css_content),
+        )
     }
 }
 
@@ -227,9 +261,9 @@ impl TailwindGenerator {
                         None
                     };
 
-                    if let Some(arbitrary_value) = arbitrary_value {
-                        let mut css_content = String::new();
+                    let mut css_content = String::new();
 
+                    if let Some(arbitrary_value) = arbitrary_value {
                         if plugin.is_matching_value(arbitrary_value.0, arbitrary_value.1)
                             && plugin.css_template_value(
                                 &to_css_value(arbitrary_value.1),
@@ -238,15 +272,11 @@ impl TailwindGenerator {
                         {
                             return Some(gen_css_rule(selector, &css_content));
                         }
-                    } else {
-                        let mut css_content = String::new();
-
-                        if plugin.get_css_for_modifier(
-                            &selector.get_modifier(plugin.namespace()),
-                            &mut css_content,
-                        ) {
-                            return Some(gen_css_rule(selector, &css_content));
-                        }
+                    } else if plugin.get_css_for_modifier(
+                        &selector.get_modifier(plugin.namespace()),
+                        &mut css_content,
+                    ) {
+                        return Some(gen_css_rule(selector, &css_content));
                     }
                 }
             }
@@ -328,6 +358,103 @@ mod tests {
             )
         );
     }
+
+    #[test]
+    fn gen_selector_css_test_variants() {
+        let mut generator = TailwindGenerator::new();
+        generator.add_selector("sm:hover:bg-red-400");
+        generator.add_selector("focus:hover:bg-red-600");
+        generator.add_selector("active:rtl:bg-red-800");
+        generator.add_selector("md:focus:selection:bg-blue-100");
+        generator.add_selector("rtl:active:focus:lg:underline");
+        generator.add_selector("print:ltr:xl:hover:focus:active:text-yellow-300");
+        generator.add_selector("2xl:motion-safe:landscape:focus-within:visited:first:odd:checked:open:rtl:bg-purple-100");
+        generator.add_selector("hover:file:bg-pink-600");
+        generator.add_selector("file:hover:bg-pink-600");
+        generator.add_selector("sm:before:target:content-[Hello_world!]");
+        generator.add_selector("marker:selection:hover:bg-green-200");
+
+        assert_eq!(
+            generator.generate(),
+            format!(
+                r#"{}@media (min-width: 640px) {{
+  .sm\:hover\:bg-red-400:hover {{
+    --tw-bg-opacity: 1;
+    background-color: rgb(248 113 113 / var(--tw-bg-opacity));
+  }}
+}}
+
+.focus\:hover\:bg-red-600:hover:focus {{
+  --tw-bg-opacity: 1;
+  background-color: rgb(220 38 38 / var(--tw-bg-opacity));
+}}
+
+[dir="rtl"] .active\:rtl\:bg-red-800:active {{
+  --tw-bg-opacity: 1;
+  background-color: rgb(153 27 27 / var(--tw-bg-opacity));
+}}
+
+@media (min-width: 768px) {{
+  .md\:focus\:selection\:bg-blue-100 *::selection, .md\:focus\:selection\:bg-blue-100::selection:focus {{
+    --tw-bg-opacity: 1;
+    background-color: rgb(219 234 254 / var(--tw-bg-opacity));
+  }}
+}}
+
+@media (min-width: 1024px) {{
+  [dir="rtl"] .rtl\:active\:focus\:lg\:underline:focus:active {{
+    -webkit-text-decoration-line: underline;
+    text-decoration-line: underline;
+  }}
+}}
+
+@media print {{
+  @media (min-width: 1280px) {{
+    [dir="ltr"] .print\:ltr\:xl\:hover\:focus\:active\:text-yellow-300:active:focus:hover {{
+      --tw-text-opacity: 1;
+      color: rgb(253 224 71 / var(--tw-text-opacity));
+    }}
+  }}
+}}
+
+@media (min-width: 1536px) {{
+  @media (prefers-reduced-motion: no-preference) {{
+    @media (orientation: landscape) {{
+      [dir="rtl"] .\32xl\:motion-safe\:landscape\:focus-within\:visited\:first\:odd\:checked\:open\:rtl\:bg-purple-100[open]:checked:nth-child(odd):first-child:visited:focus-within {{
+        --tw-bg-opacity: 1;
+        background-color: rgb(243 232 255 / var(--tw-bg-opacity));
+      }}
+    }}
+  }}
+}}
+
+.hover\:file\:bg-pink-600::file-selector-button:hover {{
+  --tw-bg-opacity: 1;
+  background-color: rgb(219 39 119 / var(--tw-bg-opacity));
+}}
+
+.file\:hover\:bg-pink-600:hover::file-selector-button {{
+  --tw-bg-opacity: 1;
+  background-color: rgb(219 39 119 / var(--tw-bg-opacity));
+}}
+
+@media (min-width: 640px) {{
+  .sm\:before\:target\:content-\[Hello_world\!\]:target::before {{
+    --tw-content: "Hello world!";
+    content: var(--tw-content);
+  }}
+}}
+
+.marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection *::marker, .marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection::marker {{
+  --tw-bg-opacity: 1;
+  background-color: rgb(187 247 208 / var(--tw-bg-opacity));
+}}"#,
+                preflight::TAILWIND_PREFLIGHT_CSS
+            )
+        );
+    }
+
+    // TODO: Test dedup, test ::selection or ::marker
 
     /*#[test]
     fn gen_css_from_files_test() {

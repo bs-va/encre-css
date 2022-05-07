@@ -45,7 +45,7 @@ impl Plugin for PaddingXPlugin {
         write!(
             css_content,
             "padding-left: {val};
-  padding-right: {val};"
+padding-right: {val};"
         )
         .is_ok()
     }
@@ -75,7 +75,7 @@ impl Plugin for PaddingYPlugin {
         write!(
             css_content,
             "padding-top: {val};
-  padding-bottom: {val};"
+padding-bottom: {val};"
         )
         .is_ok()
     }
@@ -236,7 +236,7 @@ impl Plugin for MarginXPlugin {
         write!(
             css_content,
             "margin-left: {val};
-  margin-right: {val};"
+margin-right: {val};"
         )
         .is_ok()
     }
@@ -270,7 +270,7 @@ impl Plugin for MarginYPlugin {
         write!(
             css_content,
             "margin-top: {val};
-  margin-bottom: {val};"
+margin-bottom: {val};"
         )
         .is_ok()
     }
@@ -424,7 +424,7 @@ impl Plugin for SpaceXPlugin {
         write!(
             css_content,
             "margin-left: calc({val} * calc(1 - var(--tw-space-x-reverse)));
-  margin-right: calc({val} * var(--tw-space-x-reverse));"
+margin-right: calc({val} * var(--tw-space-x-reverse));"
         )
         .is_ok()
     }
@@ -464,7 +464,7 @@ impl Plugin for SpaceYPlugin {
         write!(
             css_content,
             "margin-top: calc({val} * calc(1 - var(--tw-space-y-reverse)));
-  margin-bottom: calc({val} * var(--tw-space-y-reverse));"
+margin-bottom: calc({val} * var(--tw-space-y-reverse));"
         )
         .is_ok()
     }

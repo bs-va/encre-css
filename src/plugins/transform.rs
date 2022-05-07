@@ -61,7 +61,7 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
                     write!(
                         css_content,
                         "--tw-translate-x: {};
-  {}",
+{}",
                         length, CSS_TRANSFORM
                     )
                     .ok();
@@ -72,7 +72,7 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
                     write!(
                         css_content,
                         "--tw-translate-y: {};
-  {}",
+{}",
                         length, CSS_TRANSFORM
                     )
                     .ok();
@@ -88,7 +88,7 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
                     write!(
                         css_content,
                         "--tw-scale-x: {};
-  {}",
+{}",
                         scale_value / 100.,
                         CSS_TRANSFORM
                     )
@@ -100,7 +100,7 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
                     write!(
                         css_content,
                         "--tw-scale-y: {};
- {}",
+{}",
                         scale_value / 100.,
                         CSS_TRANSFORM
                     )
@@ -111,8 +111,8 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
                 write!(
                     css_content,
                     "--tw-scale-x: {val};
-  --tw-scale-y: {val};
-  {}",
+--tw-scale-y: {val};
+{}",
                     CSS_TRANSFORM,
                     val = scale_value / 100.
                 )
@@ -127,7 +127,7 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
                 write!(
                     css_content,
                     "--tw-rotate: {rotate_value}deg;
-  {}",
+{}",
                     CSS_TRANSFORM
                 )
                 .ok();
@@ -142,7 +142,7 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
                     write!(
                         css_content,
                         "--tw-skew-x: {skew_value}deg;
-  {}",
+{}",
                         CSS_TRANSFORM
                     )
                     .ok();
@@ -153,7 +153,7 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
                     write!(
                         css_content,
                         "--tw-skew-y: {skew_value}deg;
- {}",
+{}",
                         CSS_TRANSFORM
                     )
                     .ok();

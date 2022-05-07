@@ -77,7 +77,7 @@ impl Plugin for FilterPlugin {
             _ => return false,
         };
 
-        result && write!(css_content, "\n  {}", CSS_FILTER).is_ok()
+        result && write!(css_content, "\n{}", CSS_FILTER).is_ok()
     }
 }
 
@@ -156,6 +156,6 @@ impl Plugin for BackdropFilterPlugin {
             _ => return false,
         };
 
-        result && write!(css_content, "\n  {}", CSS_FILTER).is_ok()
+        result && write!(css_content, "\n{}", CSS_FILTER).is_ok()
     }
 }

@@ -28,24 +28,24 @@ impl Plugin for PropertyPlugin {
     fn get_css_for_modifier(&self, modifier: &str, css_content: &mut String) -> bool {
         match modifier {
             "" => write!(css_content, "transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;").is_ok(),
+transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+transition-duration: 150ms;").is_ok(),
             "none" => write!(css_content, "transition-property: none;").is_ok(),
             "all" => write!(css_content, "transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;").is_ok(),
+transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+transition-duration: 150ms;").is_ok(),
             "colors" => write!(css_content, "transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-  transition-timing-function: cubic-bezier(0.4, 0, 0);
-  transition-duration: 150ms;").is_ok(),
+transition-timing-function: cubic-bezier(0.4, 0, 0);
+transition-duration: 150ms;").is_ok(),
             "opacity" => write!(css_content, "transition-property: opacity;
-  transition-timing-function: cubic-bezier(0.4, 0, 0);
-  transition-duration: 150ms;").is_ok(),
+transition-timing-function: cubic-bezier(0.4, 0, 0);
+transition-duration: 150ms;").is_ok(),
             "shadow" => write!(css_content, "transition-property: box-shadow;
-  transition-timing-function: cubic-bezier(0.4, 0, 0);
-  transition-duration: 150ms;").is_ok(),
+transition-timing-function: cubic-bezier(0.4, 0, 0);
+transition-duration: 150ms;").is_ok(),
             "transform" => write!(css_content, "transition-property: transform;
-  transition-timing-function: cubic-bezier(0.4, 0, 0);
-  transition-duration: 150ms;").is_ok(),
+transition-timing-function: cubic-bezier(0.4, 0, 0);
+transition-duration: 150ms;").is_ok(),
             _ => false,
         }
     }

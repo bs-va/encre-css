@@ -50,8 +50,8 @@ impl Plugin for AppearancePlugin {
             write!(
                 css_content,
                 "-webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;"
+-moz-appearance: none;
+appearance: none;"
             )
             .is_ok()
         } else {
@@ -258,7 +258,7 @@ impl Plugin for ScrollMarginXPlugin {
         write!(
             css_content,
             "scroll-margin-left: {val};
-  scroll-margin-right: {val};"
+scroll-margin-right: {val};"
         )
         .is_ok()
     }
@@ -292,7 +292,7 @@ impl Plugin for ScrollMarginYPlugin {
         write!(
             css_content,
             "scroll-margin-top: {val};
-  scroll-margin-bottom: {val};"
+scroll-margin-bottom: {val};"
         )
         .is_ok()
     }
@@ -469,7 +469,7 @@ impl Plugin for ScrollPaddingXPlugin {
         write!(
             css_content,
             "scroll-padding-left: {val};
-  scroll-padding-right: {val};"
+scroll-padding-right: {val};"
         )
         .is_ok()
     }
@@ -499,7 +499,7 @@ impl Plugin for ScrollPaddingYPlugin {
         write!(
             css_content,
             "scroll-padding-top: {val};
-  scroll-padding-bottom: {val};"
+scroll-padding-bottom: {val};"
         )
         .is_ok()
     }
@@ -662,25 +662,25 @@ impl Plugin for ScrollSnapTypePlugin {
             "none" => write!(
                 css_content,
                 "-ms-scroll-snap-type: none;
-  scroll-snap-type: none;"
+scroll-snap-type: none;"
             )
             .is_ok(),
             "x" => write!(
                 css_content,
                 "-ms-scroll-snap-type: x var(--tw-scroll-snap-strictness);
-  scroll-snap-type: x var(--tw-scroll-snap-strictness);"
+scroll-snap-type: x var(--tw-scroll-snap-strictness);"
             )
             .is_ok(),
             "y" => write!(
                 css_content,
                 "-ms-scroll-snap-type: y var(--tw-scroll-snap-strictness);
-  scroll-snap-type: y var(--tw-scroll-snap-strictness);"
+scroll-snap-type: y var(--tw-scroll-snap-strictness);"
             )
             .is_ok(),
             "both" => write!(
                 css_content,
                 "-ms-scroll-snap-type: both var(--tw-scroll-snap-strictness);
-  scroll-snap-type: both var(--tw-scroll-snap-strictness);"
+scroll-snap-type: both var(--tw-scroll-snap-strictness);"
             )
             .is_ok(),
             "mandatory" => write!(css_content, "--tw-scroll-snap-strictness: mandatory;").is_ok(),

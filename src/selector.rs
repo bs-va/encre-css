@@ -13,7 +13,6 @@ pub struct Selector {
     full_name: String,
     variants: Vec<String>,
     content: String,
-    arbitrary_value: Option<String>,
     is_negative: bool,
     is_important: bool,
 }
@@ -33,18 +32,12 @@ impl Selector {
             (data, false)
         };
 
-        let arbitrary_value = {
-            if let Some(opening_index) = data.find('[') {
-                data.find(']')
-                    .map(|closing_index| data[opening_index + 1..closing_index].to_string())
-            } else {
-                None
-            }
-        };
-
         if VARIANT_REGEX.is_match(data) {
             // TODO: Escape `:` inside `[]`
-            let mut variants = data.split(VARIANT_SEPARATOR).map(|v| v.to_string()).collect::<Vec<String>>();
+            let mut variants = data
+                .split(VARIANT_SEPARATOR)
+                .map(|v| v.to_string())
+                .collect::<Vec<String>>();
             let content = variants.pop().unwrap();
 
             // Used to be compatible with TailwindCSS
@@ -54,7 +47,6 @@ impl Selector {
                 full_name: data.to_string(),
                 variants,
                 content,
-                arbitrary_value,
                 is_negative,
                 is_important,
             }
@@ -63,7 +55,6 @@ impl Selector {
                 full_name: data.to_string(),
                 variants: vec![],
                 content: data.to_string(), // TODO: Prevent
-                arbitrary_value,
                 is_negative,
                 is_important,
             }

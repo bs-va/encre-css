@@ -90,9 +90,9 @@ impl Plugin for InsetPlugin {
         write!(
             css_content,
             "top: {val};
-  right: {val};
-  bottom: {val};
-  left: {val};"
+right: {val};
+bottom: {val};
+left: {val};"
         )
         .is_ok()
     }
@@ -122,7 +122,7 @@ impl Plugin for InsetXPlugin {
         write!(
             css_content,
             "left: {val};
-  right: {val};"
+right: {val};"
         )
         .is_ok()
     }
@@ -152,7 +152,7 @@ impl Plugin for InsetYPlugin {
         write!(
             css_content,
             "top: {val};
-  bottom: {val};"
+bottom: {val};"
         )
         .is_ok()
     }

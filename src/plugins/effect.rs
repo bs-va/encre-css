@@ -88,33 +88,33 @@ impl Plugin for BoxShadowPlugin {
             "" => write!(
                 css_content,
                 "--tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
-  {}", CSS_SHADOW).is_ok(),
+--tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
+{}", CSS_SHADOW).is_ok(),
             "sm" => write!(css_content, "--tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
-  {}", CSS_SHADOW).is_ok(),
+--tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
+{}", CSS_SHADOW).is_ok(),
             "md" => write!(
                 css_content,
                 "--tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
-  {}", CSS_SHADOW).is_ok(),
+--tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+{}", CSS_SHADOW).is_ok(),
             "lg" => write!(
                 css_content,
                 "--tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
-  {}", CSS_SHADOW).is_ok(),
+--tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
+{}", CSS_SHADOW).is_ok(),
             "xl" => write!(
                 css_content,
                 "--tw-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
-  {}", CSS_SHADOW).is_ok(),
+--tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
+{}", CSS_SHADOW).is_ok(),
             "2xl" => write!(css_content, "--tw-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-  --tw-shadow-colored: 0 25px 50px -12px var(--tw-shadow-color);
-  {}", CSS_SHADOW).is_ok(),
+--tw-shadow-colored: 0 25px 50px -12px var(--tw-shadow-color);
+{}", CSS_SHADOW).is_ok(),
             "inner" => {
                 write!(css_content, "--tw-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
-  --tw-shadow-colored: inset 0 2px 4px 0 var(--tw-shadow-color);
-  {}", CSS_SHADOW).is_ok()
+--tw-shadow-colored: inset 0 2px 4px 0 var(--tw-shadow-color);
+{}", CSS_SHADOW).is_ok()
             }
             "none" => self.css_template_value("none", css_content),
             _ => false,
@@ -139,13 +139,17 @@ impl Plugin for BoxShadowColorPlugin {
             write!(
                 css_content,
                 "--tw-shadow-color: {};
-  --tw-shadow: var(--tw-shadow-colored);",
+--tw-shadow: var(--tw-shadow-colored);",
                 val.replace("/ var(--tw-opacity)", "")
             )
             .is_ok()
         } else {
-            write!(css_content, "--tw-shadow-color: {val};
-  --tw-shadow: var(--tw-shadow-colored);").is_ok()
+            write!(
+                css_content,
+                "--tw-shadow-color: {val};
+--tw-shadow: var(--tw-shadow-colored);"
+            )
+            .is_ok()
         }
     }
 
