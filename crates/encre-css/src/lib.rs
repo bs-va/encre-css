@@ -31,7 +31,9 @@ use plugins::PLUGINS;
 use preflight::ENCRE_PREFLIGHT_CSS;
 use selector::Selector;
 use variant::{Variant, VARIANTS};
-use config::Config;
+
+pub use config::Config;
+pub use error::Error;
 
 lazy_static! {
     static ref SPLIT_REGEX: Regex = Regex::new(r#"(?-u)[\s'"`;>=]+"#).unwrap();
@@ -175,7 +177,7 @@ impl EncreGenerator {
     ///
     /// The paths in the [`Config::content`] field of the configuration will be scanned
     pub fn from_config(config: Config) -> Self {
-        let content = config.input.clone();
+        let input = config.input.clone();
 
         let mut result = Self {
             config,
@@ -184,7 +186,7 @@ impl EncreGenerator {
         };
 
         // TODO: Use rayon to make this part parallel
-        content.iter().for_each(|path| {
+        input.iter().for_each(|path| {
             result.scan_path(path);
         });
 
@@ -317,6 +319,12 @@ impl EncreGenerator {
         .collect::<Vec<String>>();
 
         format!("{}{}", ENCRE_PREFLIGHT_CSS, result.join("\n\n"))
+    }
+
+    /// Forget the scanned selectors (useful when repeatedly calling [`EncreGenerator::generate`])
+    pub fn clear_scanned_selectors(&mut self) {
+        self.scanned_selectors_without_variant.clear();
+        self.scanned_selectors_with_variant.clear();
     }
 }
 

@@ -1,6 +1,7 @@
-use std::{fs, time::Instant, path::PathBuf};
-use encre_css::EncreGenerator;
+use std::{fs, sync::mpsc::channel, time::{Instant, Duration}, path::PathBuf};
+use encre_css::{EncreGenerator, Config};
 use clap::Parser;
+use notify::{Watcher, RecursiveMode, DebouncedEvent::*, watcher};
 
 pub const DEFAULT_CONFIG_FILE: &str = "encre.toml";
 
@@ -20,13 +21,33 @@ struct Cli {
     #[clap(short)]
     output: Option<String>,
 
+    /// Watch for changes
+    #[clap(short, long)]
+    watch: bool,
+
     /// Whether to display the time taken to generate the CSS
     #[clap(long)]
     display_time: bool,
 }
 
+fn gen_css(generator: &EncreGenerator, output: Option<&PathBuf>, display_time: bool) {
+    let start = Instant::now();
+    let css = generator.generate();
+    let duration = start.elapsed();
+
+    if let Some(file) = output {
+        fs::write(file, css).expect("failed to write to the file");
+    } else {
+        // If no file is specified, the CSS generated is written to the standard output
+        println!("{}", css);
+    }
+
+    if display_time {
+        println!("CSS generated in {:?}", duration);
+    }
+}
+
 fn main() {
-    // TODO: Watch mode
     let cli = Cli::parse();
 
     let config_file = if let Some(ref config_file) = cli.config {
@@ -35,24 +56,69 @@ fn main() {
         DEFAULT_CONFIG_FILE
     };
 
-    let start = Instant::now();
-    let mut generator = EncreGenerator::new(config_file.into());
+    if cli.watch {
+        let (tx, rx) = channel();
 
-    if let Some(path) = cli.input {
-        generator.scan_path(&path);
-    }
+        let mut watcher = watcher(tx, Duration::from_millis(500)).unwrap();
 
-    let css = generator.generate();
-    let duration = start.elapsed();
+        // Due to https://github.com/notify-rs/notify/issues/247, the whole current directory is
+        // watched
+        watcher.watch(".", RecursiveMode::Recursive).unwrap();
 
-    if let Some(file) = cli.output {
-        fs::write(file, css).expect("failed to write to the file");
+        let config = match Config::from_file(PathBuf::from(config_file)) {
+            Ok(config) => config,
+            Err(e) => {
+                eprintln!("{}", e);
+                Config::default()
+            },
+        };
+
+        let input = config.input.clone();
+        let mut generator = EncreGenerator::from_config(config);
+
+        if let Some(ref path) = cli.input {
+            generator.scan_path(path);
+        }
+
+        // Initial generation
+        gen_css(&generator, cli.output.as_ref().map(PathBuf::from).as_ref(), cli.display_time);
+
+        loop {
+            match rx.recv() {
+                // TODO: More clever reloading method (just reload changed files and prevent rebuilding an
+                // `EncreGenerator`)
+                Ok(event) => {
+                    if let Create(ref path) | Write(ref path) | Remove(ref path) | Rename(_, ref path) = event {
+                        // Prevent infinite loop because the watcher detects changes of the output file
+                        if let Some(ref output_path) = cli.output {
+                            if PathBuf::from(output_path).canonicalize().unwrap() == path.canonicalize().unwrap() {
+                                continue;
+                            }
+                        }
+
+                        generator.clear_scanned_selectors();
+
+                        input.iter().for_each(|path| {
+                            generator.scan_path(path);
+                        });
+
+                        if let Some(ref path) = cli.input {
+                            generator.scan_path(path);
+                        }
+
+                        gen_css(&generator, cli.output.as_ref().map(PathBuf::from).as_ref(), cli.display_time);
+                    }
+                },
+                Err(e) => println!("watch error: {:?}", e),
+            }
+        }
     } else {
-        // If no file is specified, the CSS generated is written to the standard output
-        println!("{}", css);
-    }
+        let mut generator = EncreGenerator::new(PathBuf::from(config_file));
 
-    if cli.display_time {
-        println!("CSS generated in {:?}", duration);
+        if let Some(path) = cli.input {
+            generator.scan_path(&path);
+        }
+
+        gen_css(&generator, cli.output.map(PathBuf::from).as_ref(), cli.display_time);
     }
 }
