@@ -1,12 +1,7 @@
 // TODO: Make the lines marked as `CAN BE EDITED` editable with a config file
-
-/// From <https://github.com/tailwindlabs/tailwindcss/blob/master/src/css/preflight.css>
-///
-/// Under the MIT license:
-/// <https://github.com/tailwindlabs/tailwindcss/blob/master/src/css/LICENSE>
-pub const TAILWIND_PREFLIGHT_CSS: &str = r#"/*
-1. Prevent padding and border from affecting element width. (https://github.com/mozdevs/cssremedy/issues/4)
-2. Allow adding a border to an element by just adding a border-width. (https://github.com/tailwindcss/tailwindcss/pull/116)
+pub const ENCRE_PREFLIGHT_CSS: &str = r#"/*
+1. Prevent padding and border from affecting element width.
+2. Allow adding a border to an element by just adding a border-width.
 */
 
 *,
@@ -310,7 +305,7 @@ textarea {
 }
 
 /*
-1. Reset the default placeholder opacity in Firefox. (https://github.com/tailwindlabs/tailwindcss/issues/3300)
+1. Reset the default placeholder opacity in Firefox.
 2. Set the default placeholder color to the user's configured gray 400 color.
 */
 

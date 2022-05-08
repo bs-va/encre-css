@@ -1,11 +1,11 @@
 use std::{env, iter, path::PathBuf, time::Instant};
-use tailwind_rs::TailwindGenerator;
+use encre_css::EncreGenerator;
 use wax::Glob;
 
 fn main() {
     // TODO: Clap (multiple input paths, output file, config file, ...)
     let args: Vec<String> = env::args().collect();
-    let mut generator = TailwindGenerator::new();
+    let mut generator = EncreGenerator::new();
 
     let (prefix, glob) = Glob::partitioned(&args[1]).unwrap();
     let path = PathBuf::from(&args[1]);

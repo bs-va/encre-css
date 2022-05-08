@@ -1,11 +1,11 @@
-//! A TailwindCSS compatible CSS generation library written in Rust
+//! A TailwindCSS-compatible CSS generation library written in Rust
 //!
 //! # Example
 //!
 //! ```rust
-//! use tailwind_rs::TailwindGenerator;
+//! use encre_css::EncreGenerator;
 //!
-//! let mut generator = TailwindGenerator::new();
+//! let mut generator = EncreGenerator::new();
 //! generator.scan_content(r#"class="bg-red-500""#);
 //!
 //! assert!(generator.generate().contains(r#".bg-red-500 {
@@ -25,7 +25,7 @@ use regex::Regex;
 use std::{fs, io::Read, path::PathBuf};
 
 use plugins::PLUGINS;
-use preflight::TAILWIND_PREFLIGHT_CSS;
+use preflight::ENCRE_PREFLIGHT_CSS;
 use selector::Selector;
 use variant::{Variant, VARIANTS};
 
@@ -68,7 +68,6 @@ pub fn to_css_value(val: &str) -> String {
     }*/*/*/
 }
 
-/// <https://v2.tailwindcss.com/docs/just-in-time-mode#arbitrary-value-support>
 pub const VALID_PLUGIN_HINT: [&str; 4] = ["color", "length", "angle", "list"];
 
 const WILL_BE_REPLACED_BY_CSS_SELECTOR: &str = "WILL_BE_REPLACED_BY_CSS_SELECTOR";
@@ -152,12 +151,12 @@ pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
 
 /// Main structure used to generate CSS from selectors
 #[derive(Default)]
-pub struct TailwindGenerator {
+pub struct EncreGenerator {
     scanned_selectors_without_variant: Vec<Selector>,
     scanned_selectors_with_variant: Vec<Selector>,
 }
 
-impl TailwindGenerator {
+impl EncreGenerator {
     pub fn new() -> Self {
         Self {
             scanned_selectors_without_variant: vec![],
@@ -204,9 +203,9 @@ impl TailwindGenerator {
     /// NOTE: Don't forget to scan selectors using either [scan_files] or [scan_content] or by
     /// adding individual selectors using [add_selector]
     ///
-    /// [scan_files]: TailwindGenerator::scan_files
-    /// [scan_content]: TailwindGenerator::scan_content
-    /// [add_selector]: TailwindGenerator::add_selector
+    /// [scan_files]: EncreGenerator::scan_files
+    /// [scan_content]: EncreGenerator::scan_content
+    /// [add_selector]: EncreGenerator::add_selector
     pub fn generate(&self) -> String {
         let result = [
             &self.scanned_selectors_without_variant,
@@ -273,7 +272,7 @@ impl TailwindGenerator {
         })
         .collect::<Vec<String>>();
 
-        format!("{}{}", TAILWIND_PREFLIGHT_CSS, result.join("\n\n"))
+        format!("{}{}", ENCRE_PREFLIGHT_CSS, result.join("\n\n"))
     }
 }
 
@@ -284,7 +283,7 @@ mod tests {
 
     #[test]
     fn scan_content_test() {
-        let mut generator = TailwindGenerator::new();
+        let mut generator = EncreGenerator::new();
         generator.scan_content(
             r#"<div class="w-full h-full absolute bg-blue-500 foo-bar sm:focus:ring hover:bg-black border-[#333] text-[color:var(--hello)]"></div>"#
         );
@@ -317,7 +316,7 @@ mod tests {
 
     #[test]
     fn gen_selector_css_test() {
-        let mut generator = TailwindGenerator::new();
+        let mut generator = EncreGenerator::new();
         generator.add_selector("w-full");
 
         assert_eq!(
@@ -326,14 +325,14 @@ mod tests {
                 r#"{}.w-full {{
   width: 100%;
 }}"#,
-                preflight::TAILWIND_PREFLIGHT_CSS
+                preflight::ENCRE_PREFLIGHT_CSS
             )
         );
     }
 
     #[test]
     fn gen_with_variant_selector_css_test() {
-        let mut generator = TailwindGenerator::new();
+        let mut generator = EncreGenerator::new();
         generator.add_selector("focus:w-full");
 
         assert_eq!(
@@ -342,14 +341,14 @@ mod tests {
                 r#"{}.focus\:w-full:focus {{
   width: 100%;
 }}"#,
-                preflight::TAILWIND_PREFLIGHT_CSS,
+                preflight::ENCRE_PREFLIGHT_CSS,
             )
         );
     }
 
     #[test]
     fn gen_selector_css_variants_test() {
-        let mut generator = TailwindGenerator::new();
+        let mut generator = EncreGenerator::new();
         generator.add_selector("sm:hover:bg-red-400");
         generator.add_selector("focus:hover:bg-red-600");
         generator.add_selector("active:rtl:bg-red-800");
@@ -437,14 +436,14 @@ mod tests {
   --tw-bg-opacity: 1;
   background-color: rgb(187 247 208 / var(--tw-bg-opacity));
 }}"#,
-                preflight::TAILWIND_PREFLIGHT_CSS
+                preflight::ENCRE_PREFLIGHT_CSS
             )
         );
     }
 
     #[test]
     fn gen_selector_css_negative_values_test() {
-        let mut generator = TailwindGenerator::new();
+        let mut generator = EncreGenerator::new();
         generator.add_selector("-translate-x-52");
         generator.add_selector("-mb-8");
         generator.add_selector("-hue-rotate-60");
@@ -463,12 +462,12 @@ mod tests {
 .-hue-rotate-60 {{
   --tw-hue-rotate: hue-rotate(-60deg);
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
-}}"#, preflight::TAILWIND_PREFLIGHT_CSS));
+}}"#, preflight::ENCRE_PREFLIGHT_CSS));
     }
 
     #[test]
     fn gen_selector_css_prevent_duplication_test() {
-        let mut generator = TailwindGenerator::new();
+        let mut generator = EncreGenerator::new();
         generator.add_selector("bg-red-500");
         generator.add_selector("bg-red-500");
         generator.add_selector("bg-red-500");
@@ -478,19 +477,6 @@ mod tests {
             format!(r#"{}.bg-red-500 {{
   --tw-bg-opacity: 1;
   background-color: rgb(239 68 68 / var(--tw-bg-opacity));
-}}"#, preflight::TAILWIND_PREFLIGHT_CSS));
+}}"#, preflight::ENCRE_PREFLIGHT_CSS));
     }
-
-    /*#[test]
-    fn gen_css_from_files_test() {
-        use std::{iter, fs};
-
-        let mut generator = TailwindGenerator::new();
-        generator.scan_files(iter::once("tests/fixtures/index.html".into()));
-
-        assert_eq!(
-            generator.generate(),
-            fs::read_to_string("tests/fixtures/should_be_generated.css").unwrap(),
-        );
-    }*/
 }
