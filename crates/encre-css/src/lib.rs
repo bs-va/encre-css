@@ -18,23 +18,20 @@ pub mod preflight;
 pub mod selector;
 pub mod utils;
 pub mod variant;
+pub mod config;
+pub mod error;
 
 use lazy_static::lazy_static;
 use rayon::prelude::*;
 use regex::Regex;
-use std::{fs, io::Read, path::PathBuf};
+use std::{fs, iter, io::Read, path::PathBuf};
+use wax::Glob;
 
 use plugins::PLUGINS;
 use preflight::ENCRE_PREFLIGHT_CSS;
 use selector::Selector;
 use variant::{Variant, VARIANTS};
-
-// TODO features:
-// - Cache
-// - Real prefix (like en-)???
-// - CSS variant for dark: configurable
-// - Configurable preflight
-// - Support a safelist in the configuration file
+use config::Config;
 
 lazy_static! {
     static ref SPLIT_REGEX: Regex = Regex::new(r#"(?-u)[\s'"`;>=]+"#).unwrap();
@@ -145,23 +142,53 @@ pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
 
         rule.replace(WILL_BE_REPLACED_BY_CSS_SELECTOR, &css_selector)
     } else {
-        format!("{} {{\n  {}\n}}", css_selector, indent(css_content),)
+        format!("{} {{\n  {}\n}}", css_selector, indent(css_content))
     }
 }
 
 /// Main structure used to generate CSS from selectors
 #[derive(Default)]
 pub struct EncreGenerator {
+    config: Config,
     scanned_selectors_without_variant: Vec<Selector>,
     scanned_selectors_with_variant: Vec<Selector>,
 }
 
 impl EncreGenerator {
-    pub fn new() -> Self {
-        Self {
+    /// Create a new [`EncreGenerator`] by trying to read a configuration file
+    ///
+    /// If the file does not exist, a warning will be emitted and the default configuration will be
+    /// used
+    pub fn new(path: PathBuf) -> Self {
+        let config = match Config::from_file(path) {
+            Ok(config) => config,
+            Err(e) => {
+                eprintln!("{}", e);
+                Config::default()
+            },
+        };
+
+        Self::from_config(config)
+    }
+
+    /// Create a new [`EncreGenerator`] using a given configuration
+    ///
+    /// The paths in the [`Config::content`] field of the configuration will be scanned
+    pub fn from_config(config: Config) -> Self {
+        let content = config.input.clone();
+
+        let mut result = Self {
+            config,
             scanned_selectors_without_variant: vec![],
             scanned_selectors_with_variant: vec![],
-        }
+        };
+
+        // TODO: Use rayon to make this part parallel
+        content.iter().for_each(|path| {
+            result.scan_path(path);
+        });
+
+        result
     }
 
     /// Add a new selector which will have its CSS generated
@@ -193,8 +220,25 @@ impl EncreGenerator {
         for file in files {
             let mut file = fs::File::open(file).unwrap();
             file_content.clear();
-            file.read_to_string(&mut file_content).unwrap();
-            self.scan_content(&file_content);
+
+            if file.read_to_string(&mut file_content).is_ok() {
+                self.scan_content(&file_content);
+            }
+            // TODO: Display a warning otherwise
+        }
+    }
+
+    /// Scan all files in a path using the glob syntax
+    pub fn scan_path(&mut self, glob_path: &PathBuf) {
+        let (prefix, glob) = Glob::partitioned(glob_path.to_str().expect("failed to convert the glob to a PathBuf")).unwrap();
+
+        if prefix == *glob_path {
+            self.scan_files(iter::once(glob_path.clone()));
+        } else {
+            self.scan_files(
+                glob.walk(prefix, usize::MAX)
+                    .map(|e| e.unwrap().into_path()),
+            );
         }
     }
 

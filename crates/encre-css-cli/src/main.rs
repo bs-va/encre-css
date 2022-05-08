@@ -1,28 +1,58 @@
-use std::{env, iter, path::PathBuf, time::Instant};
+use std::{fs, time::Instant, path::PathBuf};
 use encre_css::EncreGenerator;
-use wax::Glob;
+use clap::Parser;
+
+pub const DEFAULT_CONFIG_FILE: &str = "encre.toml";
+
+#[derive(Parser)]
+#[clap(author, version, about, long_about = None)]
+struct Cli {
+    /// The path to a custom configuration file
+    #[clap(short)]
+    config: Option<String>,
+
+    /// An extra input path not specified in the configuration file
+    #[clap(short)]
+    input: Option<PathBuf>,
+
+    /// Output file which will contains the generated CSS styles
+    /// (will be printed to the standard output by default)
+    #[clap(short)]
+    output: Option<String>,
+
+    /// Whether to display the time taken to generate the CSS
+    #[clap(long)]
+    display_time: bool,
+}
 
 fn main() {
-    // TODO: Clap (multiple input paths, output file, config file, ...)
-    let args: Vec<String> = env::args().collect();
-    let mut generator = EncreGenerator::new();
+    // TODO: Watch mode
+    let cli = Cli::parse();
 
-    let (prefix, glob) = Glob::partitioned(&args[1]).unwrap();
-    let path = PathBuf::from(&args[1]);
-    let start = Instant::now();
-
-    if prefix == path {
-        generator.scan_files(iter::once(path));
+    let config_file = if let Some(ref config_file) = cli.config {
+        config_file
     } else {
-        generator.scan_files(
-            glob.walk(prefix, usize::MAX)
-                .map(|e| e.unwrap().into_path()),
-        );
+        DEFAULT_CONFIG_FILE
+    };
+
+    let start = Instant::now();
+    let mut generator = EncreGenerator::new(config_file.into());
+
+    if let Some(path) = cli.input {
+        generator.scan_path(&path);
     }
 
     let css = generator.generate();
     let duration = start.elapsed();
 
-    println!("{}", css);
-    println!("/* CSS generated in {:?} */", duration);
+    if let Some(file) = cli.output {
+        fs::write(file, css).expect("failed to write to the file");
+    } else {
+        // If no file is specified, the CSS generated is written to the standard output
+        println!("{}", css);
+    }
+
+    if cli.display_time {
+        println!("CSS generated in {:?}", duration);
+    }
 }
