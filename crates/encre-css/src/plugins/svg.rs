@@ -17,11 +17,11 @@ impl Plugin for FillPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--tw-opacity") {
+        if val.contains("--en-opacity") {
             write!(
                 css_content,
                 "fill: {};",
-                val.replace("/ var(--tw-opacity)", "")
+                val.replace("/ var(--en-opacity)", "")
             )
             .is_ok()
         } else {
@@ -51,11 +51,11 @@ impl Plugin for StrokeColorPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--tw-opacity") {
+        if val.contains("--en-opacity") {
             write!(
                 css_content,
                 "stroke: {};",
-                val.replace("/ var(--tw-opacity)", "")
+                val.replace("/ var(--en-opacity)", "")
             )
             .is_ok()
         } else {

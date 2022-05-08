@@ -292,7 +292,7 @@ pub fn get(modifier: &str) -> Option<String> {
             if let Some(opacity) = opacity {
                 opacity.to_string()
             } else {
-                "var(--tw-opacity)".to_string()
+                "var(--en-opacity)".to_string()
             }
         )
     })

@@ -418,14 +418,14 @@ impl Plugin for SpaceXPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if !css_content.contains("--tw-space-x-reverse") {
-            write!(css_content, "--tw-space-x-reverse: 0;\n  ").ok();
+        if !css_content.contains("--en-space-x-reverse") {
+            write!(css_content, "--en-space-x-reverse: 0;\n  ").ok();
         }
 
         write!(
             css_content,
-            "margin-left: calc({val} * calc(1 - var(--tw-space-x-reverse)));
-margin-right: calc({val} * var(--tw-space-x-reverse));"
+            "margin-left: calc({val} * calc(1 - var(--en-space-x-reverse)));
+margin-right: calc({val} * var(--en-space-x-reverse));"
         )
         .is_ok()
     }
@@ -433,11 +433,11 @@ margin-right: calc({val} * var(--tw-space-x-reverse));"
     fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
         // TODO: class with `> :not([hidden]) ~ :not([hidden])`
         if modifier.is("reverse") {
-            return write!(css_content, "--tw-space-x-reverse: 1;").is_ok();
+            return write!(css_content, "--en-space-x-reverse: 1;").is_ok();
         }
 
         if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
-            write!(css_content, "--tw-space-x-reverse: 0;\n  ").ok();
+            write!(css_content, "--en-space-x-reverse: 0;\n  ").ok();
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -458,14 +458,14 @@ impl Plugin for SpaceYPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if !css_content.contains("--tw-space-y-reverse") {
-            write!(css_content, "--tw-space-y-reverse: 0;\n  ").ok();
+        if !css_content.contains("--en-space-y-reverse") {
+            write!(css_content, "--en-space-y-reverse: 0;\n  ").ok();
         }
 
         write!(
             css_content,
-            "margin-top: calc({val} * calc(1 - var(--tw-space-y-reverse)));
-margin-bottom: calc({val} * var(--tw-space-y-reverse));"
+            "margin-top: calc({val} * calc(1 - var(--en-space-y-reverse)));
+margin-bottom: calc({val} * var(--en-space-y-reverse));"
         )
         .is_ok()
     }
@@ -473,11 +473,11 @@ margin-bottom: calc({val} * var(--tw-space-y-reverse));"
     fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
         // TODO: class with `> :not([hidden]) ~ :not([hidden])`
         if modifier.is("reverse") {
-            return write!(css_content, "--tw-space-y-reverse: 1;").is_ok();
+            return write!(css_content, "--en-space-y-reverse: 1;").is_ok();
         }
 
         if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
-            write!(css_content, "--tw-space-y-reverse: 0;\n  ").ok();
+            write!(css_content, "--en-space-y-reverse: 0;\n  ").ok();
             self.css_template_value(&length, css_content)
         } else {
             false

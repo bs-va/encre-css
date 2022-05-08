@@ -6,7 +6,7 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use std::fmt::Write;
 
-pub const CSS_FONT_VARIANT_NUMERIC: &str = "font-variant-numeric: var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction);";
+pub const CSS_FONT_VARIANT_NUMERIC: &str = "font-variant-numeric: var(--en-ordinal) var(--en-slashed-zero) var(--en-numeric-figure) var(--en-numeric-spacing) var(--en-numeric-fraction);";
 
 lazy_static! {
     static ref START_WITH_INT_REGEX: Regex = Regex::new(r"(?-u)^\d").unwrap();
@@ -25,12 +25,12 @@ impl Plugin for ColorPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--tw-opacity") {
+        if val.contains("--en-opacity") {
             write!(
                 css_content,
-                "--tw-text-opacity: 1;
+                "--en-text-opacity: 1;
 color: {};",
-                val.replace("--tw-opacity", "--tw-text-opacity")
+                val.replace("--en-opacity", "--en-text-opacity")
             )
             .is_ok()
         } else {
@@ -58,7 +58,7 @@ impl Plugin for OpacityPlugin {
     fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.to_f32() {
-            write!(css_content, "--tw-text-opacity: {};", opacity_value / 100.).is_ok()
+            write!(css_content, "--en-text-opacity: {};", opacity_value / 100.).is_ok()
         } else {
             false
         }
@@ -396,12 +396,12 @@ impl Plugin for TextDecorationColorPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--tw-opacity") {
+        if val.contains("--en-opacity") {
             write!(
                 css_content,
                 "-webkit-text-decoration-color: {color};
 text-decoration-color: {color};",
-                color = val.replace(" / var(--tw-opacity)", "")
+                color = val.replace(" / var(--en-opacity)", "")
             )
             .is_ok()
         } else {
@@ -525,8 +525,8 @@ impl Plugin for ContentPlugin {
         // containing spaces, they are added later
         write!(
             css_content,
-            "--tw-content: \"{val}\";
-content: var(--tw-content);"
+            "--en-content: \"{val}\";
+content: var(--en-content);"
         )
         .is_ok()
     }
@@ -553,56 +553,56 @@ impl Plugin for FontVariantNumericPlugin {
             "normal-nums" => write!(css_content, "font-variant-numeric: normal;").is_ok(),
             "ordinal" => write!(
                 css_content,
-                "--tw-ordinal: ordinal;
+                "--en-ordinal: ordinal;
 {}",
                 CSS_FONT_VARIANT_NUMERIC
             )
             .is_ok(),
             "slashed-zero" => write!(
                 css_content,
-                "--tw-slashed-zero: slashed-zero;
+                "--en-slashed-zero: slashed-zero;
 {}",
                 CSS_FONT_VARIANT_NUMERIC
             )
             .is_ok(),
             "lining-nums" => write!(
                 css_content,
-                "--tw-numeric-figure: lining-nums;
+                "--en-numeric-figure: lining-nums;
 {}",
                 CSS_FONT_VARIANT_NUMERIC
             )
             .is_ok(),
             "oldstyle-nums" => write!(
                 css_content,
-                "--tw-numeric-figure: oldstyle-nums;
+                "--en-numeric-figure: oldstyle-nums;
 {}",
                 CSS_FONT_VARIANT_NUMERIC
             )
             .is_ok(),
             "proportional-nums" => write!(
                 css_content,
-                "--tw-numeric-spacing: proportional-nums;
+                "--en-numeric-spacing: proportional-nums;
 {}",
                 CSS_FONT_VARIANT_NUMERIC
             )
             .is_ok(),
             "tabular-nums" => write!(
                 css_content,
-                "--tw-numeric-spacing: tabular-nums;
+                "--en-numeric-spacing: tabular-nums;
 {}",
                 CSS_FONT_VARIANT_NUMERIC
             )
             .is_ok(),
             "diagonal-fractions" => write!(
                 css_content,
-                "--tw-numeric-fraction: diagonal-fractions;
+                "--en-numeric-fraction: diagonal-fractions;
 {}",
                 CSS_FONT_VARIANT_NUMERIC
             )
             .is_ok(),
             "stacked-fractions" => write!(
                 css_content,
-                "--tw-numeric-fraction: stacked-fractions;
+                "--en-numeric-fraction: stacked-fractions;
 {}",
                 CSS_FONT_VARIANT_NUMERIC
             )

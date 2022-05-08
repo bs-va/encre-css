@@ -4,7 +4,7 @@ use crate::utils::{default_lengths, value_matchers::*};
 
 use std::fmt::Write;
 
-pub const CSS_TRANSFORM: &str = "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));";
+pub const CSS_TRANSFORM: &str = "transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));";
 
 #[derive(Debug)]
 pub struct OriginPlugin;
@@ -57,7 +57,7 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
                 if let Some(length) = default_lengths::get_extended(val, modifier.is_negative()) {
                     write!(
                         css_content,
-                        "--tw-translate-x: {};
+                        "--en-translate-x: {};
 {}",
                         length, CSS_TRANSFORM
                     )
@@ -68,7 +68,7 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
                 if let Some(length) = default_lengths::get_extended(val, modifier.is_negative()) {
                     write!(
                         css_content,
-                        "--tw-translate-y: {};
+                        "--en-translate-y: {};
 {}",
                         length, CSS_TRANSFORM
                     )
@@ -84,7 +84,7 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
                 if let Ok(scale_value) = val.parse::<f32>() {
                     write!(
                         css_content,
-                        "--tw-scale-x: {};
+                        "--en-scale-x: {};
 {}",
                         scale_value / 100.,
                         CSS_TRANSFORM
@@ -96,7 +96,7 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
                 if let Ok(scale_value) = val.parse::<f32>() {
                     write!(
                         css_content,
-                        "--tw-scale-y: {};
+                        "--en-scale-y: {};
 {}",
                         scale_value / 100.,
                         CSS_TRANSFORM
@@ -107,8 +107,8 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
             } else if let Ok(scale_value) = val.parse::<f32>() {
                 write!(
                     css_content,
-                    "--tw-scale-x: {val};
---tw-scale-y: {val};
+                    "--en-scale-x: {val};
+--en-scale-y: {val};
 {}",
                     CSS_TRANSFORM,
                     val = scale_value / 100.
@@ -123,7 +123,7 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
             if let Ok(rotate_value) = val.parse::<f32>() {
                 write!(
                     css_content,
-                    "--tw-rotate: {rotate_value}deg;
+                    "--en-rotate: {rotate_value}deg;
 {}",
                     CSS_TRANSFORM
                 )
@@ -138,7 +138,7 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
                 if let Ok(skew_value) = val.parse::<f32>() {
                     write!(
                         css_content,
-                        "--tw-skew-x: {skew_value}deg;
+                        "--en-skew-x: {skew_value}deg;
 {}",
                         CSS_TRANSFORM
                     )
@@ -149,7 +149,7 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
                 if let Ok(skew_value) = val.parse::<f32>() {
                     write!(
                         css_content,
-                        "--tw-skew-y: {skew_value}deg;
+                        "--en-skew-y: {skew_value}deg;
 {}",
                         CSS_TRANSFORM
                     )

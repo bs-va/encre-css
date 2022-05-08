@@ -9,8 +9,8 @@
 //! generator.scan_content(r#"class="bg-red-500""#);
 //!
 //! assert!(generator.generate().contains(r#".bg-red-500 {
-//!   --tw-bg-opacity: 1;
-//!   background-color: rgb(239 68 68 / var(--tw-bg-opacity));
+//!   --en-bg-opacity: 1;
+//!   background-color: rgb(239 68 68 / var(--en-bg-opacity));
 //! }"#));
 //! ```
 pub mod plugins;
@@ -31,7 +31,7 @@ use variant::{Variant, VARIANTS};
 
 // TODO features:
 // - Cache
-// - Real prefix (like tw-)???
+// - Real prefix (like en-)???
 // - CSS variant for dark: configurable
 // - Configurable preflight
 // - Support a safelist in the configuration file
@@ -366,25 +366,25 @@ mod tests {
             format!(
                 r#"{}@media (min-width: 640px) {{
   .sm\:hover\:bg-red-400:hover {{
-    --tw-bg-opacity: 1;
-    background-color: rgb(248 113 113 / var(--tw-bg-opacity));
+    --en-bg-opacity: 1;
+    background-color: rgb(248 113 113 / var(--en-bg-opacity));
   }}
 }}
 
 .focus\:hover\:bg-red-600:hover:focus {{
-  --tw-bg-opacity: 1;
-  background-color: rgb(220 38 38 / var(--tw-bg-opacity));
+  --en-bg-opacity: 1;
+  background-color: rgb(220 38 38 / var(--en-bg-opacity));
 }}
 
 [dir="rtl"] .active\:rtl\:bg-red-800:active {{
-  --tw-bg-opacity: 1;
-  background-color: rgb(153 27 27 / var(--tw-bg-opacity));
+  --en-bg-opacity: 1;
+  background-color: rgb(153 27 27 / var(--en-bg-opacity));
 }}
 
 @media (min-width: 768px) {{
   .md\:focus\:selection\:bg-blue-100 *::selection, .md\:focus\:selection\:bg-blue-100::selection:focus {{
-    --tw-bg-opacity: 1;
-    background-color: rgb(219 234 254 / var(--tw-bg-opacity));
+    --en-bg-opacity: 1;
+    background-color: rgb(219 234 254 / var(--en-bg-opacity));
   }}
 }}
 
@@ -398,8 +398,8 @@ mod tests {
 @media print {{
   @media (min-width: 1280px) {{
     [dir="ltr"] .print\:ltr\:xl\:hover\:focus\:active\:text-yellow-300:active:focus:hover {{
-      --tw-text-opacity: 1;
-      color: rgb(253 224 71 / var(--tw-text-opacity));
+      --en-text-opacity: 1;
+      color: rgb(253 224 71 / var(--en-text-opacity));
     }}
   }}
 }}
@@ -408,33 +408,33 @@ mod tests {
   @media (prefers-reduced-motion: no-preference) {{
     @media (orientation: landscape) {{
       [dir="rtl"] .\32xl\:motion-safe\:landscape\:focus-within\:visited\:first\:odd\:checked\:open\:rtl\:bg-purple-100[open]:checked:nth-child(odd):first-child:visited:focus-within {{
-        --tw-bg-opacity: 1;
-        background-color: rgb(243 232 255 / var(--tw-bg-opacity));
+        --en-bg-opacity: 1;
+        background-color: rgb(243 232 255 / var(--en-bg-opacity));
       }}
     }}
   }}
 }}
 
 .hover\:file\:bg-pink-600::file-selector-button:hover {{
-  --tw-bg-opacity: 1;
-  background-color: rgb(219 39 119 / var(--tw-bg-opacity));
+  --en-bg-opacity: 1;
+  background-color: rgb(219 39 119 / var(--en-bg-opacity));
 }}
 
 .file\:hover\:bg-pink-600:hover::file-selector-button {{
-  --tw-bg-opacity: 1;
-  background-color: rgb(219 39 119 / var(--tw-bg-opacity));
+  --en-bg-opacity: 1;
+  background-color: rgb(219 39 119 / var(--en-bg-opacity));
 }}
 
 @media (min-width: 640px) {{
   .sm\:before\:target\:content-\[Hello_world\!\]:target::before {{
-    --tw-content: "Hello world!";
-    content: var(--tw-content);
+    --en-content: "Hello world!";
+    content: var(--en-content);
   }}
 }}
 
 .marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection *::marker, .marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection::marker {{
-  --tw-bg-opacity: 1;
-  background-color: rgb(187 247 208 / var(--tw-bg-opacity));
+  --en-bg-opacity: 1;
+  background-color: rgb(187 247 208 / var(--en-bg-opacity));
 }}"#,
                 preflight::ENCRE_PREFLIGHT_CSS
             )
@@ -451,8 +451,8 @@ mod tests {
         assert_eq!(
             generator.generate(),
             format!(r#"{}.-translate-x-52 {{
-  --tw-translate-x: -13rem;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+  --en-translate-x: -13rem;
+  transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
 }}
 
 .-mb-8 {{
@@ -460,8 +460,8 @@ mod tests {
 }}
 
 .-hue-rotate-60 {{
-  --tw-hue-rotate: hue-rotate(-60deg);
-  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+  --en-hue-rotate: hue-rotate(-60deg);
+  filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
 }}"#, preflight::ENCRE_PREFLIGHT_CSS));
     }
 
@@ -475,8 +475,8 @@ mod tests {
         assert_eq!(
             generator.generate(),
             format!(r#"{}.bg-red-500 {{
-  --tw-bg-opacity: 1;
-  background-color: rgb(239 68 68 / var(--tw-bg-opacity));
+  --en-bg-opacity: 1;
+  background-color: rgb(239 68 68 / var(--en-bg-opacity));
 }}"#, preflight::ENCRE_PREFLIGHT_CSS));
     }
 }

@@ -23,12 +23,12 @@ impl Plugin for ColorPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--tw-opacity") {
+        if val.contains("--en-opacity") {
             write!(
                 css_content,
-                "--tw-bg-opacity: 1;
+                "--en-bg-opacity: 1;
 background-color: {};",
-                val.replace("--tw-opacity", "--tw-bg-opacity")
+                val.replace("--en-opacity", "--en-bg-opacity")
             )
             .is_ok()
         } else {
@@ -93,7 +93,7 @@ impl Plugin for OpacityPlugin {
     fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.to_f32() {
-            write!(css_content, "--tw-bg-opacity: {};", opacity_value / 100.).is_ok()
+            write!(css_content, "--en-bg-opacity: {};", opacity_value / 100.).is_ok()
         } else {
             false
         }
@@ -121,35 +121,35 @@ impl Plugin for ImagePlugin {
         match modifier.content() {
             "bg-none" => self.css_template_value("none", css_content),
             "gradient-to-t" => self.css_template_value(
-                "linear-gradient(to top, var(--tw-gradient-stops))",
+                "linear-gradient(to top, var(--en-gradient-stops))",
                 css_content,
             ),
             "gradient-to-tr" => self.css_template_value(
-                "linear-gradient(to top right, var(--tw-gradient-stops))",
+                "linear-gradient(to top right, var(--en-gradient-stops))",
                 css_content,
             ),
             "gradient-to-r" => self.css_template_value(
-                "linear-gradient(to right, var(--tw-gradient-stops))",
+                "linear-gradient(to right, var(--en-gradient-stops))",
                 css_content,
             ),
             "gradient-to-br" => self.css_template_value(
-                "linear-gradient(to bottom right, var(--tw-gradient-stops))",
+                "linear-gradient(to bottom right, var(--en-gradient-stops))",
                 css_content,
             ),
             "gradient-to-b" => self.css_template_value(
-                "linear-gradient(to bottom, var(--tw-gradient-stops))",
+                "linear-gradient(to bottom, var(--en-gradient-stops))",
                 css_content,
             ),
             "gradient-to-bl" => self.css_template_value(
-                "linear-gradient(to bottom left, var(--tw-gradient-stops))",
+                "linear-gradient(to bottom left, var(--en-gradient-stops))",
                 css_content,
             ),
             "gradient-to-l" => self.css_template_value(
-                "linear-gradient(to left, var(--tw-gradient-stops))",
+                "linear-gradient(to left, var(--en-gradient-stops))",
                 css_content,
             ),
             "gradient-to-tl" => self.css_template_value(
-                "linear-gradient(to top left, var(--tw-gradient-stops))",
+                "linear-gradient(to top left, var(--en-gradient-stops))",
                 css_content,
             ),
             _ => false,
@@ -176,16 +176,16 @@ impl Plugin for GradientFromPlugin {
             OPACITY_IN_RGB_REGEX.replace(val, "/ 0)")
         };
 
-        let val = if val.contains("--tw-opacity") {
-            val.replace(" / var(--tw-opacity)", "")
+        let val = if val.contains("--en-opacity") {
+            val.replace(" / var(--en-opacity)", "")
         } else {
             val.to_string()
         };
 
         write!(
             css_content,
-            "--tw-gradient-from: {val};
---tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, {default_to});"
+            "--en-gradient-from: {val};
+--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to, {default_to});"
         )
         .is_ok()
     }
@@ -218,15 +218,15 @@ impl Plugin for GradientViaPlugin {
             OPACITY_IN_RGB_REGEX.replace(val, "/ 0)")
         };
 
-        let val = if val.contains("--tw-opacity") {
-            val.replace(" / var(--tw-opacity)", "")
+        let val = if val.contains("--en-opacity") {
+            val.replace(" / var(--en-opacity)", "")
         } else {
             val.to_string()
         };
 
         write!(
             css_content,
-            "--tw-gradient-stops: var(--tw-gradient-from), {}, var(--tw-gradient-to, {});",
+            "--en-gradient-stops: var(--en-gradient-from), {}, var(--en-gradient-to, {});",
             val, default_to
         )
         .is_ok()
@@ -254,13 +254,13 @@ impl Plugin for GradientToPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        let val = if val.contains("--tw-opacity") {
-            val.replace(" / var(--tw-opacity)", "")
+        let val = if val.contains("--en-opacity") {
+            val.replace(" / var(--en-opacity)", "")
         } else {
             val.to_string()
         };
 
-        write!(css_content, "--tw-gradient-to: {val};").is_ok()
+        write!(css_content, "--en-gradient-to: {val};").is_ok()
     }
 
     fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {

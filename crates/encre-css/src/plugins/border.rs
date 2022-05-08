@@ -4,7 +4,7 @@ use crate::utils::{default_colors, value_matchers::*};
 
 use std::fmt::Write;
 
-const CSS_RING_OFFSET_SHADOW: &str = "--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);";
+const CSS_RING_OFFSET_SHADOW: &str = "--en-ring-offset-shadow: var(--en-ring-inset) 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color);";
 
 #[derive(Debug)]
 pub struct ColorPlugin;
@@ -19,12 +19,12 @@ impl Plugin for ColorPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--tw-opacity") {
+        if val.contains("--en-opacity") {
             write!(
                 css_content,
-                "--tw-border-opacity: 1;
+                "--en-border-opacity: 1;
 border-color: {};",
-                val.replace("--tw-opacity", "--tw-border-opacity")
+                val.replace("--en-opacity", "--en-border-opacity")
             )
             .is_ok()
         } else {
@@ -608,7 +608,7 @@ impl Plugin for OpacityPlugin {
         if let Ok(opacity_value) = modifier.to_f32() {
             write!(
                 css_content,
-                "--tw-border-opacity: {};",
+                "--en-border-opacity: {};",
                 opacity_value / 100.
             )
             .is_ok()
@@ -631,12 +631,12 @@ impl Plugin for DivideColorPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--tw-opacity") {
+        if val.contains("--en-opacity") {
             write!(
                 css_content,
-                "--tw-divide-opacity: 1;
+                "--en-divide-opacity: 1;
 border-color: {};",
-                val.replace("--tw-opacity", "--tw-divide-opacity")
+                val.replace("--en-opacity", "--en-divide-opacity")
             )
             .is_ok()
         } else {
@@ -666,14 +666,14 @@ impl Plugin for DivideWidthXPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if !css_content.contains("--tw-divide-x-reverse") {
-            writeln!(css_content, "--tw-divide-x-reverse: 0;").ok();
+        if !css_content.contains("--en-divide-x-reverse") {
+            writeln!(css_content, "--en-divide-x-reverse: 0;").ok();
         }
 
         write!(
             css_content,
-            "border-left-width: calc({val} * calc(1 - var(--tw-divide-x-reverse)));
-border-right-width: calc({val} * var(--tw-divide-x-reverse));"
+            "border-left-width: calc({val} * calc(1 - var(--en-divide-x-reverse)));
+border-right-width: calc({val} * var(--en-divide-x-reverse));"
         )
         .is_ok()
     }
@@ -681,15 +681,15 @@ border-right-width: calc({val} * var(--tw-divide-x-reverse));"
     fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
         // TODO: class with `> :not([hidden]) ~ :not([hidden])`
         if modifier.is_empty() {
-            writeln!(css_content, "--tw-divide-x-reverse: 0;").ok();
+            writeln!(css_content, "--en-divide-x-reverse: 0;").ok();
             return self.css_template_value("1px", css_content);
         } else if modifier.is("reverse") {
-            return write!(css_content, "--tw-divide-x-reverse: 1;").is_ok();
+            return write!(css_content, "--en-divide-x-reverse: 1;").is_ok();
         }
 
         // NOTE: Not-compatible with TailwindCSS, support all values
         if modifier.to_usize().is_ok() {
-            writeln!(css_content, "--tw-divide-x-reverse: 0;").ok();
+            writeln!(css_content, "--en-divide-x-reverse: 0;").ok();
             self.css_template_value(&format!("{}px", modifier), css_content)
         } else {
             false
@@ -710,14 +710,14 @@ impl Plugin for DivideWidthYPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if !css_content.contains("--tw-divide-y-reverse") {
-            writeln!(css_content, "--tw-divide-y-reverse: 0;").ok();
+        if !css_content.contains("--en-divide-y-reverse") {
+            writeln!(css_content, "--en-divide-y-reverse: 0;").ok();
         }
 
         write!(
             css_content,
-            "border-top-width: calc({val} * calc(1 - var(--tw-divide-y-reverse)));
-  border-bottom-width: calc({val} * var(--tw-divide-y-reverse));"
+            "border-top-width: calc({val} * calc(1 - var(--en-divide-y-reverse)));
+  border-bottom-width: calc({val} * var(--en-divide-y-reverse));"
         )
         .is_ok()
     }
@@ -725,15 +725,15 @@ impl Plugin for DivideWidthYPlugin {
     fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
         // TODO: class with `> :not([hidden]) ~ :not([hidden])`
         if modifier.is_empty() {
-            writeln!(css_content, "--tw-divide-y-reverse: 0;").ok();
+            writeln!(css_content, "--en-divide-y-reverse: 0;").ok();
             return self.css_template_value("1px", css_content);
         } else if modifier.is("reverse") {
-            return write!(css_content, "--tw-divide-y-reverse: 1;").is_ok();
+            return write!(css_content, "--en-divide-y-reverse: 1;").is_ok();
         }
 
         // NOTE: Not-compatible with TailwindCSS, support all values
         if modifier.to_usize().is_ok() {
-            writeln!(css_content, "--tw-divide-y-reverse: 0;").ok();
+            writeln!(css_content, "--en-divide-y-reverse: 0;").ok();
             self.css_template_value(&format!("{}px", modifier), css_content)
         } else {
             false
@@ -774,7 +774,7 @@ impl Plugin for DivideOpacityPlugin {
         if let Ok(opacity_value) = modifier.to_f32() {
             write!(
                 css_content,
-                "--tw-divide-opacity: {};",
+                "--en-divide-opacity: {};",
                 opacity_value / 100.
             )
             .is_ok()
@@ -797,12 +797,12 @@ impl Plugin for RingColorPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--tw-opacity") {
+        if val.contains("--en-opacity") {
             write!(
                 css_content,
-                "--tw-ring-opacity: 1;
+                "--en-ring-opacity: 1;
 --ring-color: {};",
-                val.replace("--tw-opacity", "--tw-ring-opacity")
+                val.replace("--en-opacity", "--en-ring-opacity")
             )
             .is_ok()
         } else {
@@ -833,15 +833,15 @@ impl Plugin for RingWidthPlugin {
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
         write!(css_content, "{}
---tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc({val} + var(--tw-ring-offset-width)) var(--tw-ring-color);
-box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);", CSS_RING_OFFSET_SHADOW).is_ok()
+--en-ring-shadow: var(--en-ring-inset) 0 0 0 calc({val} + var(--en-ring-offset-width)) var(--en-ring-color);
+box-shadow: var(--en-ring-offset-shadow), var(--en-ring-shadow), var(--en-shadow, 0 0 #0000);", CSS_RING_OFFSET_SHADOW).is_ok()
     }
 
     fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
         if modifier.is_empty() {
             return self.css_template_value("3px", css_content);
         } else if modifier.is("inset") {
-            return write!(css_content, "--tw-ring-inset: inset;").is_ok();
+            return write!(css_content, "--en-ring-inset: inset;").is_ok();
         }
 
         // NOTE: Not-compatible with TailwindCSS, support all values
@@ -864,7 +864,7 @@ impl Plugin for RingOpacityPlugin {
     fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.to_f32() {
-            write!(css_content, "--tw-ring-opacity: {};", opacity_value / 100.).is_ok()
+            write!(css_content, "--en-ring-opacity: {};", opacity_value / 100.).is_ok()
         } else {
             false
         }
@@ -884,15 +884,15 @@ impl Plugin for RingOffsetColorPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--tw-opacity") {
+        if val.contains("--en-opacity") {
             write!(
                 css_content,
-                "--tw-ring-offset-color: {};",
-                val.replace("/ var(--tw-opacity)", "")
+                "--en-ring-offset-color: {};",
+                val.replace("/ var(--en-opacity)", "")
             )
             .is_ok()
         } else {
-            write!(css_content, "--tw-ring-offset-color: {val};").is_ok()
+            write!(css_content, "--en-ring-offset-color: {val};").is_ok()
         }
     }
 
@@ -918,7 +918,7 @@ impl Plugin for RingOffsetWidthPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "--tw-ring-offset-width: {val};",).is_ok()
+        write!(css_content, "--en-ring-offset-width: {val};",).is_ok()
     }
 
     fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
@@ -944,11 +944,11 @@ impl Plugin for OutlineColorPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--tw-opacity") {
+        if val.contains("--en-opacity") {
             write!(
                 css_content,
                 "outline-color: {};",
-                val.replace(" / var(--tw-opacity)", "")
+                val.replace(" / var(--en-opacity)", "")
             )
             .is_ok()
         } else {

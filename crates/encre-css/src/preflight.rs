@@ -15,7 +15,7 @@ pub const ENCRE_PREFLIGHT_CSS: &str = r#"/*
 
 ::before,
 ::after {
-  --tw-content: '';
+  --en-content: '';
 }
 
 /*
@@ -384,48 +384,48 @@ Ensure the default browser behavior of the `hidden` attribute.
 }
 
 *, ::before, ::after {
-  --tw-translate-x: 0;
-  --tw-translate-y: 0;
-  --tw-rotate: 0;
-  --tw-skew-x: 0;
-  --tw-skew-y: 0;
-  --tw-scale-x: 1;
-  --tw-scale-y: 1;
-  --tw-pan-x:  ;
-  --tw-pan-y:  ;
-  --tw-pinch-zoom:  ;
-  --tw-scroll-snap-strictness: proximity;
-  --tw-ordinal:  ;
-  --tw-slashed-zero:  ;
-  --tw-numeric-figure:  ;
-  --tw-numeric-spacing:  ;
-  --tw-numeric-fraction:  ;
-  --tw-ring-inset:  ;
-  --tw-ring-offset-width: 0px;
-  --tw-ring-offset-color: #fff;
-  --tw-ring-color: rgb(59 130 246 / 0.5);
-  --tw-ring-offset-shadow: 0 0 #0000;
-  --tw-ring-shadow: 0 0 #0000;
-  --tw-shadow: 0 0 #0000;
-  --tw-shadow-colored: 0 0 #0000;
-  --tw-blur:  ;
-  --tw-brightness:  ;
-  --tw-contrast:  ;
-  --tw-grayscale:  ;
-  --tw-hue-rotate:  ;
-  --tw-invert:  ;
-  --tw-saturate:  ;
-  --tw-sepia:  ;
-  --tw-drop-shadow:  ;
-  --tw-backdrop-blur:  ;
-  --tw-backdrop-brightness:  ;
-  --tw-backdrop-contrast:  ;
-  --tw-backdrop-grayscale:  ;
-  --tw-backdrop-hue-rotate:  ;
-  --tw-backdrop-invert:  ;
-  --tw-backdrop-opacity:  ;
-  --tw-backdrop-saturate:  ;
-  --tw-backdrop-sepia:  ;
+  --en-translate-x: 0;
+  --en-translate-y: 0;
+  --en-rotate: 0;
+  --en-skew-x: 0;
+  --en-skew-y: 0;
+  --en-scale-x: 1;
+  --en-scale-y: 1;
+  --en-pan-x:  ;
+  --en-pan-y:  ;
+  --en-pinch-zoom:  ;
+  --en-scroll-snap-strictness: proximity;
+  --en-ordinal:  ;
+  --en-slashed-zero:  ;
+  --en-numeric-figure:  ;
+  --en-numeric-spacing:  ;
+  --en-numeric-fraction:  ;
+  --en-ring-inset:  ;
+  --en-ring-offset-width: 0px;
+  --en-ring-offset-color: #fff;
+  --en-ring-color: rgb(59 130 246 / 0.5);
+  --en-ring-offset-shadow: 0 0 #0000;
+  --en-ring-shadow: 0 0 #0000;
+  --en-shadow: 0 0 #0000;
+  --en-shadow-colored: 0 0 #0000;
+  --en-blur:  ;
+  --en-brightness:  ;
+  --en-contrast:  ;
+  --en-grayscale:  ;
+  --en-hue-rotate:  ;
+  --en-invert:  ;
+  --en-saturate:  ;
+  --en-sepia:  ;
+  --en-drop-shadow:  ;
+  --en-backdrop-blur:  ;
+  --en-backdrop-brightness:  ;
+  --en-backdrop-contrast:  ;
+  --en-backdrop-grayscale:  ;
+  --en-backdrop-hue-rotate:  ;
+  --en-backdrop-invert:  ;
+  --en-backdrop-opacity:  ;
+  --en-backdrop-saturate:  ;
+  --en-backdrop-sepia:  ;
 }
 
 "#;

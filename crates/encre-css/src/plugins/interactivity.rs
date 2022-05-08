@@ -17,11 +17,11 @@ impl Plugin for AccentColorPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--tw-opacity") {
+        if val.contains("--en-opacity") {
             write!(
                 css_content,
                 "accent-color: {};",
-                val.replace(" / var(--tw-opacity)", "")
+                val.replace(" / var(--en-opacity)", "")
             )
             .is_ok()
         } else {
@@ -136,11 +136,11 @@ impl Plugin for CaretColorPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--tw-opacity") {
+        if val.contains("--en-opacity") {
             write!(
                 css_content,
                 "caret-color: {};",
-                val.replace(" / var(--tw-opacity)", "")
+                val.replace(" / var(--en-opacity)", "")
             )
             .is_ok()
         } else {
@@ -666,24 +666,24 @@ scroll-snap-type: none;"
             .is_ok(),
             "x" => write!(
                 css_content,
-                "-ms-scroll-snap-type: x var(--tw-scroll-snap-strictness);
-scroll-snap-type: x var(--tw-scroll-snap-strictness);"
+                "-ms-scroll-snap-type: x var(--en-scroll-snap-strictness);
+scroll-snap-type: x var(--en-scroll-snap-strictness);"
             )
             .is_ok(),
             "y" => write!(
                 css_content,
-                "-ms-scroll-snap-type: y var(--tw-scroll-snap-strictness);
-scroll-snap-type: y var(--tw-scroll-snap-strictness);"
+                "-ms-scroll-snap-type: y var(--en-scroll-snap-strictness);
+scroll-snap-type: y var(--en-scroll-snap-strictness);"
             )
             .is_ok(),
             "both" => write!(
                 css_content,
-                "-ms-scroll-snap-type: both var(--tw-scroll-snap-strictness);
-scroll-snap-type: both var(--tw-scroll-snap-strictness);"
+                "-ms-scroll-snap-type: both var(--en-scroll-snap-strictness);
+scroll-snap-type: both var(--en-scroll-snap-strictness);"
             )
             .is_ok(),
-            "mandatory" => write!(css_content, "--tw-scroll-snap-strictness: mandatory;").is_ok(),
-            "proximity" => write!(css_content, "--tw-scroll-snap-strictness: proximity;").is_ok(),
+            "mandatory" => write!(css_content, "--en-scroll-snap-strictness: mandatory;").is_ok(),
+            "proximity" => write!(css_content, "--en-scroll-snap-strictness: proximity;").is_ok(),
             _ => false,
         }
     }

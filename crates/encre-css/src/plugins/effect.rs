@@ -4,7 +4,7 @@ use crate::utils::{default_colors, value_matchers::*};
 
 use std::fmt::Write;
 
-const CSS_SHADOW: &str = "box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);";
+const CSS_SHADOW: &str = "box-shadow: var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow);";
 
 #[derive(Debug)]
 pub struct MixBlendModePlugin;
@@ -88,33 +88,33 @@ impl Plugin for BoxShadowPlugin {
         match modifier.content() {
             "" => write!(
                 css_content,
-                "--tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
---tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
+                "--en-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+--en-shadow-colored: 0 1px 3px 0 var(--en-shadow-color), 0 1px 2px -1px var(--en-shadow-color);
 {}", CSS_SHADOW).is_ok(),
-            "sm" => write!(css_content, "--tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
---tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
+            "sm" => write!(css_content, "--en-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+--en-shadow-colored: 0 1px 2px 0 var(--en-shadow-color);
 {}", CSS_SHADOW).is_ok(),
             "md" => write!(
                 css_content,
-                "--tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
---tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+                "--en-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+--en-shadow-colored: 0 4px 6px -1px var(--en-shadow-color), 0 2px 4px -2px var(--en-shadow-color);
 {}", CSS_SHADOW).is_ok(),
             "lg" => write!(
                 css_content,
-                "--tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
---tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
+                "--en-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+--en-shadow-colored: 0 10px 15px -3px var(--en-shadow-color), 0 4px 6px -4px var(--en-shadow-color);
 {}", CSS_SHADOW).is_ok(),
             "xl" => write!(
                 css_content,
-                "--tw-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
---tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
+                "--en-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+--en-shadow-colored: 0 20px 25px -5px var(--en-shadow-color), 0 8px 10px -6px var(--en-shadow-color);
 {}", CSS_SHADOW).is_ok(),
-            "2xl" => write!(css_content, "--tw-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
---tw-shadow-colored: 0 25px 50px -12px var(--tw-shadow-color);
+            "2xl" => write!(css_content, "--en-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+--en-shadow-colored: 0 25px 50px -12px var(--en-shadow-color);
 {}", CSS_SHADOW).is_ok(),
             "inner" => {
-                write!(css_content, "--tw-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
---tw-shadow-colored: inset 0 2px 4px 0 var(--tw-shadow-color);
+                write!(css_content, "--en-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+--en-shadow-colored: inset 0 2px 4px 0 var(--en-shadow-color);
 {}", CSS_SHADOW).is_ok()
             }
             "none" => self.css_template_value("none", css_content),
@@ -136,19 +136,19 @@ impl Plugin for BoxShadowColorPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--tw-opacity") {
+        if val.contains("--en-opacity") {
             write!(
                 css_content,
-                "--tw-shadow-color: {};
---tw-shadow: var(--tw-shadow-colored);",
-                val.replace("/ var(--tw-opacity)", "")
+                "--en-shadow-color: {};
+--en-shadow: var(--en-shadow-colored);",
+                val.replace("/ var(--en-opacity)", "")
             )
             .is_ok()
         } else {
             write!(
                 css_content,
-                "--tw-shadow-color: {val};
---tw-shadow: var(--tw-shadow-colored);"
+                "--en-shadow-color: {val};
+--en-shadow: var(--en-shadow-colored);"
             )
             .is_ok()
         }
