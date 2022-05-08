@@ -1,0 +1,13 @@
+[package]
+name = "encre-css"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+color-name = "1.1.0"
+lazy_static = "1.4.0"
+regex = "1.5.5"
+rayon = "1.5.2"
+
+[dev-dependencies]
+pretty_assertions = "1.2.1"

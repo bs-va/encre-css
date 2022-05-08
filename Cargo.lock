@@ -160,6 +160,13 @@ dependencies = [
  "pretty_assertions",
  "rayon",
  "regex",
+]
+
+[[package]]
+name = "encre-css-cli"
+version = "0.1.0"
+dependencies = [
+ "encre-css",
  "wax",
 ]
 

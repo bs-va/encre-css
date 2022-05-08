@@ -1,0 +1,8 @@
+[package]
+name = "encre-css-cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+wax = "0.4.0"
+encre-css = { path = "../encre-css" }
