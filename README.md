@@ -1,4 +1,4 @@
-# EncreCSS
+# encre-css (french word for `ink`)
 
 > A TailwindCSS-compatible CSS generation library written in Rust
 
@@ -8,7 +8,7 @@ Add `encre_css` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-encre_css = { git = "https://gitlab.com/encre-css/encre-css" }
+encre-css = { git = "https://gitlab.com/encre-css/encre-css.git" }
 ```
 
 Then, use the `EncreGenerator` structure to generate CSS styles:
@@ -23,3 +23,7 @@ let css_styles = generator.generate();
 
 // Do something with the styles
 ```
+
+### License
+
+`encre-css` is published under the [MIT license](https://gitlab.com/encre-css/encre-css/-/blob/main/LICENSE).
