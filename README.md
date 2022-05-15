@@ -4,7 +4,7 @@
 
 ### Getting started
 
-Add `encre_css` to your `Cargo.toml`:
+Add `encre-css` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
