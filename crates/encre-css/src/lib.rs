@@ -3,9 +3,10 @@
 //! # Example
 //!
 //! ```rust
-//! use encre_css::EncreGenerator;
+//! use encre_css::{EncreGenerator, Config};
 //!
-//! let mut generator = EncreGenerator::new();
+//! let mut generator = EncreGenerator::from_config(Config::default());
+//! // Or let mut generator = EncreGenerator::new("encre.toml".into()); if your current directory contains an `encre.toml` file
 //! generator.scan_content(r#"class="bg-red-500""#);
 //!
 //! assert!(generator.generate().contains(r#".bg-red-500 {
@@ -23,7 +24,7 @@ pub mod error;
 
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::{fs, iter, io::Read, path::PathBuf};
+use std::{fs, iter, collections::BTreeMap, io::Read, path::PathBuf};
 use wax::Glob;
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -32,7 +33,7 @@ use rayon::prelude::*;
 use plugins::PLUGINS;
 use preflight::ENCRE_PREFLIGHT_CSS;
 use selector::Selector;
-use variant::{Variant, VARIANTS};
+use variant::{Variant, init_variants};
 
 pub use config::Config;
 pub use error::Error;
@@ -78,85 +79,11 @@ pub fn indent(val: String) -> String {
     val.replace('\n', "\n  ")
 }
 
-/// Generate a complete CSS rule (with a class selector, a rule content and, if requested, some
-/// pseudo-elements or `@media` queries)
-pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
-    let mut css_selector = selector
-        .to_string()
-        .replace('[', "\\[")
-        .replace(']', "\\]")
-        .replace('/', "\\/")
-        .replace('\"', "\\\"")
-        .replace('\'', "\\'")
-        .replace('(', "\\(")
-        .replace(')', "\\)")
-        .replace('#', "\\#")
-        .replace(':', "\\:")
-        .replace(',', r"\2c ")
-        .replace('.', "\\.")
-        .replace('!', "\\!")
-        .replace('%', "\\%");
-
-    if css_selector.starts_with(char::is_numeric) {
-        // CSS classes are not supposed to start with a number, we need to escape it
-        css_selector.insert_str(0, "\\3");
-    }
-
-    // A CSS class starts with a `.`
-    css_selector.insert(0, '.');
-
-    let css_content = if selector.is_important() {
-        css_content.replace(';', " !important;")
-    } else {
-        css_content.to_string()
-    };
-
-    let variants = selector.get_variants();
-    if !variants.is_empty() {
-        let rule = variants.iter().fold(
-            format!(
-                "{} {{\n  {}\n}}",
-                WILL_BE_REPLACED_BY_CSS_SELECTOR,
-                indent(css_content),
-            ),
-            |acc, variant| {
-                let right_variant = if let Some(result) = VARIANTS.get(variant.as_str()) {
-                    result
-                } else {
-                    println!("Unknown variant: {}", variant);
-                    return acc;
-                };
-
-                match right_variant {
-                    Variant::PseudoClass(name) => {
-                        css_selector.push_str(&format!(":{}", name));
-                        acc
-                    }
-                    Variant::PseudoElement(name) => {
-                        css_selector.push_str(&format!("::{}", name));
-                        acc
-                    }
-                    Variant::WrapSelector(template) => {
-                        css_selector = template.replace('&', &css_selector);
-                        acc
-                    }
-                    Variant::AtRule(at_rule) => {
-                        format!("{} {{\n  {}\n}}", at_rule, indent(acc),)
-                    }
-                }
-            },
-        );
-
-        rule.replace(WILL_BE_REPLACED_BY_CSS_SELECTOR, &css_selector)
-    } else {
-        format!("{} {{\n  {}\n}}", css_selector, indent(css_content))
-    }
-}
-
 /// Main structure used to generate CSS from selectors
 #[derive(Default)]
 pub struct EncreGenerator {
     config: Config,
+    variants: BTreeMap<&'static str, Variant>,
     scanned_selectors_without_variant: Vec<Selector>,
     scanned_selectors_with_variant: Vec<Selector>,
 }
@@ -185,6 +112,7 @@ impl EncreGenerator {
         let input = config.input.clone();
 
         let mut result = Self {
+            variants: init_variants(&config),
             config,
             scanned_selectors_without_variant: vec![],
             scanned_selectors_with_variant: vec![],
@@ -315,13 +243,13 @@ impl EncreGenerator {
                                     &mut css_content,
                                 )
                             {
-                                return Some(gen_css_rule(selector, &css_content));
+                                return Some(self.gen_css_rule(selector, &css_content));
                             }
                         } else if plugin.get_css_for_modifier(
                             &selector.get_modifier(plugin.namespace()),
                             &mut css_content,
                         ) {
-                            return Some(gen_css_rule(selector, &css_content));
+                            return Some(self.gen_css_rule(selector, &css_content));
                         }
                     }
                 }
@@ -331,6 +259,81 @@ impl EncreGenerator {
             .collect::<Vec<String>>();
 
         format!("{}{}", ENCRE_PREFLIGHT_CSS, result.join("\n\n"))
+    }
+
+    /// Generate a complete CSS rule (with a class selector, a rule content and, if requested, some
+    /// pseudo-elements or `@media` queries)
+    pub fn gen_css_rule(&self, selector: &Selector, css_content: &str) -> String {
+        let mut css_selector = selector
+            .to_string()
+            .replace('[', "\\[")
+            .replace(']', "\\]")
+            .replace('/', "\\/")
+            .replace('\"', "\\\"")
+            .replace('\'', "\\'")
+            .replace('(', "\\(")
+            .replace(')', "\\)")
+            .replace('#', "\\#")
+            .replace(':', "\\:")
+            .replace(',', r"\2c ")
+            .replace('.', "\\.")
+            .replace('!', "\\!")
+            .replace('%', "\\%");
+
+        if css_selector.starts_with(char::is_numeric) {
+            // CSS classes are not supposed to start with a number, we need to escape it
+            css_selector.insert_str(0, "\\3");
+        }
+
+        // A CSS class starts with a `.`
+        css_selector.insert(0, '.');
+
+        let css_content = if selector.is_important() {
+            css_content.replace(';', " !important;")
+        } else {
+            css_content.to_string()
+        };
+
+        let variants = selector.get_variants();
+        if !variants.is_empty() {
+            let rule = variants.iter().fold(
+                format!(
+                    "{} {{\n  {}\n}}",
+                    WILL_BE_REPLACED_BY_CSS_SELECTOR,
+                    indent(css_content),
+                ),
+                |acc, variant| {
+                    let right_variant = if let Some(result) = self.variants.get(variant.as_str()) {
+                        result
+                    } else {
+                        println!("Unknown variant: {}", variant);
+                        return acc;
+                    };
+
+                    match right_variant {
+                        Variant::PseudoClass(name) => {
+                            css_selector.push_str(&format!(":{}", name));
+                            acc
+                        }
+                        Variant::PseudoElement(name) => {
+                            css_selector.push_str(&format!("::{}", name));
+                            acc
+                        }
+                        Variant::WrapSelector(template) => {
+                            css_selector = template.replace('&', &css_selector);
+                            acc
+                        }
+                        Variant::AtRule(at_rule) => {
+                            format!("{} {{\n  {}\n}}", at_rule, indent(acc),)
+                        }
+                    }
+                },
+            );
+
+            rule.replace(WILL_BE_REPLACED_BY_CSS_SELECTOR, &css_selector)
+        } else {
+            format!("{} {{\n  {}\n}}", css_selector, indent(css_content))
+        }
     }
 
     /// Forget the scanned selectors (useful when repeatedly calling [`EncreGenerator::generate`])
@@ -343,11 +346,14 @@ impl EncreGenerator {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::config::DarkModeConfig;
+
+    use std::borrow::Cow;
     use pretty_assertions::assert_eq;
 
     #[test]
     fn scan_content_test() {
-        let mut generator = EncreGenerator::new();
+        let mut generator = EncreGenerator::from_config(Config::default());
         generator.scan_content(
             r#"<div class="w-full h-full absolute bg-blue-500 foo-bar sm:focus:ring hover:bg-black border-[#333] text-[color:var(--hello)]"></div>"#
         );
@@ -380,7 +386,7 @@ mod tests {
 
     #[test]
     fn gen_selector_css_test() {
-        let mut generator = EncreGenerator::new();
+        let mut generator = EncreGenerator::from_config(Config::default());
         generator.add_selector("w-full");
 
         assert_eq!(
@@ -396,7 +402,7 @@ mod tests {
 
     #[test]
     fn gen_with_variant_selector_css_test() {
-        let mut generator = EncreGenerator::new();
+        let mut generator = EncreGenerator::from_config(Config::default());
         generator.add_selector("focus:w-full");
 
         assert_eq!(
@@ -412,7 +418,7 @@ mod tests {
 
     #[test]
     fn gen_selector_css_variants_test() {
-        let mut generator = EncreGenerator::new();
+        let mut generator = EncreGenerator::from_config(Config::default());
         generator.add_selector("sm:hover:bg-red-400");
         generator.add_selector("focus:hover:bg-red-600");
         generator.add_selector("active:rtl:bg-red-800");
@@ -507,7 +513,7 @@ mod tests {
 
     #[test]
     fn gen_selector_css_negative_values_test() {
-        let mut generator = EncreGenerator::new();
+        let mut generator = EncreGenerator::from_config(Config::default());
         generator.add_selector("-translate-x-52");
         generator.add_selector("-mb-8");
         generator.add_selector("-hue-rotate-60");
@@ -531,7 +537,7 @@ mod tests {
 
     #[test]
     fn gen_selector_css_prevent_duplication_test() {
-        let mut generator = EncreGenerator::new();
+        let mut generator = EncreGenerator::from_config(Config::default());
         generator.add_selector("bg-red-500");
         generator.add_selector("bg-red-500");
         generator.add_selector("bg-red-500");
@@ -542,5 +548,33 @@ mod tests {
   --en-bg-opacity: 1;
   background-color: rgb(239 68 68 / var(--en-bg-opacity));
 }}"#, preflight::ENCRE_PREFLIGHT_CSS));
+    }
+
+    #[test]
+    fn gen_selector_css_with_dark_variant_test() {
+        let mut generator = EncreGenerator::from_config(Config::default());
+        generator.add_selector("dark:mt-px");
+
+        assert_eq!(
+            generator.generate(),
+            format!(r#"{}@media (prefers-color-scheme: dark) {{
+  .dark\:mt-px {{
+    margin-top: 1px;
+  }}
+}}"#, preflight::ENCRE_PREFLIGHT_CSS)
+        );
+
+        let mut config = Config::default();
+        config.theme.dark_mode = DarkModeConfig::Class(Cow::from(".dark"));
+
+        let mut generator = EncreGenerator::from_config(config);
+        generator.add_selector("dark:mt-px");
+
+        assert_eq!(
+            generator.generate(),
+            format!(r#"{}.dark .dark\:mt-px {{
+  margin-top: 1px;
+}}"#, preflight::ENCRE_PREFLIGHT_CSS)
+        );
     }
 }

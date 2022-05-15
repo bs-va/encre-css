@@ -1,12 +1,12 @@
 use crate::error::{Result, Error};
 
 use serde_derive::Deserialize;
-use std::{fs, path::PathBuf};
+use std::{fs, path::PathBuf, borrow::Cow};
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum DarkModeConfig {
-    Class(String),
+    Class(Cow<'static, str>),
     Media,
 }
 
