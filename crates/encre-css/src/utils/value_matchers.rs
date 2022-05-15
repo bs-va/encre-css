@@ -88,7 +88,7 @@ pub fn is_matching_var(val: &str) -> bool {
 
 pub fn is_matching_color(val: &str) -> bool {
     COLOR_REGEX.is_match(val)
-        || Color::val().by_string(val.to_string()).is_ok()
+        || !val.is_empty() && Color::val().by_string(val.to_string()).is_ok()
         || is_matching_var(val)
 }
 
@@ -97,6 +97,7 @@ pub fn is_matching_length(val: &str) -> bool {
         v == "0"
             || LENGTH_REGEX.is_match(v)
             || LENGTH_CSS_FUNCTIONS_REGEXES.iter().any(|r| r.is_match(val))
+            || is_matching_percentage(val)
     })
 }
 

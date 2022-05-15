@@ -65,10 +65,14 @@ pub fn build(config: Option<String>, extra_input: Option<PathBuf>, output: Optio
                     if let Create(ref path) | Write(ref path) | Remove(ref path) | Rename(_, ref path) = event {
                         // Prevent infinite loop because the watcher detects changes of the output file
                         if let Some(ref output_path) = output {
-                            if PathBuf::from(output_path).canonicalize().unwrap() == path.canonicalize().unwrap() {
-                                continue;
+                            if let (Ok(path1), Ok(path2)) = (PathBuf::from(output_path).canonicalize(), path.canonicalize()) {
+                                if path1 == path2 {
+                                    continue;
+                                }
                             }
                         }
+
+                        // TODO: Handle configuration changes
 
                         println!("Changes detected. Reloading…");
                         generator.clear_scanned_selectors();

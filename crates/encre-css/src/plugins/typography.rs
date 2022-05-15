@@ -479,7 +479,7 @@ pub struct TextDecorationOffsetPlugin;
 
 impl Plugin for TextDecorationOffsetPlugin {
     fn namespace(&self) -> &str {
-        "underline"
+        "underline-offset"
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {

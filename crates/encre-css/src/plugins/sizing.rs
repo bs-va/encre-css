@@ -21,6 +21,10 @@ impl Plugin for WidthPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is("screen") {
+            return self.css_template_value("100vw", css_content);
+        }
+
         if let Some(length) = default_lengths::get_extended_size(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
@@ -122,6 +126,10 @@ impl Plugin for HeightPlugin {
     }
 
     fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+        if modifier.is("screen") {
+            return self.css_template_value("100vh", css_content);
+        }
+
         if let Some(length) = default_lengths::get_extended_size(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {

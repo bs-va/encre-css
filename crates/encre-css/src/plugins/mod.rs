@@ -74,6 +74,7 @@ lazy_static! {
         &background::PositionPlugin,
         &background::RepeatPlugin,
         &background::SizePlugin,
+        &border::ColorPlugin,
         &border::RadiusPlugin,
         &border::RadiusTopPlugin,
         &border::RadiusBottomPlugin,

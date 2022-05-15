@@ -85,7 +85,6 @@ pub fn get_fraction(val: &str, is_negative: bool) -> Option<String> {
 
 pub fn get_keyword_size(val: &str) -> Option<String> {
     match val {
-        "screen" => Some("100vw".to_string()),
         "min" => Some("min-content".to_string()),
         "max" => Some("max-content".to_string()),
         _ => None,

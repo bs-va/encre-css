@@ -22,10 +22,12 @@ pub mod config;
 pub mod error;
 
 use lazy_static::lazy_static;
-use rayon::prelude::*;
 use regex::Regex;
 use std::{fs, iter, io::Read, path::PathBuf};
 use wax::Glob;
+
+#[cfg(not(target_arch = "wasm32"))]
+use rayon::prelude::*;
 
 use plugins::PLUGINS;
 use preflight::ENCRE_PREFLIGHT_CSS;
@@ -49,22 +51,23 @@ pub fn to_css_value(val: &str) -> String {
     // Don't replace `_` if it is a URL
     //
     // TODO: Do the same for values **containing** an url (e.g. 10px_5px_1px_2px_url('/hello/world.png'))
-    if !URL_REGEX.is_match(val) {
+    let val = if !URL_REGEX.is_match(val) {
         // Don't replace `_` if prefixed by a `\`
         val.replace("\\_", WILL_BE_REPLACED_BY_UNDERSCORE)
             .replace('_', " ")
             .replace(WILL_BE_REPLACED_BY_UNDERSCORE, "_")
     } else {
         val.to_string()
-    }
+    };
 
-    // TODO: Add spaces around operators inside calc() that do not follow an operator
-    /* or '('.
-    return value.replace(
-        /(-?\d*\.?\d(?!\b-.+[,)](?![^+\-/*])\D)(?:%|[a-z]+)?|\))([+\-/*])/g,
-        '$1 $2 '
-    )
-    }*/*/*/
+    if val.contains("calc") {
+        val.replace('-', " - ")
+            .replace('+', " + ")
+            .replace('/', " / ")
+            .replace('*', "*")
+    } else {
+        val
+    }
 }
 
 pub const VALID_PLUGIN_HINT: [&str; 4] = ["color", "length", "angle", "list"];
@@ -91,7 +94,8 @@ pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
         .replace(':', "\\:")
         .replace(',', r"\2c ")
         .replace('.', "\\.")
-        .replace('!', "\\!");
+        .replace('!', "\\!")
+        .replace('%', "\\%");
 
     if css_selector.starts_with(char::is_numeric) {
         // CSS classes are not supposed to start with a number, we need to escape it
@@ -119,7 +123,8 @@ pub fn gen_css_rule(selector: &Selector, css_content: &str) -> String {
                 let right_variant = if let Some(result) = VARIANTS.get(variant.as_str()) {
                     result
                 } else {
-                    panic!("Unknown variant: {}", variant);
+                    println!("Unknown variant: {}", variant);
+                    return acc;
                 };
 
                 match right_variant {
@@ -253,70 +258,77 @@ impl EncreGenerator {
     /// [scan_content]: EncreGenerator::scan_content
     /// [add_selector]: EncreGenerator::add_selector
     pub fn generate(&self) -> String {
-        let result = [
+        let selectors = [
             &self.scanned_selectors_without_variant,
             &self.scanned_selectors_with_variant,
-        ]
-        .par_iter()
-        .flat_map(|v| *v)
-        .filter_map(|selector| {
-            // Find the right plugin to handle this selector (if the resulting CSS is valid,
-            // the plugin is good)
-            for plugin in PLUGINS.iter() {
-                if selector.check_namespace(plugin.namespace()) {
-                    let maybe_arbitrary_value = selector.get_arbitrary_value();
-                    let arbitrary_value = if let Some(ref arbitrary_value) = maybe_arbitrary_value {
-                        let mut split = arbitrary_value.split(':');
-                        let maybe_hint = split.next().unwrap();
+        ];
 
-                        if maybe_hint == arbitrary_value {
-                            // No plugin hint
-                            Some(("", maybe_hint))
-                        } else {
-                            let val = split.next();
+        #[cfg(target_arch = "wasm32")]
+        let iter = selectors.iter();
 
-                            if let Some(val) = val {
-                                if VALID_PLUGIN_HINT.contains(&maybe_hint) {
-                                    // Valid! Return (hint, stripped arbitrary value)
-                                    Some((maybe_hint, val))
-                                } else {
-                                    // Unknown plugin hint (like `bg-[sth:#333]`)
-                                    // TODO: Display a warning
-                                    Some(("", val))
-                                }
-                            } else {
-                                // Malformed arbitrary value (like just `bg-[color:]`)
-                                // TODO: Display a warning
+        #[cfg(not(target_arch = "wasm32"))]
+        let iter = selectors.par_iter();
+
+        let result = iter
+            .flat_map(|v| *v)
+            .filter_map(|selector| {
+                // Find the right plugin to handle this selector (if the resulting CSS is valid,
+                // the plugin is good)
+                for plugin in PLUGINS.iter() {
+                    if selector.check_namespace(plugin.namespace()) {
+                        let maybe_arbitrary_value = selector.get_arbitrary_value();
+                        let arbitrary_value = if let Some(ref arbitrary_value) = maybe_arbitrary_value {
+                            let mut split = arbitrary_value.split(':');
+                            let maybe_hint = split.next().unwrap();
+
+                            if maybe_hint == arbitrary_value {
+                                // No plugin hint
                                 Some(("", maybe_hint))
+                            } else {
+                                let val = split.next();
+
+                                if let Some(val) = val {
+                                    if VALID_PLUGIN_HINT.contains(&maybe_hint) {
+                                        // Valid! Return (hint, stripped arbitrary value)
+                                        Some((maybe_hint, val))
+                                    } else {
+                                        // Unknown plugin hint (like `bg-[sth:#333]`)
+                                        // TODO: Display a warning
+                                        Some(("", val))
+                                    }
+                                } else {
+                                    // Malformed arbitrary value (like just `bg-[color:]`)
+                                    // TODO: Display a warning
+                                    Some(("", maybe_hint))
+                                }
                             }
-                        }
-                    } else {
-                        None
-                    };
+                        } else {
+                            None
+                        };
 
-                    let mut css_content = String::new();
+                        let mut css_content = String::new();
 
-                    if let Some(arbitrary_value) = arbitrary_value {
-                        if plugin.is_matching_value(arbitrary_value.0, arbitrary_value.1)
-                            && plugin.css_template_value(
-                                &to_css_value(arbitrary_value.1),
-                                &mut css_content,
-                            )
-                        {
+                        if let Some(arbitrary_value) = arbitrary_value {
+                            if plugin.is_matching_value(arbitrary_value.0, arbitrary_value.1)
+                                && plugin.css_template_value(
+                                    &to_css_value(arbitrary_value.1),
+                                    &mut css_content,
+                                )
+                            {
+                                return Some(gen_css_rule(selector, &css_content));
+                            }
+                        } else if plugin.get_css_for_modifier(
+                            &selector.get_modifier(plugin.namespace()),
+                            &mut css_content,
+                        ) {
                             return Some(gen_css_rule(selector, &css_content));
                         }
-                    } else if plugin.get_css_for_modifier(
-                        &selector.get_modifier(plugin.namespace()),
-                        &mut css_content,
-                    ) {
-                        return Some(gen_css_rule(selector, &css_content));
                     }
                 }
-            }
 
-            None
-        })
-        .collect::<Vec<String>>();
+                None
+            })
+            .collect::<Vec<String>>();
 
         format!("{}{}", ENCRE_PREFLIGHT_CSS, result.join("\n\n"))
     }
