@@ -28,6 +28,12 @@ impl Deref for ScreenConfig {
     }
 }
 
+impl From<BTreeMap<Cow<'static, str>, Cow<'static, str>>> for ScreenConfig {
+    fn from(v: BTreeMap<Cow<'static, str>, Cow<'static, str>>) -> Self {
+        Self(v)
+    }
+}
+
 impl Default for ScreenConfig {
     fn default() -> Self {
         let mut screens = BTreeMap::new();
@@ -277,6 +283,12 @@ impl Default for ColorConfig {
         colors.insert(Cow::from("rose-900"), [136, 19, 55]);
 
         Self(colors)
+    }
+}
+
+impl From<BTreeMap<Cow<'static, str>, [u8; 3]>> for ColorConfig {
+    fn from(v: BTreeMap<Cow<'static, str>, [u8; 3]>) -> Self {
+        Self(v)
     }
 }
 

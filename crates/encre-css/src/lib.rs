@@ -347,7 +347,7 @@ impl EncreGenerator {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::config::DarkModeConfig;
+    use crate::config::{DarkModeConfig, ColorConfig, ScreenConfig};
 
     use std::borrow::Cow;
     use pretty_assertions::assert_eq;
@@ -575,6 +575,32 @@ mod tests {
             generator.generate(),
             format!(r#"{}.dark .dark\:mt-px {{
   margin-top: 1px;
+}}"#, preflight::ENCRE_PREFLIGHT_CSS)
+        );
+    }
+
+    #[test]
+    fn gen_selector_css_with_custom_config_test() {
+        let mut colors = BTreeMap::new();
+        colors.insert(Cow::from("rosa-500"), [229, 24, 106]);
+
+        let mut screens = BTreeMap::new();
+        screens.insert(Cow::from("3xl"), Cow::from("1600px"));
+
+        let mut config = Config::default();
+        config.theme.colors = ColorConfig::from(colors);
+        config.theme.screens = ScreenConfig::from(screens);
+
+        let mut generator = EncreGenerator::from_config(config);
+        generator.add_selector("3xl:text-rosa-500");
+
+        assert_eq!(
+            generator.generate(),
+            format!(r#"{}@media (min-width: 1600px) {{
+  .\33xl\:text-rosa-500 {{
+    --en-text-opacity: 1;
+    color: rgb(229 24 106 / var(--en-text-opacity));
+  }}
 }}"#, preflight::ENCRE_PREFLIGHT_CSS)
         );
     }

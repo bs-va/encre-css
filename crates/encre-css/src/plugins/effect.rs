@@ -84,7 +84,7 @@ impl Plugin for BoxShadowPlugin {
         write!(css_content, "box-shadow: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
         match modifier.content() {
             "" => write!(
                 css_content,
