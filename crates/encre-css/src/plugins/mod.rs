@@ -1,4 +1,4 @@
-use crate::selector::Modifier;
+use crate::{config::Config, selector::Modifier};
 
 use lazy_static::lazy_static;
 use std::fmt;
@@ -54,7 +54,7 @@ pub trait Plugin: fmt::Debug {
     /// Get the CSS code from a modifier
     ///
     /// Returns whether the function handled the modifier
-    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool;
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool;
 
     // TODO: fn custom_css(&self) -> String; (custom CSS added only if plugin used at least once, e.g. for animations or for filters and transforms (avoid repeat CSS_FILTER))
 }

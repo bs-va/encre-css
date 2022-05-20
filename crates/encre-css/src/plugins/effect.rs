@@ -1,5 +1,5 @@
 use super::Plugin;
-use crate::selector::Modifier;
+use crate::{config::Config, selector::Modifier};
 use crate::utils::{default_colors, value_matchers::*};
 
 use std::fmt::Write;
@@ -14,7 +14,7 @@ impl Plugin for MixBlendModePlugin {
         "mix-blend"
     }
 
-    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
         match modifier.content() {
             "normal" => write!(css_content, "mix-blend-mode: normal;").is_ok(),
             "multiply" => write!(css_content, "mix-blend-mode: multiply;").is_ok(),
@@ -45,7 +45,7 @@ impl Plugin for BackgroundBlendModePlugin {
         "bg-blend"
     }
 
-    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
         match modifier.content() {
             "normal" => write!(css_content, "background-blend-mode: normal;").is_ok(),
             "multiply" => write!(css_content, "background-blend-mode: multiply;").is_ok(),
@@ -84,7 +84,7 @@ impl Plugin for BoxShadowPlugin {
         write!(css_content, "box-shadow: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
         match modifier.content() {
             "" => write!(
                 css_content,
@@ -154,8 +154,8 @@ impl Plugin for BoxShadowColorPlugin {
         }
     }
 
-    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
-        if let Some(color) = default_colors::get(modifier.content()) {
+    fn get_css_for_modifier(&self, config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+        if let Some(color) = default_colors::get(config, modifier.content()) {
             self.css_template_value(&color, css_content)
         } else {
             false
@@ -171,7 +171,7 @@ impl Plugin for OpacityPlugin {
         "opacity"
     }
 
-    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.to_f32() {
             write!(css_content, "opacity: {};", opacity_value / 100.).is_ok()

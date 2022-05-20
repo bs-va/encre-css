@@ -1,5 +1,5 @@
 use super::Plugin;
-use crate::selector::Modifier;
+use crate::{config::Config, selector::Modifier};
 use crate::utils::{default_lengths, value_matchers::*};
 
 use std::fmt::Write;
@@ -20,7 +20,7 @@ impl Plugin for ColumnsPlugin {
         write!(css_content, "grid-template-columns: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
         if modifier.is("none") {
             return self.css_template_value("none", css_content);
         }
@@ -50,7 +50,7 @@ impl Plugin for RowsPlugin {
         write!(css_content, "grid-template-rows: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
         if modifier.is("none") {
             return self.css_template_value("none", css_content);
         }
@@ -80,7 +80,7 @@ impl Plugin for StartEndSpanColumnPlugin {
         write!(css_content, "grid-column: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
         if modifier.is("auto") {
             return self.css_template_value("auto", css_content);
         }
@@ -137,7 +137,7 @@ impl Plugin for StartEndSpanRowPlugin {
         write!(css_content, "grid-row: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
         if modifier.is("auto") {
             return self.css_template_value("auto", css_content);
         }
@@ -186,7 +186,7 @@ impl Plugin for AutoFlowPlugin {
         "grid-flow"
     }
 
-    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
         match modifier.content() {
             "row" => write!(css_content, "grid-auto-flow: row;").is_ok(),
             "col" => write!(css_content, "grid-auto-flow: column;").is_ok(),
@@ -213,7 +213,7 @@ impl Plugin for AutoColumnsPlugin {
         write!(css_content, "grid-auto-columns: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
         match modifier.content() {
             "auto" => self.css_template_value("auto", css_content),
             "min" => self.css_template_value("min-content", css_content),
@@ -240,7 +240,7 @@ impl Plugin for AutoRowsPlugin {
         write!(css_content, "grid-auto-rows: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
         match modifier.content() {
             "auto" => self.css_template_value("auto", css_content),
             "min" => self.css_template_value("min-content", css_content),
@@ -267,7 +267,7 @@ impl Plugin for GapPlugin {
         write!(css_content, "gap: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
         if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
@@ -292,7 +292,7 @@ impl Plugin for GapXPlugin {
         write!(css_content, "column-gap: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
         if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
@@ -317,7 +317,7 @@ impl Plugin for GapYPlugin {
         write!(css_content, "row-gap: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
         if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {

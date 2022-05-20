@@ -24,7 +24,7 @@ pub mod error;
 
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::{fs, iter, collections::BTreeMap, io::Read, path::PathBuf};
+use std::{fs, iter, borrow::Cow, collections::BTreeMap, io::Read, path::PathBuf};
 use wax::Glob;
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -83,7 +83,7 @@ pub fn indent(val: String) -> String {
 #[derive(Default)]
 pub struct EncreGenerator {
     config: Config,
-    variants: BTreeMap<&'static str, Variant>,
+    variants: BTreeMap<Cow<'static, str>, Variant>,
     scanned_selectors_without_variant: Vec<Selector>,
     scanned_selectors_with_variant: Vec<Selector>,
 }
@@ -119,9 +119,9 @@ impl EncreGenerator {
         };
 
         // TODO: Use rayon to make this part parallel
-        input.iter().for_each(|path| {
-            result.scan_path(path);
-        });
+        for path in input {
+            result.scan_path(&path);
+        }
 
         result
     }
@@ -246,6 +246,7 @@ impl EncreGenerator {
                                 return Some(self.gen_css_rule(selector, &css_content));
                             }
                         } else if plugin.get_css_for_modifier(
+                            &self.config,
                             &selector.get_modifier(plugin.namespace()),
                             &mut css_content,
                         ) {

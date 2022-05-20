@@ -1,5 +1,5 @@
 use super::Plugin;
-use crate::selector::Modifier;
+use crate::{config::Config, selector::Modifier};
 
 use std::fmt::Write;
 
@@ -11,7 +11,7 @@ const CSS_BACKDROP_FILTER: &str = "-webkit-backdrop-filter: var(--en-backdrop-bl
 pub struct FilterPlugin;
 
 impl Plugin for FilterPlugin {
-    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
         if modifier.content() == "filter" {
             return write!(css_content, "{}", CSS_FILTER).is_ok();
         } else if modifier.content() == "filter-none" {
@@ -85,7 +85,7 @@ impl Plugin for BackdropFilterPlugin {
         "backdrop"
     }
 
-    fn get_css_for_modifier(&self, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
         if modifier.content() == "filter" {
             return write!(css_content, "{}", CSS_BACKDROP_FILTER).is_ok();
         } else if modifier.content() == "filter-none" {
