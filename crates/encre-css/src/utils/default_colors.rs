@@ -2,6 +2,7 @@ use crate::config::Config;
 
 use lazy_static::lazy_static;
 use regex::Regex;
+use std::borrow::Cow;
 
 lazy_static! {
     static ref OPACITY_SUFFIX_REGEX: Regex = Regex::new(r"(?-u)/(\d*)$").unwrap();
@@ -47,16 +48,7 @@ pub fn get(config: &Config, modifier: &str) -> Option<String> {
     } else if modifier == "white" {
         Some(&[0xff, 0xff, 0xff])
     } else {
-        let mut result = None;
-
-        for color in &*config.theme.colors {
-            if modifier == color.0.as_ref() {
-                result = Some(color.1);
-                break;
-            }
-        }
-
-        result
+        config.theme.colors.get(&Cow::from(modifier))
     };
 
     // Convert the array to a CSS color with an opacity value (if the color is found)

@@ -604,4 +604,61 @@ mod tests {
 }}"#, preflight::ENCRE_PREFLIGHT_CSS)
         );
     }
+
+    #[test]
+    fn parse_config_file_test() {
+        let mut config = Config::default();
+        config.theme.colors.insert(Cow::from("rosa-500"), [229, 24, 106]);
+        config.theme.colors.insert(Cow::from("yellow-400"), [255, 239, 14]);
+        config.theme.screens.remove(&Cow::from("lg"));
+        config.theme.screens.insert(Cow::from("lg"), Cow::from("2000px"));
+        config.theme.screens.insert(Cow::from("3xl"), Cow::from("1600px"));
+        config.theme.dark_mode = DarkModeConfig::Class(Cow::from(".dark"));
+
+        assert_eq!(Config::from_file("tests/fixtures/custom_config.toml".into()).unwrap(), config);
+    }
+
+    #[test]
+    fn config_is_extended_and_overridden_test() {
+        let config = Config::from_file("tests/fixtures/custom_config.toml".into()).unwrap();
+
+        let mut generator = EncreGenerator::from_config(config);
+        generator.add_selector("bg-rosa-500");
+        generator.add_selector("bg-yellow-400");
+        generator.add_selector("bg-yellow-100");
+        generator.add_selector("3xl:underline");
+        generator.add_selector("lg:text-rosa-500");
+
+        assert_eq!(
+            generator.generate(),
+            format!(r#"{}.bg-rosa-500 {{
+  --en-bg-opacity: 1;
+  background-color: rgb(229 24 106 / var(--en-bg-opacity));
+}}
+
+.bg-yellow-400 {{
+  --en-bg-opacity: 1;
+  background-color: rgb(255 239 14 / var(--en-bg-opacity));
+}}
+
+.bg-yellow-100 {{
+  --en-bg-opacity: 1;
+  background-color: rgb(254 249 195 / var(--en-bg-opacity));
+}}
+
+@media (min-width: 1600px) {{
+  .\33xl\:underline {{
+    -webkit-text-decoration-line: underline;
+    text-decoration-line: underline;
+  }}
+}}
+
+@media (min-width: 2000px) {{
+  .lg\:text-rosa-500 {{
+    --en-text-opacity: 1;
+    color: rgb(229 24 106 / var(--en-text-opacity));
+  }}
+}}"#, preflight::ENCRE_PREFLIGHT_CSS)
+        );
+    }
 }

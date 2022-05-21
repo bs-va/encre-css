@@ -2,9 +2,9 @@ use crate::error::{Result, Error};
 
 use serde::{Deserialize, Deserializer, de::{Visitor, MapAccess, value::MapAccessDeserializer}};
 use serde_derive::Deserialize;
-use std::{fs, fmt, ops::Deref, path::PathBuf, borrow::Cow, collections::BTreeMap};
+use std::{fs, fmt, ops::{Deref, DerefMut}, path::PathBuf, borrow::Cow, collections::BTreeMap};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, PartialEq, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum DarkModeConfig {
     Class(Cow<'static, str>),
@@ -17,7 +17,7 @@ impl Default for DarkModeConfig {
     }
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, PartialEq, Clone, Deserialize)]
 pub struct ScreenConfig(BTreeMap<Cow<'static, str>, Cow<'static, str>>);
 
 impl Deref for ScreenConfig {
@@ -25,6 +25,12 @@ impl Deref for ScreenConfig {
 
     fn deref(&self) -> &Self::Target {
         &self.0
+    }
+}
+
+impl DerefMut for ScreenConfig {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
     }
 }
 
@@ -47,7 +53,7 @@ impl Default for ScreenConfig {
     }
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, PartialEq, Clone, Deserialize)]
 pub struct ColorConfig(BTreeMap<Cow<'static, str>, [u8; 3]>);
 
 impl Deref for ColorConfig {
@@ -55,6 +61,12 @@ impl Deref for ColorConfig {
 
     fn deref(&self) -> &Self::Target {
         &self.0
+    }
+}
+
+impl DerefMut for ColorConfig {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
     }
 }
 
@@ -335,18 +347,16 @@ fn convert_hex_to_rgb<'de, D>(d: D) -> std::result::Result<ColorConfig, D::Error
 
     let mut colors_rgb_content = BTreeMap::new();
 
-    {
-        let colors_hex = d.deserialize_any(ColorConfigHex)?;
+    let colors_hex = d.deserialize_any(ColorConfigHex)?;
 
-        for color in colors_hex {
-            colors_rgb_content.insert(color.0, hex_to_rgb(color.1));
-        }
+    for color in colors_hex {
+        colors_rgb_content.insert(color.0, hex_to_rgb(color.1));
     }
 
     Ok(ColorConfig(colors_rgb_content))
 }
 
-#[derive(Debug, Default, Deserialize)]
+#[derive(Debug, PartialEq, Default, Deserialize)]
 pub struct ThemeConfig {
     #[serde(default)]
     pub dark_mode: DarkModeConfig,
@@ -358,7 +368,7 @@ pub struct ThemeConfig {
     pub colors: ColorConfig,
 }
 
-#[derive(Default, Debug, Deserialize)]
+#[derive(Default, PartialEq, Debug, Deserialize)]
 pub struct Config {
     #[serde(default)]
     pub input: Vec<PathBuf>,
@@ -374,7 +384,32 @@ pub struct Config {
 
 impl Config {
     pub fn from_file(path: PathBuf) -> Result<Self> {
-        toml::from_str(&fs::read_to_string(&path).map_err(|e| Error::ConfigFileNotFound(path, e))?).map_err(|e| e.into())
-        // TODO: Extend all configuration options instead of overriding them
+        let mut config: Config = toml::from_str(&fs::read_to_string(&path).map_err(|e| Error::ConfigFileNotFound(path, e))?)?;
+
+        if config.theme.colors != ColorConfig::default() {
+            let overriden_colors = config.theme.colors.clone();
+            config.theme.colors.extend(ColorConfig::default().iter().filter_map(|c| {
+                let key = c.0.clone();
+                if !overriden_colors.contains_key(&key) {
+                    Some((key, *c.1))
+                } else {
+                    None
+                }
+            }));
+        }
+
+        if config.theme.screens != ScreenConfig::default() {
+            let overriden_screens = config.theme.screens.clone();
+            config.theme.screens.extend(ScreenConfig::default().iter().filter_map(|c| {
+                let key = c.0.clone();
+                if !overriden_screens.contains_key(&key) {
+                    Some((key, c.1.clone()))
+                } else {
+                    None
+                }
+            }));
+        }
+
+        Ok(config)
     }
 }
