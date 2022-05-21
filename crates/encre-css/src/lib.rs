@@ -7,7 +7,7 @@
 //!
 //! let mut generator = EncreGenerator::from_config(Config::default());
 //! // Or let mut generator = EncreGenerator::new("encre.toml".into()); if your current directory contains an `encre.toml` file
-//! generator.scan_content(r#"class="bg-red-500""#);
+//! generator.scan_raw(r#"class="bg-red-500""#);
 //!
 //! assert!(generator.generate().contains(r#".bg-red-500 {
 //!   --en-bg-opacity: 1;
@@ -107,7 +107,7 @@ impl EncreGenerator {
 
     /// Create a new [`EncreGenerator`] using a given configuration
     ///
-    /// The paths in the [`Config::content`] field of the configuration will be scanned
+    /// The paths in the [`Config::input`] field of the configuration will be scanned
     pub fn from_config(config: Config) -> Self {
         let input = config.input.clone();
 
@@ -141,23 +141,23 @@ impl EncreGenerator {
         }
     }
 
-    /// Scan the content of a file and store all the selectors found
-    pub fn scan_content(&mut self, content: &str) {
-        for val in SPLIT_REGEX.split(content) {
+    /// Scan the contents of a file and store all the selectors found
+    pub fn scan_raw(&mut self, contents: &str) {
+        for val in SPLIT_REGEX.split(contents) {
             self.add_selector(val);
         }
     }
 
     /// Scan all files given and store all the selectors found
     pub fn scan_files(&mut self, files: impl Iterator<Item = PathBuf>) {
-        let mut file_content: String = String::new();
+        let mut file_contents: String = String::new();
 
         for file in files {
             let mut file = fs::File::open(file).unwrap();
-            file_content.clear();
+            file_contents.clear();
 
-            if file.read_to_string(&mut file_content).is_ok() {
-                self.scan_content(&file_content);
+            if file.read_to_string(&mut file_contents).is_ok() {
+                self.scan_raw(&file_contents);
             }
             // TODO: Display a warning otherwise
         }
@@ -179,11 +179,11 @@ impl EncreGenerator {
 
     /// Generate the CSS styles needed based on the scanned selectors
     ///
-    /// NOTE: Don't forget to scan selectors using either [scan_files] or [scan_content] or by
+    /// NOTE: Don't forget to scan selectors using either [scan_files] or [scan_raw] or by
     /// adding individual selectors using [add_selector]
     ///
     /// [scan_files]: EncreGenerator::scan_files
-    /// [scan_content]: EncreGenerator::scan_content
+    /// [scan_raw]: EncreGenerator::scan_raw
     /// [add_selector]: EncreGenerator::add_selector
     pub fn generate(&self) -> String {
         let selectors = [
@@ -337,8 +337,9 @@ impl EncreGenerator {
         }
     }
 
-    /// Forget the scanned selectors (useful when repeatedly calling [`EncreGenerator::generate`])
-    pub fn clear_scanned_selectors(&mut self) {
+    /// Return to the default state of the generator (without scanned selectors)
+    /// Useful when repeatedly calling [`EncreGenerator::generate`]
+    pub fn reset(&mut self) {
         self.scanned_selectors_without_variant.clear();
         self.scanned_selectors_with_variant.clear();
     }
@@ -353,9 +354,9 @@ mod tests {
     use pretty_assertions::assert_eq;
 
     #[test]
-    fn scan_content_test() {
+    fn scan_raw_test() {
         let mut generator = EncreGenerator::from_config(Config::default());
-        generator.scan_content(
+        generator.scan_raw(
             r#"<div class="w-full h-full absolute bg-blue-500 foo-bar sm:focus:ring hover:bg-black border-[#333] text-[color:var(--hello)]"></div>"#
         );
 
