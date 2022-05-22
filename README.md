@@ -17,7 +17,7 @@ Then, use the `EncreGenerator` structure to generate CSS styles:
 use encre_css::EncreGenerator;
 
 let mut generator = EncreGenerator::new();
-generator.scan_content(r#"class="bg-red-500""#);
+generator.scan_raw(r#"class="bg-red-500""#);
 
 let css_styles = generator.generate();
 
