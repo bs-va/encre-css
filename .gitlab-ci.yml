@@ -6,7 +6,7 @@ cache:
       - target/
 
 check:test:
-  stage: check
+  stage: test
   script:
     - cargo test --workspace
 
