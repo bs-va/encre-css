@@ -1,7 +1,6 @@
 use crate::error::{Result, Error};
 
 use serde::{Deserialize, Deserializer, de::{Visitor, MapAccess, value::MapAccessDeserializer}};
-use serde_derive::Deserialize;
 use std::{fs, fmt, ops::{Deref, DerefMut}, path::PathBuf, borrow::Cow, collections::BTreeMap};
 
 #[derive(Debug, PartialEq, Deserialize)]
