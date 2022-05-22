@@ -1,4 +1,4 @@
-# encre-css (french word for `ink`)
+# encre-css (French word for `ink`)
 
 > A TailwindCSS-compatible CSS generation library written in Rust
 
