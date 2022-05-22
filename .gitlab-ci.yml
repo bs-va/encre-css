@@ -1,8 +1,9 @@
 image: rust:latest
 
-stages:
-  - check
-  - deploy
+cache:
+  key: shared-cache
+  paths:
+      - target/
 
 check:test:
   stage: check
