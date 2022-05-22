@@ -75,7 +75,7 @@ pub fn build(config: Option<String>, extra_input: Option<PathBuf>, output: Optio
                         // TODO: Handle configuration changes
 
                         println!("Changes detected. Reloading…");
-                        generator.clear_scanned_selectors();
+                        generator.reset();
 
                         input.iter().for_each(|path| {
                             generator.scan_path(path);
