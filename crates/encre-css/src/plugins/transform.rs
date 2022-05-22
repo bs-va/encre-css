@@ -22,7 +22,7 @@ impl Plugin for OriginPlugin {
         write!(css_content, "transform-origin: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
         if modifier.is_one_of(&[
             "center",
             "top",
@@ -49,7 +49,7 @@ impl Plugin for TranslateRotateScaleSkewPlugin {
         ""
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
         let mut result = false;
 
         if let Some(val) = modifier.strip_prefix("translate-") {

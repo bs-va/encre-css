@@ -30,10 +30,10 @@ use wax::Glob;
 #[cfg(not(target_arch = "wasm32"))]
 use rayon::prelude::*;
 
-use plugins::PLUGINS;
 use preflight::ENCRE_PREFLIGHT_CSS;
 use selector::Selector;
 use variant::{Variant, init_variants};
+use plugins::*;
 
 pub use config::Config;
 pub use error::Error;
@@ -191,6 +191,8 @@ impl EncreGenerator {
             &self.scanned_selectors_with_variant,
         ];
 
+        let plugins = self.build_plugins();
+
         #[cfg(target_arch = "wasm32")]
         let iter = selectors.iter();
 
@@ -202,7 +204,7 @@ impl EncreGenerator {
             .filter_map(|selector| {
                 // Find the right plugin to handle this selector (if the resulting CSS is valid,
                 // the plugin is good)
-                for plugin in PLUGINS.iter() {
+                plugins.iter().find_map(|plugin| {
                     if selector.check_namespace(plugin.namespace()) {
                         let maybe_arbitrary_value = selector.get_arbitrary_value();
                         let arbitrary_value = if let Some(ref arbitrary_value) = maybe_arbitrary_value {
@@ -235,6 +237,7 @@ impl EncreGenerator {
                         };
 
                         let mut css_content = String::new();
+                        let mut custom_css = String::new();
 
                         if let Some(arbitrary_value) = arbitrary_value {
                             if plugin.is_matching_value(arbitrary_value.0, arbitrary_value.1)
@@ -243,19 +246,30 @@ impl EncreGenerator {
                                     &mut css_content,
                                 )
                             {
-                                return Some(self.gen_css_rule(selector, &css_content));
+                                Some(self.gen_css_rule(selector, &css_content))
+                            } else {
+                                None
                             }
                         } else if plugin.get_css_for_modifier(
                             &self.config,
                             &selector.get_modifier(plugin.namespace()),
                             &mut css_content,
+                            &mut custom_css,
                         ) {
-                            return Some(self.gen_css_rule(selector, &css_content));
-                        }
-                    }
-                }
+                            let mut css = self.gen_css_rule(selector, &css_content);
 
-                None
+                            if !custom_css.is_empty() {
+                                css.push_str(&format!("\n\n{}", custom_css));
+                            }
+
+                            Some(css)
+                        } else {
+                            None
+                        }
+                    } else {
+                        None
+                    }
+                })
             })
             .collect::<Vec<String>>();
 
@@ -337,7 +351,198 @@ impl EncreGenerator {
         }
     }
 
-    /// Return to the default state of the generator (without scanned selectors)
+    /// Return the list of plugins needed
+    pub fn build_plugins(&self) -> [Box<dyn Plugin + Sync>; 181] {
+        // TODO: Better sorting (colors and lengths after all the other utilities (because they have
+        // hints))
+        [
+            Box::new(background::ColorPlugin),
+            Box::new(background::AttachmentPlugin),
+            Box::new(background::ClipPlugin),
+            Box::new(background::OpacityPlugin),
+            Box::new(background::ImagePlugin),
+            Box::new(background::GradientFromPlugin),
+            Box::new(background::GradientViaPlugin),
+            Box::new(background::GradientToPlugin),
+            Box::new(background::PositionPlugin),
+            Box::new(background::RepeatPlugin),
+            Box::new(background::SizePlugin),
+            Box::new(border::ColorPlugin),
+            Box::new(border::RadiusPlugin),
+            Box::new(border::RadiusTopPlugin),
+            Box::new(border::RadiusBottomPlugin),
+            Box::new(border::RadiusLeftPlugin),
+            Box::new(border::RadiusRightPlugin),
+            Box::new(border::RadiusTopLeftPlugin),
+            Box::new(border::RadiusTopRightPlugin),
+            Box::new(border::RadiusBottomLeftPlugin),
+            Box::new(border::RadiusBottomRightPlugin),
+            Box::new(border::StylePlugin),
+            Box::new(border::WidthPlugin),
+            Box::new(border::WidthXPlugin),
+            Box::new(border::WidthYPlugin),
+            Box::new(border::WidthTopPlugin),
+            Box::new(border::WidthBottomPlugin),
+            Box::new(border::WidthLeftPlugin),
+            Box::new(border::WidthRightPlugin),
+            Box::new(border::OpacityPlugin),
+            Box::new(border::DivideColorPlugin),
+            Box::new(border::DivideWidthXPlugin),
+            Box::new(border::DivideWidthYPlugin),
+            Box::new(border::DivideStylePlugin),
+            Box::new(border::DivideOpacityPlugin),
+            Box::new(border::RingOffsetColorPlugin),
+            Box::new(border::RingOffsetWidthPlugin),
+            Box::new(border::RingColorPlugin),
+            Box::new(border::RingWidthPlugin),
+            Box::new(border::RingOpacityPlugin),
+            Box::new(border::OutlineColorPlugin),
+            Box::new(border::OutlineWidthPlugin),
+            Box::new(border::OutlineStylePlugin),
+            Box::new(border::OutlineOffsetPlugin),
+            Box::new(typography::ColorPlugin),
+            Box::new(typography::OpacityPlugin),
+            Box::new(typography::FontFamilyPlugin),
+            Box::new(typography::FontSizePlugin),
+            Box::new(typography::FontWeightPlugin),
+            Box::new(typography::TextAlignmentPlugin),
+            Box::new(typography::TrackingPlugin),
+            Box::new(typography::LeadingPlugin),
+            Box::new(typography::TextDecorationColorPlugin),
+            Box::new(typography::TextDecorationStylePlugin),
+            Box::new(typography::TextDecorationThicknessPlugin),
+            Box::new(typography::TextDecorationOffsetPlugin),
+            Box::new(typography::ContentPlugin),
+            Box::new(typography::ListStyleTypePlugin),
+            Box::new(typography::ListStylePositionPlugin),
+            Box::new(typography::VerticalAlignPlugin),
+            Box::new(typography::WhitespacePlugin),
+            Box::new(typography::WordBreakPlugin),
+            Box::new(sizing::WidthPlugin),
+            Box::new(sizing::MinWidthPlugin),
+            Box::new(sizing::MaxWidthPlugin),
+            Box::new(sizing::HeightPlugin),
+            Box::new(sizing::MinHeightPlugin),
+            Box::new(sizing::MaxHeightPlugin),
+            Box::new(spacing::PaddingPlugin),
+            Box::new(spacing::PaddingXPlugin),
+            Box::new(spacing::PaddingYPlugin),
+            Box::new(spacing::PaddingLeftPlugin),
+            Box::new(spacing::PaddingRightPlugin),
+            Box::new(spacing::PaddingTopPlugin),
+            Box::new(spacing::PaddingBottomPlugin),
+            Box::new(spacing::MarginPlugin),
+            Box::new(spacing::MarginXPlugin),
+            Box::new(spacing::MarginYPlugin),
+            Box::new(spacing::MarginLeftPlugin),
+            Box::new(spacing::MarginRightPlugin),
+            Box::new(spacing::MarginTopPlugin),
+            Box::new(spacing::MarginBottomPlugin),
+            Box::new(spacing::SpaceXPlugin),
+            Box::new(spacing::SpaceYPlugin),
+            Box::new(flexbox::OrderPlugin),
+            Box::new(flexbox::DirectionPlugin),
+            Box::new(flexbox::WrapPlugin),
+            Box::new(flexbox::GrowShrinkBasisPlugin),
+            Box::new(layout::InsetPlugin),
+            Box::new(layout::InsetXPlugin),
+            Box::new(layout::InsetYPlugin),
+            Box::new(layout::TopPlugin),
+            Box::new(layout::BottomPlugin),
+            Box::new(layout::LeftPlugin),
+            Box::new(layout::RightPlugin),
+            Box::new(layout::ZIndexPlugin),
+            Box::new(layout::ContainerPlugin),
+            Box::new(layout::BoxDecorationBreakPlugin),
+            Box::new(layout::BoxSizingPlugin),
+            Box::new(layout::FloatPlugin),
+            Box::new(layout::ClearPlugin),
+            Box::new(layout::IsolationPlugin),
+            Box::new(layout::ObjectFitPlugin),
+            Box::new(layout::ObjectPositionPlugin),
+            Box::new(layout::OverflowPlugin),
+            Box::new(layout::OverscrollPlugin),
+            Box::new(alignment::AlignContentPlugin),
+            Box::new(alignment::AlignItemsPlugin),
+            Box::new(alignment::AlignSelfPlugin),
+            Box::new(alignment::JustifyContentPlugin),
+            Box::new(alignment::JustifyItemsPlugin),
+            Box::new(alignment::JustifySelfPlugin),
+            Box::new(alignment::PlaceContentPlugin),
+            Box::new(alignment::PlaceItemsPlugin),
+            Box::new(alignment::PlaceSelfPlugin),
+            Box::new(effect::MixBlendModePlugin),
+            Box::new(effect::OpacityPlugin),
+            Box::new(effect::BackgroundBlendModePlugin),
+            Box::new(effect::BoxShadowPlugin),
+            Box::new(effect::BoxShadowColorPlugin),
+            Box::new(transition::DurationPlugin),
+            Box::new(transition::DelayPlugin),
+            Box::new(transition::EasePlugin),
+            Box::new(transition::PropertyPlugin),
+            Box::new(transition::AnimatePlugin::new()),
+            Box::new(grid::ColumnsPlugin),
+            Box::new(grid::RowsPlugin),
+            Box::new(grid::GapPlugin),
+            Box::new(grid::GapXPlugin),
+            Box::new(grid::GapYPlugin),
+            Box::new(grid::StartEndSpanColumnPlugin),
+            Box::new(grid::StartEndSpanRowPlugin),
+            Box::new(grid::AutoFlowPlugin),
+            Box::new(grid::AutoColumnsPlugin),
+            Box::new(grid::AutoRowsPlugin),
+            Box::new(interactivity::AccentColorPlugin),
+            Box::new(interactivity::AppearancePlugin),
+            Box::new(interactivity::CursorPlugin),
+            Box::new(interactivity::CaretColorPlugin),
+            Box::new(interactivity::PointerEventsPlugin),
+            Box::new(interactivity::ResizePlugin),
+            Box::new(interactivity::ScrollBehaviorPlugin),
+            Box::new(interactivity::TouchActionPlugin),
+            Box::new(interactivity::UserSelectPlugin),
+            Box::new(interactivity::WillChangePlugin),
+            Box::new(interactivity::ScrollSnapAlignPlugin),
+            Box::new(interactivity::ScrollSnapStopPlugin),
+            Box::new(interactivity::ScrollSnapTypePlugin),
+            Box::new(interactivity::ScrollPaddingPlugin),
+            Box::new(interactivity::ScrollPaddingXPlugin),
+            Box::new(interactivity::ScrollPaddingYPlugin),
+            Box::new(interactivity::ScrollPaddingLeftPlugin),
+            Box::new(interactivity::ScrollPaddingRightPlugin),
+            Box::new(interactivity::ScrollPaddingTopPlugin),
+            Box::new(interactivity::ScrollPaddingBottomPlugin),
+            Box::new(interactivity::ScrollMarginPlugin),
+            Box::new(interactivity::ScrollMarginXPlugin),
+            Box::new(interactivity::ScrollMarginYPlugin),
+            Box::new(interactivity::ScrollMarginLeftPlugin),
+            Box::new(interactivity::ScrollMarginRightPlugin),
+            Box::new(interactivity::ScrollMarginTopPlugin),
+            Box::new(interactivity::ScrollMarginBottomPlugin),
+            Box::new(svg::FillPlugin),
+            Box::new(svg::StrokeColorPlugin),
+            Box::new(svg::StrokeWidthPlugin),
+            Box::new(table::BorderCollapsePlugin),
+            Box::new(table::TableLayoutPlugin),
+            Box::new(transform::OriginPlugin),
+
+            // It is better to include the following plugins at the end because they match the "" namespace
+            Box::new(layout::DisplayPlugin),
+            Box::new(layout::PositionPlugin),
+            Box::new(layout::VisibilityPlugin),
+            Box::new(filter::FilterPlugin),
+            Box::new(filter::BackdropFilterPlugin),
+            Box::new(typography::TextTransformPlugin),
+            Box::new(typography::ItalicPlugin),
+            Box::new(typography::TextDecorationPlugin),
+            Box::new(typography::FontVariantNumericPlugin),
+            Box::new(typography::FontSmoothingPlugin),
+            Box::new(typography::TextOverflowPlugin),
+            Box::new(accessibility::ScreenReaderPlugin),
+            Box::new(transform::TranslateRotateScaleSkewPlugin),
+        ]
+    }
+
+    /// Restore the default state of the generator (without any scanned selectors)
     /// Useful when repeatedly calling [`EncreGenerator::generate`]
     pub fn reset(&mut self) {
         self.scanned_selectors_without_variant.clear();

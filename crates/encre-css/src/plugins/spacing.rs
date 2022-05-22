@@ -21,7 +21,7 @@ impl Plugin for PaddingPlugin {
         write!(css_content, "padding: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
         if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
@@ -51,7 +51,7 @@ padding-right: {val};"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
         if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
@@ -81,7 +81,7 @@ padding-bottom: {val};"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
         if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
@@ -106,7 +106,7 @@ impl Plugin for PaddingLeftPlugin {
         write!(css_content, "padding-left: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
         if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
@@ -131,7 +131,7 @@ impl Plugin for PaddingRightPlugin {
         write!(css_content, "padding-right: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
         if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
@@ -156,7 +156,7 @@ impl Plugin for PaddingTopPlugin {
         write!(css_content, "padding-top: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
         if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
@@ -181,7 +181,7 @@ impl Plugin for PaddingBottomPlugin {
         write!(css_content, "padding-bottom: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
         if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative()) {
             self.css_template_value(&length, css_content)
         } else {
@@ -208,7 +208,7 @@ impl Plugin for MarginPlugin {
         write!(css_content, "margin: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
         if modifier.is("auto") {
             return self.css_template_value("auto", css_content);
         }
@@ -242,7 +242,7 @@ margin-right: {val};"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
         if modifier.is("auto") {
             return self.css_template_value("auto", css_content);
         }
@@ -276,7 +276,7 @@ margin-bottom: {val};"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
         if modifier.is("auto") {
             return self.css_template_value("auto", css_content);
         }
@@ -305,7 +305,7 @@ impl Plugin for MarginLeftPlugin {
         write!(css_content, "margin-left: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
         if modifier.is("auto") {
             return self.css_template_value("auto", css_content);
         }
@@ -334,7 +334,7 @@ impl Plugin for MarginRightPlugin {
         write!(css_content, "margin-right: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
         if modifier.is("auto") {
             return self.css_template_value("auto", css_content);
         }
@@ -363,7 +363,7 @@ impl Plugin for MarginTopPlugin {
         write!(css_content, "margin-top: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
         if modifier.is("auto") {
             return self.css_template_value("auto", css_content);
         }
@@ -392,7 +392,7 @@ impl Plugin for MarginBottomPlugin {
         write!(css_content, "margin-bottom: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
         if modifier.is("auto") {
             return self.css_template_value("auto", css_content);
         }
@@ -430,7 +430,7 @@ margin-right: calc({val} * var(--en-space-x-reverse));"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
         // TODO: class with `> :not([hidden]) ~ :not([hidden])`
         if modifier.is("reverse") {
             return write!(css_content, "--en-space-x-reverse: 1;").is_ok();
@@ -470,7 +470,7 @@ margin-bottom: calc({val} * var(--en-space-y-reverse));"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
         // TODO: class with `> :not([hidden]) ~ :not([hidden])`
         if modifier.is("reverse") {
             return write!(css_content, "--en-space-y-reverse: 1;").is_ok();

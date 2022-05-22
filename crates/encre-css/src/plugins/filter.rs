@@ -5,13 +5,13 @@ use std::fmt::Write;
 
 const CSS_FILTER: &str = "filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);";
 const CSS_BACKDROP_FILTER: &str = "-webkit-backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
-  backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);";
+backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);";
 
 #[derive(Debug)]
 pub struct FilterPlugin;
 
 impl Plugin for FilterPlugin {
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
         if modifier.content() == "filter" {
             return write!(css_content, "{}", CSS_FILTER).is_ok();
         } else if modifier.content() == "filter-none" {
@@ -85,11 +85,12 @@ impl Plugin for BackdropFilterPlugin {
         "backdrop"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String) -> bool {
+    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
         if modifier.content() == "filter" {
             return write!(css_content, "{}", CSS_BACKDROP_FILTER).is_ok();
         } else if modifier.content() == "filter-none" {
-            return write!(css_content, "filter: none;").is_ok();
+            return write!(css_content, "-webkit-backdrop-filter: none;
+backdrop-filter: none;").is_ok();
         }
 
         let result = match modifier.content() {
@@ -147,6 +148,6 @@ impl Plugin for BackdropFilterPlugin {
             _ => return false,
         };
 
-        result && write!(css_content, "\n{}", CSS_FILTER).is_ok()
+        result && write!(css_content, "\n{}", CSS_BACKDROP_FILTER).is_ok()
     }
 }
