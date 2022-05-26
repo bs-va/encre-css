@@ -1,6 +1,6 @@
 use super::Plugin;
-use crate::{config::Config, selector::Modifier};
 use crate::utils::{default_colors, value_matchers::*};
+use crate::{config::Config, selector::Modifier};
 
 use std::fmt::Write;
 
@@ -32,7 +32,13 @@ border-color: {};",
         }
     }
 
-    fn get_css_for_modifier(&self, config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if let Some(color) = default_colors::get(config, modifier.content()) {
             self.css_template_value(&color, css_content)
         } else {
@@ -58,7 +64,13 @@ impl Plugin for RadiusPlugin {
         write!(css_content, "border-radius: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "" => self.css_template_value("0.25rem", css_content),
             "none" => self.css_template_value("0", css_content),
@@ -96,7 +108,13 @@ border-top-right-radius: {val};"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "" => self.css_template_value("0.25rem", css_content),
             "none" => self.css_template_value("0", css_content),
@@ -134,7 +152,13 @@ border-bottom-right-radius: {val};"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "" => self.css_template_value("0.25rem", css_content),
             "none" => self.css_template_value("0", css_content),
@@ -172,7 +196,13 @@ border-bottom-left-radius: {val};"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "" => self.css_template_value("0.25rem", css_content),
             "none" => self.css_template_value("0", css_content),
@@ -210,7 +240,13 @@ border-bottom-right-radius: {val};"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "" => self.css_template_value("0.25rem", css_content),
             "none" => self.css_template_value("0", css_content),
@@ -243,7 +279,13 @@ impl Plugin for RadiusTopLeftPlugin {
         write!(css_content, "border-top-left-radius: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "" => self.css_template_value("0.25rem", css_content),
             "none" => self.css_template_value("0", css_content),
@@ -276,7 +318,13 @@ impl Plugin for RadiusBottomLeftPlugin {
         write!(css_content, "border-bottom-left-radius: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "" => self.css_template_value("0.25rem", css_content),
             "none" => self.css_template_value("0", css_content),
@@ -309,7 +357,13 @@ impl Plugin for RadiusBottomRightPlugin {
         write!(css_content, "border-bottom-right-radius: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "" => self.css_template_value("0.25rem", css_content),
             "none" => self.css_template_value("0", css_content),
@@ -342,7 +396,13 @@ impl Plugin for RadiusTopRightPlugin {
         write!(css_content, "border-top-right-radius: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "" => self.css_template_value("", css_content),
             "none" => self.css_template_value("", css_content),
@@ -366,7 +426,13 @@ impl Plugin for StylePlugin {
         "border"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if modifier.is_one_of(&["solid", "dashed", "dotted", "double", "hidden", "none"]) {
             write!(css_content, "border-style: {};", modifier).is_ok()
         } else {
@@ -391,7 +457,13 @@ impl Plugin for WidthPlugin {
         write!(css_content, "border-width: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if modifier.is_empty() {
             return self.css_template_value("1px", css_content);
         }
@@ -426,7 +498,13 @@ border-right-width: {val};"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if modifier.is_empty() {
             return self.css_template_value("1px", css_content);
         }
@@ -461,7 +539,13 @@ border-bottom-width: {val};"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if modifier.is_empty() {
             return self.css_template_value("1px", css_content);
         }
@@ -491,7 +575,13 @@ impl Plugin for WidthTopPlugin {
         write!(css_content, "border-top-width: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if modifier.is_empty() {
             return self.css_template_value("1px", css_content);
         }
@@ -521,7 +611,13 @@ impl Plugin for WidthBottomPlugin {
         write!(css_content, "border-bottom-width: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if modifier.is_empty() {
             return self.css_template_value("1px", css_content);
         }
@@ -551,7 +647,13 @@ impl Plugin for WidthLeftPlugin {
         write!(css_content, "border-left-width: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if modifier.is_empty() {
             return self.css_template_value("1px", css_content);
         }
@@ -581,7 +683,13 @@ impl Plugin for WidthRightPlugin {
         write!(css_content, "border-right-width: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if modifier.is_empty() {
             return self.css_template_value("1px", css_content);
         }
@@ -603,7 +711,13 @@ impl Plugin for OpacityPlugin {
         "border-opacity"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.to_f32() {
             write!(
@@ -644,7 +758,13 @@ border-color: {};",
         }
     }
 
-    fn get_css_for_modifier(&self, config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if let Some(color) = default_colors::get(config, modifier.content()) {
             self.css_template_value(&color, css_content)
         } else {
@@ -678,16 +798,22 @@ border-right-width: {val};"
             )
             .is_ok()
         } else {
-        write!(
-            css_content,
-            "border-left-width: calc({val} * calc(1 - var(--en-divide-x-reverse)));
+            write!(
+                css_content,
+                "border-left-width: calc({val} * calc(1 - var(--en-divide-x-reverse)));
 border-right-width: calc({val} * var(--en-divide-x-reverse));"
-        )
-        .is_ok()
+            )
+            .is_ok()
         }
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         // TODO: class with `> :not([hidden]) ~ :not([hidden])`
         if modifier.is_empty() {
             writeln!(css_content, "--en-divide-x-reverse: 0;").ok();
@@ -731,16 +857,22 @@ border-bottom-width: {val};"
             )
             .is_ok()
         } else {
-        write!(
-            css_content,
-            "border-top-width: calc({val} * calc(1 - var(--en-divide-y-reverse)));
-  border-bottom-width: calc({val} * var(--en-divide-y-reverse));"
-        )
-        .is_ok()
+            write!(
+                css_content,
+                "border-top-width: calc({val} * calc(1 - var(--en-divide-y-reverse)));
+border-bottom-width: calc({val} * var(--en-divide-y-reverse));"
+            )
+            .is_ok()
         }
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         // TODO: class with `> :not([hidden]) ~ :not([hidden])`
         if modifier.is_empty() {
             writeln!(css_content, "--en-divide-y-reverse: 0;").ok();
@@ -767,7 +899,13 @@ impl Plugin for DivideStylePlugin {
         "divide"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "solid" => write!(css_content, "border-style: solid;").is_ok(),
             "dashed" => write!(css_content, "border-style: dashed;").is_ok(),
@@ -787,7 +925,13 @@ impl Plugin for DivideOpacityPlugin {
         "divide-opacity"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.to_f32() {
             write!(
@@ -828,7 +972,13 @@ impl Plugin for RingColorPlugin {
         }
     }
 
-    fn get_css_for_modifier(&self, config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if let Some(color) = default_colors::get(config, modifier.content()) {
             self.css_template_value(&color, css_content)
         } else {
@@ -855,7 +1005,13 @@ impl Plugin for RingWidthPlugin {
 box-shadow: var(--en-ring-offset-shadow), var(--en-ring-shadow), var(--en-shadow, 0 0 #0000);", CSS_RING_OFFSET_SHADOW).is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if modifier.is_empty() {
             return self.css_template_value("3px", css_content);
         } else if modifier.is("inset") {
@@ -879,7 +1035,13 @@ impl Plugin for RingOpacityPlugin {
         "ring-opacity"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.to_f32() {
             write!(css_content, "--en-ring-opacity: {};", opacity_value / 100.).is_ok()
@@ -914,7 +1076,13 @@ impl Plugin for RingOffsetColorPlugin {
         }
     }
 
-    fn get_css_for_modifier(&self, config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if let Some(color) = default_colors::get(config, modifier.content()) {
             self.css_template_value(&color, css_content)
         } else {
@@ -939,7 +1107,13 @@ impl Plugin for RingOffsetWidthPlugin {
         write!(css_content, "--en-ring-offset-width: {val};",).is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if modifier.to_usize().is_ok() {
             self.css_template_value(&format!("{}px", modifier), css_content)
@@ -974,7 +1148,13 @@ impl Plugin for OutlineColorPlugin {
         }
     }
 
-    fn get_css_for_modifier(&self, config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if let Some(color) = default_colors::get(config, modifier.content()) {
             self.css_template_value(&color, css_content)
         } else {
@@ -999,7 +1179,13 @@ impl Plugin for OutlineWidthPlugin {
         write!(css_content, "outline-width: {val};",).is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if modifier.to_usize().is_ok() {
             self.css_template_value(&format!("{}px", modifier), css_content)
@@ -1017,7 +1203,13 @@ impl Plugin for OutlineStylePlugin {
         "outline"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "" => write!(css_content, "outline-style: solid;").is_ok(),
             "none" => write!(
@@ -1051,7 +1243,13 @@ impl Plugin for OutlineOffsetPlugin {
         write!(css_content, "outline-offset: {val};",).is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if modifier.to_usize().is_ok() {
             self.css_template_value(&format!("{}px", modifier), css_content)

@@ -11,7 +11,13 @@ impl Plugin for ScreenReaderPlugin {
         ""
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "sr-only" => write!(
                 css_content,

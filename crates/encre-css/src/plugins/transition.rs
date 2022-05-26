@@ -1,10 +1,13 @@
 use super::Plugin;
-use crate::{config::Config, selector::Modifier};
 use crate::utils::value_matchers::*;
+use crate::{config::Config, selector::Modifier};
 
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::{fmt::Write, sync::atomic::{AtomicBool, Ordering}};
+use std::{
+    fmt::Write,
+    sync::atomic::{AtomicBool, Ordering},
+};
 
 lazy_static! {
     static ref PROPERTY_REGEX: Regex = Regex::new(r"[^\d]+").unwrap();
@@ -26,7 +29,13 @@ impl Plugin for PropertyPlugin {
         write!(css_content, "transition-property: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "" => write!(css_content, "transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
 transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -68,7 +77,13 @@ impl Plugin for DurationPlugin {
         write!(css_content, "transition-duration: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(duration) = modifier.to_usize() {
             self.css_template_value(&format!("{duration}ms"), css_content)
@@ -94,7 +109,13 @@ impl Plugin for DelayPlugin {
         write!(css_content, "transition-delay: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(delay) = modifier.to_usize() {
             self.css_template_value(&format!("{delay}ms"), css_content)
@@ -120,7 +141,13 @@ impl Plugin for EasePlugin {
         write!(css_content, "transition-timing-function: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "linear" => self.css_template_value("linear", css_content),
             "in" => self.css_template_value("cubic-bezier(0.4, 0, 1, 1)", css_content),
@@ -160,17 +187,32 @@ impl Plugin for AnimatePlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "-webkit-animation: bounce 1s infinite;
-animation: {val};").is_ok()
+        write!(
+            css_content,
+            "-webkit-animation: bounce 1s infinite;
+animation: {val};"
+        )
+        .is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        custom_css: &mut String,
+    ) -> bool {
         println!("{}", modifier);
         match modifier.content() {
             "none" => self.css_template_value("none", css_content),
             "spin" => {
-                if !self.is_spin_animation_already_defined.swap(true, Ordering::Relaxed) {
-                    write!(custom_css, "@-webkit-keyframes spin {{
+                if !self
+                    .is_spin_animation_already_defined
+                    .swap(true, Ordering::Relaxed)
+                {
+                    write!(
+                        custom_css,
+                        "@-webkit-keyframes spin {{
   to {{
     transform: rotate(360deg);
   }}
@@ -183,14 +225,21 @@ animation: {val};").is_ok()
   to {{
     transform: rotate(360deg);
   }}
-}}").unwrap();
+}}"
+                    )
+                    .unwrap();
                 }
 
                 self.css_template_value("spin 1s linear infinite", css_content)
-            },
+            }
             "ping" => {
-                if !self.is_ping_animation_already_defined.swap(true, Ordering::Relaxed) {
-                    write!(custom_css, "@-webkit-keyframes ping {{
+                if !self
+                    .is_ping_animation_already_defined
+                    .swap(true, Ordering::Relaxed)
+                {
+                    write!(
+                        custom_css,
+                        "@-webkit-keyframes ping {{
   75%, 100% {{
     transform: scale(2);
     opacity: 0;
@@ -202,14 +251,21 @@ animation: {val};").is_ok()
     transform: scale(2);
     opacity: 0;
   }}
-}}").unwrap();
+}}"
+                    )
+                    .unwrap();
                 }
 
                 self.css_template_value("ping 1s cubic-bezier(0, 0, 0.2, 1) infinite", css_content)
-            },
+            }
             "pulse" => {
-                if !self.is_pulse_animation_already_defined.swap(true, Ordering::Relaxed) {
-                    write!(custom_css, "@-webkit-keyframes pulse {{
+                if !self
+                    .is_pulse_animation_already_defined
+                    .swap(true, Ordering::Relaxed)
+                {
+                    write!(
+                        custom_css,
+                        "@-webkit-keyframes pulse {{
   50% {{
     opacity: .5;
   }}
@@ -222,14 +278,24 @@ animation: {val};").is_ok()
   50% {{
     opacity: .5;
   }}
-}}").unwrap();
+}}"
+                    )
+                    .unwrap();
                 }
 
-                self.css_template_value("pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite", css_content)
-            },
+                self.css_template_value(
+                    "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+                    css_content,
+                )
+            }
             "bounce" => {
-                if !self.is_bounce_animation_already_defined.swap(true, Ordering::Relaxed) {
-                    write!(custom_css, "@-webkit-keyframes bounce {{
+                if !self
+                    .is_bounce_animation_already_defined
+                    .swap(true, Ordering::Relaxed)
+                {
+                    write!(
+                        custom_css,
+                        "@-webkit-keyframes bounce {{
   0%, 100% {{
     transform: translateY(-25%);
     -webkit-animation-timing-function: cubic-bezier(0.8,0,1,1);
@@ -254,11 +320,13 @@ animation: {val};").is_ok()
     -webkit-animation-timing-function: cubic-bezier(0,0,0.2,1);
     animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
   }}
-}}").unwrap();
+}}"
+                    )
+                    .unwrap();
                 }
 
                 self.css_template_value("bounce 1s infinite", css_content)
-            },
+            }
             _ => false,
         }
     }

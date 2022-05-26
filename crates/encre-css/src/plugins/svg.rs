@@ -1,6 +1,6 @@
 use super::Plugin;
-use crate::{config::Config, selector::Modifier};
 use crate::utils::{default_colors, value_matchers::*};
+use crate::{config::Config, selector::Modifier};
 
 use std::fmt::Write;
 
@@ -29,7 +29,13 @@ impl Plugin for FillPlugin {
         }
     }
 
-    fn get_css_for_modifier(&self, config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if let Some(color) = default_colors::get(config, modifier.content()) {
             self.css_template_value(&color, css_content)
         } else {
@@ -63,7 +69,13 @@ impl Plugin for StrokeColorPlugin {
         }
     }
 
-    fn get_css_for_modifier(&self, config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if let Some(color) = default_colors::get(config, modifier.content()) {
             self.css_template_value(&color, css_content)
         } else {
@@ -88,7 +100,13 @@ impl Plugin for StrokeWidthPlugin {
         write!(css_content, "stroke-width: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if modifier.to_f32().is_ok() {
             self.css_template_value(&format!("{}px", modifier), css_content)

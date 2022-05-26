@@ -11,7 +11,13 @@ impl Plugin for BorderCollapsePlugin {
         "border"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "collapse" => write!(css_content, "border-collapse: collapse;").is_ok(),
             "separate" => write!(css_content, "border-collapse: separate;").is_ok(),
@@ -28,7 +34,13 @@ impl Plugin for TableLayoutPlugin {
         "table"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "auto" => write!(css_content, "table-layout: auto;").is_ok(),
             "fixed" => write!(css_content, "table-layout: fixed;").is_ok(),

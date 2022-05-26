@@ -1,6 +1,6 @@
 use super::Plugin;
-use crate::{config::Config, selector::Modifier};
 use crate::utils::value_matchers::*;
+use crate::{config::Config, selector::Modifier};
 
 use std::fmt::Write;
 
@@ -20,7 +20,13 @@ impl Plugin for OrderPlugin {
         write!(css_content, "order: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "first" => return self.css_template_value("-9999", css_content),
             "last" => return self.css_template_value("9999", css_content),
@@ -45,7 +51,13 @@ impl Plugin for DirectionPlugin {
         "flex"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "row" => write!(css_content, "flex-direction: row;").is_ok(),
             "row-reverse" => write!(css_content, "flex-direction: row-reverse;").is_ok(),
@@ -64,7 +76,13 @@ impl Plugin for WrapPlugin {
         "flex"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "nowrap" => write!(css_content, "flex-wrap: nowrap;").is_ok(),
             "wrap" => write!(css_content, "flex-wrap: wrap;").is_ok(),
@@ -121,7 +139,13 @@ impl Plugin for GrowShrinkBasisPlugin {
         write!(css_content, "flex: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "1" => self.css_template_value("1 1 0%", css_content),
             "auto" => self.css_template_value("1 1 auto", css_content),

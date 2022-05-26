@@ -1,7 +1,16 @@
-use crate::error::{Result, Error};
+use crate::error::{Error, Result};
 
-use serde::{Deserialize, Deserializer, de::{Visitor, MapAccess, value::MapAccessDeserializer}};
-use std::{fs, fmt, ops::{Deref, DerefMut}, path::PathBuf, borrow::Cow, collections::BTreeMap};
+use serde::{
+    de::{value::MapAccessDeserializer, MapAccess, Visitor},
+    Deserialize, Deserializer,
+};
+use std::{
+    borrow::Cow,
+    collections::BTreeMap,
+    fmt, fs,
+    ops::{Deref, DerefMut},
+    path::PathBuf,
+};
 
 #[derive(Debug, PartialEq, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -326,7 +335,10 @@ pub fn hex_to_rgb(hex: String) -> [u8; 3] {
     ]
 }
 
-fn convert_hex_to_rgb<'de, D>(d: D) -> std::result::Result<ColorConfig, D::Error> where D: Deserializer<'de> {
+fn convert_hex_to_rgb<'de, D>(d: D) -> std::result::Result<ColorConfig, D::Error>
+where
+    D: Deserializer<'de>,
+{
     struct ColorConfigHex;
 
     impl<'de> Visitor<'de> for ColorConfigHex {
@@ -374,7 +386,6 @@ pub struct Config {
 
     #[serde(default)]
     pub theme: ThemeConfig,
-
     // custom_variants: Vec<VariantConfig>,
     // custom_plugins: Vec<PluginConfig>,
 
@@ -383,30 +394,38 @@ pub struct Config {
 
 impl Config {
     pub fn from_file(path: PathBuf) -> Result<Self> {
-        let mut config: Config = toml::from_str(&fs::read_to_string(&path).map_err(|e| Error::ConfigFileNotFound(path, e))?)?;
+        let mut config: Config = toml::from_str(
+            &fs::read_to_string(&path).map_err(|e| Error::ConfigFileNotFound(path, e))?,
+        )?;
 
         if config.theme.colors != ColorConfig::default() {
             let overriden_colors = config.theme.colors.clone();
-            config.theme.colors.extend(ColorConfig::default().iter().filter_map(|c| {
-                let key = c.0.clone();
-                if !overriden_colors.contains_key(&key) {
-                    Some((key, *c.1))
-                } else {
-                    None
-                }
-            }));
+            config
+                .theme
+                .colors
+                .extend(ColorConfig::default().iter().filter_map(|c| {
+                    let key = c.0.clone();
+                    if !overriden_colors.contains_key(&key) {
+                        Some((key, *c.1))
+                    } else {
+                        None
+                    }
+                }));
         }
 
         if config.theme.screens != ScreenConfig::default() {
             let overriden_screens = config.theme.screens.clone();
-            config.theme.screens.extend(ScreenConfig::default().iter().filter_map(|c| {
-                let key = c.0.clone();
-                if !overriden_screens.contains_key(&key) {
-                    Some((key, c.1.clone()))
-                } else {
-                    None
-                }
-            }));
+            config
+                .theme
+                .screens
+                .extend(ScreenConfig::default().iter().filter_map(|c| {
+                    let key = c.0.clone();
+                    if !overriden_screens.contains_key(&key) {
+                        Some((key, c.1.clone()))
+                    } else {
+                        None
+                    }
+                }));
         }
 
         Ok(config)

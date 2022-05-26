@@ -1,10 +1,10 @@
 use super::Plugin;
-use crate::{config::Config, selector::Modifier};
 use crate::utils::{default_colors, value_matchers::*};
+use crate::{config::Config, selector::Modifier};
 
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::{fmt::Write, borrow::Cow};
+use std::{borrow::Cow, fmt::Write};
 
 lazy_static! {
     static ref OPACITY_IN_RGB_REGEX: Regex = Regex::new(r"/.*\)").unwrap();
@@ -36,7 +36,13 @@ background-color: {};",
         }
     }
 
-    fn get_css_for_modifier(&self, config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if let Some(color) = default_colors::get(config, modifier.content()) {
             self.css_template_value(&color, css_content)
         } else {
@@ -53,7 +59,13 @@ impl Plugin for AttachmentPlugin {
         "bg"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "fixed" => write!(css_content, "background-attachment: fixed;").is_ok(),
             "local" => write!(css_content, "background-attachment: local;").is_ok(),
@@ -71,7 +83,13 @@ impl Plugin for ClipPlugin {
         "bg-clip"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "border" => write!(css_content, "background-clip: border-box;").is_ok(),
             "padding" => write!(css_content, "background-clip: padding-box;").is_ok(),
@@ -90,7 +108,13 @@ impl Plugin for OpacityPlugin {
         "bg-opacity"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if let Ok(opacity_value) = modifier.to_f32() {
             write!(css_content, "--en-bg-opacity: {};", opacity_value / 100.).is_ok()
@@ -117,7 +141,13 @@ impl Plugin for ImagePlugin {
         write!(css_content, "background-image: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "bg-none" => self.css_template_value("none", css_content),
             "gradient-to-t" => self.css_template_value(
@@ -190,7 +220,13 @@ impl Plugin for GradientFromPlugin {
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if let Some(color) = default_colors::get(config, modifier.content()) {
             self.css_template_value(&color, css_content)
         } else {
@@ -232,7 +268,13 @@ impl Plugin for GradientViaPlugin {
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if let Some(color) = default_colors::get(config, modifier.content()) {
             self.css_template_value(&color, css_content)
         } else {
@@ -263,7 +305,13 @@ impl Plugin for GradientToPlugin {
         write!(css_content, "--en-gradient-to: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if let Some(color) = default_colors::get(config, modifier.content()) {
             self.css_template_value(&color, css_content)
         } else {
@@ -292,7 +340,13 @@ impl Plugin for PositionPlugin {
         write!(css_content, "background-position: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "bottom" => self.css_template_value("bottom", css_content),
             "center" => self.css_template_value("center", css_content),
@@ -316,7 +370,13 @@ impl Plugin for RepeatPlugin {
         "bg"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "repeat" => write!(css_content, "background-repeat: repeat;").is_ok(),
             "no-repeat" => write!(css_content, "background-repeat: no-repeat;").is_ok(),
@@ -352,7 +412,13 @@ impl Plugin for SizePlugin {
         write!(css_content, "background-size: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "auto" => self.css_template_value("auto", css_content),
             "cover" => self.css_template_value("cover", css_content),

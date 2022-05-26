@@ -1,6 +1,6 @@
 use super::Plugin;
-use crate::{config::Config, selector::Modifier};
 use crate::utils::{default_lengths, value_matchers::*};
+use crate::{config::Config, selector::Modifier};
 
 use std::fmt::Write;
 
@@ -8,7 +8,13 @@ use std::fmt::Write;
 pub struct PositionPlugin;
 
 impl Plugin for PositionPlugin {
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if modifier.is_one_of(&["static", "fixed", "absolute", "relative", "sticky"]) {
             write!(css_content, "position: {modifier};").is_ok()
         } else {
@@ -21,7 +27,13 @@ impl Plugin for PositionPlugin {
 pub struct DisplayPlugin;
 
 impl Plugin for DisplayPlugin {
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "hidden" => write!(css_content, "display: none;").is_ok(),
             "contents" => write!(css_content, "display: contents;").is_ok(),
@@ -53,7 +65,13 @@ impl Plugin for DisplayPlugin {
 pub struct VisibilityPlugin;
 
 impl Plugin for VisibilityPlugin {
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "visible" => write!(css_content, "visibility: visible;").is_ok(),
             "invisible" => write!(css_content, "visibility: hidden;").is_ok(),
@@ -66,7 +84,13 @@ impl Plugin for VisibilityPlugin {
 pub struct IsolationPlugin;
 
 impl Plugin for IsolationPlugin {
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "isolate" => write!(css_content, "isolation: isolate;").is_ok(),
             "isolation-auto" => write!(css_content, "isolation: auto;").is_ok(),
@@ -98,8 +122,16 @@ left: {val};"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_extended(modifier.content(), modifier.is_negative()) {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
+        if let Some(length) =
+            default_lengths::get_extended(modifier.content(), modifier.is_negative())
+        {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -128,8 +160,16 @@ right: {val};"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_extended(modifier.content(), modifier.is_negative()) {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
+        if let Some(length) =
+            default_lengths::get_extended(modifier.content(), modifier.is_negative())
+        {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -158,8 +198,16 @@ bottom: {val};"
         .is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_extended(modifier.content(), modifier.is_negative()) {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
+        if let Some(length) =
+            default_lengths::get_extended(modifier.content(), modifier.is_negative())
+        {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -183,8 +231,16 @@ impl Plugin for TopPlugin {
         write!(css_content, "top: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_extended(modifier.content(), modifier.is_negative()) {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
+        if let Some(length) =
+            default_lengths::get_extended(modifier.content(), modifier.is_negative())
+        {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -208,8 +264,16 @@ impl Plugin for BottomPlugin {
         write!(css_content, "bottom: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_extended(modifier.content(), modifier.is_negative()) {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
+        if let Some(length) =
+            default_lengths::get_extended(modifier.content(), modifier.is_negative())
+        {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -233,8 +297,16 @@ impl Plugin for LeftPlugin {
         write!(css_content, "left: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_extended(modifier.content(), modifier.is_negative()) {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
+        if let Some(length) =
+            default_lengths::get_extended(modifier.content(), modifier.is_negative())
+        {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -258,8 +330,16 @@ impl Plugin for RightPlugin {
         write!(css_content, "right: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
-        if let Some(length) = default_lengths::get_extended(modifier.content(), modifier.is_negative()) {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
+        if let Some(length) =
+            default_lengths::get_extended(modifier.content(), modifier.is_negative())
+        {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -275,7 +355,13 @@ impl Plugin for ZIndexPlugin {
         "z"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         // NOTE: Not-compatible with TailwindCSS, support all values
         if modifier.to_f32().is_ok() || modifier.is("auto") {
             write!(css_content, "z-index: {modifier};").is_ok()
@@ -293,7 +379,13 @@ impl Plugin for ContainerPlugin {
         "container"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "none" => write!(css_content, "width: 100%;").is_ok(),
             "sm" => write!(css_content, "max-width: 640px;").is_ok(),
@@ -314,7 +406,13 @@ impl Plugin for BoxDecorationBreakPlugin {
         "decoration"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if modifier.is_one_of(&["slice", "clone"]) {
             write!(css_content, "box-decoration-break: {modifier};").is_ok()
         } else {
@@ -331,7 +429,13 @@ impl Plugin for BoxSizingPlugin {
         "box"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if modifier.is_one_of(&["border", "content"]) {
             write!(css_content, "box-sizing: {modifier}-box;").is_ok()
         } else {
@@ -348,7 +452,13 @@ impl Plugin for FloatPlugin {
         "float"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if modifier.is_one_of(&["left", "right", "none"]) {
             write!(css_content, "float: {modifier};").is_ok()
         } else {
@@ -365,7 +475,13 @@ impl Plugin for ClearPlugin {
         "clear"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if modifier.is_one_of(&["left", "right", "both", "none"]) {
             write!(css_content, "clear: {modifier};").is_ok()
         } else {
@@ -382,7 +498,13 @@ impl Plugin for ObjectFitPlugin {
         "object"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if modifier.is_one_of(&["contain", "cover", "fill", "none", "scale-down"]) {
             write!(css_content, "object-fit: {modifier};").is_ok()
         } else {
@@ -407,7 +529,13 @@ impl Plugin for ObjectPositionPlugin {
         write!(css_content, "object-position: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "bottom" => self.css_template_value("bottom", css_content),
             "center" => self.css_template_value("center", css_content),
@@ -431,7 +559,13 @@ impl Plugin for OverflowPlugin {
         "overflow"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "auto" => write!(css_content, "overflow: auto;").is_ok(),
             "x-auto" => write!(css_content, "overflow-x: auto;").is_ok(),
@@ -458,7 +592,13 @@ impl Plugin for OverscrollPlugin {
         "overscroll"
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "auto" => write!(css_content, "overscroll-behavior: auto;").is_ok(),
             "y-auto" => write!(css_content, "overscroll-behavior-y: auto;").is_ok(),

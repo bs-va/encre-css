@@ -14,26 +14,26 @@
 //!   background-color: rgb(239 68 68 / var(--en-bg-opacity));
 //! }"#));
 //! ```
+pub mod config;
+pub mod error;
 pub mod plugins;
 pub mod preflight;
 pub mod selector;
 pub mod utils;
 pub mod variant;
-pub mod config;
-pub mod error;
 
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::{fs, iter, borrow::Cow, collections::BTreeMap, io::Read, path::PathBuf};
+use std::{borrow::Cow, collections::BTreeMap, fs, io::Read, iter, path::PathBuf};
 use wax::Glob;
 
 #[cfg(not(target_arch = "wasm32"))]
 use rayon::prelude::*;
 
+use plugins::*;
 use preflight::ENCRE_PREFLIGHT_CSS;
 use selector::Selector;
-use variant::{Variant, init_variants};
-use plugins::*;
+use variant::{init_variants, Variant};
 
 pub use config::Config;
 pub use error::Error;
@@ -99,7 +99,7 @@ impl EncreGenerator {
             Err(e) => {
                 eprintln!("{}", e);
                 Config::default()
-            },
+            }
         };
 
         Self::from_config(config)
@@ -165,7 +165,12 @@ impl EncreGenerator {
 
     /// Scan all files in a path using the glob syntax
     pub fn scan_path(&mut self, glob_path: &PathBuf) {
-        let (prefix, glob) = Glob::partitioned(glob_path.to_str().expect("failed to convert the glob to a PathBuf")).unwrap();
+        let (prefix, glob) = Glob::partitioned(
+            glob_path
+                .to_str()
+                .expect("failed to convert the glob to a PathBuf"),
+        )
+        .unwrap();
 
         if prefix == *glob_path {
             self.scan_files(iter::once(glob_path.clone()));
@@ -207,34 +212,35 @@ impl EncreGenerator {
                 plugins.iter().find_map(|plugin| {
                     if selector.check_namespace(plugin.namespace()) {
                         let maybe_arbitrary_value = selector.get_arbitrary_value();
-                        let arbitrary_value = if let Some(ref arbitrary_value) = maybe_arbitrary_value {
-                            let mut split = arbitrary_value.split(':');
-                            let maybe_hint = split.next().unwrap();
+                        let arbitrary_value =
+                            if let Some(ref arbitrary_value) = maybe_arbitrary_value {
+                                let mut split = arbitrary_value.split(':');
+                                let maybe_hint = split.next().unwrap();
 
-                            if maybe_hint == arbitrary_value {
-                                // No plugin hint
-                                Some(("", maybe_hint))
-                            } else {
-                                let val = split.next();
-
-                                if let Some(val) = val {
-                                    if VALID_PLUGIN_HINT.contains(&maybe_hint) {
-                                        // Valid! Return (hint, stripped arbitrary value)
-                                        Some((maybe_hint, val))
-                                    } else {
-                                        // Unknown plugin hint (like `bg-[sth:#333]`)
-                                        // TODO: Display a warning
-                                        Some(("", val))
-                                    }
-                                } else {
-                                    // Malformed arbitrary value (like just `bg-[color:]`)
-                                    // TODO: Display a warning
+                                if maybe_hint == arbitrary_value {
+                                    // No plugin hint
                                     Some(("", maybe_hint))
+                                } else {
+                                    let val = split.next();
+
+                                    if let Some(val) = val {
+                                        if VALID_PLUGIN_HINT.contains(&maybe_hint) {
+                                            // Valid! Return (hint, stripped arbitrary value)
+                                            Some((maybe_hint, val))
+                                        } else {
+                                            // Unknown plugin hint (like `bg-[sth:#333]`)
+                                            // TODO: Display a warning
+                                            Some(("", val))
+                                        }
+                                    } else {
+                                        // Malformed arbitrary value (like just `bg-[color:]`)
+                                        // TODO: Display a warning
+                                        Some(("", maybe_hint))
+                                    }
                                 }
-                            }
-                        } else {
-                            None
-                        };
+                            } else {
+                                None
+                            };
 
                         let mut css_content = String::new();
                         let mut custom_css = String::new();
@@ -524,7 +530,6 @@ impl EncreGenerator {
             Box::new(table::BorderCollapsePlugin),
             Box::new(table::TableLayoutPlugin),
             Box::new(transform::OriginPlugin),
-
             // It is better to include the following plugins at the end because they match the "" namespace
             Box::new(layout::DisplayPlugin),
             Box::new(layout::PositionPlugin),
@@ -553,10 +558,10 @@ impl EncreGenerator {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::config::{DarkModeConfig, ColorConfig, ScreenConfig};
+    use crate::config::{ColorConfig, DarkModeConfig, ScreenConfig};
 
-    use std::borrow::Cow;
     use pretty_assertions::assert_eq;
+    use std::borrow::Cow;
 
     #[test]
     fn scan_raw_test() {
@@ -727,7 +732,8 @@ mod tests {
 
         assert_eq!(
             generator.generate(),
-            format!(r#"{}.-translate-x-52 {{
+            format!(
+                r#"{}.-translate-x-52 {{
   --en-translate-x: -13rem;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
 }}
@@ -739,7 +745,10 @@ mod tests {
 .-hue-rotate-60 {{
   --en-hue-rotate: hue-rotate(-60deg);
   filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
-}}"#, preflight::ENCRE_PREFLIGHT_CSS));
+}}"#,
+                preflight::ENCRE_PREFLIGHT_CSS
+            )
+        );
     }
 
     #[test]
@@ -751,10 +760,14 @@ mod tests {
 
         assert_eq!(
             generator.generate(),
-            format!(r#"{}.bg-red-500 {{
+            format!(
+                r#"{}.bg-red-500 {{
   --en-bg-opacity: 1;
   background-color: rgb(239 68 68 / var(--en-bg-opacity));
-}}"#, preflight::ENCRE_PREFLIGHT_CSS));
+}}"#,
+                preflight::ENCRE_PREFLIGHT_CSS
+            )
+        );
     }
 
     #[test]
@@ -764,11 +777,14 @@ mod tests {
 
         assert_eq!(
             generator.generate(),
-            format!(r#"{}@media (prefers-color-scheme: dark) {{
+            format!(
+                r#"{}@media (prefers-color-scheme: dark) {{
   .dark\:mt-px {{
     margin-top: 1px;
   }}
-}}"#, preflight::ENCRE_PREFLIGHT_CSS)
+}}"#,
+                preflight::ENCRE_PREFLIGHT_CSS
+            )
         );
 
         let mut config = Config::default();
@@ -779,9 +795,12 @@ mod tests {
 
         assert_eq!(
             generator.generate(),
-            format!(r#"{}.dark .dark\:mt-px {{
+            format!(
+                r#"{}.dark .dark\:mt-px {{
   margin-top: 1px;
-}}"#, preflight::ENCRE_PREFLIGHT_CSS)
+}}"#,
+                preflight::ENCRE_PREFLIGHT_CSS
+            )
         );
     }
 
@@ -802,26 +821,44 @@ mod tests {
 
         assert_eq!(
             generator.generate(),
-            format!(r#"{}@media (min-width: 1600px) {{
+            format!(
+                r#"{}@media (min-width: 1600px) {{
   .\33xl\:text-rosa-500 {{
     --en-text-opacity: 1;
     color: rgb(229 24 106 / var(--en-text-opacity));
   }}
-}}"#, preflight::ENCRE_PREFLIGHT_CSS)
+}}"#,
+                preflight::ENCRE_PREFLIGHT_CSS
+            )
         );
     }
 
     #[test]
     fn parse_config_file_test() {
         let mut config = Config::default();
-        config.theme.colors.insert(Cow::from("rosa-500"), [229, 24, 106]);
-        config.theme.colors.insert(Cow::from("yellow-400"), [255, 239, 14]);
+        config
+            .theme
+            .colors
+            .insert(Cow::from("rosa-500"), [229, 24, 106]);
+        config
+            .theme
+            .colors
+            .insert(Cow::from("yellow-400"), [255, 239, 14]);
         config.theme.screens.remove(&Cow::from("lg"));
-        config.theme.screens.insert(Cow::from("lg"), Cow::from("2000px"));
-        config.theme.screens.insert(Cow::from("3xl"), Cow::from("1600px"));
+        config
+            .theme
+            .screens
+            .insert(Cow::from("lg"), Cow::from("2000px"));
+        config
+            .theme
+            .screens
+            .insert(Cow::from("3xl"), Cow::from("1600px"));
         config.theme.dark_mode = DarkModeConfig::Class(Cow::from(".dark"));
 
-        assert_eq!(Config::from_file("tests/fixtures/custom_config.toml".into()).unwrap(), config);
+        assert_eq!(
+            Config::from_file("tests/fixtures/custom_config.toml".into()).unwrap(),
+            config
+        );
     }
 
     #[test]
@@ -837,7 +874,8 @@ mod tests {
 
         assert_eq!(
             generator.generate(),
-            format!(r#"{}.bg-rosa-500 {{
+            format!(
+                r#"{}.bg-rosa-500 {{
   --en-bg-opacity: 1;
   background-color: rgb(229 24 106 / var(--en-bg-opacity));
 }}
@@ -864,7 +902,9 @@ mod tests {
     --en-text-opacity: 1;
     color: rgb(229 24 106 / var(--en-text-opacity));
   }}
-}}"#, preflight::ENCRE_PREFLIGHT_CSS)
+}}"#,
+                preflight::ENCRE_PREFLIGHT_CSS
+            )
         );
     }
 }

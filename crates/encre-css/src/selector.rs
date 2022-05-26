@@ -67,7 +67,12 @@ impl<'a> Modifier<'a> {
 
 impl<'a> fmt::Display for Modifier<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}{}", if self.is_negative { "-" } else { "" }, self.content)
+        write!(
+            f,
+            "{}{}",
+            if self.is_negative { "-" } else { "" },
+            self.content
+        )
     }
 }
 
@@ -133,11 +138,12 @@ impl Selector {
         if namespace.is_empty() {
             Modifier::new(&self.content, self.is_negative)
         } else {
-            let modifier_start_index = if self.content.chars().nth(namespace.len()).map(|v| v == '-') == Some(true) {
-                namespace.len() + 1
-            } else {
-                namespace.len()
-            };
+            let modifier_start_index =
+                if self.content.chars().nth(namespace.len()).map(|v| v == '-') == Some(true) {
+                    namespace.len() + 1
+                } else {
+                    namespace.len()
+                };
 
             Modifier::new(&self.content[modifier_start_index..], self.is_negative)
         }

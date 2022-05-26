@@ -100,10 +100,13 @@ pub fn get_keyword(val: &str) -> Option<String> {
 }
 
 pub fn get_extended(val: &str, is_negative: bool) -> Option<String> {
-    get_keyword(val).or_else(|| get_basic(val, is_negative).or_else(|| get_fraction(val, is_negative)))
+    get_keyword(val)
+        .or_else(|| get_basic(val, is_negative).or_else(|| get_fraction(val, is_negative)))
 }
 
 pub fn get_extended_size(val: &str, is_negative: bool) -> Option<String> {
-    get_keyword(val)
-        .or_else(|| get_keyword_size(val).or_else(|| get_basic(val, is_negative).or_else(|| get_fraction(val, is_negative))))
+    get_keyword(val).or_else(|| {
+        get_keyword_size(val)
+            .or_else(|| get_basic(val, is_negative).or_else(|| get_fraction(val, is_negative)))
+    })
 }

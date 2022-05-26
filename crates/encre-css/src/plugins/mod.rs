@@ -53,5 +53,11 @@ pub trait Plugin: fmt::Debug {
     /// Get the CSS code from a modifier
     ///
     /// Returns whether the function handled the modifier
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, custom_css: &mut String) -> bool;
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        custom_css: &mut String,
+    ) -> bool;
 }

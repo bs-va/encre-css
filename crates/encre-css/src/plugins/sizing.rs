@@ -1,6 +1,6 @@
 use super::Plugin;
-use crate::{config::Config, selector::Modifier};
 use crate::utils::{default_lengths, value_matchers::*};
+use crate::{config::Config, selector::Modifier};
 
 use std::fmt::Write;
 
@@ -20,12 +20,20 @@ impl Plugin for WidthPlugin {
         write!(css_content, "width: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if modifier.is("screen") {
             return self.css_template_value("100vw", css_content);
         }
 
-        if let Some(length) = default_lengths::get_extended_size(modifier.content(), modifier.is_negative()) {
+        if let Some(length) =
+            default_lengths::get_extended_size(modifier.content(), modifier.is_negative())
+        {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -49,7 +57,13 @@ impl Plugin for MinWidthPlugin {
         write!(css_content, "min-width: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "0" => self.css_template_value("0", css_content),
             "full" => self.css_template_value("100%", css_content),
@@ -77,7 +91,13 @@ impl Plugin for MaxWidthPlugin {
         write!(css_content, "max-width: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "0" => self.css_template_value("0rem", css_content),
             "none" => self.css_template_value("none", css_content),
@@ -125,12 +145,20 @@ impl Plugin for HeightPlugin {
         write!(css_content, "height: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         if modifier.is("screen") {
             return self.css_template_value("100vh", css_content);
         }
 
-        if let Some(length) = default_lengths::get_extended_size(modifier.content(), modifier.is_negative()) {
+        if let Some(length) =
+            default_lengths::get_extended_size(modifier.content(), modifier.is_negative())
+        {
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -154,7 +182,13 @@ impl Plugin for MinHeightPlugin {
         write!(css_content, "min-height: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "0" => self.css_template_value("0", css_content),
             "full" => self.css_template_value("100%", css_content),
@@ -183,7 +217,13 @@ impl Plugin for MaxHeightPlugin {
         write!(css_content, "max-height: {val};").is_ok()
     }
 
-    fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
+    fn get_css_for_modifier(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        css_content: &mut String,
+        _custom_css: &mut String,
+    ) -> bool {
         match modifier.content() {
             "0" => self.css_template_value("0rem", css_content),
             "none" => self.css_template_value("none", css_content),
