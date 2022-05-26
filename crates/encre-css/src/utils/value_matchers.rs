@@ -142,7 +142,7 @@ pub fn is_matching_shadow(val: &str) -> bool {
                             && (part_index >= 2 && !is_matching_color(&current_part)))
                 {
                     return false;
-        }
+                }
 
                 part_index += 1;
                 current_part.clear();
@@ -154,16 +154,16 @@ pub fn is_matching_shadow(val: &str) -> bool {
                             && (part_index >= 2 && !is_matching_color(&current_part)))
                 {
                     return false;
-        }
+                }
 
                 current_part.clear();
                 part_index = 0;
             }
             other => {
                 current_part.push(other);
-        }
             }
         }
+    }
 
     if !current_part.is_empty() {
         // Handle the last part (not suffixed by `_`)
@@ -173,8 +173,8 @@ pub fn is_matching_shadow(val: &str) -> bool {
                     && (part_index >= 2 && !is_matching_color(&current_part)))
         {
             return false;
-            }
         }
+    }
 
     true
 }
@@ -215,4 +215,111 @@ pub fn is_matching_image(val: &str) -> bool {
                 .iter()
                 .any(|e| v.starts_with(e))
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn is_matching_url_test() {
+        assert!(is_matching_url("url('/hello/world.png')"));
+    }
+
+    #[test]
+    fn is_matching_var_test() {
+        assert!(is_matching_var("var(--bg-blue)"));
+    }
+
+    #[test]
+    fn is_matching_color_test() {
+        assert!(is_matching_color("blue"));
+        assert!(is_matching_color("#333"));
+        assert!(is_matching_color("#121212"));
+        assert!(is_matching_color("rgb(12.12,12,12)"));
+        assert!(is_matching_color("rgb(12_12_12)"));
+        assert!(is_matching_color("rgb(12_12_12/0.1)"));
+        assert!(is_matching_color("rgb(12_12_12_/_0.1)"));
+        assert!(is_matching_color("rgb(var(--blue),12,12)"));
+        assert!(is_matching_color("rgb(12_12_12_/_var(--opacity))"));
+        assert!(is_matching_color("rgba(12,12,12,0.12)"));
+        assert!(is_matching_color("hsl(360,100%,50%)"));
+        assert!(is_matching_color("hsl(3.14rad,100%,50%)"));
+        assert!(is_matching_color("hsl(3.14rad_100%_50%/0.42)"));
+        assert!(is_matching_color("hsl(var(--hue)_12%_42%/var(--opacity))"));
+        assert!(is_matching_color("hsla(360,100%,50%,0.12)"));
+    }
+
+    #[test]
+    fn is_matching_length_test() {
+        assert!(is_matching_length("300px"));
+        assert!(is_matching_length("50%"));
+        assert!(is_matching_length("30vw"));
+        assert!(is_matching_length("min(10%,10px)"));
+        assert!(is_matching_length("0"));
+    }
+
+    #[test]
+    fn is_matching_number_test() {
+        assert!(is_matching_number("12"));
+        assert!(!is_matching_number("42.12"));
+    }
+
+    #[test]
+    fn is_matching_float_test() {
+        assert!(is_matching_float("42.12"));
+    }
+
+    #[test]
+    fn is_matching_percentage_test() {
+        assert!(is_matching_percentage("10%"));
+    }
+
+    #[test]
+    fn is_matching_time_test() {
+        assert!(is_matching_time("0.5s"));
+        assert!(is_matching_time("10ms"));
+    }
+
+    #[test]
+    fn is_matching_shadow_with_functions_test() {
+        assert!(is_matching_shadow("10px_10px_min(1px,2px)_10px_rgb(1,1,1)"));
+        assert!(is_matching_shadow("inset_0_-3em_3em_rgba(0,0,0,0.1),0_0_0_2px_rgb(255,255,255),0.3em_0.3em_1em_rgba(0,0,0,0.3)"));
+        assert!(is_matching_shadow(
+            "var(--a,_0_0_1px_rgb(0,_0,_0)),_0_0_1px_rgb(0,_0,_0)"
+        ));
+    }
+
+    #[test]
+    fn is_matching_gradient_test() {
+        assert!(is_matching_gradient("linear-gradient(45deg, blue, red);"));
+    }
+
+    #[test]
+    fn is_matching_position_test() {
+        assert!(is_matching_position("right"));
+        assert!(is_matching_position("12px"));
+        assert!(is_matching_position("42%"));
+    }
+
+    #[test]
+    fn is_matching_line_width_test() {
+        assert!(is_matching_line_width("thin"));
+    }
+
+    #[test]
+    fn is_matching_generic_name_test() {
+        assert!(is_matching_generic_name("sans-serif"));
+        assert!(is_matching_generic_name("fantasy"));
+    }
+
+    #[test]
+    fn is_matching_absolute_size_test() {
+        assert!(is_matching_absolute_size("xx-small"));
+    }
+
+    #[test]
+    fn is_matching_relative_size_test() {
+        assert!(is_matching_relative_size("larger"));
+    }
 }
