@@ -1,8 +1,21 @@
 use crate::DEFAULT_CONFIG_FILE;
 
-use std::{fs, sync::mpsc::channel, time::{Duration, Instant}, path::PathBuf};
-use encre_css::{EncreGenerator, Config};
-use notify::{Watcher, RecursiveMode, DebouncedEvent::*, watcher};
+use encre_css::{Config, EncreGenerator};
+use notify::{watcher, DebouncedEvent::*, RecursiveMode, Watcher};
+use std::{
+    fs,
+    path::PathBuf,
+    sync::mpsc::channel,
+    time::{Duration, Instant},
+};
+
+fn result_equal<T: PartialEq, E>(res1: Result<T, E>, res2: Result<T, E>) -> bool {
+    if let (Ok(res1), Ok(res2)) = (res1, res2) {
+        res1 == res2
+    } else {
+        false
+    }
+}
 
 fn gen_css(generator: &EncreGenerator, output: Option<&PathBuf>, display_time: bool) {
     let start = Instant::now();
@@ -21,7 +34,13 @@ fn gen_css(generator: &EncreGenerator, output: Option<&PathBuf>, display_time: b
     }
 }
 
-pub fn build(config: Option<String>, extra_input: Option<PathBuf>, output: Option<String>, watch: bool, display_time: bool) {
+pub fn build(
+    config: Option<String>,
+    extra_input: Option<PathBuf>,
+    output: Option<String>,
+    watch: bool,
+    display_time: bool,
+) {
     let config_file = if let Some(ref config_file) = config {
         config_file
     } else {
@@ -42,7 +61,7 @@ pub fn build(config: Option<String>, extra_input: Option<PathBuf>, output: Optio
             Err(e) => {
                 eprintln!("{}", e);
                 Config::default()
-            },
+            }
         };
 
         let input = config.input.clone();
@@ -53,41 +72,63 @@ pub fn build(config: Option<String>, extra_input: Option<PathBuf>, output: Optio
         }
 
         // Initial generation
-        gen_css(&generator, output.as_ref().map(PathBuf::from).as_ref(), display_time);
+        gen_css(
+            &generator,
+            output.as_ref().map(PathBuf::from).as_ref(),
+            display_time,
+        );
 
         println!("`encre-css` successfully launched in watch mode");
 
         loop {
             match rx.recv() {
-                // TODO: More clever reloading method (just reload changed files and prevent rebuilding an
-                // `EncreGenerator`)
                 Ok(event) => {
-                    if let Create(ref path) | Write(ref path) | Remove(ref path) | Rename(_, ref path) = event {
-                        // Prevent infinite loop because the watcher detects changes of the output file
-                        if let Some(ref output_path) = output {
-                            if let (Ok(path1), Ok(path2)) = (PathBuf::from(output_path).canonicalize(), path.canonicalize()) {
-                                if path1 == path2 {
-                                    continue;
-                                }
+                    if let Create(ref path)
+                    | Write(ref path)
+                    | Remove(ref path)
+                    | Rename(_, ref path) = event
+                    {
+                        let mut need_reloading = false;
+
+                        // Check that the changed file is watched
+                        if input.iter().any(|i| {
+                            result_equal(
+                                PathBuf::from(i).canonicalize(),
+                                PathBuf::from(path).canonicalize(),
+                            )
+                        }) || extra_input.is_some()
+                            && result_equal(
+                                PathBuf::from(extra_input.as_ref().unwrap()).canonicalize(),
+                                PathBuf::from(path).canonicalize(),
+                            )
+                        {
+                            println!("Changes detected. Reloading…");
+                            generator.reset();
+                            need_reloading = true;
+                        } else if result_equal(PathBuf::from(path).canonicalize(), PathBuf::from(DEFAULT_CONFIG_FILE).canonicalize()) {
+                            // Handle configuration changes
+                            println!("Configuration file changed. Reloading…");
+                            generator = EncreGenerator::new(PathBuf::from(path));
+                            need_reloading = true;
+                        }
+
+                        if need_reloading {
+                            input.iter().for_each(|path| {
+                                generator.scan_path(path);
+                            });
+
+                            if let Some(ref path) = extra_input {
+                                generator.scan_path(path);
                             }
+
+                            gen_css(
+                                &generator,
+                                output.as_ref().map(PathBuf::from).as_ref(),
+                                display_time,
+                            );
                         }
-
-                        // TODO: Handle configuration changes
-
-                        println!("Changes detected. Reloading…");
-                        generator.reset();
-
-                        input.iter().for_each(|path| {
-                            generator.scan_path(path);
-                        });
-
-                        if let Some(ref path) = extra_input {
-                            generator.scan_path(path);
-                        }
-
-                        gen_css(&generator, output.as_ref().map(PathBuf::from).as_ref(), display_time);
                     }
-                },
+                }
                 Err(e) => println!("watch error: {:?}", e),
             }
         }

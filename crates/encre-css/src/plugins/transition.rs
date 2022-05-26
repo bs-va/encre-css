@@ -177,6 +177,12 @@ impl AnimatePlugin {
     }
 }
 
+impl Default for AnimatePlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Plugin for AnimatePlugin {
     fn namespace(&self) -> &str {
         "animate"
