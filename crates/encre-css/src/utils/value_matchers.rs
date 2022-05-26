@@ -121,47 +121,62 @@ pub fn is_matching_time(val: &str) -> bool {
 }
 
 pub fn is_matching_shadow(val: &str) -> bool {
-    // TODO: \,(?![^(]*\)) -> prevent splitting rgba(12,12,12,0.2)
-    val.split(',').all(|shadow| {
-        let value = shadow.trim();
-        let mut parts = value.split('_');
-        let mut is_matching = (false, false, false, false, false);
+    let mut in_parenthesis = false;
+    let mut current_part = String::new();
+    let mut part_index = 0;
 
-        if let Some(part) = parts.next() {
-            if SHADOW_KEYWORDS.contains(&part) {
-                return true;
-            } else if is_matching_length(part) {
-                is_matching.0 = true;
+    for c in val.chars() {
+        match c {
+            '(' => {
+                current_part.push('(');
+                in_parenthesis = true;
+            }
+            ')' => {
+                current_part.push(')');
+                in_parenthesis = false;
+            }
+            '_' if !in_parenthesis => {
+                if !(part_index == 0 && SHADOW_KEYWORDS.contains(&current_part.as_str()))
+                    && (part_index > 4
+                        || !is_matching_length(&current_part)
+                            && (part_index >= 2 && !is_matching_color(&current_part)))
+                {
+                    return false;
+        }
+
+                part_index += 1;
+                current_part.clear();
+            }
+            ',' if !in_parenthesis => {
+                if !(part_index == 0 && SHADOW_KEYWORDS.contains(&current_part.as_str()))
+                    && (part_index > 4
+                        || !is_matching_length(&current_part)
+                            && (part_index >= 2 && !is_matching_color(&current_part)))
+                {
+                    return false;
+        }
+
+                current_part.clear();
+                part_index = 0;
+            }
+            other => {
+                current_part.push(other);
+        }
             }
         }
 
-        if let Some(part) = parts.next() {
-            if is_matching_length(part) {
-                is_matching.1 = true;
+    if !current_part.is_empty() {
+        // Handle the last part (not suffixed by `_`)
+        if !(part_index == 0 && SHADOW_KEYWORDS.contains(&current_part.as_str()))
+            && (part_index > 4
+                || !is_matching_length(&current_part)
+                    && (part_index >= 2 && !is_matching_color(&current_part)))
+        {
+            return false;
             }
         }
 
-        if let Some(part) = parts.next() {
-            if is_matching_length(part) {
-                is_matching.2 = true;
-            }
-        }
-
-        if let Some(part) = parts.next() {
-            if is_matching_length(part) {
-                is_matching.3 = true;
-            }
-        }
-
-        if let Some(part) = parts.next() {
-            if is_matching_color(part) {
-                is_matching.4 = true;
-                return true;
-            }
-        }
-
-        is_matching.0 && is_matching.1 && is_matching.2 && is_matching.3 && is_matching.4
-    })
+    true
 }
 
 pub fn is_matching_gradient(val: &str) -> bool {
