@@ -662,7 +662,7 @@ impl Plugin for DivideWidthXPlugin {
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+        hint == "length" || is_matching_length(val) || is_matching_line_width(val)
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
@@ -670,12 +670,21 @@ impl Plugin for DivideWidthXPlugin {
             writeln!(css_content, "--en-divide-x-reverse: 0;").ok();
         }
 
+        if is_matching_line_width(val) {
+            write!(
+                css_content,
+                "border-left-width: {val};
+border-right-width: {val};"
+            )
+            .is_ok()
+        } else {
         write!(
             css_content,
             "border-left-width: calc({val} * calc(1 - var(--en-divide-x-reverse)));
 border-right-width: calc({val} * var(--en-divide-x-reverse));"
         )
         .is_ok()
+        }
     }
 
     fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {
@@ -706,7 +715,7 @@ impl Plugin for DivideWidthYPlugin {
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+        hint == "length" || is_matching_length(val) || is_matching_line_width(val)
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
@@ -714,12 +723,21 @@ impl Plugin for DivideWidthYPlugin {
             writeln!(css_content, "--en-divide-y-reverse: 0;").ok();
         }
 
+        if is_matching_line_width(val) {
+            write!(
+                css_content,
+                "border-top-width: {val};
+border-bottom-width: {val};"
+            )
+            .is_ok()
+        } else {
         write!(
             css_content,
             "border-top-width: calc({val} * calc(1 - var(--en-divide-y-reverse)));
   border-bottom-width: calc({val} * var(--en-divide-y-reverse));"
         )
         .is_ok()
+        }
     }
 
     fn get_css_for_modifier(&self, _config: &Config, modifier: &Modifier, css_content: &mut String, _custom_css: &mut String) -> bool {

@@ -122,7 +122,10 @@ impl Plugin for FontSizePlugin {
     }
 
     fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+        hint == "length"
+            || is_matching_length(val)
+            || is_matching_absolute_size(val)
+            || is_matching_relative_size(val)
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
