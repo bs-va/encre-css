@@ -45,7 +45,7 @@ const RELATIVE_SIZES: [&str; 2] = ["larger", "smaller"];
 
 lazy_static! {
     static ref COLOR_REGEX: Regex =
-        Regex::new(r"(?-u)^(#[a-f\d]{3}|#[a-f\d]{6}|rgba?\(([\d,_\.]+|var\(--.+\))[,_]([\d,_\.]+|var\(--.+\))[,_]([\d,_\.]+|var\(--.+\))((_+)?/(_+)?([\d_\.]+|var\(--.+\)))?\)|hsla?\(([\d_\.]+|var\(--.+\))(deg|rad|grad|turn)?[,_]([\d_\.%]+|var\(--.+\))[,_]([\d_\.%]+|var\(--.+\))([,_]([\d_\.%]+|var\(--.+\)))?((_+)?/(_+)?([\d_\.]+|var\(--.+\)))?\))$")
+        Regex::new(r"^(#[a-f\d]{3}|#[a-f\d]{6}|rgba?\(([\d,_\.]+|var\(--.+\))[,_]([\d,_\.]+|var\(--.+\))[,_]([\d,_\.]+|var\(--.+\))((_+)?/(_+)?([\d_\.]+|var\(--.+\)))?\)|hsla?\(([\d_\.]+|var\(--.+\))(deg|rad|grad|turn)?[,_]([\d_\.%]+|var\(--.+\))[,_]([\d_\.%]+|var\(--.+\))([,_]([\d_\.%]+|var\(--.+\)))?((_+)?/(_+)?([\d_\.]+|var\(--.+\)))?\))$")
             .unwrap();
     static ref LENGTH_REGEX: Regex =
         Regex::new(&format!("(?-u)(?:{})$", LENGTH_UNITS.join("|"))).unwrap();
