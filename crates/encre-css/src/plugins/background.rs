@@ -23,16 +23,22 @@ impl Plugin for ColorPlugin {
     }
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
+        let property = if val.contains("url") {
+            "background-image"
+        } else {
+            "background-color"
+        };
+        
         if val.contains("--en-opacity") {
             write!(
                 css_content,
                 "--en-bg-opacity: 1;
-background-color: {};",
+{property}: {};",
                 val.replace("--en-opacity", "--en-bg-opacity")
             )
             .is_ok()
         } else {
-            write!(css_content, "background-color: {val};").is_ok()
+            write!(css_content, "{property}: {val};").is_ok()
         }
     }
 

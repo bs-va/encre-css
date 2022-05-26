@@ -50,8 +50,6 @@ const WILL_BE_REPLACED_BY_UNDERSCORE: &str = "WILL-BE-REPLACED-BY-UNDERSCORE";
 ///  -  `_` (underscores) are converted to ` ` (spaces) (not in `url`s)
 pub fn to_css_value(val: &str) -> String {
     // Don't replace `_` if it is a URL
-    //
-    // TODO: Do the same for values **containing** an url (e.g. 10px_5px_1px_2px_url('/hello/world.png'))
     let val = if !URL_REGEX.is_match(val) {
         // Don't replace `_` if prefixed by a `\`
         val.replace("\\_", WILL_BE_REPLACED_BY_UNDERSCORE)
@@ -606,6 +604,33 @@ mod tests {
             format!(
                 r#"{}.w-full {{
   width: 100%;
+}}"#,
+                preflight::ENCRE_PREFLIGHT_CSS
+            )
+        );
+    }
+
+        #[test]
+    fn gen_selector_css_arbitrary_value_test() {
+        // TODO: Support --en-bg-opacity in arbitrary values
+        let mut generator = EncreGenerator::from_config(Config::default());
+        generator.add_selector("w-[12px]");
+        generator.add_selector("bg-[red]");
+        generator.add_selector("bg-[url('../img/image_with_underscores.png')]");
+
+        assert_eq!(
+            generator.generate(),
+            format!(
+                r#"{}.w-\[12px\] {{
+  width: 12px;
+}}
+
+.bg-\[red\] {{
+  background-color: red;
+}}
+
+.bg-\[url\(\'\.\.\/img\/image_with_underscores\.png\'\)\] {{
+  background-image: url('../img/image_with_underscores.png');
 }}"#,
                 preflight::ENCRE_PREFLIGHT_CSS
             )
