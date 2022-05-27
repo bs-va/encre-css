@@ -32,7 +32,7 @@ pub fn hex_to_rgb(hex: &str) -> Result<[u8; 3]> {
 }
 
 /// Get a color from a modifier
-pub fn get(config: &Config, modifier: &str) -> Option<String> {
+pub fn get<'a>(config: &Config, modifier: &'a str) -> Option<Cow<'a, str>> {
     // Handle the new opacity syntax (e.g. `bg-red-500/25`)
     let (mut opacity, modifier) =
         if let Some(opacity_suffix) = OPACITY_SUFFIX_REGEX.captures(modifier) {
@@ -47,17 +47,17 @@ pub fn get(config: &Config, modifier: &str) -> Option<String> {
                         .unwrap()
                         / 100.,
                 ),
-                new_modifier.to_string(),
+                new_modifier.clone(),
             )
         } else {
             // The `current` and `inherit` modifiers cannot have their opacity changed
             if modifier == "current" {
-                return Some("currentColor".to_string());
+                return Some(Cow::from("currentColor"));
             } else if modifier == "inherit" {
-                return Some("inherit".to_string());
+                return Some(Cow::from("inherit"));
             }
 
-            (None, modifier.to_string())
+            (None, Cow::from(modifier))
         };
 
     let rgb_result = if modifier == "transparent" {
@@ -70,7 +70,7 @@ pub fn get(config: &Config, modifier: &str) -> Option<String> {
         Some([0, 0, 0])
     } else if modifier == "white" {
         Some([0xff, 0xff, 0xff])
-    } else if let Some(hex_color) = config.theme.colors.get(&Cow::from(modifier)) {
+    } else if let Some(hex_color) = config.theme.colors.get(&modifier) {
         hex_to_rgb(hex_color).ok()
     } else {
         None
@@ -78,17 +78,17 @@ pub fn get(config: &Config, modifier: &str) -> Option<String> {
 
     // Convert the array to a CSS color with an opacity value (if the color is found)
     rgb_result.map(|rgb_result| {
-        format!(
+        Cow::from(format!(
             "rgb({} {} {} / {})",
             rgb_result[0],
             rgb_result[1],
             rgb_result[2],
             if let Some(opacity) = opacity {
-                opacity.to_string()
+                Cow::from(opacity.to_string())
             } else {
-                "var(--en-opacity)".to_string()
+                Cow::from("var(--en-opacity)")
             }
-        )
+        ))
     })
 }
 

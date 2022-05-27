@@ -207,15 +207,15 @@ impl Plugin for GradientFromPlugin {
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
         let default_to = if val == "inherit" || val == "currentColor" {
-            Cow::Borrowed("rgb(255 255 255 / 0)")
+            Cow::from("rgb(255 255 255 / 0)")
         } else {
             OPACITY_IN_RGB_REGEX.replace(val, "/ 0)")
         };
 
         let val = if val.contains("--en-opacity") {
-            val.replace(" / var(--en-opacity)", "")
+            Cow::from(val.replace(" / var(--en-opacity)", ""))
         } else {
-            val.to_string()
+            Cow::from(val)
         };
 
         write!(
@@ -261,9 +261,9 @@ impl Plugin for GradientViaPlugin {
         };
 
         let val = if val.contains("--en-opacity") {
-            val.replace(" / var(--en-opacity)", "")
+            Cow::from(val.replace(" / var(--en-opacity)", ""))
         } else {
-            val.to_string()
+            Cow::from(val)
         };
 
         write!(
@@ -303,9 +303,9 @@ impl Plugin for GradientToPlugin {
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
         let val = if val.contains("--en-opacity") {
-            val.replace(" / var(--en-opacity)", "")
+            Cow::from(val.replace(" / var(--en-opacity)", ""))
         } else {
-            val.to_string()
+            Cow::from(val)
         };
 
         write!(css_content, "--en-gradient-to: {val};").is_ok()

@@ -148,12 +148,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "color-name"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c8cabd7573f60c1096a1e2bd82b2dc03a8063e607c698e15189a476c3541d65c"
-
-[[package]]
 name = "const_format"
 version = "0.2.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -302,7 +296,6 @@ checksum = "e78d4f1cc4ae33bbfc157ed5d5a5ef3bc29227303d595861deb238fcec4e9457"
 name = "encre-css"
 version = "0.1.0"
 dependencies = [
- "color-name",
  "criterion",
  "lazy_static",
  "pretty_assertions",

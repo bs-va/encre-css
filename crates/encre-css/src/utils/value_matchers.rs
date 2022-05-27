@@ -1,22 +1,21 @@
-use color_name::Color;
 use lazy_static::lazy_static;
 use regex::Regex;
 
-const LENGTH_UNITS: [&str; 16] = [
+pub const LENGTH_UNITS: [&str; 16] = [
     "cm", "mm", "Q", "in", "pc", "pt", "px", "em", "ex", "ch", "rem", "lh", "vw", "vh", "vmin",
     "vmax",
 ];
-const LINE_WIDTHS: [&str; 3] = ["thin", "medium", "thick"];
-const GRADIENT_TYPES: [&str; 5] = [
+pub const LINE_WIDTHS: [&str; 3] = ["thin", "medium", "thick"];
+pub const GRADIENT_TYPES: [&str; 5] = [
     "linear-gradient",
     "radial-gradient",
     "repeating-linear-gradient",
     "repeating-radial-gradient",
     "conic-gradient",
 ];
-const SHADOW_KEYWORDS: [&str; 5] = ["inset", "inherit", "initial", "revert", "unset"];
-const VALID_POSITIONS: [&str; 5] = ["center", "top", "right", "bottom", "left"];
-const GENERIC_NAMES: [&str; 13] = [
+pub const SHADOW_KEYWORDS: [&str; 5] = ["inset", "inherit", "initial", "revert", "unset"];
+pub const VALID_POSITIONS: [&str; 5] = ["center", "top", "right", "bottom", "left"];
+pub const GENERIC_NAMES: [&str; 13] = [
     "serif",
     "sans-serif",
     "monospace",
@@ -31,7 +30,7 @@ const GENERIC_NAMES: [&str; 13] = [
     "emoji",
     "fangsong",
 ];
-const ABSOLUTE_SIZES: [&str; 8] = [
+pub const ABSOLUTE_SIZES: [&str; 8] = [
     "xx-small",
     "x-small",
     "small",
@@ -41,7 +40,157 @@ const ABSOLUTE_SIZES: [&str; 8] = [
     "x-large",
     "xxx-large",
 ];
-const RELATIVE_SIZES: [&str; 2] = ["larger", "smaller"];
+pub const RELATIVE_SIZES: [&str; 2] = ["larger", "smaller"];
+pub const NAMED_COLORS: [&str; 148] = [
+    "antiquewhite",
+    "aliceblue",
+    "aqua",
+    "aquamarine",
+    "azure",
+    "beige",
+    "bisque",
+    "black",
+    "blanchedalmond",
+    "blue",
+    "blueviolet",
+    "brown",
+    "burlywood",
+    "cadetblue",
+    "chartreuse",
+    "chocolate",
+    "coral",
+    "cornflowerblue",
+    "cornsilk",
+    "crimson",
+    "cyan",
+    "darkblue",
+    "darkcyan",
+    "darkgoldenrod",
+    "darkgray",
+    "darkgreen",
+    "darkgrey",
+    "darkkhaki",
+    "darkmagenta",
+    "darkolivegreen",
+    "darkorange",
+    "darkorchid",
+    "darkred",
+    "darksalmon",
+    "darkseagreen",
+    "darkslateblue",
+    "darkslategray",
+    "darkslategrey",
+    "darkturquoise",
+    "darkviolet",
+    "deeppink",
+    "deepskyblue",
+    "dimgray",
+    "dimgrey",
+    "dodgerblue",
+    "firebrick",
+    "floralwhite",
+    "forestgreen",
+    "fuchsia",
+    "gainsboro",
+    "ghostwhite",
+    "gold",
+    "goldenrod",
+    "gray",
+    "green",
+    "greenyellow",
+    "grey",
+    "honeydew",
+    "hotpink",
+    "indianred",
+    "indigo",
+    "ivory",
+    "khaki",
+    "lavender",
+    "lavenderblush",
+    "lawngreen",
+    "lemonchiffon",
+    "lightblue",
+    "lightcoral",
+    "lightcyan",
+    "lightgoldenrodyellow",
+    "lightgray",
+    "lightgreen",
+    "lightgrey",
+    "lightpink",
+    "lightsalmon",
+    "lightseagreen",
+    "lightskyblue",
+    "lightslategray",
+    "lightslategrey",
+    "lightsteelblue",
+    "lightyellow",
+    "lime",
+    "limegreen",
+    "linen",
+    "magenta",
+    "maroon",
+    "mediumaquamarine",
+    "mediumblue",
+    "mediumorchid",
+    "mediumpurple",
+    "mediumseagreen",
+    "mediumslateblue",
+    "mediumspringgreen",
+    "mediumturquoise",
+    "mediumvioletred",
+    "midnightblue",
+    "mintcream",
+    "mistyrose",
+    "moccasin",
+    "navajowhite",
+    "navy",
+    "oldlace",
+    "olive",
+    "olivedrab",
+    "orange",
+    "orangered",
+    "orchid",
+    "palegoldenrod",
+    "palegreen",
+    "paleturquoise",
+    "palevioletred",
+    "papayawhip",
+    "peachpuff",
+    "peru",
+    "pink",
+    "plum",
+    "powderblue",
+    "purple",
+    "rebeccapurple",
+    "red",
+    "rosybrown",
+    "royalblue",
+    "saddlebrown",
+    "salmon",
+    "sandybrown",
+    "seagreen",
+    "seashell",
+    "sienna",
+    "silver",
+    "skyblue",
+    "slateblue",
+    "slategray",
+    "slategrey",
+    "snow",
+    "springgreen",
+    "steelblue",
+    "tan",
+    "teal",
+    "thistle",
+    "tomato",
+    "turquoise",
+    "violet",
+    "wheat",
+    "white",
+    "whitesmoke",
+    "yellow",
+    "yellowgreen",
+];
 
 lazy_static! {
     static ref COLOR_REGEX: Regex =
@@ -88,7 +237,7 @@ pub fn is_matching_var(val: &str) -> bool {
 
 pub fn is_matching_color(val: &str) -> bool {
     COLOR_REGEX.is_match(val)
-        || !val.is_empty() && Color::val().by_string(val.to_string()).is_ok()
+        || !val.is_empty() && NAMED_COLORS.iter().any(|c| &val == c)
         || is_matching_var(val)
 }
 

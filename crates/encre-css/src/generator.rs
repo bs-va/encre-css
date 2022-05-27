@@ -20,7 +20,44 @@ lazy_static! {
     static ref CALC_REGEX: Regex = Regex::new(r"calc\((.+)\)").unwrap();
 }
 
+pub const VALID_PLUGIN_HINT: [&str; 4] = ["color", "length", "angle", "list"];
+const WILL_BE_REPLACED_BY_CSS_SELECTOR: &str = "WILL_BE_REPLACED_BY_CSS_SELECTOR";
 const WILL_BE_REPLACED_BY_UNDERSCORE: &str = "WILL-BE-REPLACED-BY-UNDERSCORE";
+
+pub fn indent(val: Cow<str>) -> String {
+    val.replace('\n', "\n  ")
+}
+
+pub fn find_arbitrary_value_hint(selector: Option<&String>) -> Option<(&str, &str)> {
+    if let Some(arbitrary_value) = selector {
+        let mut split = arbitrary_value.split(':');
+        let maybe_hint = split.next().unwrap();
+
+        if maybe_hint == arbitrary_value.as_str() {
+            // No plugin hint
+            Some(("", arbitrary_value))
+        } else {
+            let val = split.next();
+
+            if let Some(val) = val {
+                if VALID_PLUGIN_HINT.contains(&maybe_hint) {
+                    // Valid! Return (hint, stripped arbitrary value)
+                    Some((maybe_hint, val))
+                } else {
+                    // Unknown plugin hint (like `bg-[sth:#333]`)
+                    // TODO: Display a warning
+                    Some(("", val))
+                }
+            } else {
+                // Malformed arbitrary value (like just `bg-[color:]`)
+                // TODO: Display a warning
+                Some(("", maybe_hint))
+            }
+        }
+    } else {
+        None
+    }
+}
 
 /// Convert an arbitrary value into a CSS value
 ///
@@ -62,45 +99,6 @@ pub fn to_css_value(val: &str) -> Cow<str> {
         )
     } else {
         Cow::from(val)
-    }
-}
-
-pub const VALID_PLUGIN_HINT: [&str; 4] = ["color", "length", "angle", "list"];
-
-const WILL_BE_REPLACED_BY_CSS_SELECTOR: &str = "WILL_BE_REPLACED_BY_CSS_SELECTOR";
-
-pub fn indent(val: String) -> String {
-    val.replace('\n', "\n  ")
-}
-
-pub fn find_arbitrary_value_hint(selector: Option<&String>) -> Option<(&str, &str)> {
-    if let Some(arbitrary_value) = selector {
-        let mut split = arbitrary_value.split(':');
-        let maybe_hint = split.next().unwrap();
-
-        if maybe_hint == arbitrary_value.as_str() {
-            // No plugin hint
-            Some(("", arbitrary_value))
-        } else {
-            let val = split.next();
-
-            if let Some(val) = val {
-                if VALID_PLUGIN_HINT.contains(&maybe_hint) {
-                    // Valid! Return (hint, stripped arbitrary value)
-                    Some((maybe_hint, val))
-                } else {
-                    // Unknown plugin hint (like `bg-[sth:#333]`)
-                    // TODO: Display a warning
-                    Some(("", val))
-                }
-            } else {
-                // Malformed arbitrary value (like just `bg-[color:]`)
-                // TODO: Display a warning
-                Some(("", maybe_hint))
-            }
-        }
-    } else {
-        None
     }
 }
 
@@ -285,9 +283,9 @@ impl EncreGenerator {
             .collect::<String>();
 
         let css_content = if selector.is_important() {
-            css_content.replace(';', " !important;")
+            Cow::from(css_content.replace(';', " !important;"))
         } else {
-            css_content.to_string()
+            Cow::from(css_content)
         };
 
         let variants = selector.get_variants();
@@ -320,7 +318,7 @@ impl EncreGenerator {
                             acc
                         }
                         Variant::AtRule(at_rule) => {
-                            format!("{} {{\n  {}\n}}", at_rule, indent(acc),)
+                            format!("{} {{\n  {}\n}}", at_rule, indent(Cow::from(acc)),)
                         }
                     }
                 },
