@@ -99,16 +99,16 @@ mod tests {
         assert_eq!(
             generator.generate(),
             format!(
-                r#"{}.w-\[12px\] {{
-  width: 12px;
-}}
-
-.bg-\[red\] {{
+                r#"{}.bg-\[red\] {{
   background-color: red;
 }}
 
 .bg-\[url\(\'\.\.\/img\/image_with_underscores\.png\'\)\] {{
   background-image: url('../img/image_with_underscores.png');
+}}
+
+.w-\[12px\] {{
+  width: 12px;
 }}"#,
                 preflight::ENCRE_PREFLIGHT_CSS
             )
@@ -149,16 +149,15 @@ mod tests {
         assert_eq!(
             generator.generate(),
             format!(
-                r#"{}@media (min-width: 640px) {{
-  .sm\:hover\:bg-red-400:hover {{
-    --en-bg-opacity: 1;
-    background-color: rgb(248 113 113 / var(--en-bg-opacity));
+                r#"{}@media (min-width: 1536px) {{
+  @media (prefers-reduced-motion: no-preference) {{
+    @media (orientation: landscape) {{
+      [dir="rtl"] .\32xl\:motion-safe\:landscape\:focus-within\:visited\:first\:odd\:checked\:open\:rtl\:bg-purple-100[open]:checked:nth-child(odd):first-child:visited:focus-within {{
+        --en-bg-opacity: 1;
+        background-color: rgb(243 232 255 / var(--en-bg-opacity));
+      }}
+    }}
   }}
-}}
-
-.focus\:hover\:bg-red-600:hover:focus {{
-  --en-bg-opacity: 1;
-  background-color: rgb(220 38 38 / var(--en-bg-opacity));
 }}
 
 [dir="rtl"] .active\:rtl\:bg-red-800:active {{
@@ -166,17 +165,30 @@ mod tests {
   background-color: rgb(153 27 27 / var(--en-bg-opacity));
 }}
 
+.file\:hover\:bg-pink-600:hover::file-selector-button {{
+  --en-bg-opacity: 1;
+  background-color: rgb(219 39 119 / var(--en-bg-opacity));
+}}
+
+.focus\:hover\:bg-red-600:hover:focus {{
+  --en-bg-opacity: 1;
+  background-color: rgb(220 38 38 / var(--en-bg-opacity));
+}}
+
+.hover\:file\:bg-pink-600::file-selector-button:hover {{
+  --en-bg-opacity: 1;
+  background-color: rgb(219 39 119 / var(--en-bg-opacity));
+}}
+
+.marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection *::marker, .marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection::marker {{
+  --en-bg-opacity: 1;
+  background-color: rgb(187 247 208 / var(--en-bg-opacity));
+}}
+
 @media (min-width: 768px) {{
   .md\:focus\:selection\:bg-blue-100 *::selection, .md\:focus\:selection\:bg-blue-100::selection:focus {{
     --en-bg-opacity: 1;
     background-color: rgb(219 234 254 / var(--en-bg-opacity));
-  }}
-}}
-
-@media (min-width: 1024px) {{
-  [dir="rtl"] .rtl\:active\:focus\:lg\:underline:focus:active {{
-    -webkit-text-decoration-line: underline;
-    text-decoration-line: underline;
   }}
 }}
 
@@ -189,25 +201,11 @@ mod tests {
   }}
 }}
 
-@media (min-width: 1536px) {{
-  @media (prefers-reduced-motion: no-preference) {{
-    @media (orientation: landscape) {{
-      [dir="rtl"] .\32xl\:motion-safe\:landscape\:focus-within\:visited\:first\:odd\:checked\:open\:rtl\:bg-purple-100[open]:checked:nth-child(odd):first-child:visited:focus-within {{
-        --en-bg-opacity: 1;
-        background-color: rgb(243 232 255 / var(--en-bg-opacity));
-      }}
-    }}
+@media (min-width: 1024px) {{
+  [dir="rtl"] .rtl\:active\:focus\:lg\:underline:focus:active {{
+    -webkit-text-decoration-line: underline;
+    text-decoration-line: underline;
   }}
-}}
-
-.hover\:file\:bg-pink-600::file-selector-button:hover {{
-  --en-bg-opacity: 1;
-  background-color: rgb(219 39 119 / var(--en-bg-opacity));
-}}
-
-.file\:hover\:bg-pink-600:hover::file-selector-button {{
-  --en-bg-opacity: 1;
-  background-color: rgb(219 39 119 / var(--en-bg-opacity));
 }}
 
 @media (min-width: 640px) {{
@@ -217,9 +215,11 @@ mod tests {
   }}
 }}
 
-.marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection *::marker, .marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection::marker {{
-  --en-bg-opacity: 1;
-  background-color: rgb(187 247 208 / var(--en-bg-opacity));
+@media (min-width: 640px) {{
+  .sm\:hover\:bg-red-400:hover {{
+    --en-bg-opacity: 1;
+    background-color: rgb(248 113 113 / var(--en-bg-opacity));
+  }}
 }}"#,
                 preflight::ENCRE_PREFLIGHT_CSS
             )
@@ -236,18 +236,18 @@ mod tests {
         assert_eq!(
             generator.generate(),
             format!(
-                r#"{}.-translate-x-52 {{
-  --en-translate-x: -13rem;
-  transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
+                r#"{}.-hue-rotate-60 {{
+  --en-hue-rotate: hue-rotate(-60deg);
+  filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
 }}
 
 .-mb-8 {{
   margin-bottom: -2rem;
 }}
 
-.-hue-rotate-60 {{
-  --en-hue-rotate: hue-rotate(-60deg);
-  filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
+.-translate-x-52 {{
+  --en-translate-x: -13rem;
+  transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
 }}"#,
                 preflight::ENCRE_PREFLIGHT_CSS
             )
@@ -383,14 +383,14 @@ mod tests {
   background-color: rgb(229 24 106 / var(--en-bg-opacity));
 }}
 
-.bg-yellow-400 {{
-  --en-bg-opacity: 1;
-  background-color: rgb(255 239 14 / var(--en-bg-opacity));
-}}
-
 .bg-yellow-100 {{
   --en-bg-opacity: 1;
   background-color: rgb(254 249 195 / var(--en-bg-opacity));
+}}
+
+.bg-yellow-400 {{
+  --en-bg-opacity: 1;
+  background-color: rgb(255 239 14 / var(--en-bg-opacity));
 }}
 
 @media (min-width: 1600px) {{
