@@ -16,550 +16,28 @@
 //! ```
 pub mod config;
 pub mod error;
+pub mod extractor;
+pub mod generator;
 pub mod plugins;
 pub mod preflight;
 pub mod selector;
 pub mod utils;
 pub mod variant;
 
-use lazy_static::lazy_static;
-use regex::Regex;
-use std::{borrow::Cow, collections::BTreeMap, fs, io::Read, iter, path::PathBuf};
-use wax::Glob;
-
-#[cfg(not(target_arch = "wasm32"))]
-use rayon::prelude::*;
-
-use plugins::*;
-use preflight::ENCRE_PREFLIGHT_CSS;
-use selector::Selector;
-use variant::{init_variants, Variant};
-
 pub use config::Config;
 pub use error::Error;
-
-lazy_static! {
-    static ref SPLIT_REGEX: Regex = Regex::new(r#"(?-u)[\s'"`;>=]+"#).unwrap();
-    static ref URL_REGEX: Regex = Regex::new("^url\\(.*\\)$").unwrap();
-}
-
-const WILL_BE_REPLACED_BY_UNDERSCORE: &str = "WILL-BE-REPLACED-BY-UNDERSCORE";
-
-/// Convert an arbitrary value into a CSS value
-///
-///  -  `_` (underscores) are converted to ` ` (spaces) (not in `url`s)
-pub fn to_css_value(val: &str) -> String {
-    // Don't replace `_` if it is a URL
-    let val = if !URL_REGEX.is_match(val) {
-        // Don't replace `_` if prefixed by a `\`
-        val.replace("\\_", WILL_BE_REPLACED_BY_UNDERSCORE)
-            .replace('_', " ")
-            .replace(WILL_BE_REPLACED_BY_UNDERSCORE, "_")
-    } else {
-        val.to_string()
-    };
-
-    if val.contains("calc") {
-        val.replace('-', " - ")
-            .replace('+', " + ")
-            .replace('/', " / ")
-            .replace('*', "*")
-    } else {
-        val
-    }
-}
-
-pub const VALID_PLUGIN_HINT: [&str; 4] = ["color", "length", "angle", "list"];
-
-const WILL_BE_REPLACED_BY_CSS_SELECTOR: &str = "WILL_BE_REPLACED_BY_CSS_SELECTOR";
-
-pub fn indent(val: String) -> String {
-    val.replace('\n', "\n  ")
-}
-
-/// Main structure used to generate CSS from selectors
-#[derive(Default)]
-pub struct EncreGenerator {
-    config: Config,
-    variants: BTreeMap<Cow<'static, str>, Variant>,
-    scanned_selectors_without_variant: Vec<Selector>,
-    scanned_selectors_with_variant: Vec<Selector>,
-}
-
-impl EncreGenerator {
-    /// Create a new [`EncreGenerator`] by trying to read a configuration file
-    ///
-    /// If the file does not exist, a warning will be emitted and the default configuration will be
-    /// used
-    pub fn new(path: PathBuf) -> Self {
-        let config = match Config::from_file(path) {
-            Ok(config) => config,
-            Err(e) => {
-                eprintln!("{}", e);
-                Config::default()
-            }
-        };
-
-        Self::from_config(config)
-    }
-
-    /// Create a new [`EncreGenerator`] using a given configuration
-    ///
-    /// The paths in the [`Config::input`] field of the configuration will be scanned
-    pub fn from_config(config: Config) -> Self {
-        let input = config.input.clone();
-
-        let mut result = Self {
-            variants: init_variants(&config),
-            config,
-            scanned_selectors_without_variant: vec![],
-            scanned_selectors_with_variant: vec![],
-        };
-
-        // TODO: Use rayon to make this part parallel
-        for path in input {
-            result.scan_path(&path);
-        }
-
-        result
-    }
-
-    /// Add a new selector which will have its CSS generated
-    ///
-    /// This function automatically handles duplicated selectors
-    pub fn add_selector(&mut self, val: &str) {
-        let selector = Selector::new(val);
-
-        if !selector.get_variants().is_empty() {
-            if !self.scanned_selectors_with_variant.contains(&selector) {
-                self.scanned_selectors_with_variant.push(selector);
-            }
-        } else if !self.scanned_selectors_without_variant.contains(&selector) {
-            self.scanned_selectors_without_variant.push(selector);
-        }
-    }
-
-    /// Scan the contents of a file and store all the selectors found
-    pub fn scan_raw(&mut self, contents: &str) {
-        for val in SPLIT_REGEX.split(contents) {
-            self.add_selector(val);
-        }
-    }
-
-    /// Scan all files given and store all the selectors found
-    pub fn scan_files(&mut self, files: impl Iterator<Item = PathBuf>) {
-        let mut file_contents: String = String::new();
-
-        for file in files {
-            let mut file = fs::File::open(file).unwrap();
-            file_contents.clear();
-
-            if file.read_to_string(&mut file_contents).is_ok() {
-                self.scan_raw(&file_contents);
-            }
-            // TODO: Display a warning otherwise
-        }
-    }
-
-    /// Scan all files in a path using the glob syntax
-    pub fn scan_path(&mut self, glob_path: &PathBuf) {
-        let (prefix, glob) = Glob::partitioned(
-            glob_path
-                .to_str()
-                .expect("failed to convert the glob to a PathBuf"),
-        )
-        .unwrap();
-
-        if prefix == *glob_path {
-            self.scan_files(iter::once(glob_path.clone()));
-        } else {
-            self.scan_files(
-                glob.walk(prefix, usize::MAX)
-                    .map(|e| e.unwrap().into_path()),
-            );
-        }
-    }
-
-    /// Generate the CSS styles needed based on the scanned selectors
-    ///
-    /// NOTE: Don't forget to scan selectors using either [scan_files] or [scan_raw] or by
-    /// adding individual selectors using [add_selector]
-    ///
-    /// [scan_files]: EncreGenerator::scan_files
-    /// [scan_raw]: EncreGenerator::scan_raw
-    /// [add_selector]: EncreGenerator::add_selector
-    pub fn generate(&self) -> String {
-        let selectors = [
-            &self.scanned_selectors_without_variant,
-            &self.scanned_selectors_with_variant,
-        ];
-
-        let plugins = self.build_plugins();
-
-        #[cfg(target_arch = "wasm32")]
-        let iter = selectors.iter();
-
-        #[cfg(not(target_arch = "wasm32"))]
-        let iter = selectors.par_iter();
-
-        let result = iter
-            .flat_map(|v| *v)
-            .filter_map(|selector| {
-                // Find the right plugin to handle this selector (if the resulting CSS is valid,
-                // the plugin is good)
-                plugins.iter().find_map(|plugin| {
-                    if selector.check_namespace(plugin.namespace()) {
-                        let maybe_arbitrary_value = selector.get_arbitrary_value();
-                        let arbitrary_value =
-                            if let Some(ref arbitrary_value) = maybe_arbitrary_value {
-                                let mut split = arbitrary_value.split(':');
-                                let maybe_hint = split.next().unwrap();
-
-                                if maybe_hint == arbitrary_value {
-                                    // No plugin hint
-                                    Some(("", maybe_hint))
-                                } else {
-                                    let val = split.next();
-
-                                    if let Some(val) = val {
-                                        if VALID_PLUGIN_HINT.contains(&maybe_hint) {
-                                            // Valid! Return (hint, stripped arbitrary value)
-                                            Some((maybe_hint, val))
-                                        } else {
-                                            // Unknown plugin hint (like `bg-[sth:#333]`)
-                                            // TODO: Display a warning
-                                            Some(("", val))
-                                        }
-                                    } else {
-                                        // Malformed arbitrary value (like just `bg-[color:]`)
-                                        // TODO: Display a warning
-                                        Some(("", maybe_hint))
-                                    }
-                                }
-                            } else {
-                                None
-                            };
-
-                        let mut css_content = String::new();
-                        let mut custom_css = String::new();
-
-                        if let Some(arbitrary_value) = arbitrary_value {
-                            if plugin.is_matching_value(arbitrary_value.0, arbitrary_value.1)
-                                && plugin.css_template_value(
-                                    &to_css_value(arbitrary_value.1),
-                                    &mut css_content,
-                                )
-                            {
-                                Some(self.gen_css_rule(selector, &css_content))
-                            } else {
-                                None
-                            }
-                        } else if plugin.get_css_for_modifier(
-                            &self.config,
-                            &selector.get_modifier(plugin.namespace()),
-                            &mut css_content,
-                            &mut custom_css,
-                        ) {
-                            let mut css = self.gen_css_rule(selector, &css_content);
-
-                            if !custom_css.is_empty() {
-                                css.push_str(&format!("\n\n{}", custom_css));
-                            }
-
-                            Some(css)
-                        } else {
-                            None
-                        }
-                    } else {
-                        None
-                    }
-                })
-            })
-            .collect::<Vec<String>>();
-
-        format!("{}{}", ENCRE_PREFLIGHT_CSS, result.join("\n\n"))
-    }
-
-    /// Generate a complete CSS rule (with a class selector, a rule content and, if requested, some
-    /// pseudo-elements or `@media` queries)
-    pub fn gen_css_rule(&self, selector: &Selector, css_content: &str) -> String {
-        let mut css_selector = selector
-            .to_string()
-            .replace('[', "\\[")
-            .replace(']', "\\]")
-            .replace('/', "\\/")
-            .replace('\"', "\\\"")
-            .replace('\'', "\\'")
-            .replace('(', "\\(")
-            .replace(')', "\\)")
-            .replace('#', "\\#")
-            .replace(':', "\\:")
-            .replace(',', r"\2c ")
-            .replace('.', "\\.")
-            .replace('!', "\\!")
-            .replace('%', "\\%");
-
-        if css_selector.starts_with(char::is_numeric) {
-            // CSS classes are not supposed to start with a number, we need to escape it
-            css_selector.insert_str(0, "\\3");
-        }
-
-        // A CSS class starts with a `.`
-        css_selector.insert(0, '.');
-
-        let css_content = if selector.is_important() {
-            css_content.replace(';', " !important;")
-        } else {
-            css_content.to_string()
-        };
-
-        let variants = selector.get_variants();
-        if !variants.is_empty() {
-            let rule = variants.iter().fold(
-                format!(
-                    "{} {{\n  {}\n}}",
-                    WILL_BE_REPLACED_BY_CSS_SELECTOR,
-                    indent(css_content),
-                ),
-                |acc, variant| {
-                    let right_variant = if let Some(result) = self.variants.get(variant.as_str()) {
-                        result
-                    } else {
-                        println!("Unknown variant: {}", variant);
-                        return acc;
-                    };
-
-                    match right_variant {
-                        Variant::PseudoClass(name) => {
-                            css_selector.push_str(&format!(":{}", name));
-                            acc
-                        }
-                        Variant::PseudoElement(name) => {
-                            css_selector.push_str(&format!("::{}", name));
-                            acc
-                        }
-                        Variant::WrapSelector(template) => {
-                            css_selector = template.replace('&', &css_selector);
-                            acc
-                        }
-                        Variant::AtRule(at_rule) => {
-                            format!("{} {{\n  {}\n}}", at_rule, indent(acc),)
-                        }
-                    }
-                },
-            );
-
-            rule.replace(WILL_BE_REPLACED_BY_CSS_SELECTOR, &css_selector)
-        } else {
-            format!("{} {{\n  {}\n}}", css_selector, indent(css_content))
-        }
-    }
-
-    /// Return the list of plugins needed
-    pub fn build_plugins(&self) -> [Box<dyn Plugin + Sync>; 181] {
-        // TODO: Better sorting (colors and lengths after all the other utilities (because they have
-        // hints))
-        [
-            Box::new(background::ColorPlugin),
-            Box::new(background::AttachmentPlugin),
-            Box::new(background::ClipPlugin),
-            Box::new(background::OpacityPlugin),
-            Box::new(background::ImagePlugin),
-            Box::new(background::GradientFromPlugin),
-            Box::new(background::GradientViaPlugin),
-            Box::new(background::GradientToPlugin),
-            Box::new(background::PositionPlugin),
-            Box::new(background::RepeatPlugin),
-            Box::new(background::SizePlugin),
-            Box::new(border::ColorPlugin),
-            Box::new(border::RadiusPlugin),
-            Box::new(border::RadiusTopPlugin),
-            Box::new(border::RadiusBottomPlugin),
-            Box::new(border::RadiusLeftPlugin),
-            Box::new(border::RadiusRightPlugin),
-            Box::new(border::RadiusTopLeftPlugin),
-            Box::new(border::RadiusTopRightPlugin),
-            Box::new(border::RadiusBottomLeftPlugin),
-            Box::new(border::RadiusBottomRightPlugin),
-            Box::new(border::StylePlugin),
-            Box::new(border::WidthPlugin),
-            Box::new(border::WidthXPlugin),
-            Box::new(border::WidthYPlugin),
-            Box::new(border::WidthTopPlugin),
-            Box::new(border::WidthBottomPlugin),
-            Box::new(border::WidthLeftPlugin),
-            Box::new(border::WidthRightPlugin),
-            Box::new(border::OpacityPlugin),
-            Box::new(border::DivideColorPlugin),
-            Box::new(border::DivideWidthXPlugin),
-            Box::new(border::DivideWidthYPlugin),
-            Box::new(border::DivideStylePlugin),
-            Box::new(border::DivideOpacityPlugin),
-            Box::new(border::RingOffsetColorPlugin),
-            Box::new(border::RingOffsetWidthPlugin),
-            Box::new(border::RingColorPlugin),
-            Box::new(border::RingWidthPlugin),
-            Box::new(border::RingOpacityPlugin),
-            Box::new(border::OutlineColorPlugin),
-            Box::new(border::OutlineWidthPlugin),
-            Box::new(border::OutlineStylePlugin),
-            Box::new(border::OutlineOffsetPlugin),
-            Box::new(typography::ColorPlugin),
-            Box::new(typography::OpacityPlugin),
-            Box::new(typography::FontFamilyPlugin),
-            Box::new(typography::FontSizePlugin),
-            Box::new(typography::FontWeightPlugin),
-            Box::new(typography::TextAlignmentPlugin),
-            Box::new(typography::TrackingPlugin),
-            Box::new(typography::LeadingPlugin),
-            Box::new(typography::TextDecorationColorPlugin),
-            Box::new(typography::TextDecorationStylePlugin),
-            Box::new(typography::TextDecorationThicknessPlugin),
-            Box::new(typography::TextDecorationOffsetPlugin),
-            Box::new(typography::ContentPlugin),
-            Box::new(typography::ListStyleTypePlugin),
-            Box::new(typography::ListStylePositionPlugin),
-            Box::new(typography::VerticalAlignPlugin),
-            Box::new(typography::WhitespacePlugin),
-            Box::new(typography::WordBreakPlugin),
-            Box::new(sizing::WidthPlugin),
-            Box::new(sizing::MinWidthPlugin),
-            Box::new(sizing::MaxWidthPlugin),
-            Box::new(sizing::HeightPlugin),
-            Box::new(sizing::MinHeightPlugin),
-            Box::new(sizing::MaxHeightPlugin),
-            Box::new(spacing::PaddingPlugin),
-            Box::new(spacing::PaddingXPlugin),
-            Box::new(spacing::PaddingYPlugin),
-            Box::new(spacing::PaddingLeftPlugin),
-            Box::new(spacing::PaddingRightPlugin),
-            Box::new(spacing::PaddingTopPlugin),
-            Box::new(spacing::PaddingBottomPlugin),
-            Box::new(spacing::MarginPlugin),
-            Box::new(spacing::MarginXPlugin),
-            Box::new(spacing::MarginYPlugin),
-            Box::new(spacing::MarginLeftPlugin),
-            Box::new(spacing::MarginRightPlugin),
-            Box::new(spacing::MarginTopPlugin),
-            Box::new(spacing::MarginBottomPlugin),
-            Box::new(spacing::SpaceXPlugin),
-            Box::new(spacing::SpaceYPlugin),
-            Box::new(flexbox::OrderPlugin),
-            Box::new(flexbox::DirectionPlugin),
-            Box::new(flexbox::WrapPlugin),
-            Box::new(flexbox::GrowShrinkBasisPlugin),
-            Box::new(layout::InsetPlugin),
-            Box::new(layout::InsetXPlugin),
-            Box::new(layout::InsetYPlugin),
-            Box::new(layout::TopPlugin),
-            Box::new(layout::BottomPlugin),
-            Box::new(layout::LeftPlugin),
-            Box::new(layout::RightPlugin),
-            Box::new(layout::ZIndexPlugin),
-            Box::new(layout::ContainerPlugin),
-            Box::new(layout::BoxDecorationBreakPlugin),
-            Box::new(layout::BoxSizingPlugin),
-            Box::new(layout::FloatPlugin),
-            Box::new(layout::ClearPlugin),
-            Box::new(layout::IsolationPlugin),
-            Box::new(layout::ObjectFitPlugin),
-            Box::new(layout::ObjectPositionPlugin),
-            Box::new(layout::OverflowPlugin),
-            Box::new(layout::OverscrollPlugin),
-            Box::new(alignment::AlignContentPlugin),
-            Box::new(alignment::AlignItemsPlugin),
-            Box::new(alignment::AlignSelfPlugin),
-            Box::new(alignment::JustifyContentPlugin),
-            Box::new(alignment::JustifyItemsPlugin),
-            Box::new(alignment::JustifySelfPlugin),
-            Box::new(alignment::PlaceContentPlugin),
-            Box::new(alignment::PlaceItemsPlugin),
-            Box::new(alignment::PlaceSelfPlugin),
-            Box::new(effect::MixBlendModePlugin),
-            Box::new(effect::OpacityPlugin),
-            Box::new(effect::BackgroundBlendModePlugin),
-            Box::new(effect::BoxShadowPlugin),
-            Box::new(effect::BoxShadowColorPlugin),
-            Box::new(transition::DurationPlugin),
-            Box::new(transition::DelayPlugin),
-            Box::new(transition::EasePlugin),
-            Box::new(transition::PropertyPlugin),
-            Box::new(transition::AnimatePlugin::new()),
-            Box::new(grid::ColumnsPlugin),
-            Box::new(grid::RowsPlugin),
-            Box::new(grid::GapPlugin),
-            Box::new(grid::GapXPlugin),
-            Box::new(grid::GapYPlugin),
-            Box::new(grid::StartEndSpanColumnPlugin),
-            Box::new(grid::StartEndSpanRowPlugin),
-            Box::new(grid::AutoFlowPlugin),
-            Box::new(grid::AutoColumnsPlugin),
-            Box::new(grid::AutoRowsPlugin),
-            Box::new(interactivity::AccentColorPlugin),
-            Box::new(interactivity::AppearancePlugin),
-            Box::new(interactivity::CursorPlugin),
-            Box::new(interactivity::CaretColorPlugin),
-            Box::new(interactivity::PointerEventsPlugin),
-            Box::new(interactivity::ResizePlugin),
-            Box::new(interactivity::ScrollBehaviorPlugin),
-            Box::new(interactivity::TouchActionPlugin),
-            Box::new(interactivity::UserSelectPlugin),
-            Box::new(interactivity::WillChangePlugin),
-            Box::new(interactivity::ScrollSnapAlignPlugin),
-            Box::new(interactivity::ScrollSnapStopPlugin),
-            Box::new(interactivity::ScrollSnapTypePlugin),
-            Box::new(interactivity::ScrollPaddingPlugin),
-            Box::new(interactivity::ScrollPaddingXPlugin),
-            Box::new(interactivity::ScrollPaddingYPlugin),
-            Box::new(interactivity::ScrollPaddingLeftPlugin),
-            Box::new(interactivity::ScrollPaddingRightPlugin),
-            Box::new(interactivity::ScrollPaddingTopPlugin),
-            Box::new(interactivity::ScrollPaddingBottomPlugin),
-            Box::new(interactivity::ScrollMarginPlugin),
-            Box::new(interactivity::ScrollMarginXPlugin),
-            Box::new(interactivity::ScrollMarginYPlugin),
-            Box::new(interactivity::ScrollMarginLeftPlugin),
-            Box::new(interactivity::ScrollMarginRightPlugin),
-            Box::new(interactivity::ScrollMarginTopPlugin),
-            Box::new(interactivity::ScrollMarginBottomPlugin),
-            Box::new(svg::FillPlugin),
-            Box::new(svg::StrokeColorPlugin),
-            Box::new(svg::StrokeWidthPlugin),
-            Box::new(table::BorderCollapsePlugin),
-            Box::new(table::TableLayoutPlugin),
-            Box::new(transform::OriginPlugin),
-            // It is better to include the following plugins at the end because they match the "" namespace
-            Box::new(layout::DisplayPlugin),
-            Box::new(layout::PositionPlugin),
-            Box::new(layout::VisibilityPlugin),
-            Box::new(filter::FilterPlugin),
-            Box::new(filter::BackdropFilterPlugin),
-            Box::new(typography::TextTransformPlugin),
-            Box::new(typography::ItalicPlugin),
-            Box::new(typography::TextDecorationPlugin),
-            Box::new(typography::FontVariantNumericPlugin),
-            Box::new(typography::FontSmoothingPlugin),
-            Box::new(typography::TextOverflowPlugin),
-            Box::new(accessibility::ScreenReaderPlugin),
-            Box::new(transform::TranslateRotateScaleSkewPlugin),
-        ]
-    }
-
-    /// Restore the default state of the generator (without any scanned selectors)
-    /// Useful when repeatedly calling [`EncreGenerator::generate`]
-    pub fn reset(&mut self) {
-        self.scanned_selectors_without_variant.clear();
-        self.scanned_selectors_with_variant.clear();
-    }
-}
+pub use generator::EncreGenerator;
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::config::{ColorConfig, DarkModeConfig, ScreenConfig};
+    use crate::{
+        config::{ColorConfig, DarkModeConfig, ScreenConfig},
+        selector::Selector,
+    };
 
     use pretty_assertions::assert_eq;
-    use std::borrow::Cow;
+    use std::{borrow::Cow, collections::{BTreeSet, BTreeMap}};
 
     #[test]
     fn scan_raw_test() {
@@ -569,8 +47,8 @@ mod tests {
         );
 
         assert_eq!(
-            generator.scanned_selectors_without_variant,
-            vec![
+            generator.extractor.scanned_selectors_without_variant,
+            BTreeSet::from([
                 Selector::new("<div"),
                 Selector::new("class"),
                 Selector::new("w-full"),
@@ -582,15 +60,15 @@ mod tests {
                 Selector::new("text-[color:var(--hello)]"),
                 Selector::new("</div"),
                 Selector::new(""), // TODO: Why?
-            ]
+            ])
         );
 
         assert_eq!(
-            generator.scanned_selectors_with_variant,
-            vec![
+            generator.extractor.scanned_selectors_with_variant,
+            BTreeSet::from([
                 Selector::new("sm:focus:ring"),
                 Selector::new("hover:bg-black")
-            ]
+            ])
         );
     }
 
@@ -610,7 +88,7 @@ mod tests {
         );
     }
 
-        #[test]
+    #[test]
     fn gen_selector_css_arbitrary_value_test() {
         // TODO: Support --en-bg-opacity in arbitrary values
         let mut generator = EncreGenerator::from_config(Config::default());
