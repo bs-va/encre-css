@@ -12,7 +12,7 @@ use regex::Regex;
 use std::{
     borrow::Cow,
     collections::BTreeMap,
-    path::PathBuf,
+    path::Path,
 };
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -100,7 +100,7 @@ impl EncreGenerator {
     ///
     /// If the file does not exist, a warning will be emitted and the default configuration will be
     /// used
-    pub fn new(path: PathBuf) -> Self {
+    pub fn new<T: AsRef<Path>>(path: T) -> Self {
         let config = match Config::from_file(path) {
             Ok(config) => config,
             Err(e) => {
@@ -144,12 +144,12 @@ impl EncreGenerator {
     }
 
     /// Scan all files given and store all the selectors found
-    pub fn scan_files(&mut self, files: impl Iterator<Item = PathBuf>) {
+    pub fn scan_files<T: AsRef<Path>>(&mut self, files: impl Iterator<Item = T>) {
         self.extractor.scan_files(files);
     }
 
     /// Scan all files in a path using the glob syntax
-    pub fn scan_path(&mut self, glob_path: &PathBuf) {
+    pub fn scan_path<T: AsRef<Path>>(&mut self, glob_path: T) {
         self.extractor.scan_path(glob_path);
     }
 

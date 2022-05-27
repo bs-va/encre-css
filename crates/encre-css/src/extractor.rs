@@ -2,7 +2,7 @@ use crate::selector::Selector;
 
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::{collections::BTreeSet, fs, io::Read, iter, path::PathBuf};
+use std::{collections::BTreeSet, fs, io::Read, iter, path::Path};
 use wax::Glob;
 
 lazy_static! {
@@ -43,7 +43,7 @@ impl Extractor {
     }
 
     /// Scan all files given and store all the selectors found
-    pub fn scan_files(&mut self, files: impl Iterator<Item = PathBuf>) {
+    pub fn scan_files<T: AsRef<Path>>(&mut self, files: impl Iterator<Item = T>) {
         let mut file_contents: String = String::new();
 
         for file in files {
@@ -58,16 +58,17 @@ impl Extractor {
     }
 
     /// Scan all files in a path using the glob syntax
-    pub fn scan_path(&mut self, glob_path: &PathBuf) {
+    pub fn scan_path<T: AsRef<Path>>(&mut self, glob_path: T) {
         let (prefix, glob) = Glob::partitioned(
             glob_path
+                .as_ref()
                 .to_str()
-                .expect("failed to convert the glob to a PathBuf"),
+                .expect("failed to convert the glob to a string"),
         )
         .unwrap();
 
-        if prefix == *glob_path {
-            self.scan_files(iter::once(glob_path.clone()));
+        if prefix == glob_path.as_ref() {
+            self.scan_files(iter::once(glob_path));
         } else {
             self.scan_files(
                 glob.walk(prefix, usize::MAX)

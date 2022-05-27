@@ -1,6 +1,6 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use encre_css::{utils::value_matchers, Config, EncreGenerator};
-use std::{iter, path::PathBuf};
+use std::iter;
 
 fn scan(c: &mut Criterion) {
     let mut generator = EncreGenerator::from_config(Config::default());
@@ -11,9 +11,7 @@ fn scan(c: &mut Criterion) {
 
     c.bench_function("scan_files", |b| {
         b.iter(|| {
-            generator.scan_files(black_box(iter::once(PathBuf::from(
-                "tests/fixtures/index.js",
-            ))));
+            generator.scan_files(black_box(iter::once("tests/fixtures/index.js")));
         })
     });
 }

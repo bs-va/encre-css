@@ -6,7 +6,7 @@ use std::{
     collections::BTreeMap,
     fs,
     ops::{Deref, DerefMut},
-    path::PathBuf,
+    path::{Path, PathBuf},
 };
 
 #[derive(Debug, PartialEq, Deserialize)]
@@ -335,9 +335,9 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn from_file(path: PathBuf) -> Result<Self> {
+    pub fn from_file<T: AsRef<Path>>(path: T) -> Result<Self> {
         let mut config: Config = toml::from_str(
-            &fs::read_to_string(&path).map_err(|e| Error::ConfigFileNotFound(path, e))?,
+            &fs::read_to_string(&path).map_err(|e| Error::ConfigFileNotFound(path.as_ref().to_path_buf(), e))?,
         )?;
 
         if config.theme.colors != ColorConfig::default() {

@@ -6,7 +6,7 @@
 //! use encre_css::{EncreGenerator, Config};
 //!
 //! let mut generator = EncreGenerator::from_config(Config::default());
-//! // Or let mut generator = EncreGenerator::new("encre.toml".into()); if your current directory contains an `encre.toml` file
+//! // Or let mut generator = EncreGenerator::new("encre.toml"); if your current directory contains an `encre.toml` file
 //! generator.scan_raw(r#"class="bg-red-500""#);
 //!
 //! assert!(generator.generate().contains(r#".bg-red-500 {
@@ -359,14 +359,14 @@ mod tests {
         config.theme.dark_mode = DarkModeConfig::Class(Cow::from(".dark"));
 
         assert_eq!(
-            Config::from_file("tests/fixtures/custom_config.toml".into()).unwrap(),
+            Config::from_file("tests/fixtures/custom_config.toml").unwrap(),
             config
         );
     }
 
     #[test]
     fn config_is_extended_and_overridden_test() {
-        let config = Config::from_file("tests/fixtures/custom_config.toml".into()).unwrap();
+        let config = Config::from_file("tests/fixtures/custom_config.toml").unwrap();
 
         let mut generator = EncreGenerator::from_config(config);
         generator.add_selector("bg-rosa-500");

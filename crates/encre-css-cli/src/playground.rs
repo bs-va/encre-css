@@ -27,7 +27,7 @@ pub fn launch_playground(name: Option<String>) {
     });
     let dir_path = PathBuf::from(&name);
 
-    fs::create_dir(&dir_path).expect("failed to create a new directory in the current directory");
+    fs::create_dir(&name).expect("failed to create a new directory in the current directory");
     fs::write(dir_path.join("index.html"), DEFAULT_HTML_CONTENT).expect("failed to create an `encre.toml` file in the created directory");
     fs::write(dir_path.join(DEFAULT_CONFIG_FILE), DEFAULT_CONFIG_CONTENT).expect("failed to create the configuration file in the created directory");
 

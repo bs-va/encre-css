@@ -4,7 +4,7 @@ use encre_css::{Config, EncreGenerator};
 use notify::{watcher, DebouncedEvent::*, RecursiveMode, Watcher};
 use std::{
     fs,
-    path::PathBuf,
+    path::{Path, PathBuf},
     sync::mpsc::channel,
     time::{Duration, Instant},
 };
@@ -17,7 +17,7 @@ fn result_equal<T: PartialEq, E>(res1: Result<T, E>, res2: Result<T, E>) -> bool
     }
 }
 
-fn gen_css(generator: &EncreGenerator, output: Option<&PathBuf>, display_time: bool) {
+fn gen_css<T: AsRef<Path>>(generator: &EncreGenerator, output: Option<T>, display_time: bool) {
     let start = Instant::now();
     let css = generator.generate();
     let duration = start.elapsed();
@@ -34,9 +34,9 @@ fn gen_css(generator: &EncreGenerator, output: Option<&PathBuf>, display_time: b
     }
 }
 
-pub fn build(
+pub fn build<T: AsRef<Path>>(
     config: Option<String>,
-    extra_input: Option<PathBuf>,
+    extra_input: Option<T>,
     output: Option<String>,
     watch: bool,
     display_time: bool,
@@ -56,7 +56,7 @@ pub fn build(
         // watched
         watcher.watch(".", RecursiveMode::Recursive).unwrap();
 
-        let config = match Config::from_file(PathBuf::from(config_file)) {
+        let config = match Config::from_file(config_file) {
             Ok(config) => config,
             Err(e) => {
                 eprintln!("{}", e);
@@ -74,7 +74,7 @@ pub fn build(
         // Initial generation
         gen_css(
             &generator,
-            output.as_ref().map(PathBuf::from).as_ref(),
+            output.as_ref(),
             display_time,
         );
 
@@ -98,7 +98,7 @@ pub fn build(
                             )
                         }) || extra_input.is_some()
                             && result_equal(
-                                PathBuf::from(extra_input.as_ref().unwrap()).canonicalize(),
+                                extra_input.as_ref().unwrap().as_ref().canonicalize(),
                                 PathBuf::from(path).canonicalize(),
                             )
                         {
@@ -108,7 +108,7 @@ pub fn build(
                         } else if result_equal(PathBuf::from(path).canonicalize(), PathBuf::from(DEFAULT_CONFIG_FILE).canonicalize()) {
                             // Handle configuration changes
                             println!("Configuration file changed. Reloading…");
-                            generator = EncreGenerator::new(PathBuf::from(path));
+                            generator = EncreGenerator::new(path);
                             need_reloading = true;
                         }
 
@@ -123,7 +123,7 @@ pub fn build(
 
                             gen_css(
                                 &generator,
-                                output.as_ref().map(PathBuf::from).as_ref(),
+                                output.as_ref(),
                                 display_time,
                             );
                         }
@@ -133,12 +133,12 @@ pub fn build(
             }
         }
     } else {
-        let mut generator = EncreGenerator::new(PathBuf::from(config_file));
+        let mut generator = EncreGenerator::new(config_file);
 
         if let Some(path) = extra_input {
             generator.scan_path(&path);
         }
 
-        gen_css(&generator, output.map(PathBuf::from).as_ref(), display_time);
+        gen_css(&generator, output, display_time);
     }
 }
