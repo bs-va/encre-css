@@ -15,3 +15,4 @@ encre-css = { path = "../encre-css" }
 clap = { version = "3.1.17", features = ["derive"] }
 notify = "4.0.17"
 rand = "0.8.5"
+wax = "0.4.0"

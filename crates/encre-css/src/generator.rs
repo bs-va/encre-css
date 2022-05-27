@@ -1,25 +1,23 @@
 use crate::{
+    config::Config,
     extractor::Extractor,
     plugins::*,
     preflight::ENCRE_PREFLIGHT_CSS,
     selector::Selector,
     variant::{init_variants, Variant},
-    config::Config,
 };
 
 use lazy_static::lazy_static;
-use regex::Regex;
-use std::{
-    borrow::Cow,
-    collections::BTreeMap,
-    path::Path,
-};
+use regex::{Captures, Regex};
+use std::{borrow::Cow, collections::BTreeMap, path::Path, sync::Arc};
 
 #[cfg(not(target_arch = "wasm32"))]
 use rayon::prelude::*;
 
 lazy_static! {
-    static ref URL_REGEX: Regex = Regex::new("^url\\(.*\\)$").unwrap();
+    static ref URL_REGEX: Regex = Regex::new(r"url\((.+)\)").unwrap();
+    static ref URL_REGEX_STRICT: Regex = Regex::new(r"^url\((.+)\)$").unwrap();
+    static ref CALC_REGEX: Regex = Regex::new(r"calc\((.+)\)").unwrap();
 }
 
 const WILL_BE_REPLACED_BY_UNDERSCORE: &str = "WILL-BE-REPLACED-BY-UNDERSCORE";
@@ -27,24 +25,43 @@ const WILL_BE_REPLACED_BY_UNDERSCORE: &str = "WILL-BE-REPLACED-BY-UNDERSCORE";
 /// Convert an arbitrary value into a CSS value
 ///
 ///  -  `_` (underscores) are converted to ` ` (spaces) (not in `url`s)
-pub fn to_css_value(val: &str) -> String {
+pub fn to_css_value(val: &str) -> Cow<str> {
     // Don't replace `_` if it is a URL
-    let val = if !URL_REGEX.is_match(val) {
-        // Don't replace `_` if prefixed by a `\`
-        val.replace("\\_", WILL_BE_REPLACED_BY_UNDERSCORE)
-            .replace('_', " ")
-            .replace(WILL_BE_REPLACED_BY_UNDERSCORE, "_")
+    let val = if val.contains("url") {
+        // If the value contains an url, it won't contain a calculation, so we can safely return here
+        URL_REGEX.replace(val, |caps: &Captures| {
+            format!(
+                "url({})",
+                caps[1].replace('_', WILL_BE_REPLACED_BY_UNDERSCORE)
+            )
+        })
     } else {
-        val.to_string()
+        Cow::from(val)
     };
 
+    // Don't replace `_` if prefixed by a `\`
+    let val = val
+        .replace("\\_", WILL_BE_REPLACED_BY_UNDERSCORE)
+        .replace('_', " ")
+        .replace(WILL_BE_REPLACED_BY_UNDERSCORE, "_");
+
     if val.contains("calc") {
-        val.replace('-', " - ")
-            .replace('+', " + ")
-            .replace('/', " / ")
-            .replace('*', "*")
+        Cow::from(
+            CALC_REGEX
+                .replace(&val, |caps: &Captures| {
+                    format!(
+                        "calc({})",
+                        caps[1]
+                            .replace('-', " - ")
+                            .replace('+', " + ")
+                            .replace('/', " / ")
+                            .replace('*', "*")
+                    )
+                })
+                .to_string(),
+        )
     } else {
-        val
+        Cow::from(val)
     }
 }
 
@@ -90,7 +107,7 @@ pub fn find_arbitrary_value_hint(selector: Option<&String>) -> Option<(&str, &st
 /// Main structure used to generate CSS from selectors
 #[derive(Default)]
 pub struct EncreGenerator {
-    config: Config,
+    config: Arc<Config>,
     variants: BTreeMap<Cow<'static, str>, Variant>,
     pub(crate) extractor: Extractor,
 }
@@ -116,7 +133,6 @@ impl EncreGenerator {
     ///
     /// The paths in the [`Config::input`] field of the configuration will be scanned
     pub fn from_config(config: Config) -> Self {
-        let variants = init_variants(&config);
         let mut extractor = Extractor::new();
 
         // TODO: Use rayon to make this part parallel
@@ -125,12 +141,21 @@ impl EncreGenerator {
         }
 
         Self {
-            variants,
-            config,
+            variants: init_variants(&config),
+            config: Arc::new(config),
             extractor,
         }
     }
-    
+
+    /// Get the configuration
+    pub fn get_config(&self) -> Arc<Config> {
+        self.config.clone()
+    }
+
+    pub fn set_config(&mut self, config: Config) {
+        self.config = Arc::new(config);
+    }
+
     /// Add a new selector which will have its CSS generated
     ///
     /// This function automatically handles duplicated selectors
@@ -166,7 +191,7 @@ impl EncreGenerator {
             &self.extractor.scanned_selectors_without_variant,
             &self.extractor.scanned_selectors_with_variant,
         ];
-        
+
         let plugins = self.build_plugins();
 
         #[cfg(target_arch = "wasm32")]
@@ -176,12 +201,16 @@ impl EncreGenerator {
         let iter = selectors.iter();
 
         // The CSS for a selector is roughly 30 characters
-        let mut result = String::with_capacity((self.extractor.scanned_selectors_without_variant.len() + self.extractor.scanned_selectors_with_variant.len()) * 30);
+        let mut result = String::with_capacity(
+            (self.extractor.scanned_selectors_without_variant.len()
+                + self.extractor.scanned_selectors_with_variant.len())
+                * 30,
+        );
 
         iter.flat_map(|v| *v).for_each(|selector| {
             let arbitrary_value = selector.get_arbitrary_value();
             let arbitrary_value = find_arbitrary_value_hint(arbitrary_value.as_ref());
-            
+
             // Find the right plugin to handle this selector (if the resulting CSS is valid,
             // the plugin is good)
             for plugin in &plugins {
@@ -196,7 +225,10 @@ impl EncreGenerator {
                                 &mut css_content,
                             )
                         {
-                            result.push_str(&format!("{}\n\n", self.gen_css_rule(selector, &css_content).as_str()));
+                            result.push_str(&format!(
+                                "{}\n\n",
+                                self.gen_css_rule(selector, &css_content).as_str()
+                            ));
                             break;
                         }
                     } else if plugin.get_css_for_modifier(
@@ -209,7 +241,10 @@ impl EncreGenerator {
                             result.push_str(&format!("{}\n\n", custom_css));
                         }
 
-                        result.push_str(&format!("{}\n\n", self.gen_css_rule(selector, &css_content)));
+                        result.push_str(&format!(
+                            "{}\n\n",
+                            self.gen_css_rule(selector, &css_content)
+                        ));
 
                         break;
                     }
@@ -224,28 +259,30 @@ impl EncreGenerator {
     /// pseudo-elements or `@media` queries)
     pub fn gen_css_rule(&self, selector: &Selector, css_content: &str) -> String {
         let mut css_selector = selector
-            .to_string()
-            .replace('[', "\\[")
-            .replace(']', "\\]")
-            .replace('/', "\\/")
-            .replace('\"', "\\\"")
-            .replace('\'', "\\'")
-            .replace('(', "\\(")
-            .replace(')', "\\)")
-            .replace('#', "\\#")
-            .replace(':', "\\:")
-            .replace(',', r"\2c ")
-            .replace('.', "\\.")
-            .replace('!', "\\!")
-            .replace('%', "\\%");
+            .full()
+            .chars()
+            .enumerate()
+            .map(|(i, ch)| {
+                if i == 0 {
+                    // A CSS class must start with a `.`
+                    let mut result = ".".to_string();
 
-        if css_selector.starts_with(char::is_numeric) {
-            // CSS classes are not supposed to start with a number, we need to escape it
-            css_selector.insert_str(0, "\\3");
-        }
-
-        // A CSS class starts with a `.`
-        css_selector.insert(0, '.');
+                    if ch.is_numeric() {
+                        // CSS classes must not start with a number, we need to escape it
+                        result.push_str("\\3");
+                        result.push(ch);
+                        result
+                    } else {
+                        result.push(ch);
+                        result
+                    }
+                } else if !ch.is_alphanumeric() && ch != '-' && ch != '_' {
+                    format!("\\{}", ch)
+                } else {
+                    ch.to_string()
+                }
+            })
+            .collect::<String>();
 
         let css_content = if selector.is_important() {
             css_content.replace(';', " !important;")
@@ -368,20 +405,20 @@ impl EncreGenerator {
             Box::new(sizing::HeightPlugin),
             Box::new(sizing::MinHeightPlugin),
             Box::new(sizing::MaxHeightPlugin),
-            Box::new(spacing::PaddingPlugin),
-            Box::new(spacing::PaddingXPlugin),
-            Box::new(spacing::PaddingYPlugin),
             Box::new(spacing::PaddingLeftPlugin),
             Box::new(spacing::PaddingRightPlugin),
             Box::new(spacing::PaddingTopPlugin),
             Box::new(spacing::PaddingBottomPlugin),
-            Box::new(spacing::MarginPlugin),
-            Box::new(spacing::MarginXPlugin),
-            Box::new(spacing::MarginYPlugin),
+            Box::new(spacing::PaddingXPlugin),
+            Box::new(spacing::PaddingYPlugin),
+            Box::new(spacing::PaddingPlugin),
             Box::new(spacing::MarginLeftPlugin),
             Box::new(spacing::MarginRightPlugin),
             Box::new(spacing::MarginTopPlugin),
             Box::new(spacing::MarginBottomPlugin),
+            Box::new(spacing::MarginXPlugin),
+            Box::new(spacing::MarginYPlugin),
+            Box::new(spacing::MarginPlugin),
             Box::new(spacing::SpaceXPlugin),
             Box::new(spacing::SpaceYPlugin),
             Box::new(flexbox::OrderPlugin),

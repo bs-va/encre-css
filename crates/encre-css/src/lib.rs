@@ -37,7 +37,10 @@ mod tests {
     };
 
     use pretty_assertions::assert_eq;
-    use std::{borrow::Cow, collections::{BTreeSet, BTreeMap}};
+    use std::{
+        borrow::Cow,
+        collections::{BTreeMap, BTreeSet},
+    };
 
     #[test]
     fn scan_raw_test() {
@@ -95,6 +98,8 @@ mod tests {
         generator.add_selector("w-[12px]");
         generator.add_selector("bg-[red]");
         generator.add_selector("bg-[url('../img/image_with_underscores.png')]");
+        generator.add_selector("mt-[calc(100%-10px)]");
+        generator.add_selector("2xl:pb-[calc((100%/2)-10px+2rem)]");
 
         assert_eq!(
             generator.generate(),
@@ -107,8 +112,18 @@ mod tests {
   background-image: url('../img/image_with_underscores.png');
 }}
 
+.mt-\[calc\(100\%-10px\)\] {{
+  margin-top: calc(100% - 10px);
+}}
+
 .w-\[12px\] {{
   width: 12px;
+}}
+
+@media (min-width: 1536px) {{
+  .\32xl\:pb-\[calc\(\(100\%\/2\)-10px\+2rem\)\] {{
+    padding-bottom: calc((100% / 2) - 10px + 2rem);
+  }}
 }}"#,
                 preflight::ENCRE_PREFLIGHT_CSS
             )

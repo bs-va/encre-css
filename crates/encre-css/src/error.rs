@@ -1,5 +1,4 @@
-use std::{path::PathBuf, num::ParseIntError, fmt};
-use serde::{de, ser};
+use std::{path::PathBuf, num::ParseIntError};
 use thiserror::Error as ErrorTrait;
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -14,19 +13,4 @@ pub enum Error {
 
     #[error("error when converting the hexadecimal color `{0}` to rgb: {1:?}")]
     HexToRgbConversion(String, ParseIntError),
-
-    #[error("error when deserializing: {0:?}")]
-    Deserialize(String),
-}
-
-impl ser::Error for Error {
-    fn custom<T: fmt::Display>(msg: T) -> Self {
-        Error::Deserialize(msg.to_string())
-    }
-}
-
-impl de::Error for Error {
-    fn custom<T: fmt::Display>(msg: T) -> Self {
-        Error::Deserialize(msg.to_string())
-    }
 }

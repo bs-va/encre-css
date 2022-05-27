@@ -181,6 +181,10 @@ impl Selector {
         longest.contains(smallest)
     }
 
+    pub fn full(&self) -> &str {
+        &self.full_name
+    }
+
     pub fn len(&self) -> usize {
         self.content.len()
     }

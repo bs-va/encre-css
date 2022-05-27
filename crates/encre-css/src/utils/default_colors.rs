@@ -8,10 +8,10 @@ lazy_static! {
     static ref OPACITY_SUFFIX_REGEX: Regex = Regex::new(r"(?-u)/(\d*)$").unwrap();
 }
 
-pub fn hex_to_rgb(hex: Cow<'static, str>) -> Result<[u8; 3]> {
+pub fn hex_to_rgb(hex: &str) -> Result<[u8; 3]> {
     // Remove the useless `#` from the start of the color
     let hex = if let Some(hex) = hex.strip_prefix('#') {
-        Cow::from(hex)
+        hex
     } else {
         hex
     };
@@ -71,7 +71,7 @@ pub fn get(config: &Config, modifier: &str) -> Option<String> {
     } else if modifier == "white" {
         Some([0xff, 0xff, 0xff])
     } else if let Some(hex_color) = config.theme.colors.get(&Cow::from(modifier)) {
-        hex_to_rgb(hex_color.clone()).ok()
+        hex_to_rgb(hex_color).ok()
     } else {
         None
     };
@@ -98,9 +98,9 @@ mod tests {
     
     #[test]
     fn hex_to_rgb_test() {
-        assert_eq!(hex_to_rgb(Cow::from("#ff0000")).unwrap(), [255, 0, 0]);
-        assert_eq!(hex_to_rgb(Cow::from("#FF00FF")).unwrap(), [255, 0, 255]);
-        assert_eq!(hex_to_rgb(Cow::from("#332")).unwrap(), [51, 51, 34]);
-        assert_eq!(hex_to_rgb(Cow::from("#FEF")).unwrap(), [255, 238, 255]);
+        assert_eq!(hex_to_rgb(&Cow::from("#ff0000")).unwrap(), [255, 0, 0]);
+        assert_eq!(hex_to_rgb(&Cow::from("#FF00FF")).unwrap(), [255, 0, 255]);
+        assert_eq!(hex_to_rgb(&Cow::from("#332")).unwrap(), [51, 51, 34]);
+        assert_eq!(hex_to_rgb(&Cow::from("#FEF")).unwrap(), [255, 238, 255]);
     }
 }

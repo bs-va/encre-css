@@ -7,7 +7,9 @@ use std::{
     path::{Path, PathBuf},
     sync::mpsc::channel,
     time::{Duration, Instant},
+    iter,
 };
+use wax::Glob;
 
 fn result_equal<T: PartialEq, E>(res1: Result<T, E>, res2: Result<T, E>) -> bool {
     if let (Ok(res1), Ok(res2)) = (res1, res2) {
@@ -64,7 +66,6 @@ pub fn build<T: AsRef<Path>>(
             }
         };
 
-        let input = config.input.clone();
         let mut generator = EncreGenerator::from_config(config);
 
         if let Some(ref path) = extra_input {
@@ -72,11 +73,7 @@ pub fn build<T: AsRef<Path>>(
         }
 
         // Initial generation
-        gen_css(
-            &generator,
-            output.as_ref(),
-            display_time,
-        );
+        gen_css(&generator, output.as_ref(), display_time);
 
         println!("`encre-css` successfully launched in watch mode");
 
@@ -89,11 +86,27 @@ pub fn build<T: AsRef<Path>>(
                     | Rename(_, ref path) = event
                     {
                         let mut need_reloading = false;
+                        let input = &generator.get_config().input;
+                        let mut files = input.iter().flat_map(|glob_path| {
+                            let (prefix, glob) = Glob::partitioned(
+                            glob_path
+                                .to_str()
+                                .expect("failed to convert the glob to a string"),
+                            ).unwrap();
+
+                            if &prefix == glob_path {
+                                iter::once(glob_path.clone()).collect::<Vec<PathBuf>>()
+                            } else {
+                                glob.walk(prefix, usize::MAX)
+                                    .map(|e| e.unwrap().into_path())
+                                    .collect::<Vec<PathBuf>>()
+                            }
+                        });
 
                         // Check that the changed file is watched
-                        if input.iter().any(|i| {
+                        if files.any(|file_path| {
                             result_equal(
-                                PathBuf::from(i).canonicalize(),
+                                file_path.canonicalize(),
                                 PathBuf::from(path).canonicalize(),
                             )
                         }) || extra_input.is_some()
@@ -103,16 +116,29 @@ pub fn build<T: AsRef<Path>>(
                             )
                         {
                             println!("Changes detected. Reloading…");
-                            generator.reset();
                             need_reloading = true;
-                        } else if result_equal(PathBuf::from(path).canonicalize(), PathBuf::from(DEFAULT_CONFIG_FILE).canonicalize()) {
+                        } else if result_equal(
+                            PathBuf::from(path).canonicalize(),
+                            PathBuf::from(DEFAULT_CONFIG_FILE).canonicalize(),
+                        ) {
                             // Handle configuration changes
                             println!("Configuration file changed. Reloading…");
-                            generator = EncreGenerator::new(path);
+
+                            let config = match Config::from_file(config_file) {
+                                Ok(config) => config,
+                                Err(e) => {
+                                    eprintln!("{}", e);
+                                    Config::default()
+                                }
+                            };
+
+                            generator.set_config(config);
                             need_reloading = true;
                         }
 
                         if need_reloading {
+                            generator.reset();
+
                             input.iter().for_each(|path| {
                                 generator.scan_path(path);
                             });
@@ -121,11 +147,7 @@ pub fn build<T: AsRef<Path>>(
                                 generator.scan_path(path);
                             }
 
-                            gen_css(
-                                &generator,
-                                output.as_ref(),
-                                display_time,
-                            );
+                            gen_css(&generator, output.as_ref(), display_time);
                         }
                     }
                 }
