@@ -1,4 +1,4 @@
 [theme]
 dark_mode = { class = ".dark" }
 screens = { 3xl = "1600px", lg = "2000px" }
-colors = { rosa-500 = "#E5186A", yellow-400 = "#FFEF0E" }
+colors = { rosa-500 = "#e5186a", yellow-400 = "#ffef0e" }

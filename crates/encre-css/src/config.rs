@@ -1,13 +1,10 @@
 use crate::error::{Error, Result};
 
-use serde::{
-    de::{value::MapAccessDeserializer, MapAccess, Visitor},
-    Deserialize, Deserializer,
-};
+use serde::Deserialize;
 use std::{
     borrow::Cow,
     collections::BTreeMap,
-    fmt, fs,
+    fs,
     ops::{Deref, DerefMut},
     path::PathBuf,
 };
@@ -62,10 +59,10 @@ impl Default for ScreenConfig {
 }
 
 #[derive(Debug, PartialEq, Clone, Deserialize)]
-pub struct ColorConfig(BTreeMap<Cow<'static, str>, [u8; 3]>);
+pub struct ColorConfig(BTreeMap<Cow<'static, str>, Cow<'static, str>>);
 
 impl Deref for ColorConfig {
-    type Target = BTreeMap<Cow<'static, str>, [u8; 3]>;
+    type Target = BTreeMap<Cow<'static, str>, Cow<'static, str>>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -81,290 +78,235 @@ impl DerefMut for ColorConfig {
 impl Default for ColorConfig {
     fn default() -> Self {
         let mut colors = BTreeMap::new();
-        colors.insert(Cow::from("slate-50"), [248, 250, 252]);
-        colors.insert(Cow::from("slate-100"), [241, 245, 249]);
-        colors.insert(Cow::from("slate-200"), [226, 232, 240]);
-        colors.insert(Cow::from("slate-300"), [203, 213, 225]);
-        colors.insert(Cow::from("slate-400"), [148, 163, 184]);
-        colors.insert(Cow::from("slate-500"), [100, 116, 139]);
-        colors.insert(Cow::from("slate-600"), [71, 85, 105]);
-        colors.insert(Cow::from("slate-700"), [51, 65, 85]);
-        colors.insert(Cow::from("slate-800"), [30, 41, 59]);
-        colors.insert(Cow::from("slate-900"), [15, 23, 42]);
-        colors.insert(Cow::from("gray-50"), [249, 250, 251]);
-        colors.insert(Cow::from("gray-100"), [243, 244, 246]);
-        colors.insert(Cow::from("gray-200"), [229, 231, 235]);
-        colors.insert(Cow::from("gray-300"), [209, 213, 219]);
-        colors.insert(Cow::from("gray-400"), [156, 163, 175]);
-        colors.insert(Cow::from("gray-500"), [107, 114, 128]);
-        colors.insert(Cow::from("gray-600"), [75, 85, 99]);
-        colors.insert(Cow::from("gray-700"), [55, 65, 81]);
-        colors.insert(Cow::from("gray-800"), [31, 41, 55]);
-        colors.insert(Cow::from("gray-900"), [17, 24, 39]);
-        colors.insert(Cow::from("zinc-50"), [250, 250, 250]);
-        colors.insert(Cow::from("zinc-100"), [244, 244, 245]);
-        colors.insert(Cow::from("zinc-200"), [228, 228, 231]);
-        colors.insert(Cow::from("zinc-300"), [212, 212, 216]);
-        colors.insert(Cow::from("zinc-400"), [161, 161, 170]);
-        colors.insert(Cow::from("zinc-500"), [113, 113, 122]);
-        colors.insert(Cow::from("zinc-600"), [82, 82, 91]);
-        colors.insert(Cow::from("zinc-700"), [63, 63, 70]);
-        colors.insert(Cow::from("zinc-800"), [39, 39, 42]);
-        colors.insert(Cow::from("zinc-900"), [24, 24, 27]);
-        colors.insert(Cow::from("neutral-50"), [250, 250, 250]);
-        colors.insert(Cow::from("neutral-100"), [245, 245, 245]);
-        colors.insert(Cow::from("neutral-200"), [229, 229, 229]);
-        colors.insert(Cow::from("neutral-300"), [212, 212, 212]);
-        colors.insert(Cow::from("neutral-400"), [163, 163, 163]);
-        colors.insert(Cow::from("neutral-500"), [115, 115, 115]);
-        colors.insert(Cow::from("neutral-600"), [82, 82, 82]);
-        colors.insert(Cow::from("neutral-700"), [64, 64, 64]);
-        colors.insert(Cow::from("neutral-800"), [38, 38, 38]);
-        colors.insert(Cow::from("neutral-900"), [23, 23, 23]);
-        colors.insert(Cow::from("stone-50"), [250, 250, 249]);
-        colors.insert(Cow::from("stone-100"), [245, 245, 244]);
-        colors.insert(Cow::from("stone-200"), [231, 229, 228]);
-        colors.insert(Cow::from("stone-300"), [214, 211, 209]);
-        colors.insert(Cow::from("stone-400"), [168, 162, 158]);
-        colors.insert(Cow::from("stone-500"), [120, 113, 108]);
-        colors.insert(Cow::from("stone-600"), [87, 83, 78]);
-        colors.insert(Cow::from("stone-700"), [68, 64, 60]);
-        colors.insert(Cow::from("stone-800"), [41, 37, 36]);
-        colors.insert(Cow::from("stone-900"), [28, 25, 23]);
-        colors.insert(Cow::from("red-50"), [254, 242, 242]);
-        colors.insert(Cow::from("red-100"), [254, 226, 226]);
-        colors.insert(Cow::from("red-200"), [254, 202, 202]);
-        colors.insert(Cow::from("red-300"), [252, 165, 165]);
-        colors.insert(Cow::from("red-400"), [248, 113, 113]);
-        colors.insert(Cow::from("red-500"), [239, 68, 68]);
-        colors.insert(Cow::from("red-600"), [220, 38, 38]);
-        colors.insert(Cow::from("red-700"), [185, 28, 28]);
-        colors.insert(Cow::from("red-800"), [153, 27, 27]);
-        colors.insert(Cow::from("red-900"), [127, 29, 29]);
-        colors.insert(Cow::from("orange-50"), [255, 247, 237]);
-        colors.insert(Cow::from("orange-100"), [255, 237, 213]);
-        colors.insert(Cow::from("orange-200"), [254, 215, 170]);
-        colors.insert(Cow::from("orange-300"), [253, 186, 116]);
-        colors.insert(Cow::from("orange-400"), [251, 146, 60]);
-        colors.insert(Cow::from("orange-500"), [249, 115, 22]);
-        colors.insert(Cow::from("orange-600"), [234, 88, 12]);
-        colors.insert(Cow::from("orange-700"), [194, 65, 12]);
-        colors.insert(Cow::from("orange-800"), [154, 52, 18]);
-        colors.insert(Cow::from("orange-900"), [124, 45, 18]);
-        colors.insert(Cow::from("amber-50"), [255, 251, 235]);
-        colors.insert(Cow::from("amber-100"), [254, 243, 199]);
-        colors.insert(Cow::from("amber-200"), [253, 230, 138]);
-        colors.insert(Cow::from("amber-300"), [252, 211, 77]);
-        colors.insert(Cow::from("amber-400"), [251, 191, 36]);
-        colors.insert(Cow::from("amber-500"), [245, 158, 11]);
-        colors.insert(Cow::from("amber-600"), [217, 119, 6]);
-        colors.insert(Cow::from("amber-700"), [180, 83, 9]);
-        colors.insert(Cow::from("amber-800"), [146, 64, 14]);
-        colors.insert(Cow::from("amber-900"), [120, 53, 15]);
-        colors.insert(Cow::from("yellow-50"), [254, 252, 232]);
-        colors.insert(Cow::from("yellow-100"), [254, 249, 195]);
-        colors.insert(Cow::from("yellow-200"), [254, 240, 138]);
-        colors.insert(Cow::from("yellow-300"), [253, 224, 71]);
-        colors.insert(Cow::from("yellow-400"), [250, 204, 21]);
-        colors.insert(Cow::from("yellow-500"), [234, 179, 8]);
-        colors.insert(Cow::from("yellow-600"), [202, 138, 4]);
-        colors.insert(Cow::from("yellow-700"), [161, 98, 7]);
-        colors.insert(Cow::from("yellow-800"), [133, 77, 14]);
-        colors.insert(Cow::from("yellow-900"), [113, 63, 18]);
-        colors.insert(Cow::from("lime-50"), [247, 254, 231]);
-        colors.insert(Cow::from("lime-100"), [236, 252, 203]);
-        colors.insert(Cow::from("lime-200"), [217, 249, 157]);
-        colors.insert(Cow::from("lime-300"), [190, 242, 100]);
-        colors.insert(Cow::from("lime-400"), [163, 230, 53]);
-        colors.insert(Cow::from("lime-500"), [132, 204, 22]);
-        colors.insert(Cow::from("lime-600"), [101, 163, 13]);
-        colors.insert(Cow::from("lime-700"), [77, 124, 15]);
-        colors.insert(Cow::from("lime-800"), [63, 98, 18]);
-        colors.insert(Cow::from("lime-900"), [54, 83, 20]);
-        colors.insert(Cow::from("green-50"), [240, 253, 244]);
-        colors.insert(Cow::from("green-100"), [220, 252, 231]);
-        colors.insert(Cow::from("green-200"), [187, 247, 208]);
-        colors.insert(Cow::from("green-300"), [134, 239, 172]);
-        colors.insert(Cow::from("green-400"), [74, 222, 128]);
-        colors.insert(Cow::from("green-500"), [34, 197, 94]);
-        colors.insert(Cow::from("green-600"), [22, 163, 74]);
-        colors.insert(Cow::from("green-700"), [21, 128, 61]);
-        colors.insert(Cow::from("green-800"), [22, 101, 52]);
-        colors.insert(Cow::from("green-900"), [20, 83, 45]);
-        colors.insert(Cow::from("emerald-50"), [236, 253, 245]);
-        colors.insert(Cow::from("emerald-100"), [209, 250, 229]);
-        colors.insert(Cow::from("emerald-200"), [167, 243, 208]);
-        colors.insert(Cow::from("emerald-300"), [110, 231, 183]);
-        colors.insert(Cow::from("emerald-400"), [52, 211, 153]);
-        colors.insert(Cow::from("emerald-500"), [16, 185, 129]);
-        colors.insert(Cow::from("emerald-600"), [5, 150, 105]);
-        colors.insert(Cow::from("emerald-700"), [4, 120, 87]);
-        colors.insert(Cow::from("emerald-800"), [6, 95, 70]);
-        colors.insert(Cow::from("emerald-900"), [6, 78, 59]);
-        colors.insert(Cow::from("teal-50"), [240, 253, 250]);
-        colors.insert(Cow::from("teal-100"), [204, 251, 241]);
-        colors.insert(Cow::from("teal-200"), [153, 246, 228]);
-        colors.insert(Cow::from("teal-300"), [94, 234, 212]);
-        colors.insert(Cow::from("teal-400"), [45, 212, 191]);
-        colors.insert(Cow::from("teal-500"), [20, 184, 166]);
-        colors.insert(Cow::from("teal-600"), [13, 148, 136]);
-        colors.insert(Cow::from("teal-700"), [15, 118, 110]);
-        colors.insert(Cow::from("teal-800"), [17, 94, 89]);
-        colors.insert(Cow::from("teal-900"), [19, 78, 74]);
-        colors.insert(Cow::from("cyan-50"), [236, 254, 255]);
-        colors.insert(Cow::from("cyan-100"), [207, 250, 254]);
-        colors.insert(Cow::from("cyan-200"), [165, 243, 252]);
-        colors.insert(Cow::from("cyan-300"), [103, 232, 249]);
-        colors.insert(Cow::from("cyan-400"), [34, 211, 238]);
-        colors.insert(Cow::from("cyan-500"), [6, 182, 212]);
-        colors.insert(Cow::from("cyan-600"), [8, 145, 178]);
-        colors.insert(Cow::from("cyan-700"), [14, 116, 144]);
-        colors.insert(Cow::from("cyan-800"), [21, 94, 117]);
-        colors.insert(Cow::from("cyan-900"), [22, 78, 99]);
-        colors.insert(Cow::from("sky-50"), [240, 249, 255]);
-        colors.insert(Cow::from("sky-100"), [224, 242, 254]);
-        colors.insert(Cow::from("sky-200"), [186, 230, 253]);
-        colors.insert(Cow::from("sky-300"), [125, 211, 252]);
-        colors.insert(Cow::from("sky-400"), [56, 189, 248]);
-        colors.insert(Cow::from("sky-500"), [14, 165, 233]);
-        colors.insert(Cow::from("sky-600"), [2, 132, 199]);
-        colors.insert(Cow::from("sky-700"), [3, 105, 161]);
-        colors.insert(Cow::from("sky-800"), [7, 89, 133]);
-        colors.insert(Cow::from("sky-900"), [12, 74, 110]);
-        colors.insert(Cow::from("blue-50"), [239, 246, 255]);
-        colors.insert(Cow::from("blue-100"), [219, 234, 254]);
-        colors.insert(Cow::from("blue-200"), [191, 219, 254]);
-        colors.insert(Cow::from("blue-300"), [147, 197, 253]);
-        colors.insert(Cow::from("blue-400"), [96, 165, 250]);
-        colors.insert(Cow::from("blue-500"), [59, 130, 246]);
-        colors.insert(Cow::from("blue-600"), [37, 99, 235]);
-        colors.insert(Cow::from("blue-700"), [29, 78, 216]);
-        colors.insert(Cow::from("blue-800"), [30, 64, 175]);
-        colors.insert(Cow::from("blue-900"), [30, 58, 138]);
-        colors.insert(Cow::from("indigo-50"), [238, 242, 255]);
-        colors.insert(Cow::from("indigo-100"), [224, 231, 255]);
-        colors.insert(Cow::from("indigo-200"), [199, 210, 254]);
-        colors.insert(Cow::from("indigo-300"), [165, 180, 252]);
-        colors.insert(Cow::from("indigo-400"), [129, 140, 248]);
-        colors.insert(Cow::from("indigo-500"), [99, 102, 241]);
-        colors.insert(Cow::from("indigo-600"), [79, 70, 229]);
-        colors.insert(Cow::from("indigo-700"), [67, 56, 202]);
-        colors.insert(Cow::from("indigo-800"), [55, 48, 163]);
-        colors.insert(Cow::from("indigo-900"), [49, 46, 129]);
-        colors.insert(Cow::from("violet-50"), [245, 243, 255]);
-        colors.insert(Cow::from("violet-100"), [237, 233, 254]);
-        colors.insert(Cow::from("violet-200"), [221, 214, 254]);
-        colors.insert(Cow::from("violet-300"), [196, 181, 253]);
-        colors.insert(Cow::from("violet-400"), [167, 139, 250]);
-        colors.insert(Cow::from("violet-500"), [139, 92, 246]);
-        colors.insert(Cow::from("violet-600"), [124, 58, 237]);
-        colors.insert(Cow::from("violet-700"), [109, 40, 217]);
-        colors.insert(Cow::from("violet-800"), [91, 33, 182]);
-        colors.insert(Cow::from("violet-900"), [76, 29, 149]);
-        colors.insert(Cow::from("purple-50"), [250, 245, 255]);
-        colors.insert(Cow::from("purple-100"), [243, 232, 255]);
-        colors.insert(Cow::from("purple-200"), [233, 213, 255]);
-        colors.insert(Cow::from("purple-300"), [216, 180, 254]);
-        colors.insert(Cow::from("purple-400"), [192, 132, 252]);
-        colors.insert(Cow::from("purple-500"), [168, 85, 247]);
-        colors.insert(Cow::from("purple-600"), [147, 51, 234]);
-        colors.insert(Cow::from("purple-700"), [126, 34, 206]);
-        colors.insert(Cow::from("purple-800"), [107, 33, 168]);
-        colors.insert(Cow::from("purple-900"), [88, 28, 135]);
-        colors.insert(Cow::from("fuchsia-50"), [253, 244, 255]);
-        colors.insert(Cow::from("fuchsia-100"), [250, 232, 255]);
-        colors.insert(Cow::from("fuchsia-200"), [245, 208, 254]);
-        colors.insert(Cow::from("fuchsia-300"), [240, 171, 252]);
-        colors.insert(Cow::from("fuchsia-400"), [232, 121, 249]);
-        colors.insert(Cow::from("fuchsia-500"), [217, 70, 239]);
-        colors.insert(Cow::from("fuchsia-600"), [192, 38, 211]);
-        colors.insert(Cow::from("fuchsia-700"), [162, 28, 175]);
-        colors.insert(Cow::from("fuchsia-800"), [134, 25, 143]);
-        colors.insert(Cow::from("fuchsia-900"), [112, 26, 117]);
-        colors.insert(Cow::from("pink-50"), [253, 242, 248]);
-        colors.insert(Cow::from("pink-100"), [252, 231, 243]);
-        colors.insert(Cow::from("pink-200"), [251, 207, 232]);
-        colors.insert(Cow::from("pink-300"), [249, 168, 212]);
-        colors.insert(Cow::from("pink-400"), [244, 114, 182]);
-        colors.insert(Cow::from("pink-500"), [236, 72, 153]);
-        colors.insert(Cow::from("pink-600"), [219, 39, 119]);
-        colors.insert(Cow::from("pink-700"), [190, 24, 93]);
-        colors.insert(Cow::from("pink-800"), [157, 23, 77]);
-        colors.insert(Cow::from("pink-900"), [131, 24, 67]);
-        colors.insert(Cow::from("rose-50"), [255, 241, 242]);
-        colors.insert(Cow::from("rose-100"), [255, 228, 230]);
-        colors.insert(Cow::from("rose-200"), [254, 205, 211]);
-        colors.insert(Cow::from("rose-300"), [253, 164, 175]);
-        colors.insert(Cow::from("rose-400"), [251, 113, 133]);
-        colors.insert(Cow::from("rose-500"), [244, 63, 94]);
-        colors.insert(Cow::from("rose-600"), [225, 29, 72]);
-        colors.insert(Cow::from("rose-700"), [190, 18, 60]);
-        colors.insert(Cow::from("rose-800"), [159, 18, 57]);
-        colors.insert(Cow::from("rose-900"), [136, 19, 55]);
+        colors.insert(Cow::from("slate-50"), Cow::from("#f8fafc"));
+        colors.insert(Cow::from("slate-100"), Cow::from("#f1f5f9"));
+        colors.insert(Cow::from("slate-200"), Cow::from("#e2e8f0"));
+        colors.insert(Cow::from("slate-300"), Cow::from("#cbd5e1"));
+        colors.insert(Cow::from("slate-400"), Cow::from("#94a3b8"));
+        colors.insert(Cow::from("slate-500"), Cow::from("#64748b"));
+        colors.insert(Cow::from("slate-600"), Cow::from("#475569"));
+        colors.insert(Cow::from("slate-700"), Cow::from("#334155"));
+        colors.insert(Cow::from("slate-800"), Cow::from("#1e293b"));
+        colors.insert(Cow::from("slate-900"), Cow::from("#0f172a"));
+        colors.insert(Cow::from("gray-50"), Cow::from("#f9fafb"));
+        colors.insert(Cow::from("gray-100"), Cow::from("#f3f4f6"));
+        colors.insert(Cow::from("gray-200"), Cow::from("#e5e7eb"));
+        colors.insert(Cow::from("gray-300"), Cow::from("#d1d5db"));
+        colors.insert(Cow::from("gray-400"), Cow::from("#9ca3af"));
+        colors.insert(Cow::from("gray-500"), Cow::from("#6b7280"));
+        colors.insert(Cow::from("gray-600"), Cow::from("#4b5563"));
+        colors.insert(Cow::from("gray-700"), Cow::from("#374151"));
+        colors.insert(Cow::from("gray-800"), Cow::from("#1f2937"));
+        colors.insert(Cow::from("gray-900"), Cow::from("#111827"));
+        colors.insert(Cow::from("zinc-50"), Cow::from("#fafafa"));
+        colors.insert(Cow::from("zinc-100"), Cow::from("#f4f4f5"));
+        colors.insert(Cow::from("zinc-200"), Cow::from("#e4e4e7"));
+        colors.insert(Cow::from("zinc-300"), Cow::from("#d4d4d8"));
+        colors.insert(Cow::from("zinc-400"), Cow::from("#a1a1aa"));
+        colors.insert(Cow::from("zinc-500"), Cow::from("#71717a"));
+        colors.insert(Cow::from("zinc-600"), Cow::from("#52525b"));
+        colors.insert(Cow::from("zinc-700"), Cow::from("#3f3f46"));
+        colors.insert(Cow::from("zinc-800"), Cow::from("#27272a"));
+        colors.insert(Cow::from("zinc-900"), Cow::from("#18181b"));
+        colors.insert(Cow::from("neutral-50"), Cow::from("#fafafa"));
+        colors.insert(Cow::from("neutral-100"), Cow::from("#f5f5f5"));
+        colors.insert(Cow::from("neutral-200"), Cow::from("#e5e5e5"));
+        colors.insert(Cow::from("neutral-300"), Cow::from("#d4d4d4"));
+        colors.insert(Cow::from("neutral-400"), Cow::from("#a3a3a3"));
+        colors.insert(Cow::from("neutral-500"), Cow::from("#737373"));
+        colors.insert(Cow::from("neutral-600"), Cow::from("#525252"));
+        colors.insert(Cow::from("neutral-700"), Cow::from("#404040"));
+        colors.insert(Cow::from("neutral-800"), Cow::from("#262626"));
+        colors.insert(Cow::from("neutral-900"), Cow::from("#171717"));
+        colors.insert(Cow::from("stone-50"), Cow::from("#fafaf9"));
+        colors.insert(Cow::from("stone-100"), Cow::from("#f5f5f4"));
+        colors.insert(Cow::from("stone-200"), Cow::from("#e7e5e4"));
+        colors.insert(Cow::from("stone-300"), Cow::from("#d6d3d1"));
+        colors.insert(Cow::from("stone-400"), Cow::from("#a8a29e"));
+        colors.insert(Cow::from("stone-500"), Cow::from("#78716c"));
+        colors.insert(Cow::from("stone-600"), Cow::from("#57534e"));
+        colors.insert(Cow::from("stone-700"), Cow::from("#44403c"));
+        colors.insert(Cow::from("stone-800"), Cow::from("#292524"));
+        colors.insert(Cow::from("stone-900"), Cow::from("#1c1917"));
+        colors.insert(Cow::from("red-50"), Cow::from("#fef2f2"));
+        colors.insert(Cow::from("red-100"), Cow::from("#fee2e2"));
+        colors.insert(Cow::from("red-200"), Cow::from("#fecaca"));
+        colors.insert(Cow::from("red-300"), Cow::from("#fca5a5"));
+        colors.insert(Cow::from("red-400"), Cow::from("#f87171"));
+        colors.insert(Cow::from("red-500"), Cow::from("#ef4444"));
+        colors.insert(Cow::from("red-600"), Cow::from("#dc2626"));
+        colors.insert(Cow::from("red-700"), Cow::from("#b91c1c"));
+        colors.insert(Cow::from("red-800"), Cow::from("#991b1b"));
+        colors.insert(Cow::from("red-900"), Cow::from("#7f1d1d"));
+        colors.insert(Cow::from("orange-50"), Cow::from("#fff7ed"));
+        colors.insert(Cow::from("orange-100"), Cow::from("#ffedd5"));
+        colors.insert(Cow::from("orange-200"), Cow::from("#fed7aa"));
+        colors.insert(Cow::from("orange-300"), Cow::from("#fdba74"));
+        colors.insert(Cow::from("orange-400"), Cow::from("#fb923c"));
+        colors.insert(Cow::from("orange-500"), Cow::from("#f97316"));
+        colors.insert(Cow::from("orange-600"), Cow::from("#ea580c"));
+        colors.insert(Cow::from("orange-700"), Cow::from("#c2410c"));
+        colors.insert(Cow::from("orange-800"), Cow::from("#9a3412"));
+        colors.insert(Cow::from("orange-900"), Cow::from("#7c2d12"));
+        colors.insert(Cow::from("amber-50"), Cow::from("#fffbeb"));
+        colors.insert(Cow::from("amber-100"), Cow::from("#fef3c7"));
+        colors.insert(Cow::from("amber-200"), Cow::from("#fde68a"));
+        colors.insert(Cow::from("amber-300"), Cow::from("#fcd34d"));
+        colors.insert(Cow::from("amber-400"), Cow::from("#fbbf24"));
+        colors.insert(Cow::from("amber-500"), Cow::from("#f59e0b"));
+        colors.insert(Cow::from("amber-600"), Cow::from("#d97706"));
+        colors.insert(Cow::from("amber-700"), Cow::from("#b45309"));
+        colors.insert(Cow::from("amber-800"), Cow::from("#92400e"));
+        colors.insert(Cow::from("amber-900"), Cow::from("#78350f"));
+        colors.insert(Cow::from("yellow-50"), Cow::from("#fefce8"));
+        colors.insert(Cow::from("yellow-100"), Cow::from("#fef9c3"));
+        colors.insert(Cow::from("yellow-200"), Cow::from("#fef08a"));
+        colors.insert(Cow::from("yellow-300"), Cow::from("#fde047"));
+        colors.insert(Cow::from("yellow-400"), Cow::from("#facc15"));
+        colors.insert(Cow::from("yellow-500"), Cow::from("#eab308"));
+        colors.insert(Cow::from("yellow-600"), Cow::from("#ca8a04"));
+        colors.insert(Cow::from("yellow-700"), Cow::from("#a16207"));
+        colors.insert(Cow::from("yellow-800"), Cow::from("#854d0e"));
+        colors.insert(Cow::from("yellow-900"), Cow::from("#713f12"));
+        colors.insert(Cow::from("lime-50"), Cow::from("#f7fee7"));
+        colors.insert(Cow::from("lime-100"), Cow::from("#ecfccb"));
+        colors.insert(Cow::from("lime-200"), Cow::from("#d9f99d"));
+        colors.insert(Cow::from("lime-300"), Cow::from("#bef264"));
+        colors.insert(Cow::from("lime-400"), Cow::from("#a3e635"));
+        colors.insert(Cow::from("lime-500"), Cow::from("#84cc16"));
+        colors.insert(Cow::from("lime-600"), Cow::from("#65a30d"));
+        colors.insert(Cow::from("lime-700"), Cow::from("#4d7c0f"));
+        colors.insert(Cow::from("lime-800"), Cow::from("#3f6212"));
+        colors.insert(Cow::from("lime-900"), Cow::from("#365314"));
+        colors.insert(Cow::from("green-50"), Cow::from("#f0fdf4"));
+        colors.insert(Cow::from("green-100"), Cow::from("#dcfce7"));
+        colors.insert(Cow::from("green-200"), Cow::from("#bbf7d0"));
+        colors.insert(Cow::from("green-300"), Cow::from("#86efac"));
+        colors.insert(Cow::from("green-400"), Cow::from("#4ade80"));
+        colors.insert(Cow::from("green-500"), Cow::from("#22c55e"));
+        colors.insert(Cow::from("green-600"), Cow::from("#16a34a"));
+        colors.insert(Cow::from("green-700"), Cow::from("#15803d"));
+        colors.insert(Cow::from("green-800"), Cow::from("#166534"));
+        colors.insert(Cow::from("green-900"), Cow::from("#14532d"));
+        colors.insert(Cow::from("emerald-50"), Cow::from("#ecfdf5"));
+        colors.insert(Cow::from("emerald-100"), Cow::from("#d1fae5"));
+        colors.insert(Cow::from("emerald-200"), Cow::from("#a7f3d0"));
+        colors.insert(Cow::from("emerald-300"), Cow::from("#6ee7b7"));
+        colors.insert(Cow::from("emerald-400"), Cow::from("#34d399"));
+        colors.insert(Cow::from("emerald-500"), Cow::from("#10b981"));
+        colors.insert(Cow::from("emerald-600"), Cow::from("#059669"));
+        colors.insert(Cow::from("emerald-700"), Cow::from("#047857"));
+        colors.insert(Cow::from("emerald-800"), Cow::from("#065f46"));
+        colors.insert(Cow::from("emerald-900"), Cow::from("#064e3b"));
+        colors.insert(Cow::from("teal-50"), Cow::from("#f0fdfa"));
+        colors.insert(Cow::from("teal-100"), Cow::from("#ccfbf1"));
+        colors.insert(Cow::from("teal-200"), Cow::from("#99f6e4"));
+        colors.insert(Cow::from("teal-300"), Cow::from("#5eead4"));
+        colors.insert(Cow::from("teal-400"), Cow::from("#2dd4bf"));
+        colors.insert(Cow::from("teal-500"), Cow::from("#14b8a6"));
+        colors.insert(Cow::from("teal-600"), Cow::from("#0d9488"));
+        colors.insert(Cow::from("teal-700"), Cow::from("#0f766e"));
+        colors.insert(Cow::from("teal-800"), Cow::from("#115e59"));
+        colors.insert(Cow::from("teal-900"), Cow::from("#134e4a"));
+        colors.insert(Cow::from("cyan-50"), Cow::from("#ecfeff"));
+        colors.insert(Cow::from("cyan-100"), Cow::from("#cffafe"));
+        colors.insert(Cow::from("cyan-200"), Cow::from("#a5f3fc"));
+        colors.insert(Cow::from("cyan-300"), Cow::from("#67e8f9"));
+        colors.insert(Cow::from("cyan-400"), Cow::from("#22d3ee"));
+        colors.insert(Cow::from("cyan-500"), Cow::from("#06b6d4"));
+        colors.insert(Cow::from("cyan-600"), Cow::from("#0891b2"));
+        colors.insert(Cow::from("cyan-700"), Cow::from("#0e7490"));
+        colors.insert(Cow::from("cyan-800"), Cow::from("#155e75"));
+        colors.insert(Cow::from("cyan-900"), Cow::from("#164e63"));
+        colors.insert(Cow::from("sky-50"), Cow::from("#f0f9ff"));
+        colors.insert(Cow::from("sky-100"), Cow::from("#e0f2fe"));
+        colors.insert(Cow::from("sky-200"), Cow::from("#bae6fd"));
+        colors.insert(Cow::from("sky-300"), Cow::from("#7dd3fc"));
+        colors.insert(Cow::from("sky-400"), Cow::from("#38bdf8"));
+        colors.insert(Cow::from("sky-500"), Cow::from("#0ea5e9"));
+        colors.insert(Cow::from("sky-600"), Cow::from("#0284c7"));
+        colors.insert(Cow::from("sky-700"), Cow::from("#0369a1"));
+        colors.insert(Cow::from("sky-800"), Cow::from("#075985"));
+        colors.insert(Cow::from("sky-900"), Cow::from("#0c4a6e"));
+        colors.insert(Cow::from("blue-50"), Cow::from("#eff6ff"));
+        colors.insert(Cow::from("blue-100"), Cow::from("#dbeafe"));
+        colors.insert(Cow::from("blue-200"), Cow::from("#bfdbfe"));
+        colors.insert(Cow::from("blue-300"), Cow::from("#93c5fd"));
+        colors.insert(Cow::from("blue-400"), Cow::from("#60a5fa"));
+        colors.insert(Cow::from("blue-500"), Cow::from("#3b82f6"));
+        colors.insert(Cow::from("blue-600"), Cow::from("#2563eb"));
+        colors.insert(Cow::from("blue-700"), Cow::from("#1d4ed8"));
+        colors.insert(Cow::from("blue-800"), Cow::from("#1e40af"));
+        colors.insert(Cow::from("blue-900"), Cow::from("#1e3a8a"));
+        colors.insert(Cow::from("indigo-50"), Cow::from("#eef2ff"));
+        colors.insert(Cow::from("indigo-100"), Cow::from("#e0e7ff"));
+        colors.insert(Cow::from("indigo-200"), Cow::from("#c7d2fe"));
+        colors.insert(Cow::from("indigo-300"), Cow::from("#a5b4fc"));
+        colors.insert(Cow::from("indigo-400"), Cow::from("#818cf8"));
+        colors.insert(Cow::from("indigo-500"), Cow::from("#6366f1"));
+        colors.insert(Cow::from("indigo-600"), Cow::from("#4f46e5"));
+        colors.insert(Cow::from("indigo-700"), Cow::from("#4338ca"));
+        colors.insert(Cow::from("indigo-800"), Cow::from("#3730a3"));
+        colors.insert(Cow::from("indigo-900"), Cow::from("#312e81"));
+        colors.insert(Cow::from("violet-50"), Cow::from("#f5f3ff"));
+        colors.insert(Cow::from("violet-100"), Cow::from("#ede9fe"));
+        colors.insert(Cow::from("violet-200"), Cow::from("#ddd6fe"));
+        colors.insert(Cow::from("violet-300"), Cow::from("#c4b5fd"));
+        colors.insert(Cow::from("violet-400"), Cow::from("#a78bfa"));
+        colors.insert(Cow::from("violet-500"), Cow::from("#8b5cf6"));
+        colors.insert(Cow::from("violet-600"), Cow::from("#7c3aed"));
+        colors.insert(Cow::from("violet-700"), Cow::from("#6d28d9"));
+        colors.insert(Cow::from("violet-800"), Cow::from("#5b21b6"));
+        colors.insert(Cow::from("violet-900"), Cow::from("#4c1d95"));
+        colors.insert(Cow::from("purple-50"), Cow::from("#faf5ff"));
+        colors.insert(Cow::from("purple-100"), Cow::from("#f3e8ff"));
+        colors.insert(Cow::from("purple-200"), Cow::from("#e9d5ff"));
+        colors.insert(Cow::from("purple-300"), Cow::from("#d8b4fe"));
+        colors.insert(Cow::from("purple-400"), Cow::from("#c084fc"));
+        colors.insert(Cow::from("purple-500"), Cow::from("#a855f7"));
+        colors.insert(Cow::from("purple-600"), Cow::from("#9333ea"));
+        colors.insert(Cow::from("purple-700"), Cow::from("#7e22ce"));
+        colors.insert(Cow::from("purple-800"), Cow::from("#6b21a8"));
+        colors.insert(Cow::from("purple-900"), Cow::from("#581c87"));
+        colors.insert(Cow::from("fuchsia-50"), Cow::from("#fdf4ff"));
+        colors.insert(Cow::from("fuchsia-100"), Cow::from("#fae8ff"));
+        colors.insert(Cow::from("fuchsia-200"), Cow::from("#f5d0fe"));
+        colors.insert(Cow::from("fuchsia-300"), Cow::from("#f0abfc"));
+        colors.insert(Cow::from("fuchsia-400"), Cow::from("#e879f9"));
+        colors.insert(Cow::from("fuchsia-500"), Cow::from("#d946ef"));
+        colors.insert(Cow::from("fuchsia-600"), Cow::from("#c026d3"));
+        colors.insert(Cow::from("fuchsia-700"), Cow::from("#a21caf"));
+        colors.insert(Cow::from("fuchsia-800"), Cow::from("#86198f"));
+        colors.insert(Cow::from("fuchsia-900"), Cow::from("#701a75"));
+        colors.insert(Cow::from("pink-50"), Cow::from("#fdf2f8"));
+        colors.insert(Cow::from("pink-100"), Cow::from("#fce7f3"));
+        colors.insert(Cow::from("pink-200"), Cow::from("#fbcfe8"));
+        colors.insert(Cow::from("pink-300"), Cow::from("#f9a8d4"));
+        colors.insert(Cow::from("pink-400"), Cow::from("#f472b6"));
+        colors.insert(Cow::from("pink-500"), Cow::from("#ec4899"));
+        colors.insert(Cow::from("pink-600"), Cow::from("#db2777"));
+        colors.insert(Cow::from("pink-700"), Cow::from("#be185d"));
+        colors.insert(Cow::from("pink-800"), Cow::from("#9d174d"));
+        colors.insert(Cow::from("pink-900"), Cow::from("#831843"));
+        colors.insert(Cow::from("rose-50"), Cow::from("#fff1f2"));
+        colors.insert(Cow::from("rose-100"), Cow::from("#ffe4e6"));
+        colors.insert(Cow::from("rose-200"), Cow::from("#fecdd3"));
+        colors.insert(Cow::from("rose-300"), Cow::from("#fda4af"));
+        colors.insert(Cow::from("rose-400"), Cow::from("#fb7185"));
+        colors.insert(Cow::from("rose-500"), Cow::from("#f43f5e"));
+        colors.insert(Cow::from("rose-600"), Cow::from("#e11d48"));
+        colors.insert(Cow::from("rose-700"), Cow::from("#be123c"));
+        colors.insert(Cow::from("rose-800"), Cow::from("#9f1239"));
+        colors.insert(Cow::from("rose-900"), Cow::from("#881337"));
 
         Self(colors)
     }
 }
 
-impl From<BTreeMap<Cow<'static, str>, [u8; 3]>> for ColorConfig {
-    fn from(v: BTreeMap<Cow<'static, str>, [u8; 3]>) -> Self {
+impl From<BTreeMap<Cow<'static, str>, Cow<'static, str>>> for ColorConfig {
+    fn from(v: BTreeMap<Cow<'static, str>, Cow<'static, str>>) -> Self {
         Self(v)
     }
-}
-
-pub fn hex_to_rgb(hex: String) -> [u8; 3] {
-    // Remove the useless `#` from the start of the color
-    let hex = if let Some(hex) = hex.strip_prefix('#') {
-        Cow::from(hex)
-    } else {
-        Cow::from(hex)
-    };
-
-    // Support the hexadecimal shorthand
-    let hex = if hex.len() == 3 {
-        hex.clone() + hex
-    } else {
-        hex
-    };
-
-    // TODO: Handle errors
-    [
-        u8::from_str_radix(&hex[0..2], 16).expect("failed to decode hex to rgb"),
-        u8::from_str_radix(&hex[2..4], 16).expect("failed to decode hex to rgb"),
-        u8::from_str_radix(&hex[4..6], 16).expect("failed to decode hex to rgb"),
-    ]
-}
-
-fn convert_hex_to_rgb<'de, D>(d: D) -> std::result::Result<ColorConfig, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    struct ColorConfigHex;
-
-    impl<'de> Visitor<'de> for ColorConfigHex {
-        type Value = BTreeMap<Cow<'static, str>, String>;
-
-        fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-            formatter.write_str("map")
-        }
-
-        fn visit_map<M>(self, map: M) -> std::result::Result<Self::Value, M::Error>
-        where
-            M: MapAccess<'de>,
-        {
-            Deserialize::deserialize(MapAccessDeserializer::new(map))
-        }
-    }
-
-    let mut colors_rgb_content = BTreeMap::new();
-
-    let colors_hex = d.deserialize_any(ColorConfigHex)?;
-
-    for color in colors_hex {
-        colors_rgb_content.insert(color.0, hex_to_rgb(color.1));
-    }
-
-    Ok(ColorConfig(colors_rgb_content))
 }
 
 #[derive(Debug, PartialEq, Default, Deserialize)]
@@ -375,7 +317,7 @@ pub struct ThemeConfig {
     #[serde(default)]
     pub screens: ScreenConfig,
 
-    #[serde(default, deserialize_with = "convert_hex_to_rgb")]
+    #[serde(default)]
     pub colors: ColorConfig,
 }
 
@@ -406,7 +348,7 @@ impl Config {
                 .extend(ColorConfig::default().iter().filter_map(|c| {
                     let key = c.0.clone();
                     if !overriden_colors.contains_key(&key) {
-                        Some((key, *c.1))
+                        Some((key, c.1.clone()))
                     } else {
                         None
                     }

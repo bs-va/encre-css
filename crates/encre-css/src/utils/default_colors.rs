@@ -1,4 +1,4 @@
-use crate::config::Config;
+use crate::{error::{Result, Error}, config::Config};
 
 use lazy_static::lazy_static;
 use regex::Regex;
@@ -6,6 +6,29 @@ use std::borrow::Cow;
 
 lazy_static! {
     static ref OPACITY_SUFFIX_REGEX: Regex = Regex::new(r"(?-u)/(\d*)$").unwrap();
+}
+
+pub fn hex_to_rgb(hex: Cow<'static, str>) -> Result<[u8; 3]> {
+    // Remove the useless `#` from the start of the color
+    let hex = if let Some(hex) = hex.strip_prefix('#') {
+        Cow::from(hex)
+    } else {
+        hex
+    };
+
+    // Support the hexadecimal shorthand
+    let hex = if hex.len() == 3 {
+        hex.chars().map(|ch| ch.to_string().repeat(2).to_lowercase()).collect::<String>()
+    } else {
+        hex.to_lowercase()
+    };
+
+    // TODO: Handle errors
+    let r = u8::from_str_radix(&hex[0..2], 16).map_err(|e| Error::HexToRgbConversion(hex[0..2].to_string(), e))?;
+    let g = u8::from_str_radix(&hex[2..4], 16).map_err(|e| Error::HexToRgbConversion(hex[2..4].to_string(), e))?;
+    let b = u8::from_str_radix(&hex[4..6], 16).map_err(|e| Error::HexToRgbConversion(hex[4..6].to_string(), e))?;
+
+    Ok([r, g, b])
 }
 
 /// Get a color from a modifier
@@ -42,13 +65,15 @@ pub fn get(config: &Config, modifier: &str) -> Option<String> {
             opacity = Some(0.0);
         }
 
-        Some(&[0, 0, 0])
+        Some([0, 0, 0])
     } else if modifier == "black" {
-        Some(&[0, 0, 0])
+        Some([0, 0, 0])
     } else if modifier == "white" {
-        Some(&[0xff, 0xff, 0xff])
+        Some([0xff, 0xff, 0xff])
+    } else if let Some(hex_color) = config.theme.colors.get(&Cow::from(modifier)) {
+        hex_to_rgb(hex_color.clone()).ok()
     } else {
-        config.theme.colors.get(&Cow::from(modifier))
+        None
     };
 
     // Convert the array to a CSS color with an opacity value (if the color is found)
@@ -65,4 +90,17 @@ pub fn get(config: &Config, modifier: &str) -> Option<String> {
             }
         )
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn hex_to_rgb_test() {
+        assert_eq!(hex_to_rgb(Cow::from("#ff0000")).unwrap(), [255, 0, 0]);
+        assert_eq!(hex_to_rgb(Cow::from("#FF00FF")).unwrap(), [255, 0, 255]);
+        assert_eq!(hex_to_rgb(Cow::from("#332")).unwrap(), [51, 51, 34]);
+        assert_eq!(hex_to_rgb(Cow::from("#FEF")).unwrap(), [255, 238, 255]);
+    }
 }

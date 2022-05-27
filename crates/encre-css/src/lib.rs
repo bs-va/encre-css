@@ -832,7 +832,7 @@ mod tests {
     #[test]
     fn gen_selector_css_with_custom_config_test() {
         let mut colors = BTreeMap::new();
-        colors.insert(Cow::from("rosa-500"), [229, 24, 106]);
+        colors.insert(Cow::from("rosa-500"), Cow::from("#e5186a"));
 
         let mut screens = BTreeMap::new();
         screens.insert(Cow::from("3xl"), Cow::from("1600px"));
@@ -864,11 +864,11 @@ mod tests {
         config
             .theme
             .colors
-            .insert(Cow::from("rosa-500"), [229, 24, 106]);
+            .insert(Cow::from("rosa-500"), Cow::from("#e5186a"));
         config
             .theme
             .colors
-            .insert(Cow::from("yellow-400"), [255, 239, 14]);
+            .insert(Cow::from("yellow-400"), Cow::from("#ffef0e"));
         config.theme.screens.remove(&Cow::from("lg"));
         config
             .theme
