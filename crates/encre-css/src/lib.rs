@@ -62,7 +62,6 @@ mod tests {
                 Selector::new("border-[#333]"),
                 Selector::new("text-[color:var(--hello)]"),
                 Selector::new("</div"),
-                Selector::new(""), // TODO: Why?
             ])
         );
 
@@ -157,6 +156,28 @@ mod tests {
   .\32xl\:pb-\[calc\(\(100\%\/2\)-10px\+2rem\)\] {{
     padding-bottom: calc((100% / 2) - 10px + 2rem);
   }}
+}}"#,
+                preflight::ENCRE_PREFLIGHT_CSS
+            )
+        );
+    }
+
+    #[test]
+    fn gen_selector_css_arbitrary_value_hint_test() {
+        // TODO: Support --en-bg-opacity in arbitrary values
+        let mut generator = EncreGenerator::from_config(Config::default());
+        generator.add_selector("bg-[color:red]");
+        generator.add_selector("hover:bg-[color:red]");
+
+        assert_eq!(
+            generator.generate(),
+            format!(
+                r#"{}.bg-\[color\:red\] {{
+  background-color: red;
+}}
+
+.hover\:bg-\[color\:red\]:hover {{
+  background-color: red;
 }}"#,
                 preflight::ENCRE_PREFLIGHT_CSS
             )

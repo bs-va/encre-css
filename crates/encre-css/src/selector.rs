@@ -22,31 +22,37 @@ impl<'a> Modifier<'a> {
     }
 
     /// Get the content of the modifier
+    #[inline]
     pub fn content(&self) -> &str {
         self.content
     }
 
     //// Check if the modifier is negative
+    #[inline]
     pub fn is_negative(&self) -> bool {
         self.is_negative
     }
 
     //// Check if the modifier content is equals to a string
+    #[inline]
     pub fn is(&self, val: &str) -> bool {
         self.content == val
     }
 
     //// Check if the modifier content is equals to at least one value in the given list
+    #[inline]
     pub fn is_one_of(&self, values: &[&str]) -> bool {
         values.contains(&self.content)
     }
 
     //// Check if the modifier is empty
+    #[inline]
     pub fn is_empty(&self) -> bool {
         self.content.is_empty()
     }
 
     /// Try to convert the modifier to an `f32`
+    #[inline]
     pub fn to_f32(&self) -> Result<f32, num::ParseFloatError> {
         if self.is_negative {
             self.content.parse::<f32>().map(|v| -v)
@@ -56,10 +62,12 @@ impl<'a> Modifier<'a> {
     }
 
     /// Try to convert the modifier to a `usize`
+    #[inline]
     pub fn to_usize(&self) -> Result<usize, num::ParseIntError> {
         self.content.parse::<usize>()
     }
 
+    #[inline]
     pub fn strip_prefix(&self, prefix: &str) -> Option<&str> {
         self.content.strip_prefix(prefix)
     }
@@ -79,7 +87,7 @@ impl<'a> fmt::Display for Modifier<'a> {
 #[derive(Debug, PartialEq, Eq, Clone, Hash, PartialOrd, Ord)]
 pub struct Selector {
     full_name: String,
-    variants: Vec<String>,
+    variants: Option<Vec<String>>,
     content: String,
     is_negative: bool,
     is_important: bool,
@@ -100,19 +108,41 @@ impl Selector {
             (original_data, false)
         };
 
-        if VARIANT_REGEX.is_match(data) {
-            let mut variants = data
-                .split(VARIANT_SEPARATOR)
-                .map(|v| v.to_string())
-                .collect::<Vec<String>>();
-            let content = variants.pop().unwrap();
+        let mut variants = vec![];
+        let mut next_variant = true;
+        let mut in_square_bracket = false;
 
+        data.chars().for_each(|ch| {
+            match ch {
+                '[' => in_square_bracket = true,
+                ']' => in_square_bracket = false,
+                VARIANT_SEPARATOR => if !in_square_bracket {
+                    next_variant = true;
+                    return;
+                },
+                _ => (),
+            }
+
+            if next_variant {
+                variants.push(ch.to_string());
+                next_variant = false;
+            } else {
+                // We can safely unwrap because `next_variant` is `true` by default, so the `Vec`
+                // is bound to contain at least one element
+                variants.last_mut().unwrap().push(ch);
+            }
+        });
+
+        // The selector without variants is the remaining part of the list of variants
+        let content = variants.pop().unwrap();
+
+        if !variants.is_empty() {
             // Used to be compatible with TailwindCSS
             variants.reverse();
 
             Self {
                 full_name: original_data.to_string(),
-                variants,
+                variants: Some(variants),
                 content,
                 is_negative,
                 is_important,
@@ -120,17 +150,12 @@ impl Selector {
         } else {
             Self {
                 full_name: original_data.to_string(),
-                variants: vec![],
+                variants: None,
                 content: data.to_string(),
                 is_negative,
                 is_important,
             }
         }
-    }
-
-    /// Check whether an arbitrary string belongs to a namespace
-    pub fn check_namespace(&self, maybe_namespace: &str) -> bool {
-        self.content.starts_with(maybe_namespace)
     }
 
     /// Get the modifier of the selector from the namespace of a plugin
@@ -149,10 +174,6 @@ impl Selector {
         }
     }
 
-    pub fn get_variants(&self) -> &Vec<String> {
-        &self.variants
-    }
-
     pub fn get_arbitrary_value(&self) -> Option<String> {
         if let Some(opening_index) = self.content.find('[') {
             self.content
@@ -163,32 +184,33 @@ impl Selector {
         }
     }
 
+    /// Check whether an arbitrary string belongs to a namespace
+    #[inline]
+    pub fn check_namespace(&self, maybe_namespace: &str) -> bool {
+        self.content.starts_with(maybe_namespace)
+    }
+
+    #[inline]
+    pub fn get_variants(&self) -> Option<&Vec<String>> {
+        self.variants.as_ref()
+    }
+    
+    #[inline]
     pub fn is_important(&self) -> bool {
         self.is_important
     }
 
-    pub fn contains(&self, other: &Selector) -> bool {
-        if self.variants != other.variants {
-            return false;
-        }
-
-        let (longest, smallest) = if self.content.len() > other.content.len() {
-            (&self.content, &other.content)
-        } else {
-            (&other.content, &self.content)
-        };
-
-        longest.contains(smallest)
-    }
-
+    #[inline]
     pub fn full(&self) -> &str {
         &self.full_name
     }
 
+    #[inline]
     pub fn len(&self) -> usize {
         self.content.len()
     }
 
+    #[inline]
     pub fn is_empty(&self) -> bool {
         self.content.is_empty()
     }

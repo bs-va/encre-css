@@ -28,7 +28,7 @@ pub trait Plugin: fmt::Debug {
         ""
     }
 
-    /// Returns whether of not the plugin can handle a specific arbitrary value
+    /// Returns whether the plugin can handle a specific arbitrary value
     ///
     /// Used to distinguish plugins inside the same namespace
     ///

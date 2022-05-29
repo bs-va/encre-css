@@ -288,7 +288,7 @@ impl EncreGenerator {
         };
 
         let variants = selector.get_variants();
-        if !variants.is_empty() {
+        if let Some(variants) = variants {
             let rule = variants.iter().fold(
                 format!(
                     "{} {{\n  {}\n}}",

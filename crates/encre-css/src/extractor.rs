@@ -28,7 +28,7 @@ impl Extractor {
     pub fn add_selector(&mut self, val: &str) {
         let selector = Selector::new(val);
 
-        if !selector.get_variants().is_empty() {
+        if selector.get_variants().is_some() {
             self.scanned_selectors_with_variant.insert(selector);
         } else {
             self.scanned_selectors_without_variant.insert(selector);
@@ -38,12 +38,16 @@ impl Extractor {
     /// Scan the contents of a file and store all the selectors found
     pub fn scan_raw(&mut self, content: &str) {
         for val in SPLIT_REGEX.split(content) {
-            self.add_selector(val);
+            // The shortest selector is `m-1`
+            if val.len() >= 3 {
+                self.add_selector(val);
+            }
         }
     }
 
     /// Scan all files given and store all the selectors found
     pub fn scan_files<T: AsRef<Path>>(&mut self, files: impl Iterator<Item = T>) {
+        // TODO: Error handling
         let mut file_contents: String = String::new();
 
         for file in files {

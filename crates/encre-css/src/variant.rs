@@ -3,7 +3,7 @@ use crate::config::{Config, DarkModeConfig};
 use std::borrow::Cow;
 use std::collections::BTreeMap;
 
-pub const VARIANT_SEPARATOR: &str = ":";
+pub const VARIANT_SEPARATOR: char = ':';
 
 #[derive(Debug)]
 pub enum Variant {
