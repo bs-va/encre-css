@@ -16,7 +16,7 @@ serde = { version = "1.0.137", features = ["derive"] }
 lazy_static = "1.4.0"
 regex = "1.5.5"
 rayon = "1.5.2"
-wax = "0.4.0"
+wax = "0.5.0"
 thiserror = "1.0.31"
 
 [dev-dependencies]

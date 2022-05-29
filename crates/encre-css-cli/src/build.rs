@@ -88,16 +88,19 @@ pub fn build<T: AsRef<Path>>(
                         let mut need_reloading = false;
                         let input = &generator.get_config().input;
                         let mut files = input.iter().flat_map(|glob_path| {
-                            let (prefix, glob) = Glob::partitioned(
-                            glob_path
-                                .to_str()
-                                .expect("failed to convert the glob to a string"),
-                            ).unwrap();
+                            let (prefix, glob) = match Glob::new(
+                                glob_path
+                                    .to_str()
+                                    .expect("failed to convert the glob to a string"),
+                            ) {
+                                Ok(g) => g.partition(),
+                                Err(e) => panic!("{}", e),
+                            };
 
                             if &prefix == glob_path {
                                 iter::once(glob_path.clone()).collect::<Vec<PathBuf>>()
                             } else {
-                                glob.walk(prefix, usize::MAX)
+                                glob.walk(prefix)
                                     .map(|e| e.unwrap().into_path())
                                     .collect::<Vec<PathBuf>>()
                             }

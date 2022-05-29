@@ -542,7 +542,7 @@ margin-right: calc({val} * var(--en-space-x-reverse));"
 
         if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
         {
-            writeln!(css_content, "--en-space-x-reverse: 0;\n").ok();
+            writeln!(css_content, "--en-space-x-reverse: 0;").ok();
             self.css_template_value(&length, css_content)
         } else {
             false
@@ -564,7 +564,7 @@ impl Plugin for SpaceYPlugin {
 
     fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
         if !css_content.contains("--en-space-y-reverse") {
-            writeln!(css_content, "--en-space-y-reverse: 0;\n").ok();
+            writeln!(css_content, "--en-space-y-reverse: 0;").ok();
         }
 
         write!(
@@ -589,7 +589,7 @@ margin-bottom: calc({val} * var(--en-space-y-reverse));"
 
         if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
         {
-            writeln!(css_content, "--en-space-y-reverse: 0;\n").ok();
+            writeln!(css_content, "--en-space-y-reverse: 0;").ok();
             self.css_template_value(&length, css_content)
         } else {
             false

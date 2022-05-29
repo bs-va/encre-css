@@ -59,19 +59,21 @@ impl Extractor {
 
     /// Scan all files in a path using the glob syntax
     pub fn scan_path<T: AsRef<Path>>(&mut self, glob_path: T) {
-        let (prefix, glob) = Glob::partitioned(
+        let (prefix, glob) = match Glob::new(
             glob_path
                 .as_ref()
                 .to_str()
                 .expect("failed to convert the glob to a string"),
-        )
-        .unwrap();
+        ) {
+            Ok(g) => g.partition(),
+            Err(e) => panic!("{}", e),
+        };
 
         if prefix == glob_path.as_ref() {
             self.scan_files(iter::once(glob_path));
         } else {
             self.scan_files(
-                glob.walk(prefix, usize::MAX)
+                glob.walk(prefix)
                     .map(|e| e.unwrap().into_path()),
             );
         }
