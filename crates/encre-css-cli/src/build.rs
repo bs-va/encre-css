@@ -1,15 +1,17 @@
 use crate::DEFAULT_CONFIG_FILE;
 
-use encre_css::{Config, EncreGenerator};
+use encre_css::{extractor::Extractor, Config, EncreGenerator};
 use notify::{watcher, DebouncedEvent::*, RecursiveMode, Watcher};
 use std::{
-    fs,
+    fs, iter,
     path::{Path, PathBuf},
     sync::mpsc::channel,
     time::{Duration, Instant},
-    iter,
 };
 use wax::Glob;
+
+#[cfg(not(target_arch = "wasm32"))]
+use rayon::prelude::*;
 
 fn result_equal<T: PartialEq, E>(res1: Result<T, E>, res2: Result<T, E>) -> bool {
     if let (Ok(res1), Ok(res2)) = (res1, res2) {
@@ -87,7 +89,14 @@ pub fn build<T: AsRef<Path>>(
                     {
                         let mut need_reloading = false;
                         let input = &generator.get_config().input;
-                        let mut files = input.iter().flat_map(|glob_path| {
+
+                        #[cfg(target_arch = "wasm32")]
+                        let iter = input.iter();
+
+                        #[cfg(not(target_arch = "wasm32"))]
+                        let iter = input.par_iter();
+
+                        let files = iter.flat_map(|glob_path| {
                             let (prefix, glob) = match Glob::new(
                                 glob_path
                                     .to_str()
@@ -142,9 +151,20 @@ pub fn build<T: AsRef<Path>>(
                         if need_reloading {
                             generator.reset();
 
-                            input.iter().for_each(|path| {
-                                generator.scan_path(path);
-                            });
+                            #[cfg(target_arch = "wasm32")]
+                            let iter = input.iter();
+
+                            #[cfg(not(target_arch = "wasm32"))]
+                            let iter = input.par_iter();
+
+                            let scanned_selectors = iter
+                                .map(Extractor::scan_path)
+                                .reduce_with(|mut selectors1, selectors2| {
+                                    selectors1.extend(selectors2);
+                                    selectors1
+                                })
+                                .unwrap_or_default();
+                            generator.add_selectors(scanned_selectors);
 
                             if let Some(ref path) = extra_input {
                                 generator.scan_path(path);

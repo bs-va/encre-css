@@ -6,6 +6,7 @@ use crate::variant::VARIANT_SEPARATOR;
 
 lazy_static! {
     static ref VARIANT_REGEX: Regex = Regex::new(r"^[^\[]*:").unwrap();
+    static ref ARBITRARY_VALUE_REGEX: Regex = Regex::new(r"\[([a-zA-Z0-9-_]+:)?(.+)\]$").unwrap();
 }
 
 pub struct Modifier<'a> {
@@ -84,13 +85,13 @@ impl<'a> fmt::Display for Modifier<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Clone, Hash, PartialOrd, Ord)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Selector {
-    full_name: String,
-    variants: Option<Vec<String>>,
-    content: String,
-    is_negative: bool,
-    is_important: bool,
+    pub(crate) full_name: String,
+    pub(crate) variants: Option<Vec<String>>,
+    pub(crate) content: String,
+    pub(crate) is_negative: bool,
+    pub(crate) is_important: bool,
 }
 
 impl Selector {
@@ -174,45 +175,15 @@ impl Selector {
         }
     }
 
-    pub fn get_arbitrary_value(&self) -> Option<String> {
-        if let Some(opening_index) = self.content.find('[') {
-            self.content
-                .find(']')
-                .map(|closing_index| self.content[opening_index + 1..closing_index].to_string())
-        } else {
-            None
-        }
+    pub fn get_arbitrary_value(&self) -> Option<(&str, &str)> {
+        let caps = ARBITRARY_VALUE_REGEX.captures(&self.content)?;
+        Some((caps.get(1).map(|c| c.as_str()).unwrap_or("").trim_end_matches(':'), caps.get(2)?.as_str()))
     }
 
     /// Check whether an arbitrary string belongs to a namespace
     #[inline]
     pub fn check_namespace(&self, maybe_namespace: &str) -> bool {
         self.content.starts_with(maybe_namespace)
-    }
-
-    #[inline]
-    pub fn get_variants(&self) -> Option<&Vec<String>> {
-        self.variants.as_ref()
-    }
-    
-    #[inline]
-    pub fn is_important(&self) -> bool {
-        self.is_important
-    }
-
-    #[inline]
-    pub fn full(&self) -> &str {
-        &self.full_name
-    }
-
-    #[inline]
-    pub fn len(&self) -> usize {
-        self.content.len()
-    }
-
-    #[inline]
-    pub fn is_empty(&self) -> bool {
-        self.content.is_empty()
     }
 }
 

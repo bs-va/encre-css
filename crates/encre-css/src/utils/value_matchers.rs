@@ -274,7 +274,7 @@ pub fn is_matching_shadow(val: &str) -> bool {
     let mut current_part = String::new();
     let mut part_index = 0;
 
-    for c in val.chars() {
+    if val.chars().find_map(|c| {
         match c {
             '(' => {
                 current_part.push('(');
@@ -290,7 +290,7 @@ pub fn is_matching_shadow(val: &str) -> bool {
                         || !is_matching_length(&current_part)
                             && (part_index >= 2 && !is_matching_color(&current_part)))
                 {
-                    return false;
+                    return Some(());
                 }
 
                 part_index += 1;
@@ -302,7 +302,7 @@ pub fn is_matching_shadow(val: &str) -> bool {
                         || !is_matching_length(&current_part)
                             && (part_index >= 2 && !is_matching_color(&current_part)))
                 {
-                    return false;
+                    return Some(());
                 }
 
                 current_part.clear();
@@ -312,6 +312,10 @@ pub fn is_matching_shadow(val: &str) -> bool {
                 current_part.push(other);
             }
         }
+
+        None
+    }).is_some() {
+        return false;
     }
 
     if !current_part.is_empty() {

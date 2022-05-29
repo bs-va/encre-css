@@ -16,3 +16,4 @@ clap = { version = "3.1.17", features = ["derive"] }
 notify = "4.0.17"
 rand = "0.8.5"
 wax = "0.5.0"
+rayon = "1.5.2"

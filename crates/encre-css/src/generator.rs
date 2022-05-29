@@ -9,7 +9,12 @@ use crate::{
 
 use lazy_static::lazy_static;
 use regex::{Captures, Regex};
-use std::{borrow::Cow, collections::BTreeMap, path::Path, sync::Arc};
+use std::{
+    borrow::Cow,
+    collections::{BTreeMap, BTreeSet},
+    path::Path,
+    sync::Arc,
+};
 
 #[cfg(not(target_arch = "wasm32"))]
 use rayon::prelude::*;
@@ -103,11 +108,10 @@ pub fn to_css_value(val: &str) -> Cow<str> {
 }
 
 /// Main structure used to generate CSS from selectors
-#[derive(Default)]
 pub struct EncreGenerator {
     config: Arc<Config>,
     variants: BTreeMap<Cow<'static, str>, Variant>,
-    pub(crate) extractor: Extractor,
+    pub(crate) scanned_selectors: BTreeSet<Selector>,
 }
 
 impl EncreGenerator {
@@ -131,17 +135,24 @@ impl EncreGenerator {
     ///
     /// The paths in the [`Config::input`] field of the configuration will be scanned
     pub fn from_config(config: Config) -> Self {
-        let mut extractor = Extractor::new();
+        #[cfg(target_arch = "wasm32")]
+        let iter = config.input.iter();
 
-        // TODO: Use rayon to make this part parallel
-        for path in &config.input {
-            extractor.scan_path(path);
-        }
+        #[cfg(not(target_arch = "wasm32"))]
+        let iter = config.input.par_iter();
+
+        let scanned_selectors = iter
+            .map(Extractor::scan_path)
+            .reduce_with(|mut selectors1, selectors2| {
+                selectors1.extend(selectors2);
+                selectors1
+            })
+            .unwrap_or_default();
 
         Self {
             variants: init_variants(&config),
             config: Arc::new(config),
-            extractor,
+            scanned_selectors,
         }
     }
 
@@ -159,22 +170,30 @@ impl EncreGenerator {
     ///
     /// This function automatically handles duplicated selectors
     pub fn add_selector(&mut self, val: &str) {
-        self.extractor.add_selector(val);
+        self.scanned_selectors.insert(Selector::new(val));
+    }
+
+    /// Add a list of new selectors which will have their CSS generated
+    ///
+    /// This function automatically handles duplicated selectors
+    pub fn add_selectors(&mut self, val: BTreeSet<Selector>) {
+        self.scanned_selectors.extend(val);
     }
 
     /// Scan the contents of a file and store all the selectors found
     pub fn scan_raw(&mut self, content: &str) {
-        self.extractor.scan_raw(content);
+        self.scanned_selectors.extend(Extractor::scan_raw(content));
     }
 
     /// Scan all files given and store all the selectors found
     pub fn scan_files<T: AsRef<Path>>(&mut self, files: impl Iterator<Item = T>) {
-        self.extractor.scan_files(files);
+        self.scanned_selectors.extend(Extractor::scan_files(files));
     }
 
     /// Scan all files in a path using the glob syntax
     pub fn scan_path<T: AsRef<Path>>(&mut self, glob_path: T) {
-        self.extractor.scan_path(glob_path);
+        self.scanned_selectors
+            .extend(Extractor::scan_path(glob_path));
     }
 
     /// Generate the CSS styles needed based on the scanned selectors
@@ -188,75 +207,69 @@ impl EncreGenerator {
     pub fn generate(&self) -> String {
         let plugins = self.build_plugins();
 
-        // The CSS for a selector is roughly 30 characters
-        let mut result = String::with_capacity(
-            (self.extractor.scanned_selectors_without_variant.len()
-                + self.extractor.scanned_selectors_with_variant.len())
-                * 30,
-        );
+        #[cfg(target_arch = "wasm32")]
+        let iter = self.scanned_selectors.iter();
 
-        for selector in [&self.extractor.scanned_selectors_without_variant, &self.extractor.scanned_selectors_with_variant].iter().flat_map(|s| *s) {
-            let arbitrary_value = selector.get_arbitrary_value();
-            let arbitrary_value = find_arbitrary_value_hint(arbitrary_value.as_ref());
-            self.find_plugin(selector, arbitrary_value, &plugins, &mut result);
-        }
+        #[cfg(not(target_arch = "wasm32"))]
+        let iter = self.scanned_selectors.par_iter();
+
+        let result = iter
+            .filter_map(|selector| {
+                let arbitrary_value = selector.get_arbitrary_value();
+                self.get_css(selector, arbitrary_value, &plugins)
+            })
+            .collect::<String>();
 
         format!("{}{}", ENCRE_PREFLIGHT_CSS, result.trim_end_matches('\n'))
     }
 
-    /// Find the matching plugin from a selector
-    pub fn find_plugin(&self, selector: &Selector, arbitrary_value: Option<(&str, &str)>, plugins: &[Box<dyn Plugin + Sync>; 181], result: &mut String) {
-        if let Some(arbitrary_value) = arbitrary_value {
-            // Find the right plugin to handle this selector (if the resulting CSS is valid,
-            // the plugin is good)
-            for plugin in plugins {
-                if selector.check_namespace(plugin.namespace()) {
-                    let mut css_content = String::new();
-                    
+    /// Find the matching plugin for a selector and returns the CSS generated (if the resulting CSS is valid,
+    /// the plugin matches)
+    pub fn get_css(
+        &self,
+        selector: &Selector,
+        arbitrary_value: Option<(&str, &str)>,
+        plugins: &[Box<dyn Plugin + Sync>; 181],
+    ) -> Option<String> {
+        plugins.iter().find_map(|plugin| {
+            if selector.check_namespace(plugin.namespace()) {
+                let mut css_content = String::new();
+                let mut custom_css = String::new();
+
+                if plugin.get_css_for_modifier(
+                    &self.config,
+                    &selector.get_modifier(plugin.namespace()),
+                    &mut css_content,
+                    &mut custom_css,
+                ) {
+                    let result = format!("{}\n\n", self.gen_css_rule(selector, &css_content));
+
+                    return Some(if custom_css.is_empty() {
+                        result
+                    } else {
+                        format!("{}{}", custom_css, result)
+                    });
+                } else if let Some(arbitrary_value) = arbitrary_value {
                     if plugin.is_matching_value(arbitrary_value.0, arbitrary_value.1)
-                        && plugin.css_template_value(
-                            &to_css_value(arbitrary_value.1),
-                            &mut css_content,
-                        )
+                        && plugin
+                            .css_template_value(&to_css_value(arbitrary_value.1), &mut css_content)
                     {
-                        result.push_str(&format!(
+                        return Some(format!(
                             "{}\n\n",
                             self.gen_css_rule(selector, &css_content).as_str()
                         ));
-                        break;
                     }
                 }
             }
-        } else {
-            // Find the right plugin to handle this selector (if the resulting CSS is valid,
-            // the plugin is good)
-            for plugin in plugins {
-                if selector.check_namespace(plugin.namespace()) {
-                    let mut css_content = String::new();
-
-                    if plugin.get_css_for_modifier(
-                        &self.config,
-                        &selector.get_modifier(plugin.namespace()),
-                        &mut css_content,
-                        result,
-                    ) {
-                        result.push_str(&format!(
-                            "{}\n\n",
-                            self.gen_css_rule(selector, &css_content)
-                        ));
-
-                        break;
-                    }
-                }
-            }
-        }
+            None
+        })
     }
 
     /// Generate a complete CSS rule (with a class selector, a rule content and, if requested, some
     /// pseudo-elements or `@media` queries)
     pub fn gen_css_rule(&self, selector: &Selector, css_content: &str) -> String {
         let mut css_selector = selector
-            .full()
+            .full_name
             .chars()
             .enumerate()
             .map(|(i, ch)| {
@@ -281,13 +294,13 @@ impl EncreGenerator {
             })
             .collect::<String>();
 
-        let css_content = if selector.is_important() {
+        let css_content = if selector.is_important {
             Cow::from(css_content.replace(';', " !important;"))
         } else {
             Cow::from(css_content)
         };
 
-        let variants = selector.get_variants();
+        let variants = selector.variants.as_ref();
         if let Some(variants) = variants {
             let rule = variants.iter().fold(
                 format!(
@@ -522,7 +535,6 @@ impl EncreGenerator {
     /// Restore the default state of the generator (without any scanned selectors)
     /// Useful when repeatedly calling [`EncreGenerator::generate`]
     pub fn reset(&mut self) {
-        self.extractor.scanned_selectors_without_variant.clear();
-        self.extractor.scanned_selectors_with_variant.clear();
+        self.scanned_selectors.clear();
     }
 }

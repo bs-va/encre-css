@@ -45,7 +45,7 @@ pub trait Plugin: fmt::Debug {
     ///
     /// NOTE: This function is called after [to_css_value], so, `_` (underscores) are already converted to ` ` (spaces)
     ///
-    /// [to_css_value]: crate::to_css_value
+    /// [to_css_value]: crate::generator::to_css_value
     fn css_template_value(&self, _val: &str, _css_content: &mut String) -> bool {
         false
     }

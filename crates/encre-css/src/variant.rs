@@ -190,12 +190,12 @@ pub fn init_variants(config: &Config) -> BTreeMap<Cow<'static, str>, Variant> {
 
     // --- Screen ---
 
-    for screen in &*config.theme.screens {
+    config.theme.screens.iter().for_each(|screen| {
         variants.insert(
             screen.0.clone(),
             Variant::AtRule(Cow::Owned(format!("@media (min-width: {})", screen.1))),
         );
-    }
+    });
 
     // --- Orientation ---
 

@@ -443,7 +443,7 @@ impl Plugin for TextDecorationPlugin {
             write!(
                 css_content,
                 "-webkit-text-decoration-line: {modifier};
-text-decoration-line: {modifier};"
+        text-decoration-line: {modifier};"
             )
             .is_ok()
         } else {
@@ -469,7 +469,7 @@ impl Plugin for TextDecorationColorPlugin {
             write!(
                 css_content,
                 "-webkit-text-decoration-color: {color};
-text-decoration-color: {color};",
+        text-decoration-color: {color};",
                 color = val.replace(" / var(--en-opacity)", "")
             )
             .is_ok()
@@ -477,7 +477,7 @@ text-decoration-color: {color};",
             write!(
                 css_content,
                 "-webkit-text-decoration-color: {val};
-text-decoration-color: {val};"
+        text-decoration-color: {val};"
             )
             .is_ok()
         }

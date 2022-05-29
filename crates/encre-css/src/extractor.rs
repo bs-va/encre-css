@@ -9,60 +9,54 @@ lazy_static! {
     static ref SPLIT_REGEX: Regex = Regex::new(r#"(?-u)[\s'"`;>=]+"#).unwrap();
 }
 
-pub struct Extractor {
-    pub(crate) scanned_selectors_without_variant: BTreeSet<Selector>,
-    pub(crate) scanned_selectors_with_variant: BTreeSet<Selector>,
-}
+pub struct Extractor;
 
 impl Extractor {
-    pub fn new() -> Self {
-        Self {
-            scanned_selectors_without_variant: BTreeSet::new(),
-            scanned_selectors_with_variant: BTreeSet::new(),
-        }
-    }
-
-    /// Add a new selector which will have its CSS generated
-    ///
-    /// This function automatically handles duplicated selectors
-    pub fn add_selector(&mut self, val: &str) {
-        let selector = Selector::new(val);
-
-        if selector.get_variants().is_some() {
-            self.scanned_selectors_with_variant.insert(selector);
-        } else {
-            self.scanned_selectors_without_variant.insert(selector);
-        }
-    }
-
     /// Scan the contents of a file and store all the selectors found
-    pub fn scan_raw(&mut self, content: &str) {
-        for val in SPLIT_REGEX.split(content) {
-            // The shortest selector is `m-1`
-            if val.len() >= 3 {
-                self.add_selector(val);
-            }
-        }
+    pub fn scan_raw(content: &str) -> BTreeSet<Selector> {
+        SPLIT_REGEX
+            .split(content)
+            .filter_map(|val| {
+                // The shortest selector is `m-1`
+                if val.len() >= 3 {
+                    Some(Selector::new(val))
+                } else {
+                    None
+                }
+            })
+            .collect::<BTreeSet<Selector>>()
     }
 
     /// Scan all files given and store all the selectors found
-    pub fn scan_files<T: AsRef<Path>>(&mut self, files: impl Iterator<Item = T>) {
+    pub fn scan_files<T: AsRef<Path>>(
+        files: impl Iterator<Item = T>,
+    ) -> BTreeSet<Selector> {
         // TODO: Error handling
         let mut file_contents: String = String::new();
 
-        for file in files {
-            let mut file = fs::File::open(file).unwrap();
-            file_contents.clear();
+        files
+            .filter_map(|file_path| {
+                let mut file = match fs::File::open(&file_path) {
+                    Ok(f) => f,
+                    Err(e) => panic!("Failed to read the file {:?}: {:?}", file_path.as_ref(), e),
+                };
+                file_contents.clear();
 
-            if file.read_to_string(&mut file_contents).is_ok() {
-                self.scan_raw(&file_contents);
-            }
-            // TODO: Display a warning otherwise
-        }
+                if file.read_to_string(&mut file_contents).is_ok() {
+                    Some(Self::scan_raw(&file_contents))
+                } else {
+                    // TODO: Display a warning otherwise
+                    None
+                }
+            })
+            .reduce(|mut selectors1, selectors2| {
+                selectors1.extend(selectors2);
+                selectors1
+            }).unwrap_or_default()
     }
 
     /// Scan all files in a path using the glob syntax
-    pub fn scan_path<T: AsRef<Path>>(&mut self, glob_path: T) {
+    pub fn scan_path<T: AsRef<Path>>(glob_path: T) -> BTreeSet<Selector> {
         let (prefix, glob) = match Glob::new(
             glob_path
                 .as_ref()
@@ -74,18 +68,9 @@ impl Extractor {
         };
 
         if prefix == glob_path.as_ref() {
-            self.scan_files(iter::once(glob_path));
+            Self::scan_files(iter::once(glob_path))
         } else {
-            self.scan_files(
-                glob.walk(prefix)
-                    .map(|e| e.unwrap().into_path()),
-            );
+            Self::scan_files(glob.walk(prefix).map(|e| e.unwrap().into_path()))
         }
-    }
-}
-
-impl Default for Extractor {
-    fn default() -> Self {
-        Self::new()
     }
 }

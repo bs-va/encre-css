@@ -196,7 +196,7 @@ impl Plugin for AnimatePlugin {
         write!(
             css_content,
             "-webkit-animation: bounce 1s infinite;
-animation: {val};"
+        animation: {val};"
         )
         .is_ok()
     }
@@ -325,12 +325,12 @@ animation: {val};"
   0%, 100% {{
     transform: translateY(-25%);
     -webkit-animation-timing-function: cubic-bezier(0.8,0,1,1);
-    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+            animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
   }}
   50% {{
     transform: translateY(0);
     -webkit-animation-timing-function: cubic-bezier(0,0,0.2,1);
-    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+            animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
   }}
 }}
 

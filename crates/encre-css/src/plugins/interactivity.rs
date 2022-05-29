@@ -63,8 +63,8 @@ impl Plugin for AppearancePlugin {
             write!(
                 css_content,
                 "-webkit-appearance: none;
--moz-appearance: none;
-appearance: none;"
+   -moz-appearance: none;
+        appearance: none;"
             )
             .is_ok()
         } else {

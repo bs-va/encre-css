@@ -23,6 +23,7 @@ pub mod preflight;
 pub mod selector;
 pub mod utils;
 pub mod variant;
+pub mod sorting;
 
 pub use config::Config;
 pub use error::Error;
@@ -40,6 +41,7 @@ mod tests {
     use std::{
         borrow::Cow,
         collections::{BTreeMap, BTreeSet},
+        iter,
     };
 
     #[test]
@@ -50,7 +52,7 @@ mod tests {
         );
 
         assert_eq!(
-            generator.extractor.scanned_selectors_without_variant,
+            generator.scanned_selectors,
             BTreeSet::from([
                 Selector::new("<div"),
                 Selector::new("class"),
@@ -62,14 +64,8 @@ mod tests {
                 Selector::new("border-[#333]"),
                 Selector::new("text-[color:var(--hello)]"),
                 Selector::new("</div"),
-            ])
-        );
-
-        assert_eq!(
-            generator.extractor.scanned_selectors_with_variant,
-            BTreeSet::from([
                 Selector::new("sm:focus:ring"),
-                Selector::new("hover:bg-black")
+                Selector::new("hover:bg-black"),
             ])
         );
     }
@@ -116,7 +112,7 @@ mod tests {
 
 .animate-pulse {{
   -webkit-animation: bounce 1s infinite;
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }}"#,
                 preflight::ENCRE_PREFLIGHT_CSS
             )
@@ -273,7 +269,7 @@ mod tests {
 @media (min-width: 1024px) {{
   [dir="rtl"] .rtl\:active\:focus\:lg\:underline:focus:active {{
     -webkit-text-decoration-line: underline;
-    text-decoration-line: underline;
+            text-decoration-line: underline;
   }}
 }}
 
@@ -465,7 +461,7 @@ mod tests {
 @media (min-width: 1600px) {{
   .\33xl\:underline {{
     -webkit-text-decoration-line: underline;
-    text-decoration-line: underline;
+            text-decoration-line: underline;
   }}
 }}
 
@@ -478,5 +474,13 @@ mod tests {
                 preflight::ENCRE_PREFLIGHT_CSS
             )
         );
+    }
+
+    #[test]
+    fn arbitrary_values_test() {
+        let mut generator = EncreGenerator::from_config(Config::default());
+        generator.scan_files(iter::once("tests/fixtures/arbitrary-values.html"));
+        generator.generate();
+        // TODO: Assert
     }
 }

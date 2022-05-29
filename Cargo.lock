@@ -315,6 +315,7 @@ dependencies = [
  "encre-css",
  "notify",
  "rand",
+ "rayon",
  "wax",
 ]
 
