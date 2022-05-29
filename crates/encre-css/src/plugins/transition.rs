@@ -231,7 +231,9 @@ animation: {val};"
   to {{
     transform: rotate(360deg);
   }}
-}}"
+}}
+
+"
                     )
                     .unwrap();
                 }
@@ -257,7 +259,9 @@ animation: {val};"
     transform: scale(2);
     opacity: 0;
   }}
-}}"
+}}
+
+"
                     )
                     .unwrap();
                 }
@@ -284,7 +288,9 @@ animation: {val};"
   50% {{
     opacity: .5;
   }}
-}}"
+}}
+
+"
                     )
                     .unwrap();
                 }
@@ -326,7 +332,9 @@ animation: {val};"
     -webkit-animation-timing-function: cubic-bezier(0,0,0.2,1);
     animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
   }}
-}}"
+}}
+
+"
                     )
                     .unwrap();
                 }

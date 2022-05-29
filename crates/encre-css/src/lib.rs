@@ -92,6 +92,39 @@ mod tests {
     }
 
     #[test]
+    fn gen_selector_with_custom_css_test() {
+        let mut generator = EncreGenerator::from_config(Config::default());
+        generator.add_selector("animate-pulse");
+        generator.add_selector("animate-pulse");
+
+        assert_eq!(
+            generator.generate(),
+            format!(
+                r#"{}@-webkit-keyframes pulse {{
+  50% {{
+    opacity: .5;
+  }}
+}}
+
+@keyframes pulse {{
+  0%, 100% {{
+    opacity: 1;
+  }}
+  50% {{
+    opacity: .5;
+  }}
+}}
+
+.animate-pulse {{
+  -webkit-animation: bounce 1s infinite;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}}"#,
+                preflight::ENCRE_PREFLIGHT_CSS
+            )
+        );
+    }
+
+    #[test]
     fn gen_selector_css_arbitrary_value_test() {
         // TODO: Support --en-bg-opacity in arbitrary values
         let mut generator = EncreGenerator::from_config(Config::default());

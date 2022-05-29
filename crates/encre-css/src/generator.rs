@@ -150,6 +150,7 @@ impl EncreGenerator {
         self.config.clone()
     }
 
+    /// Set the configuration
     pub fn set_config(&mut self, config: Config) {
         self.config = Arc::new(config);
     }
@@ -185,18 +186,7 @@ impl EncreGenerator {
     /// [scan_raw]: EncreGenerator::scan_raw
     /// [add_selector]: EncreGenerator::add_selector
     pub fn generate(&self) -> String {
-        let selectors = [
-            &self.extractor.scanned_selectors_without_variant,
-            &self.extractor.scanned_selectors_with_variant,
-        ];
-
         let plugins = self.build_plugins();
-
-        #[cfg(target_arch = "wasm32")]
-        let iter = selectors.iter();
-
-        #[cfg(not(target_arch = "wasm32"))]
-        let iter = selectors.iter();
 
         // The CSS for a selector is roughly 30 characters
         let mut result = String::with_capacity(
@@ -205,40 +195,51 @@ impl EncreGenerator {
                 * 30,
         );
 
-        iter.flat_map(|v| *v).for_each(|selector| {
+        for selector in [&self.extractor.scanned_selectors_without_variant, &self.extractor.scanned_selectors_with_variant].iter().flat_map(|s| *s) {
             let arbitrary_value = selector.get_arbitrary_value();
             let arbitrary_value = find_arbitrary_value_hint(arbitrary_value.as_ref());
+            self.find_plugin(selector, arbitrary_value, &plugins, &mut result);
+        }
 
+        format!("{}{}", ENCRE_PREFLIGHT_CSS, result.trim_end_matches('\n'))
+    }
+
+    /// Find the matching plugin from a selector
+    pub fn find_plugin(&self, selector: &Selector, arbitrary_value: Option<(&str, &str)>, plugins: &[Box<dyn Plugin + Sync>; 181], result: &mut String) {
+        if let Some(arbitrary_value) = arbitrary_value {
             // Find the right plugin to handle this selector (if the resulting CSS is valid,
             // the plugin is good)
-            for plugin in &plugins {
+            for plugin in plugins {
                 if selector.check_namespace(plugin.namespace()) {
                     let mut css_content = String::new();
-                    let mut custom_css = String::new();
+                    
+                    if plugin.is_matching_value(arbitrary_value.0, arbitrary_value.1)
+                        && plugin.css_template_value(
+                            &to_css_value(arbitrary_value.1),
+                            &mut css_content,
+                        )
+                    {
+                        result.push_str(&format!(
+                            "{}\n\n",
+                            self.gen_css_rule(selector, &css_content).as_str()
+                        ));
+                        break;
+                    }
+                }
+            }
+        } else {
+            // Find the right plugin to handle this selector (if the resulting CSS is valid,
+            // the plugin is good)
+            for plugin in plugins {
+                if selector.check_namespace(plugin.namespace()) {
+                    let mut css_content = String::new();
 
-                    if let Some(arbitrary_value) = arbitrary_value {
-                        if plugin.is_matching_value(arbitrary_value.0, arbitrary_value.1)
-                            && plugin.css_template_value(
-                                &to_css_value(arbitrary_value.1),
-                                &mut css_content,
-                            )
-                        {
-                            result.push_str(&format!(
-                                "{}\n\n",
-                                self.gen_css_rule(selector, &css_content).as_str()
-                            ));
-                            break;
-                        }
-                    } else if plugin.get_css_for_modifier(
+                    if plugin.get_css_for_modifier(
                         &self.config,
                         &selector.get_modifier(plugin.namespace()),
                         &mut css_content,
-                        &mut custom_css,
+                        result,
                     ) {
-                        if !custom_css.is_empty() {
-                            result.push_str(&format!("{}\n\n", custom_css));
-                        }
-
                         result.push_str(&format!(
                             "{}\n\n",
                             self.gen_css_rule(selector, &css_content)
@@ -248,9 +249,7 @@ impl EncreGenerator {
                     }
                 }
             }
-        });
-
-        format!("{}{}", ENCRE_PREFLIGHT_CSS, result.trim_end_matches('\n'))
+        }
     }
 
     /// Generate a complete CSS rule (with a class selector, a rule content and, if requested, some
