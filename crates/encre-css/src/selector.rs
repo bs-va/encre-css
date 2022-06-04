@@ -1,5 +1,6 @@
 use lazy_static::lazy_static;
 use regex::Regex;
+use smol_str::SmolStr;
 use std::{fmt, num};
 
 use crate::variant::VARIANT_SEPARATOR;
@@ -87,7 +88,7 @@ impl<'a> fmt::Display for Modifier<'a> {
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Selector {
-    pub(crate) full_name: String,
+    pub(crate) full_name: SmolStr,
     pub(crate) variants: Option<Vec<String>>,
     pub(crate) content: String,
     pub(crate) is_negative: bool,
@@ -95,19 +96,22 @@ pub struct Selector {
 }
 
 impl Selector {
-    pub fn new(original_data: &str) -> Self {
-        // Strip the important flag before the negative one
-        let (data, is_important) = if let Some(data) = original_data.strip_prefix('!') {
-            (data, true)
-        } else {
-            (original_data, false)
-        };
+    pub fn new<T: Into<SmolStr>>(data: T) -> Self {
+        let mut data = data.into();
+        let full_name = data.clone();
 
-        let (data, is_negative) = if let Some(data) = data.strip_prefix('-') {
-            (data, true)
-        } else {
-            (original_data, false)
-        };
+        // Strip the important flag before the negative one
+        let mut is_important = false;
+        if let Some(new_data) = data.strip_prefix('!') {
+            data = SmolStr::new(new_data);
+            is_important = true;
+        }
+
+        let mut is_negative = false;
+        if let Some(new_data) = data.strip_prefix('-') {
+            data = SmolStr::new(new_data);
+            is_negative = true;
+        }
 
         let mut variants = vec![];
         let mut next_variant = true;
@@ -142,7 +146,7 @@ impl Selector {
             variants.reverse();
 
             Self {
-                full_name: original_data.to_string(),
+                full_name,
                 variants: Some(variants),
                 content,
                 is_negative,
@@ -150,7 +154,7 @@ impl Selector {
             }
         } else {
             Self {
-                full_name: original_data.to_string(),
+                full_name,
                 variants: None,
                 content: data.to_string(),
                 is_negative,
