@@ -1,5 +1,7 @@
-use std::path::PathBuf;
+use std::{env, path::PathBuf};
 use clap::{Parser, Subcommand};
+use color_eyre::Report;
+use tracing_subscriber::EnvFilter;
 
 mod playground;
 mod build;
@@ -49,11 +51,29 @@ struct Cli {
     command: Commands,
 }
 
-fn main() {
+fn main() -> Result<(), Report> {
+    // Enable nice panic reports with a backtrace
+    if env::var("RUST_BACKTRACE").is_err() {
+        env::set_var("RUST_BACKTRACE", "1");
+    }
+
+    color_eyre::install()?;
+
+    // Enable tracing using the RUST_LOG environment variable
+    if env::var("RUST_LOG").is_err() {
+        env::set_var("RUST_LOG", "info");
+    }
+
+    tracing_subscriber::fmt::fmt()
+        .with_env_filter(EnvFilter::from_default_env())
+        .init();
+
     let args = Cli::parse();
 
     match args.command {
         Commands::Playground { name } => launch_playground(name),
         Commands::Build { config, input: extra_input, output, watch, display_time } => build(config, extra_input, output, watch, display_time),
     }
+
+    Ok(())
 }

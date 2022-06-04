@@ -205,6 +205,7 @@ impl EncreGenerator {
     /// [scan_raw]: EncreGenerator::scan_raw
     /// [add_selector]: EncreGenerator::add_selector
     pub fn generate(&self) -> String {
+        debug!("Start generating CSS");
         let plugins = self.build_plugins();
 
         #[cfg(target_arch = "wasm32")]
@@ -220,7 +221,10 @@ impl EncreGenerator {
             })
             .collect::<String>();
 
-        format!("{}{}", ENCRE_PREFLIGHT_CSS, result.trim_end_matches('\n'))
+        let result = format!("{}{}", ENCRE_PREFLIGHT_CSS, result.trim_end_matches('\n'));
+        debug!("Finished generating CSS");
+
+        result
     }
 
     /// Find the matching plugin for a selector and returns the CSS generated (if the resulting CSS is valid,

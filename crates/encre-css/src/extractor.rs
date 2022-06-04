@@ -34,7 +34,8 @@ impl Extractor {
         // TODO: Error handling
         let mut file_contents: String = String::new();
 
-        files
+        debug!("Start scanning files");
+        let result = files
             .filter_map(|file_path| {
                 let mut file = match fs::File::open(&file_path) {
                     Ok(f) => f,
@@ -52,7 +53,10 @@ impl Extractor {
             .reduce(|mut selectors1, selectors2| {
                 selectors1.extend(selectors2);
                 selectors1
-            }).unwrap_or_default()
+            }).unwrap_or_default();
+        debug!("Finished scanning files");
+
+        result
     }
 
     /// Scan all files in a path using the glob syntax

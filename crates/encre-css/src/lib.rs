@@ -14,6 +14,11 @@
 //!   background-color: rgb(239 68 68 / var(--en-bg-opacity));
 //! }"#));
 //! ```
+
+// Used for the info!, trace!, debug!, warn!, error! macros
+#[macro_use]
+extern crate tracing;
+
 pub mod config;
 pub mod error;
 pub mod extractor;
