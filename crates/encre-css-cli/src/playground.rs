@@ -23,13 +23,18 @@ const DEFAULT_CONFIG_CONTENT: &str = r#"input = ["index.html"]"#;
 /// - Create the `index.html` and `encre.toml` files in it and fill them with the default content
 pub fn launch_playground(name: Option<String>) {
     let name = name.unwrap_or_else(|| {
-        format!("playground-{}", Alphanumeric.sample_string(&mut rand::thread_rng(), RANDOM_NAME_LENGTH))
+        format!(
+            "playground-{}",
+            Alphanumeric.sample_string(&mut rand::thread_rng(), RANDOM_NAME_LENGTH)
+        )
     });
     let dir_path = PathBuf::from(&name);
 
     fs::create_dir(&name).expect("failed to create a new directory in the current directory");
-    fs::write(dir_path.join("index.html"), DEFAULT_HTML_CONTENT).expect("failed to create an `encre.toml` file in the created directory");
-    fs::write(dir_path.join(DEFAULT_CONFIG_FILE), DEFAULT_CONFIG_CONTENT).expect("failed to create the configuration file in the created directory");
+    fs::write(dir_path.join("index.html"), DEFAULT_HTML_CONTENT)
+        .expect("failed to create an `encre.toml` file in the created directory");
+    fs::write(dir_path.join(DEFAULT_CONFIG_FILE), DEFAULT_CONFIG_CONTENT)
+        .expect("failed to create the configuration file in the created directory");
 
     println!("  `{name}` is ready!\n  To start editing it, run: `cd {name} && encre build --watch -o styles.css` and open the `index.html` file in your preferred editor");
 }

@@ -1,9 +1,9 @@
 use super::Plugin;
+use crate::utils::indent;
 use crate::{config::Config, selector::Modifier};
 
-use std::fmt::Write;
+use std::fmt::{self, Write};
 
-#[derive(Debug)]
 pub struct BorderCollapsePlugin;
 
 impl Plugin for BorderCollapsePlugin {
@@ -11,22 +11,34 @@ impl Plugin for BorderCollapsePlugin {
         "border"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["collapse", "separate"].contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "collapse" => write!(css_content, "border-collapse: collapse;").is_ok(),
-            "separate" => write!(css_content, "border-collapse: separate;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "collapse" => writeln!(buffer, "border-collapse: collapse;")?,
+                "separate" => writeln!(buffer, "border-collapse: separate;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct TableLayoutPlugin;
 
 impl Plugin for TableLayoutPlugin {
@@ -34,17 +46,30 @@ impl Plugin for TableLayoutPlugin {
         "table"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["auto", "fixed"].contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "auto" => write!(css_content, "table-layout: auto;").is_ok(),
-            "fixed" => write!(css_content, "table-layout: fixed;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "auto" => writeln!(buffer, "table-layout: auto;")?,
+                "fixed" => writeln!(buffer, "table-layout: fixed;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }

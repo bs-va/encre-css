@@ -9,7 +9,7 @@
 //! // Or let mut generator = EncreGenerator::new("encre.toml"); if your current directory contains an `encre.toml` file
 //! generator.scan_raw(r#"class="bg-red-500""#);
 //!
-//! assert!(generator.generate().contains(r#".bg-red-500 {
+//! assert!(generator.generate().expect("failed to generate the CSS").contains(r#".bg-red-500 {
 //!   --en-bg-opacity: 1;
 //!   background-color: rgb(239 68 68 / var(--en-bg-opacity));
 //! }"#));
@@ -26,9 +26,9 @@ pub mod generator;
 pub mod plugins;
 pub mod preflight;
 pub mod selector;
+pub mod sorting;
 pub mod utils;
 pub mod variant;
-pub mod sorting;
 
 pub use config::Config;
 pub use error::Error;
@@ -37,10 +37,8 @@ pub use generator::EncreGenerator;
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        config::{ColorConfig, DarkModeConfig, ScreenConfig},
-        selector::Selector,
-    };
+    use crate::config::{ColorConfig, DarkModeConfig, ScreenConfig};
+    use crate::selector::Selector;
 
     use pretty_assertions::assert_eq;
     use std::{
@@ -81,9 +79,11 @@ mod tests {
         generator.add_selector("w-full");
 
         assert_eq!(
-            generator.generate(),
+            generator.generate().unwrap(),
             format!(
-                r#"{}.w-full {{
+                r#"{}
+
+.w-full {{
   width: 100%;
 }}"#,
                 preflight::ENCRE_PREFLIGHT_CSS
@@ -98,9 +98,11 @@ mod tests {
         generator.add_selector("animate-pulse");
 
         assert_eq!(
-            generator.generate(),
+            generator.generate().unwrap(),
             format!(
-                r#"{}@-webkit-keyframes pulse {{
+                r#"{}
+
+@-webkit-keyframes pulse {{
   50% {{
     opacity: .5;
   }}
@@ -116,8 +118,8 @@ mod tests {
 }}
 
 .animate-pulse {{
-  -webkit-animation: bounce 1s infinite;
-          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  -webkit-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }}"#,
                 preflight::ENCRE_PREFLIGHT_CSS
             )
@@ -135,9 +137,11 @@ mod tests {
         generator.add_selector("2xl:pb-[calc((100%/2)-10px+2rem)]");
 
         assert_eq!(
-            generator.generate(),
+            generator.generate().unwrap(),
             format!(
-                r#"{}.bg-\[red\] {{
+                r#"{}
+
+.bg-\[red\] {{
   background-color: red;
 }}
 
@@ -171,9 +175,11 @@ mod tests {
         generator.add_selector("hover:bg-[color:red]");
 
         assert_eq!(
-            generator.generate(),
+            generator.generate().unwrap(),
             format!(
-                r#"{}.bg-\[color\:red\] {{
+                r#"{}
+
+.bg-\[color\:red\] {{
   background-color: red;
 }}
 
@@ -191,9 +197,11 @@ mod tests {
         generator.add_selector("focus:w-full");
 
         assert_eq!(
-            generator.generate(),
+            generator.generate().unwrap(),
             format!(
-                r#"{}.focus\:w-full:focus {{
+                r#"{}
+
+.focus\:w-full:focus {{
   width: 100%;
 }}"#,
                 preflight::ENCRE_PREFLIGHT_CSS,
@@ -217,9 +225,11 @@ mod tests {
         generator.add_selector("marker:selection:hover:bg-green-200");
 
         assert_eq!(
-            generator.generate(),
+            generator.generate().unwrap(),
             format!(
-                r#"{}@media (min-width: 1536px) {{
+                r#"{}
+
+@media (min-width: 1536px) {{
   @media (prefers-reduced-motion: no-preference) {{
     @media (orientation: landscape) {{
       [dir="rtl"] .\32xl\:motion-safe\:landscape\:focus-within\:visited\:first\:odd\:checked\:open\:rtl\:bg-purple-100[open]:checked:nth-child(odd):first-child:visited:focus-within {{
@@ -250,13 +260,13 @@ mod tests {
   background-color: rgb(219 39 119 / var(--en-bg-opacity));
 }}
 
-.marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection *::marker, .marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection::marker {{
+.marker\:selection\:hover\:bg-green-200:hover::selection::marker {{
   --en-bg-opacity: 1;
   background-color: rgb(187 247 208 / var(--en-bg-opacity));
 }}
 
 @media (min-width: 768px) {{
-  .md\:focus\:selection\:bg-blue-100 *::selection, .md\:focus\:selection\:bg-blue-100::selection:focus {{
+  .md\:focus\:selection\:bg-blue-100::selection:focus {{
     --en-bg-opacity: 1;
     background-color: rgb(219 234 254 / var(--en-bg-opacity));
   }}
@@ -274,7 +284,7 @@ mod tests {
 @media (min-width: 1024px) {{
   [dir="rtl"] .rtl\:active\:focus\:lg\:underline:focus:active {{
     -webkit-text-decoration-line: underline;
-            text-decoration-line: underline;
+    text-decoration-line: underline;
   }}
 }}
 
@@ -304,9 +314,11 @@ mod tests {
         generator.add_selector("-hue-rotate-60");
 
         assert_eq!(
-            generator.generate(),
+            generator.generate().unwrap(),
             format!(
-                r#"{}.-hue-rotate-60 {{
+                r#"{}
+
+.-hue-rotate-60 {{
   --en-hue-rotate: hue-rotate(-60deg);
   filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
 }}
@@ -332,11 +344,69 @@ mod tests {
         generator.add_selector("bg-red-500");
 
         assert_eq!(
-            generator.generate(),
+            generator.generate().unwrap(),
             format!(
-                r#"{}.bg-red-500 {{
+                r#"{}
+
+.bg-red-500 {{
   --en-bg-opacity: 1;
   background-color: rgb(239 68 68 / var(--en-bg-opacity));
+}}"#,
+                preflight::ENCRE_PREFLIGHT_CSS
+            )
+        );
+    }
+
+    #[test]
+    fn default_modifier_values_for_rounded_test() {
+        let mut generator = EncreGenerator::from_config(Config::default());
+        generator.scan_raw("rounded-tr rounded-tr-md rounded rounded-md rounded-t-sm rounded-bl-xl border-x border border-4 border-t-2");
+
+        assert_eq!(
+            generator.generate().unwrap(),
+            format!(
+                r#"{}
+
+.border {{
+  border-width: 1px;
+}}
+
+.border-4 {{
+  border-width: 4px;
+}}
+
+.border-t-2 {{
+  border-top-width: 2px;
+}}
+
+.border-x {{
+  border-left-width: 1px;
+  border-right-width: 1px;
+}}
+
+.rounded {{
+  border-radius: 0.25rem;
+}}
+
+.rounded-bl-xl {{
+  border-bottom-left-radius: 0.75rem;
+}}
+
+.rounded-md {{
+  border-radius: 0.375rem;
+}}
+
+.rounded-t-sm {{
+  border-top-left-radius: 0.125rem;
+  border-top-right-radius: 0.125rem;
+}}
+
+.rounded-tr {{
+  border-top-right-radius: 0.25rem;
+}}
+
+.rounded-tr-md {{
+  border-top-right-radius: 0.375rem;
 }}"#,
                 preflight::ENCRE_PREFLIGHT_CSS
             )
@@ -349,9 +419,11 @@ mod tests {
         generator.add_selector("dark:mt-px");
 
         assert_eq!(
-            generator.generate(),
+            generator.generate().unwrap(),
             format!(
-                r#"{}@media (prefers-color-scheme: dark) {{
+                r#"{}
+
+@media (prefers-color-scheme: dark) {{
   .dark\:mt-px {{
     margin-top: 1px;
   }}
@@ -367,9 +439,11 @@ mod tests {
         generator.add_selector("dark:mt-px");
 
         assert_eq!(
-            generator.generate(),
+            generator.generate().unwrap(),
             format!(
-                r#"{}.dark .dark\:mt-px {{
+                r#"{}
+
+.dark .dark\:mt-px {{
   margin-top: 1px;
 }}"#,
                 preflight::ENCRE_PREFLIGHT_CSS
@@ -388,15 +462,18 @@ mod tests {
         let mut config = Config::default();
         config.theme.colors = ColorConfig::from(colors);
         config.theme.screens = ScreenConfig::from(screens);
+        config.modifier_separator = Cow::from("$").into();
 
         let mut generator = EncreGenerator::from_config(config);
-        generator.add_selector("3xl:text-rosa-500");
+        generator.add_selector("3xl:text$rosa$500");
 
         assert_eq!(
-            generator.generate(),
+            generator.generate().unwrap(),
             format!(
-                r#"{}@media (min-width: 1600px) {{
-  .\33xl\:text-rosa-500 {{
+                r#"{}
+
+@media (min-width: 1600px) {{
+  .\33xl\:text\$rosa\$500 {{
     --en-text-opacity: 1;
     color: rgb(229 24 106 / var(--en-text-opacity));
   }}
@@ -446,9 +523,11 @@ mod tests {
         generator.add_selector("lg:text-rosa-500");
 
         assert_eq!(
-            generator.generate(),
+            generator.generate().unwrap(),
             format!(
-                r#"{}.bg-rosa-500 {{
+                r#"{}
+
+.bg-rosa-500 {{
   --en-bg-opacity: 1;
   background-color: rgb(229 24 106 / var(--en-bg-opacity));
 }}
@@ -466,7 +545,7 @@ mod tests {
 @media (min-width: 1600px) {{
   .\33xl\:underline {{
     -webkit-text-decoration-line: underline;
-            text-decoration-line: underline;
+    text-decoration-line: underline;
   }}
 }}
 
@@ -485,7 +564,7 @@ mod tests {
     fn arbitrary_values_test() {
         let mut generator = EncreGenerator::from_config(Config::default());
         generator.scan_files(iter::once("tests/fixtures/arbitrary-values.html"));
-        generator.generate();
+        generator.generate().unwrap();
         // TODO: Assert
     }
 }

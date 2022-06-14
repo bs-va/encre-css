@@ -1,10 +1,9 @@
 use super::Plugin;
-use crate::utils::{default_lengths, value_matchers::*};
+use crate::utils::{default_lengths, indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use std::fmt::Write;
+use std::fmt::{self, Write};
 
-#[derive(Debug)]
 pub struct WidthPlugin;
 
 impl Plugin for WidthPlugin {
@@ -12,36 +11,43 @@ impl Plugin for WidthPlugin {
         "w"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { is_negative, value } => {
+                value == "screen"
+                    || default_lengths::get_extended_size(value, *is_negative).is_some()
+            }
+            Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "width: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is("screen") {
-            return self.css_template_value("100vw", css_content);
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { is_negative, value } => {
+                if value == "screen" {
+                    return writeln!(buffer, "width: 100vw;");
+                }
+
+                writeln!(
+                    buffer,
+                    "width: {};",
+                    default_lengths::get_extended_size(value, *is_negative).unwrap()
+                )?;
+            }
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "width: {value};")?,
         }
 
-        if let Some(length) =
-            default_lengths::get_extended_size(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct MinWidthPlugin;
 
 impl Plugin for MinWidthPlugin {
@@ -49,33 +55,37 @@ impl Plugin for MinWidthPlugin {
         "min-w"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["0", "full", "min", "max", "fit"].contains(&&**value),
+            Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "min-width: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "0" => self.css_template_value("0", css_content),
-            "full" => self.css_template_value("100%", css_content),
-            "min" => self.css_template_value("min-content", css_content),
-            "max" => self.css_template_value("max-content", css_content),
-            "fit" => self.css_template_value("fit-content", css_content),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "0" => writeln!(buffer, "min-width: 0;")?,
+                "full" => writeln!(buffer, "min-width: 100%;")?,
+                "min" => writeln!(buffer, "min-width: min-content;")?,
+                "max" => writeln!(buffer, "min-width: max-content;")?,
+                "fit" => writeln!(buffer, "min-width: fit-content;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "min-width: {value};")?,
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct MaxWidthPlugin;
 
 impl Plugin for MaxWidthPlugin {
@@ -83,53 +93,61 @@ impl Plugin for MaxWidthPlugin {
         "max-w"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => [
+                "0", "xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl", "5xl", "6xl", "7xl",
+                "full", "min", "max", "screen", "fit", "none",
+            ]
+            .contains(&&**value),
+            Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "max-width: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "0" => self.css_template_value("0rem", css_content),
-            "none" => self.css_template_value("none", css_content),
-            "xs" => self.css_template_value("20rem", css_content),
-            "sm" => self.css_template_value("24rem", css_content),
-            "md" => self.css_template_value("28rem", css_content),
-            "lg" => self.css_template_value("32rem", css_content),
-            "xl" => self.css_template_value("36rem", css_content),
-            "2xl" => self.css_template_value("42rem", css_content),
-            "3xl" => self.css_template_value("48rem", css_content),
-            "4xl" => self.css_template_value("56rem", css_content),
-            "5xl" => self.css_template_value("64rem", css_content),
-            "6xl" => self.css_template_value("72rem", css_content),
-            "7xl" => self.css_template_value("80rem", css_content),
-            "full" => self.css_template_value("100%", css_content),
-            "min" => self.css_template_value("min-content", css_content),
-            "max" => self.css_template_value("max-content", css_content),
-            "fit" => self.css_template_value("fit-content", css_content),
-            "prose" => self.css_template_value("65ch", css_content),
-            "screen-sm" => self.css_template_value("640px", css_content),
-            "screen-md" => self.css_template_value("768px", css_content),
-            "screen-lg" => self.css_template_value("1024px", css_content),
-            "screen-xl" => self.css_template_value("1280px", css_content),
-            "screen-2xl" => self.css_template_value("1536px", css_content),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "0" => writeln!(buffer, "max-width: 0rem;")?,
+                "none" => writeln!(buffer, "max-width: none;")?,
+                "xs" => writeln!(buffer, "max-width: 20rem;")?,
+                "sm" => writeln!(buffer, "max-width: 24rem;")?,
+                "md" => writeln!(buffer, "max-width: 28rem;")?,
+                "lg" => writeln!(buffer, "max-width: 32rem;")?,
+                "xl" => writeln!(buffer, "max-width: 36rem;")?,
+                "2xl" => writeln!(buffer, "max-width: 42rem;")?,
+                "3xl" => writeln!(buffer, "max-width: 48rem;")?,
+                "4xl" => writeln!(buffer, "max-width: 56rem;")?,
+                "5xl" => writeln!(buffer, "max-width: 64rem;")?,
+                "6xl" => writeln!(buffer, "max-width: 72rem;")?,
+                "7xl" => writeln!(buffer, "max-width: 80rem;")?,
+                "full" => writeln!(buffer, "max-width: 100%;")?,
+                "min" => writeln!(buffer, "max-width: min-content;")?,
+                "max" => writeln!(buffer, "max-width: max-content;")?,
+                "fit" => writeln!(buffer, "max-width: fit-content;")?,
+                "prose" => writeln!(buffer, "max-width: 65ch;")?,
+                "screen-sm" => writeln!(buffer, "max-width: 640px;")?,
+                "screen-md" => writeln!(buffer, "max-width: 768px;")?,
+                "screen-lg" => writeln!(buffer, "max-width: 1024px;")?,
+                "screen-xl" => writeln!(buffer, "max-width: 1280px;")?,
+                "screen-2xl" => writeln!(buffer, "max-width: 1536px;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "max-width: {value};")?,
         }
+
+        Ok(())
     }
 }
 
 // Height
 
-#[derive(Debug)]
 pub struct HeightPlugin;
 
 impl Plugin for HeightPlugin {
@@ -137,36 +155,43 @@ impl Plugin for HeightPlugin {
         "h"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { is_negative, value } => {
+                value == "screen"
+                    || default_lengths::get_extended_size(value, *is_negative).is_some()
+            }
+            Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "height: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is("screen") {
-            return self.css_template_value("100vh", css_content);
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { is_negative, value } => {
+                if value == "screen" {
+                    return writeln!(buffer, "height: 100vh;");
+                }
+
+                writeln!(
+                    buffer,
+                    "height: {};",
+                    default_lengths::get_extended_size(value, *is_negative).unwrap()
+                )?;
+            }
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "height: {value};")?,
         }
 
-        if let Some(length) =
-            default_lengths::get_extended_size(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct MinHeightPlugin;
 
 impl Plugin for MinHeightPlugin {
@@ -174,34 +199,38 @@ impl Plugin for MinHeightPlugin {
         "min-h"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["0", "full", "min", "max", "fit"].contains(&&**value),
+            Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "min-height: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "0" => self.css_template_value("0", css_content),
-            "full" => self.css_template_value("100%", css_content),
-            "min" => self.css_template_value("min-content", css_content),
-            "max" => self.css_template_value("max-content", css_content),
-            "fit" => self.css_template_value("fit-content", css_content),
-            "screen" => self.css_template_value("100vh", css_content),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "0" => writeln!(buffer, "min-height: 0;")?,
+                "full" => writeln!(buffer, "min-height: 100%;")?,
+                "min" => writeln!(buffer, "min-height: min-content;")?,
+                "max" => writeln!(buffer, "min-height: max-content;")?,
+                "fit" => writeln!(buffer, "min-height: fit-content;")?,
+                "screen" => writeln!(buffer, "min-height: 100vh;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "min-width: {value};")?,
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct MaxHeightPlugin;
 
 impl Plugin for MaxHeightPlugin {
@@ -209,41 +238,50 @@ impl Plugin for MaxHeightPlugin {
         "max-h"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => [
+                "0", "xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl", "5xl", "6xl", "7xl",
+                "full", "min", "max", "screen", "fit", "none",
+            ]
+            .contains(&&**value),
+            Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "max-height: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "0" => self.css_template_value("0rem", css_content),
-            "none" => self.css_template_value("none", css_content),
-            "xs" => self.css_template_value("20rem", css_content),
-            "sm" => self.css_template_value("24rem", css_content),
-            "md" => self.css_template_value("28rem", css_content),
-            "lg" => self.css_template_value("32rem", css_content),
-            "xl" => self.css_template_value("36rem", css_content),
-            "2xl" => self.css_template_value("42rem", css_content),
-            "3xl" => self.css_template_value("48rem", css_content),
-            "4xl" => self.css_template_value("56rem", css_content),
-            "5xl" => self.css_template_value("64rem", css_content),
-            "6xl" => self.css_template_value("72rem", css_content),
-            "7xl" => self.css_template_value("80rem", css_content),
-            "full" => self.css_template_value("100%", css_content),
-            "min" => self.css_template_value("min-content", css_content),
-            "max" => self.css_template_value("max-content", css_content),
-            "screen" => self.css_template_value("100vh", css_content),
-            "fit" => self.css_template_value("fit-content", css_content),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "0" => writeln!(buffer, "max-height: 0rem;")?,
+                "none" => writeln!(buffer, "max-height: none;")?,
+                "xs" => writeln!(buffer, "max-height: 20rem;")?,
+                "sm" => writeln!(buffer, "max-height: 24rem;")?,
+                "md" => writeln!(buffer, "max-height: 28rem;")?,
+                "lg" => writeln!(buffer, "max-height: 32rem;")?,
+                "xl" => writeln!(buffer, "max-height: 36rem;")?,
+                "2xl" => writeln!(buffer, "max-height: 42rem;")?,
+                "3xl" => writeln!(buffer, "max-height: 48rem;")?,
+                "4xl" => writeln!(buffer, "max-height: 56rem;")?,
+                "5xl" => writeln!(buffer, "max-height: 64rem;")?,
+                "6xl" => writeln!(buffer, "max-height: 72rem;")?,
+                "7xl" => writeln!(buffer, "max-height: 80rem;")?,
+                "full" => writeln!(buffer, "max-height: 100%;")?,
+                "min" => writeln!(buffer, "max-height: min-content;")?,
+                "max" => writeln!(buffer, "max-height: max-content;")?,
+                "screen" => writeln!(buffer, "max-height: 100vh;")?,
+                "fit" => writeln!(buffer, "max-height: fit-content;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "max-height: {value};")?,
         }
+
+        Ok(())
     }
 }

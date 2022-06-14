@@ -1,11 +1,11 @@
 use super::Plugin;
-use crate::utils::value_matchers::*;
+use crate::utils::{indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::{
-    fmt::Write,
+    fmt::{self, Write},
     sync::atomic::{AtomicBool, Ordering},
 };
 
@@ -13,7 +13,6 @@ lazy_static! {
     static ref PROPERTY_REGEX: Regex = Regex::new(r"[^\d]+").unwrap();
 }
 
-#[derive(Debug)]
 pub struct PropertyPlugin;
 
 impl Plugin for PropertyPlugin {
@@ -21,47 +20,102 @@ impl Plugin for PropertyPlugin {
         "transition"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        PROPERTY_REGEX.is_match(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => [
+                "",
+                "none",
+                "all",
+                "colors",
+                "opacity",
+                "shadow",
+                "transform",
+            ]
+            .contains(&&**value),
+            Modifier::Arbitrary { value, .. } => PROPERTY_REGEX.is_match(value),
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "transition-property: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "" => write!(css_content, "transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-transition-duration: 150ms;").is_ok(),
-            "none" => write!(css_content, "transition-property: none;").is_ok(),
-            "all" => write!(css_content, "transition-property: all;
-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-transition-duration: 150ms;").is_ok(),
-            "colors" => write!(css_content, "transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-transition-timing-function: cubic-bezier(0.4, 0, 0);
-transition-duration: 150ms;").is_ok(),
-            "opacity" => write!(css_content, "transition-property: opacity;
-transition-timing-function: cubic-bezier(0.4, 0, 0);
-transition-duration: 150ms;").is_ok(),
-            "shadow" => write!(css_content, "transition-property: box-shadow;
-transition-timing-function: cubic-bezier(0.4, 0, 0);
-transition-duration: 150ms;").is_ok(),
-            "transform" => write!(css_content, "transition-property: transform;
-transition-timing-function: cubic-bezier(0.4, 0, 0);
-transition-duration: 150ms;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "" => {
+                    writeln!(buffer, "transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;")?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"
+                    )?;
+                    indent(indentation, buffer)?;
+                    writeln!(buffer, "transition-duration: 150ms;")?;
+                }
+                "none" => writeln!(buffer, "transition-property: none;")?,
+                "all" => {
+                    writeln!(buffer, "transition-property: all;")?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"
+                    )?;
+                    indent(indentation, buffer)?;
+                    writeln!(buffer, "transition-duration: 150ms;")?;
+                }
+                "colors" => {
+                    writeln!(buffer, "transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;")?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "transition-timing-function: cubic-bezier(0.4, 0, 0);"
+                    )?;
+                    indent(indentation, buffer)?;
+                    writeln!(buffer, "transition-duration: 150ms;")?;
+                }
+                "opacity" => {
+                    writeln!(buffer, "transition-property: opacity;")?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "transition-timing-function: cubic-bezier(0.4, 0, 0);"
+                    )?;
+                    indent(indentation, buffer)?;
+                    writeln!(buffer, "transition-duration: 150ms;")?;
+                }
+                "shadow" => {
+                    writeln!(buffer, "transition-property: box-shadow;")?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "transition-timing-function: cubic-bezier(0.4, 0, 0);"
+                    )?;
+                    indent(indentation, buffer)?;
+                    writeln!(buffer, "transition-duration: 150ms;")?;
+                }
+                "transform" => {
+                    writeln!(buffer, "transition-property: transform;")?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "transition-timing-function: cubic-bezier(0.4, 0, 0);"
+                    )?;
+                    indent(indentation, buffer)?;
+                    writeln!(buffer, "transition-duration: 150ms;")?;
+                }
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "transition-property: {value};")?,
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct DurationPlugin;
 
 impl Plugin for DurationPlugin {
@@ -69,31 +123,31 @@ impl Plugin for DurationPlugin {
         "duration"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_time(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
+            Modifier::Arbitrary { value, .. } => is_matching_time(value),
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "transition-duration: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(duration) = modifier.to_usize() {
-            self.css_template_value(&format!("{duration}ms"), css_content)
-        } else {
-            false
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "transition-duration: {value}ms;")?,
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "transition-duration: {value};")?,
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct DelayPlugin;
 
 impl Plugin for DelayPlugin {
@@ -101,31 +155,31 @@ impl Plugin for DelayPlugin {
         "delay"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_time(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
+            Modifier::Arbitrary { value, .. } => is_matching_time(value),
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "transition-delay: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(delay) = modifier.to_usize() {
-            self.css_template_value(&format!("{delay}ms"), css_content)
-        } else {
-            false
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "transition-delay: {value}ms;")?,
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "transition-delay: {value};")?,
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct EasePlugin;
 
 impl Plugin for EasePlugin {
@@ -133,32 +187,47 @@ impl Plugin for EasePlugin {
         "ease"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_all(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
+            Modifier::Arbitrary { value, .. } => is_matching_all(value), // TODO: Better matching
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "transition-timing-function: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "linear" => self.css_template_value("linear", css_content),
-            "in" => self.css_template_value("cubic-bezier(0.4, 0, 1, 1)", css_content),
-            "out" => self.css_template_value("cubic-bezier(0, 0, 0.2, 1)", css_content),
-            "in-out" => self.css_template_value("cubic-bezier(0.4, 0, 0.2, 1)", css_content),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "linear" => writeln!(buffer, "transition-timing-function: linear;")?,
+                "in" => writeln!(
+                    buffer,
+                    "transition-timing-function: cubic-bezier(0.4, 0, 1, 1);"
+                )?,
+                "out" => writeln!(
+                    buffer,
+                    "transition-timing-function: cubic-bezier(0, 0, 0.2, 1);"
+                )?,
+                "in-out" => writeln!(
+                    buffer,
+                    "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"
+                )?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "transition-timing-function: {value};")?
+            }
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct AnimatePlugin {
     is_spin_animation_already_defined: AtomicBool,
     is_ping_animation_already_defined: AtomicBool,
@@ -188,37 +257,18 @@ impl Plugin for AnimatePlugin {
         "animate"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_all(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(
-            css_content,
-            "-webkit-animation: bounce 1s infinite;
-        animation: {val};"
-        )
-        .is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        custom_css: &mut String,
-    ) -> bool {
-        println!("{}", modifier);
-        match modifier.content() {
-            "none" => self.css_template_value("none", css_content),
-            "spin" => {
-                if !self
-                    .is_spin_animation_already_defined
-                    .swap(true, Ordering::Relaxed)
-                {
-                    write!(
-                        custom_css,
-                        "@-webkit-keyframes spin {{
+    fn css_before_rule(&self, modifier: &Modifier, buffer: &mut String) -> fmt::Result {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                match value.as_str() {
+                    "spin" => {
+                        if !self
+                            .is_spin_animation_already_defined
+                            .swap(true, Ordering::Relaxed)
+                        {
+                            writeln!(
+                                buffer,
+                                "@-webkit-keyframes spin {{
   to {{
     transform: rotate(360deg);
   }}
@@ -231,23 +281,18 @@ impl Plugin for AnimatePlugin {
   to {{
     transform: rotate(360deg);
   }}
-}}
-
-"
-                    )
-                    .unwrap();
-                }
-
-                self.css_template_value("spin 1s linear infinite", css_content)
-            }
-            "ping" => {
-                if !self
-                    .is_ping_animation_already_defined
-                    .swap(true, Ordering::Relaxed)
-                {
-                    write!(
-                        custom_css,
-                        "@-webkit-keyframes ping {{
+}}\n"
+                            )?;
+                        }
+                    }
+                    "ping" => {
+                        if !self
+                            .is_ping_animation_already_defined
+                            .swap(true, Ordering::Relaxed)
+                        {
+                            writeln!(
+                                buffer,
+                                "@-webkit-keyframes ping {{
   75%, 100% {{
     transform: scale(2);
     opacity: 0;
@@ -259,23 +304,18 @@ impl Plugin for AnimatePlugin {
     transform: scale(2);
     opacity: 0;
   }}
-}}
-
-"
-                    )
-                    .unwrap();
-                }
-
-                self.css_template_value("ping 1s cubic-bezier(0, 0, 0.2, 1) infinite", css_content)
-            }
-            "pulse" => {
-                if !self
-                    .is_pulse_animation_already_defined
-                    .swap(true, Ordering::Relaxed)
-                {
-                    write!(
-                        custom_css,
-                        "@-webkit-keyframes pulse {{
+}}\n"
+                            )?;
+                        }
+                    }
+                    "pulse" => {
+                        if !self
+                            .is_pulse_animation_already_defined
+                            .swap(true, Ordering::Relaxed)
+                        {
+                            writeln!(
+                                buffer,
+                                "@-webkit-keyframes pulse {{
   50% {{
     opacity: .5;
   }}
@@ -288,36 +328,28 @@ impl Plugin for AnimatePlugin {
   50% {{
     opacity: .5;
   }}
-}}
-
-"
-                    )
-                    .unwrap();
-                }
-
-                self.css_template_value(
-                    "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-                    css_content,
-                )
-            }
-            "bounce" => {
-                if !self
-                    .is_bounce_animation_already_defined
-                    .swap(true, Ordering::Relaxed)
-                {
-                    write!(
-                        custom_css,
-                        "@-webkit-keyframes bounce {{
+}}\n"
+                            )?;
+                        }
+                    }
+                    "bounce" => {
+                        if !self
+                            .is_bounce_animation_already_defined
+                            .swap(true, Ordering::Relaxed)
+                        {
+                            writeln!(
+                                buffer,
+                                "@-webkit-keyframes bounce {{
   0%, 100% {{
     transform: translateY(-25%);
     -webkit-animation-timing-function: cubic-bezier(0.8,0,1,1);
-            animation-timing-function: cubic-bezier(0.8,0,1,1);
+    animation-timing-function: cubic-bezier(0.8,0,1,1);
   }}
 
   50% {{
     transform: none;
     -webkit-animation-timing-function: cubic-bezier(0,0,0.2,1);
-            animation-timing-function: cubic-bezier(0,0,0.2,1);
+    animation-timing-function: cubic-bezier(0,0,0.2,1);
   }}
 }}
 
@@ -325,23 +357,66 @@ impl Plugin for AnimatePlugin {
   0%, 100% {{
     transform: translateY(-25%);
     -webkit-animation-timing-function: cubic-bezier(0.8,0,1,1);
-            animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
   }}
   50% {{
     transform: translateY(0);
     -webkit-animation-timing-function: cubic-bezier(0,0,0.2,1);
-            animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
   }}
-}}
-
-"
-                    )
-                    .unwrap();
-                }
-
-                self.css_template_value("bounce 1s infinite", css_content)
+}}\n"
+                            )?;
+                        }
+                    }
+                    _ => unreachable!(),
+                };
             }
-            _ => false,
+            Modifier::Arbitrary { .. } => (),
         }
+
+        Ok(())
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["spin", "ping", "pulse", "bounce", "none"].contains(&value.as_str())
+            }
+            Modifier::Arbitrary { value, .. } => is_matching_all(value),
+        }
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                let animation = match value.as_str() {
+                    "none" => "none",
+                    "spin" => "spin 1s linear infinite",
+                    "ping" => "ping 1s cubic-bezier(0, 0, 0.2, 1) infinite",
+                    "pulse" => "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+                    "bounce" => "bounce 1s infinite",
+                    _ => unreachable!(),
+                };
+
+                indent(indentation, buffer)?;
+                writeln!(buffer, "-webkit-animation: {animation};")?;
+                indent(indentation, buffer)?;
+                writeln!(buffer, "animation: {animation};")?;
+            }
+            Modifier::Arbitrary { value, .. } => {
+                indent(indentation, buffer)?;
+                writeln!(buffer, "-webkit-animation: {value};")?;
+                indent(indentation, buffer)?;
+                writeln!(buffer, "animation: {value};")?;
+            }
+        }
+
+        Ok(())
     }
 }

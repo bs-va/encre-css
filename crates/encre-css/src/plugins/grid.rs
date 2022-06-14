@@ -1,10 +1,9 @@
 use super::Plugin;
-use crate::utils::{default_lengths, value_matchers::*};
+use crate::utils::{default_lengths, indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use std::fmt::Write;
+use std::fmt::{self, Write};
 
-#[derive(Debug)]
 pub struct ColumnsPlugin;
 
 impl Plugin for ColumnsPlugin {
@@ -12,35 +11,43 @@ impl Plugin for ColumnsPlugin {
         "grid-cols"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_all(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok() || value == "none",
+            Modifier::Arbitrary { value, .. } => is_matching_all(value), // TODO: Better matching
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "grid-template-columns: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is("none") {
-            return self.css_template_value("none", css_content);
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                if value == "none" {
+                    return writeln!(buffer, "grid-template-columns: none;");
+                }
+
+                // NOTE: Not-compatible with TailwindCSS, support all values
+                writeln!(
+                    buffer,
+                    "grid-template-columns: repeat({}, minmax(0, 1fr));",
+                    value.parse::<usize>().unwrap(),
+                )?;
+            }
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "grid-template-columns: {value};")?
+            }
         }
 
-        // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(num_cols) = modifier.to_usize() {
-            self.css_template_value(&format!("repeat({num_cols}, minmax(0, 1fr))"), css_content)
-        } else {
-            false
-        }
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct RowsPlugin;
 
 impl Plugin for RowsPlugin {
@@ -48,35 +55,41 @@ impl Plugin for RowsPlugin {
         "grid-rows"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_all(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok() || value == "none",
+            Modifier::Arbitrary { value, .. } => is_matching_all(value), // TODO: Better matching
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "grid-template-rows: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is("none") {
-            return self.css_template_value("none", css_content);
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                if value == "none" {
+                    return writeln!(buffer, "grid-template-rows: none;");
+                }
+
+                // NOTE: Not-compatible with TailwindCSS, support all values
+                writeln!(
+                    buffer,
+                    "grid-template-rows: repeat({}, minmax(0, 1fr));",
+                    value.parse::<usize>().unwrap(),
+                )?;
+            }
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "grid-template-rows: {value};")?,
         }
 
-        // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(num_cols) = modifier.to_usize() {
-            self.css_template_value(&format!("repeat({num_cols}, minmax(0, 1fr))"), css_content)
-        } else {
-            false
-        }
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct StartEndSpanColumnPlugin;
 
 impl Plugin for StartEndSpanColumnPlugin {
@@ -84,62 +97,71 @@ impl Plugin for StartEndSpanColumnPlugin {
         "col"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_all(val)
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                value == "auto"
+                    || value
+                        .strip_prefix(&format!("span{}", config.modifier_separator))
+                        .map(|v| v == "full" || v.parse::<usize>().is_ok())
+                        .unwrap_or(false)
+                    || value
+                        .strip_prefix(&format!("start{}", config.modifier_separator))
+                        .map(|v| v == "auto" || v.parse::<usize>().is_ok())
+                        .unwrap_or(false)
+                    || value
+                        .strip_prefix(&format!("end{}", config.modifier_separator))
+                        .map(|v| v == "auto" || v.parse::<usize>().is_ok())
+                        .unwrap_or(false)
+            }
+            Modifier::Arbitrary { value, .. } => is_matching_all(value), // TODO: Better matching
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "grid-column: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is("auto") {
-            return self.css_template_value("auto", css_content);
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                if value == "auto" {
+                    return writeln!(buffer, "grid-column: auto;");
+                }
+
+                if let Some(value) = value.strip_prefix("span-") {
+                    if value == "full" {
+                        return writeln!(buffer, "grid-column: 1 / -1;");
+                    }
+
+                    // NOTE: Not-compatible with TailwindCSS, support all values
+                    writeln!(buffer, "grid-column: span {value} / span {value};")?;
+                } else if let Some(value) = value.strip_prefix("start-") {
+                    if value == "auto" {
+                        return writeln!(buffer, "grid-column-start: auto;");
+                    }
+
+                    // NOTE: Not-compatible with TailwindCSS, support all values
+                    writeln!(buffer, "grid-column-start: {value};")?;
+                } else if let Some(value) = value.strip_prefix("end-") {
+                    if value == "auto" {
+                        return writeln!(buffer, "grid-column-end: auto;");
+                    }
+
+                    // NOTE: Not-compatible with TailwindCSS, support all values
+                    writeln!(buffer, "grid-column-end: {value};")?;
+                }
+            }
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "grid-column: {value};")?,
         }
 
-        if let Some(val) = modifier.strip_prefix("span-") {
-            if val == "full" {
-                return self.css_template_value("1 / -1", css_content);
-            }
-
-            // NOTE: Not-compatible with TailwindCSS, support all values
-            if let Ok(span_num) = val.parse::<usize>() {
-                return self.css_template_value(
-                    &format!("span {span_num} / span {span_num}"),
-                    css_content,
-                );
-            }
-        } else if let Some(val) = modifier.strip_prefix("start-") {
-            if val == "auto" {
-                return write!(css_content, "grid-column-start: auto;").is_ok();
-            }
-
-            // NOTE: Not-compatible with TailwindCSS, support all values
-            if val.parse::<usize>().is_ok() {
-                return write!(css_content, "grid-column-start: {val};").is_ok();
-            }
-        } else if let Some(val) = modifier.strip_prefix("end-") {
-            if val == "auto" {
-                return write!(css_content, "grid-column-end: auto;").is_ok();
-            }
-
-            // NOTE: Not-compatible with TailwindCSS, support all values
-            if val.parse::<usize>().is_ok() {
-                return write!(css_content, "grid-column-end: {val};").is_ok();
-            }
-        }
-
-        false
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct StartEndSpanRowPlugin;
 
 impl Plugin for StartEndSpanRowPlugin {
@@ -147,62 +169,71 @@ impl Plugin for StartEndSpanRowPlugin {
         "row"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_all(val)
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                value == "auto"
+                    || value
+                        .strip_prefix(&format!("span{}", config.modifier_separator))
+                        .map(|v| v == "full" || v.parse::<usize>().is_ok())
+                        .unwrap_or(false)
+                    || value
+                        .strip_prefix(&format!("start{}", config.modifier_separator))
+                        .map(|v| v == "auto" || v.parse::<usize>().is_ok())
+                        .unwrap_or(false)
+                    || value
+                        .strip_prefix(&format!("end{}", config.modifier_separator))
+                        .map(|v| v == "auto" || v.parse::<usize>().is_ok())
+                        .unwrap_or(false)
+            }
+            Modifier::Arbitrary { value, .. } => is_matching_all(value), // TODO: Better matching
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "grid-row: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is("auto") {
-            return self.css_template_value("auto", css_content);
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                if value == "auto" {
+                    return writeln!(buffer, "grid-row: auto;");
+                }
+
+                if let Some(value) = value.strip_prefix("span-") {
+                    if value == "full" {
+                        return writeln!(buffer, "grid-row: 1 / -1;");
+                    }
+
+                    // NOTE: Not-compatible with TailwindCSS, support all values
+                    writeln!(buffer, "grid-row: span {value} / span {value};")?;
+                } else if let Some(value) = value.strip_prefix("start-") {
+                    if value == "auto" {
+                        return writeln!(buffer, "grid-row-start: auto;");
+                    }
+
+                    // NOTE: Not-compatible with TailwindCSS, support all values
+                    writeln!(buffer, "grid-row-start: {value};")?;
+                } else if let Some(value) = value.strip_prefix("end-") {
+                    if value == "auto" {
+                        return writeln!(buffer, "grid-row-end: auto;");
+                    }
+
+                    // NOTE: Not-compatible with TailwindCSS, support all values
+                    writeln!(buffer, "grid-row-end: {value};")?;
+                }
+            }
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "grid-row: {value};")?,
         }
 
-        if let Some(val) = modifier.strip_prefix("span-") {
-            if val == "full" {
-                return self.css_template_value("1 / -1", css_content);
-            }
-
-            // NOTE: Not-compatible with TailwindCSS, support all values
-            if let Ok(span_num) = val.parse::<usize>() {
-                return self.css_template_value(
-                    &format!("span {span_num} / span {span_num}"),
-                    css_content,
-                );
-            }
-        } else if let Some(val) = modifier.strip_prefix("start-") {
-            if val == "auto" {
-                return write!(css_content, "grid-row-start: auto;").is_ok();
-            }
-
-            // NOTE: Not-compatible with TailwindCSS, support all values
-            if val.parse::<usize>().is_ok() {
-                return write!(css_content, "grid-row-start: {val};").is_ok();
-            }
-        } else if let Some(val) = modifier.strip_prefix("end-") {
-            if val == "auto" {
-                return write!(css_content, "grid-row-end: auto;").is_ok();
-            }
-
-            // NOTE: Not-compatible with TailwindCSS, support all values
-            if val.parse::<usize>().is_ok() {
-                return write!(css_content, "grid-row-end: {val};").is_ok();
-            }
-        }
-
-        false
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct AutoFlowPlugin;
 
 impl Plugin for AutoFlowPlugin {
@@ -210,24 +241,38 @@ impl Plugin for AutoFlowPlugin {
         "grid-flow"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["row", "col", "row-dense", "col-dense"].contains(&&**value)
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "row" => write!(css_content, "grid-auto-flow: row;").is_ok(),
-            "col" => write!(css_content, "grid-auto-flow: column;").is_ok(),
-            "row-dense" => write!(css_content, "grid-auto-flow: row dense;").is_ok(),
-            "col-dense" => write!(css_content, "grid-auto-flow: column dense;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "row" => writeln!(buffer, "grid-auto-flow: row;")?,
+                "col" => writeln!(buffer, "grid-auto-flow: column;")?,
+                "row-dense" => writeln!(buffer, "grid-auto-flow: row dense;")?,
+                "col-dense" => writeln!(buffer, "grid-auto-flow: column dense;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct AutoColumnsPlugin;
 
 impl Plugin for AutoColumnsPlugin {
@@ -235,32 +280,36 @@ impl Plugin for AutoColumnsPlugin {
         "auto-cols"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_all(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["auto", "min", "max", "fr"].contains(&&**value),
+            Modifier::Arbitrary { value, .. } => is_matching_all(value), // TODO: Better matching
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "grid-auto-columns: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "auto" => self.css_template_value("auto", css_content),
-            "min" => self.css_template_value("min-content", css_content),
-            "max" => self.css_template_value("max-content", css_content),
-            "fr" => self.css_template_value("minmax(0, 1fr)", css_content),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "auto" => writeln!(buffer, "grid-auto-columns: auto;")?,
+                "min" => writeln!(buffer, "grid-auto-columns: min-content;")?,
+                "max" => writeln!(buffer, "grid-auto-columns: max-content;")?,
+                "fr" => writeln!(buffer, "grid-auto-columns: minmax(0, 1fr);")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "grid-auto-columns: {value};")?,
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct AutoRowsPlugin;
 
 impl Plugin for AutoRowsPlugin {
@@ -268,32 +317,36 @@ impl Plugin for AutoRowsPlugin {
         "auto-rows"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_all(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["auto", "min", "max", "fr"].contains(&&**value),
+            Modifier::Arbitrary { value, .. } => is_matching_all(value), // TODO: Better matching
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "grid-auto-rows: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "auto" => self.css_template_value("auto", css_content),
-            "min" => self.css_template_value("min-content", css_content),
-            "max" => self.css_template_value("max-content", css_content),
-            "fr" => self.css_template_value("minmax(0, 1fr)", css_content),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "auto" => writeln!(buffer, "grid-auto-rows: auto;")?,
+                "min" => writeln!(buffer, "grid-auto-rows: min-content;")?,
+                "max" => writeln!(buffer, "grid-auto-rows: max-content;")?,
+                "fr" => writeln!(buffer, "grid-auto-rows: minmax(0, 1fr);")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "grid-auto-rows: {value};")?,
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct GapPlugin;
 
 impl Plugin for GapPlugin {
@@ -301,31 +354,36 @@ impl Plugin for GapPlugin {
         "gap"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { is_negative, value } => {
+                default_lengths::get_basic(value, *is_negative).is_some()
+            }
+            Modifier::Arbitrary { value, .. } => is_matching_length(value),
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "gap: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { is_negative, value } => writeln!(
+                buffer,
+                "gap: {};",
+                default_lengths::get_basic(value, *is_negative).unwrap()
+            )?,
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "gap: {value};")?,
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct GapXPlugin;
 
 impl Plugin for GapXPlugin {
@@ -333,31 +391,36 @@ impl Plugin for GapXPlugin {
         "gap-x"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { is_negative, value } => {
+                default_lengths::get_basic(value, *is_negative).is_some()
+            }
+            Modifier::Arbitrary { value, .. } => is_matching_length(value),
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "column-gap: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { is_negative, value } => writeln!(
+                buffer,
+                "column-gap: {};",
+                default_lengths::get_basic(value, *is_negative).unwrap()
+            )?,
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "column-gap: {value};")?,
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct GapYPlugin;
 
 impl Plugin for GapYPlugin {
@@ -365,26 +428,32 @@ impl Plugin for GapYPlugin {
         "gap-y"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { is_negative, value } => {
+                default_lengths::get_basic(value, *is_negative).is_some()
+            }
+            Modifier::Arbitrary { value, .. } => is_matching_length(value),
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "row-gap: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { is_negative, value } => writeln!(
+                buffer,
+                "row-gap: {};",
+                default_lengths::get_basic(value, *is_negative).unwrap()
+            )?,
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "row-gap: {value};")?,
         }
+
+        Ok(())
     }
 }

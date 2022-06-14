@@ -1,4 +1,4 @@
-use std::{path::PathBuf, num::ParseIntError};
+use std::{num::ParseIntError, path::PathBuf, fmt};
 use thiserror::Error as ErrorTrait;
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -13,4 +13,7 @@ pub enum Error {
 
     #[error("error when converting the hexadecimal color `{0}` to rgb: {1:?}")]
     HexToRgbConversion(String, ParseIntError),
+
+    #[error("error when formatting: {0:?}")]
+    Format(#[from] fmt::Error),
 }

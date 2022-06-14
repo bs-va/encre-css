@@ -7,13 +7,13 @@ use crate::selector::Selector;
 
 impl PartialOrd for Selector {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        if self.variants.is_none() && other.variants.is_some() {
-            Some(Ordering::Less)
+        Some(if self.variants.is_none() && other.variants.is_some() {
+            Ordering::Less
         } else if self.variants.is_some() && other.variants.is_none() {
-            Some(Ordering::Greater)
+            Ordering::Greater
         } else {
-            Some(self.full_name.cmp(&other.full_name))
-        }
+            self.full.cmp(&other.full)
+        })
     }
 }
 
@@ -24,7 +24,7 @@ impl Ord for Selector {
         } else if self.variants.is_some() && other.variants.is_none() {
             Ordering::Greater
         } else {
-            self.full_name.cmp(&other.full_name)
+            self.full.cmp(&other.full)
         }
     }
 }
@@ -41,6 +41,12 @@ mod tests {
         selectors.insert(Selector::new("lg:bg-red-500"));
         selectors.insert(Selector::new("bg-red-500"));
 
-        assert_eq!(selectors.iter().collect::<Vec<&Selector>>(), vec![&Selector::new("bg-red-500"), &Selector::new("lg:bg-red-500")]);
+        assert_eq!(
+            selectors.iter().collect::<Vec<&Selector>>(),
+            vec![
+                &Selector::new("bg-red-500"),
+                &Selector::new("lg:bg-red-500")
+            ]
+        );
     }
 }

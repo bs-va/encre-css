@@ -1,4 +1,7 @@
-use crate::{error::{Result, Error}, config::Config};
+use crate::{
+    config::Config,
+    error::{Error, Result},
+};
 
 use lazy_static::lazy_static;
 use regex::Regex;
@@ -18,33 +21,44 @@ pub fn hex_to_rgb(hex: &str) -> Result<[u8; 3]> {
 
     // Support the hexadecimal shorthand
     let hex = if hex.len() == 3 {
-        hex.chars().map(|ch| ch.to_string().repeat(2).to_lowercase()).collect::<String>()
+        hex.chars()
+            .map(|ch| ch.to_string().repeat(2).to_lowercase())
+            .collect::<String>()
     } else {
         hex.to_lowercase()
     };
 
     // TODO: Handle errors
-    let r = u8::from_str_radix(&hex[0..2], 16).map_err(|e| Error::HexToRgbConversion(hex[0..2].to_string(), e))?;
-    let g = u8::from_str_radix(&hex[2..4], 16).map_err(|e| Error::HexToRgbConversion(hex[2..4].to_string(), e))?;
-    let b = u8::from_str_radix(&hex[4..6], 16).map_err(|e| Error::HexToRgbConversion(hex[4..6].to_string(), e))?;
+    let r = u8::from_str_radix(&hex[0..2], 16)
+        .map_err(|e| Error::HexToRgbConversion(hex[0..2].to_string(), e))?;
+    let g = u8::from_str_radix(&hex[2..4], 16)
+        .map_err(|e| Error::HexToRgbConversion(hex[2..4].to_string(), e))?;
+    let b = u8::from_str_radix(&hex[4..6], 16)
+        .map_err(|e| Error::HexToRgbConversion(hex[4..6].to_string(), e))?;
 
     Ok([r, g, b])
 }
 
 /// Get a color from a modifier
 pub fn get<'a>(config: &Config, modifier: &'a str) -> Option<Cow<'a, str>> {
+    let modifier = if &**config.modifier_separator != "-" {
+        Cow::from(modifier.replace(&**config.modifier_separator, "-"))
+    } else {
+        Cow::from(modifier)
+    };
+
     // Handle the new opacity syntax (e.g. `bg-red-500/25`)
     let (mut opacity, modifier) =
-        if let Some(opacity_suffix) = OPACITY_SUFFIX_REGEX.captures(modifier) {
-            let new_modifier = &OPACITY_SUFFIX_REGEX.replace(modifier, "");
+        if let Some(opacity_suffix) = OPACITY_SUFFIX_REGEX.captures(&modifier) {
+            let new_modifier = &OPACITY_SUFFIX_REGEX.replace(&modifier, "");
             (
                 Some(
                     opacity_suffix
                         .get(1)
                         .unwrap()
                         .as_str()
-                        .parse::<f32>()
-                        .unwrap()
+                        .parse::<usize>()
+                        .unwrap() as f32
                         / 100.,
                 ),
                 new_modifier.clone(),
@@ -57,7 +71,7 @@ pub fn get<'a>(config: &Config, modifier: &'a str) -> Option<Cow<'a, str>> {
                 return Some(Cow::from("inherit"));
             }
 
-            (None, Cow::from(modifier))
+            (None, modifier)
         };
 
     let rgb_result = if modifier == "transparent" {
@@ -95,7 +109,7 @@ pub fn get<'a>(config: &Config, modifier: &'a str) -> Option<Cow<'a, str>> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn hex_to_rgb_test() {
         assert_eq!(hex_to_rgb(&Cow::from("#ff0000")).unwrap(), [255, 0, 0]);

@@ -3,15 +3,19 @@ use crate::{
     extractor::Extractor,
     plugins::*,
     preflight::ENCRE_PREFLIGHT_CSS,
-    selector::Selector,
+    selector::{Modifier, Selector},
+    utils::indent,
     variant::{init_variants, Variant},
+    error::{Result, Error},
 };
 
 use lazy_static::lazy_static;
 use regex::{Captures, Regex};
+use smol_str::SmolStr;
 use std::{
     borrow::Cow,
     collections::{BTreeMap, BTreeSet},
+    fmt::Write,
     path::Path,
     sync::Arc,
 };
@@ -26,71 +30,35 @@ lazy_static! {
 }
 
 pub const VALID_PLUGIN_HINT: [&str; 4] = ["color", "length", "angle", "list"];
-const WILL_BE_REPLACED_BY_CSS_SELECTOR: &str = "WILL_BE_REPLACED_BY_CSS_SELECTOR";
 const WILL_BE_REPLACED_BY_UNDERSCORE: &str = "WILL-BE-REPLACED-BY-UNDERSCORE";
-
-pub fn indent(val: Cow<str>) -> String {
-    val.replace('\n', "\n  ")
-}
-
-pub fn find_arbitrary_value_hint(selector: Option<&String>) -> Option<(&str, &str)> {
-    if let Some(arbitrary_value) = selector {
-        let mut split = arbitrary_value.split(':');
-        let maybe_hint = split.next().unwrap();
-
-        if maybe_hint == arbitrary_value.as_str() {
-            // No plugin hint
-            Some(("", arbitrary_value))
-        } else {
-            let val = split.next();
-
-            if let Some(val) = val {
-                if VALID_PLUGIN_HINT.contains(&maybe_hint) {
-                    // Valid! Return (hint, stripped arbitrary value)
-                    Some((maybe_hint, val))
-                } else {
-                    // Unknown plugin hint (like `bg-[sth:#333]`)
-                    // TODO: Display a warning
-                    Some(("", val))
-                }
-            } else {
-                // Malformed arbitrary value (like just `bg-[color:]`)
-                // TODO: Display a warning
-                Some(("", maybe_hint))
-            }
-        }
-    } else {
-        None
-    }
-}
 
 /// Convert an arbitrary value into a CSS value
 ///
 ///  -  `_` (underscores) are converted to ` ` (spaces) (not in `url`s)
-pub fn to_css_value(val: &str) -> Cow<str> {
+pub fn to_css_value(value: &str) -> SmolStr {
     // Don't replace `_` if it is a URL
-    let val = if val.contains("url") {
+    let value = if value.contains("url") {
         // If the value contains an url, it won't contain a calculation, so we can safely return here
-        URL_REGEX.replace(val, |caps: &Captures| {
+        URL_REGEX.replace(value, |caps: &Captures| {
             format!(
                 "url({})",
                 caps[1].replace('_', WILL_BE_REPLACED_BY_UNDERSCORE)
             )
         })
     } else {
-        Cow::from(val)
+        Cow::from(value)
     };
 
     // Don't replace `_` if prefixed by a `\`
-    let val = val
+    let value = value
         .replace("\\_", WILL_BE_REPLACED_BY_UNDERSCORE)
         .replace('_', " ")
         .replace(WILL_BE_REPLACED_BY_UNDERSCORE, "_");
 
-    if val.contains("calc") {
-        Cow::from(
+    if value.contains("calc") {
+        SmolStr::from(
             CALC_REGEX
-                .replace(&val, |caps: &Captures| {
+                .replace(&value, |caps: &Captures| {
                     format!(
                         "calc({})",
                         caps[1]
@@ -103,7 +71,7 @@ pub fn to_css_value(val: &str) -> Cow<str> {
                 .to_string(),
         )
     } else {
-        Cow::from(val)
+        SmolStr::from(value)
     }
 }
 
@@ -174,8 +142,6 @@ impl EncreGenerator {
     }
 
     /// Add a list of new selectors which will have their CSS generated
-    ///
-    /// This function automatically handles duplicated selectors
     pub fn add_selectors(&mut self, val: BTreeSet<Selector>) {
         self.scanned_selectors.extend(val);
     }
@@ -204,150 +170,137 @@ impl EncreGenerator {
     /// [scan_files]: EncreGenerator::scan_files
     /// [scan_raw]: EncreGenerator::scan_raw
     /// [add_selector]: EncreGenerator::add_selector
-    pub fn generate(&self) -> String {
+    pub fn generate(&self) -> Result<String> {
         debug!("Start generating CSS");
         let plugins = self.build_plugins();
 
-        #[cfg(target_arch = "wasm32")]
-        let iter = self.scanned_selectors.iter();
+        // TODO: Is parallelism possible without bad sorting of selectors?
+        let mut iter = self.scanned_selectors.iter();
 
-        #[cfg(not(target_arch = "wasm32"))]
-        let iter = self.scanned_selectors.par_iter();
+        let mut buffer = String::with_capacity(10 * self.scanned_selectors.len()); // TODO: More accurate value
+        buffer.push_str(ENCRE_PREFLIGHT_CSS); // TODO: Push and reserve at the same time
 
-        let result = iter
-            .filter_map(|selector| {
-                let arbitrary_value = selector.get_arbitrary_value();
-                self.get_css(selector, arbitrary_value, &plugins)
-            })
-            .collect::<String>();
+        iter.try_for_each(|selector| {
+            let mut not_found = true;
 
-        let result = format!("{}{}", ENCRE_PREFLIGHT_CSS, result.trim_end_matches('\n'));
-        debug!("Finished generating CSS");
-
-        result
-    }
-
-    /// Find the matching plugin for a selector and returns the CSS generated (if the resulting CSS is valid,
-    /// the plugin matches)
-    pub fn get_css(
-        &self,
-        selector: &Selector,
-        arbitrary_value: Option<(&str, &str)>,
-        plugins: &[Box<dyn Plugin + Sync>; 181],
-    ) -> Option<String> {
-        plugins.iter().find_map(|plugin| {
-            if selector.check_namespace(plugin.namespace()) {
-                let mut css_content = String::new();
-                let mut custom_css = String::new();
-
-                if plugin.get_css_for_modifier(
+            for plugin in &plugins {
+                if let Some(mut modifier) = selector.modifier(
                     &self.config,
-                    &selector.get_modifier(plugin.namespace()),
-                    &mut css_content,
-                    &mut custom_css,
+                    &plugin
+                        .namespace()
+                        .replace('-', &*self.config.modifier_separator),
                 ) {
-                    let result = format!("{}\n\n", self.gen_css_rule(selector, &css_content));
+                    if plugin.can_handle(&self.config, &modifier) {
+                        write!(buffer, "\n\n")?;
 
-                    return Some(if custom_css.is_empty() {
-                        result
-                    } else {
-                        format!("{}{}", custom_css, result)
-                    });
-                } else if let Some(arbitrary_value) = arbitrary_value {
-                    if plugin.is_matching_value(arbitrary_value.0, arbitrary_value.1)
-                        && plugin
-                            .css_template_value(&to_css_value(arbitrary_value.1), &mut css_content)
-                    {
-                        return Some(format!(
-                            "{}\n\n",
-                            self.gen_css_rule(selector, &css_content).as_str()
-                        ));
+                        plugin.css_before_rule(&modifier, &mut buffer)?;
+
+                        let mut indentation = 0;
+
+                        // Before rule
+                        if let Some(ref variants) = selector.variants {
+                            variants.iter().try_for_each(|variant| {
+                                if let Some(Variant::BeforeRule(variant)) =
+                                    self.variants.get(&Cow::from(variant))
+                                {
+                                    indent(indentation, &mut buffer)?;
+                                    writeln!(buffer, "{} {{", variant)?;
+                                    indentation += 1;
+                                }
+
+                                Ok::<(), Error>(())
+                            })?;
+                        }
+
+                        // Before class
+                        indent(indentation, &mut buffer)?;
+                        if let Some(ref variants) = selector.variants {
+                            // Variants are reversed to be compatible with TailwindCSS
+                            variants.iter().rev().try_for_each(|variant| {
+                                if let Some(Variant::BeforeClass(variant)) =
+                                    self.variants.get(&Cow::from(variant))
+                                {
+                                    write!(buffer, "{}", variant)?;
+                                }
+
+                                Ok::<(), Error>(())
+                            })?;
+                        }
+
+                        // Class
+                        write!(buffer, ".")?;
+
+                        selector.full.chars().enumerate().try_for_each(|(i, ch)| {
+                            if i == 0 {
+                                if ch.is_numeric() {
+                                    // CSS classes must not start with a number, we need to escape it
+                                    write!(buffer, "\\3")?;
+                                }
+
+                                write!(buffer, "{}", ch)?;
+                            } else if !ch.is_alphanumeric() && ch != '-' && ch != '_' {
+                                write!(buffer, "\\{}", ch)?;
+                            } else {
+                                write!(buffer, "{}", ch)?;
+                            }
+
+                            Ok::<(), Error>(())
+                        })?;
+
+                        // After class
+                        if let Some(ref variants) = selector.variants {
+                            // Variants are reversed to be compatible with TailwindCSS
+                            variants.iter().rev().try_for_each(|variant| {
+                                if let Some(Variant::AfterClass(variant)) =
+                                    self.variants.get(&Cow::from(variant))
+                                {
+                                    write!(buffer, "{}", variant)?;
+                                }
+
+                                Ok::<(), Error>(())
+                            })?;
+                        }
+
+                        writeln!(buffer, " {{")?;
+
+                        // Rule content
+                        if let Modifier::Arbitrary { ref mut value, .. } = modifier {
+                            // Transform the mangled CSS content of the selector into a real CSS rule
+                            *value = to_css_value(value);
+                        }
+
+                        // TODO: Support the important prefix
+                        plugin.handle(&self.config, &modifier, indentation + 1, &mut buffer)?;
+
+                        // After rule
+                        for i in (1..indentation + 1).rev() {
+                            indent(i, &mut buffer)?;
+                            writeln!(buffer, "}}")?;
+                        }
+
+                        write!(buffer, "}}")?;
+
+                        // The plugin is found, move on to the next selector
+                        not_found = false;
+                        break;
                     }
                 }
             }
-            None
-        })
-    }
 
-    /// Generate a complete CSS rule (with a class selector, a rule content and, if requested, some
-    /// pseudo-elements or `@media` queries)
-    pub fn gen_css_rule(&self, selector: &Selector, css_content: &str) -> String {
-        let mut css_selector = selector
-            .full_name
-            .chars()
-            .enumerate()
-            .map(|(i, ch)| {
-                if i == 0 {
-                    // A CSS class must start with a `.`
-                    let mut result = ".".to_string();
+            if not_found {
+                trace!("Plugin not found for handling `{}`", selector.full);
+            }
 
-                    if ch.is_numeric() {
-                        // CSS classes must not start with a number, we need to escape it
-                        result.push_str("\\3");
-                        result.push(ch);
-                        result
-                    } else {
-                        result.push(ch);
-                        result
-                    }
-                } else if !ch.is_alphanumeric() && ch != '-' && ch != '_' {
-                    format!("\\{}", ch)
-                } else {
-                    ch.to_string()
-                }
-            })
-            .collect::<String>();
+            Ok::<(), Error>(())
+        })?;
 
-        let css_content = if selector.is_important {
-            Cow::from(css_content.replace(';', " !important;"))
-        } else {
-            Cow::from(css_content)
-        };
+        debug!("Finished generating CSS");
 
-        let variants = selector.variants.as_ref();
-        if let Some(variants) = variants {
-            let rule = variants.iter().fold(
-                format!(
-                    "{} {{\n  {}\n}}",
-                    WILL_BE_REPLACED_BY_CSS_SELECTOR,
-                    indent(css_content),
-                ),
-                |acc, variant| {
-                    let right_variant = if let Some(result) = self.variants.get(variant.as_str()) {
-                        result
-                    } else {
-                        println!("Unknown variant: {}", variant);
-                        return acc;
-                    };
-
-                    match right_variant {
-                        Variant::PseudoClass(name) => {
-                            css_selector.push_str(&format!(":{}", name));
-                            acc
-                        }
-                        Variant::PseudoElement(name) => {
-                            css_selector.push_str(&format!("::{}", name));
-                            acc
-                        }
-                        Variant::WrapSelector(template) => {
-                            css_selector = template.replace('&', &css_selector);
-                            acc
-                        }
-                        Variant::AtRule(at_rule) => {
-                            format!("{} {{\n  {}\n}}", at_rule, indent(Cow::from(acc)),)
-                        }
-                    }
-                },
-            );
-
-            rule.replace(WILL_BE_REPLACED_BY_CSS_SELECTOR, &css_selector)
-        } else {
-            format!("{} {{\n  {}\n}}", css_selector, indent(css_content))
-        }
+        Ok(buffer)
     }
 
     /// Return the list of plugins needed
-    pub fn build_plugins(&self) -> [Box<dyn Plugin + Sync>; 181] {
+    pub fn build_plugins(&self) -> [Box<dyn Plugin + Send + Sync>; 206] {
         // TODO: Better sorting (colors and lengths after all the other utilities (because they have
         // hints))
         [
@@ -363,23 +316,23 @@ impl EncreGenerator {
             Box::new(background::RepeatPlugin),
             Box::new(background::SizePlugin),
             Box::new(border::ColorPlugin),
-            Box::new(border::RadiusPlugin),
+            Box::new(border::RadiusTopRightPlugin),
+            Box::new(border::RadiusTopLeftPlugin),
+            Box::new(border::RadiusBottomRightPlugin),
+            Box::new(border::RadiusBottomLeftPlugin),
             Box::new(border::RadiusTopPlugin),
             Box::new(border::RadiusBottomPlugin),
             Box::new(border::RadiusLeftPlugin),
             Box::new(border::RadiusRightPlugin),
-            Box::new(border::RadiusTopLeftPlugin),
-            Box::new(border::RadiusTopRightPlugin),
-            Box::new(border::RadiusBottomLeftPlugin),
-            Box::new(border::RadiusBottomRightPlugin),
+            Box::new(border::RadiusPlugin),
             Box::new(border::StylePlugin),
-            Box::new(border::WidthPlugin),
-            Box::new(border::WidthXPlugin),
-            Box::new(border::WidthYPlugin),
             Box::new(border::WidthTopPlugin),
             Box::new(border::WidthBottomPlugin),
             Box::new(border::WidthLeftPlugin),
             Box::new(border::WidthRightPlugin),
+            Box::new(border::WidthXPlugin),
+            Box::new(border::WidthYPlugin),
+            Box::new(border::WidthPlugin),
             Box::new(border::OpacityPlugin),
             Box::new(border::DivideColorPlugin),
             Box::new(border::DivideWidthXPlugin),
@@ -466,11 +419,6 @@ impl EncreGenerator {
             Box::new(alignment::PlaceContentPlugin),
             Box::new(alignment::PlaceItemsPlugin),
             Box::new(alignment::PlaceSelfPlugin),
-            Box::new(effect::MixBlendModePlugin),
-            Box::new(effect::OpacityPlugin),
-            Box::new(effect::BackgroundBlendModePlugin),
-            Box::new(effect::BoxShadowPlugin),
-            Box::new(effect::BoxShadowColorPlugin),
             Box::new(transition::DurationPlugin),
             Box::new(transition::DelayPlugin),
             Box::new(transition::EasePlugin),
@@ -519,12 +467,43 @@ impl EncreGenerator {
             Box::new(table::BorderCollapsePlugin),
             Box::new(table::TableLayoutPlugin),
             Box::new(transform::OriginPlugin),
+            Box::new(transform::TranslateXPlugin),
+            Box::new(transform::TranslateYPlugin),
+            Box::new(transform::RotatePlugin),
+            Box::new(transform::ScalePlugin),
+            Box::new(transform::ScaleXPlugin),
+            Box::new(transform::ScaleYPlugin),
+            Box::new(transform::SkewXPlugin),
+            Box::new(transform::SkewYPlugin),
+            Box::new(filter::FilterPlugin),
+            Box::new(filter::BlurPlugin),
+            Box::new(filter::BrightnessPlugin),
+            Box::new(filter::ContrastPlugin),
+            Box::new(filter::DropShadowPlugin),
+            Box::new(filter::GrayscalePlugin),
+            Box::new(filter::HueRotatePlugin),
+            Box::new(filter::InvertPlugin),
+            Box::new(filter::SaturatePlugin),
+            Box::new(filter::SepiaPlugin),
+            Box::new(filter::BackdropFilterPlugin),
+            Box::new(filter::BackdropBlurPlugin),
+            Box::new(filter::BackdropBrightnessPlugin),
+            Box::new(filter::BackdropContrastPlugin),
+            Box::new(filter::BackdropGrayscalePlugin),
+            Box::new(filter::BackdropHueRotatePlugin),
+            Box::new(filter::BackdropInvertPlugin),
+            Box::new(filter::BackdropOpacityPlugin),
+            Box::new(filter::BackdropSaturatePlugin),
+            Box::new(filter::BackdropSepiaPlugin),
+            Box::new(effect::MixBlendModePlugin),
+            Box::new(effect::OpacityPlugin),
+            Box::new(effect::BackgroundBlendModePlugin),
+            Box::new(effect::BoxShadowPlugin),
+            Box::new(effect::BoxShadowColorPlugin),
             // It is better to include the following plugins at the end because they match the "" namespace
             Box::new(layout::DisplayPlugin),
             Box::new(layout::PositionPlugin),
             Box::new(layout::VisibilityPlugin),
-            Box::new(filter::FilterPlugin),
-            Box::new(filter::BackdropFilterPlugin),
             Box::new(typography::TextTransformPlugin),
             Box::new(typography::ItalicPlugin),
             Box::new(typography::TextDecorationPlugin),
@@ -532,7 +511,6 @@ impl EncreGenerator {
             Box::new(typography::FontSmoothingPlugin),
             Box::new(typography::TextOverflowPlugin),
             Box::new(accessibility::ScreenReaderPlugin),
-            Box::new(transform::TranslateRotateScaleSkewPlugin),
         ]
     }
 

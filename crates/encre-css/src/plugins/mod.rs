@@ -20,7 +20,7 @@ pub mod transform;
 pub mod transition;
 pub mod typography;
 
-pub trait Plugin: fmt::Debug {
+pub trait Plugin {
     /// Returns the namespace containing the plugin
     ///
     /// By default, the plugin does not belong to a namespace
@@ -28,36 +28,24 @@ pub trait Plugin: fmt::Debug {
         ""
     }
 
-    /// Returns whether the plugin can handle a specific arbitrary value
+    /// Custom CSS written before the CSS rule
     ///
-    /// Used to distinguish plugins inside the same namespace
-    ///
-    /// By default, arbitrary values are disallowed
-    ///
-    /// The `hint` argument can be ignored, for example if the namespace contains a single plugin
-    fn is_matching_value(&self, _hint: &str, _val: &str) -> bool {
-        false
+    /// NOTE: The CSS must end with two newlines
+    fn css_before_rule(&self, _modifier: &Modifier, _buffer: &mut String) -> fmt::Result {
+        Ok(())
     }
 
-    /// Get the template for an arbitrary associated with the plugin
-    ///
-    /// Returns whether the function handled the modifier
-    ///
-    /// NOTE: This function is called after [to_css_value], so, `_` (underscores) are already converted to ` ` (spaces)
-    ///
-    /// [to_css_value]: crate::generator::to_css_value
-    fn css_template_value(&self, _val: &str, _css_content: &mut String) -> bool {
-        false
-    }
+    /// Returns whether the plugin can handle a specific modifier
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool;
 
     /// Get the CSS code from a modifier
     ///
-    /// Returns whether the function handled the modifier
-    fn get_css_for_modifier(
+    /// The CSS should end with a newline
+    fn handle(
         &self,
-        _config: &Config,
+        config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        custom_css: &mut String,
-    ) -> bool;
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result;
 }

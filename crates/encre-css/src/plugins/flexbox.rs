@@ -1,10 +1,9 @@
 use super::Plugin;
-use crate::utils::value_matchers::*;
+use crate::utils::{indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use std::fmt::Write;
+use std::fmt::{self, Write};
 
-#[derive(Debug)]
 pub struct OrderPlugin;
 
 impl Plugin for OrderPlugin {
@@ -12,38 +11,35 @@ impl Plugin for OrderPlugin {
         "order"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_number(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["first", "last", "none"].contains(&&**value),
+            Modifier::Arbitrary { value, .. } => is_matching_number(value),
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "order: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "first" => return self.css_template_value("-9999", css_content),
-            "last" => return self.css_template_value("9999", css_content),
-            "none" => return self.css_template_value("0", css_content),
-            _ => (),
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "first" => return writeln!(buffer, "order: -9999;"),
+                "last" => return writeln!(buffer, "order: 9999;"),
+                "none" => return writeln!(buffer, "order: 0;"),
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "order: {value};")?,
         }
 
-        // NOTE: Not-compatible with TailwindCSS, support all values
-        if modifier.to_f32().is_ok() {
-            self.css_template_value(&modifier.to_string(), css_content)
-        } else {
-            false
-        }
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct DirectionPlugin;
 
 impl Plugin for DirectionPlugin {
@@ -51,24 +47,38 @@ impl Plugin for DirectionPlugin {
         "flex"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["row", "row-reverse", "col", "col-reverse"].contains(&&**value)
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "row" => write!(css_content, "flex-direction: row;").is_ok(),
-            "row-reverse" => write!(css_content, "flex-direction: row-reverse;").is_ok(),
-            "col" => write!(css_content, "flex-direction: column;").is_ok(),
-            "col-reverse" => write!(css_content, "flex-direction: column-reverse;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "row" => writeln!(buffer, "flex-direction: row;")?,
+                "row-reverse" => writeln!(buffer, "flex-direction: row-reverse;")?,
+                "col" => writeln!(buffer, "flex-direction: column;")?,
+                "col-reverse" => writeln!(buffer, "flex-direction: column-reverse;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct WrapPlugin;
 
 impl Plugin for WrapPlugin {
@@ -76,23 +86,35 @@ impl Plugin for WrapPlugin {
         "flex"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["nowrap", "wrap", "wrap-reverse"].contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "nowrap" => write!(css_content, "flex-wrap: nowrap;").is_ok(),
-            "wrap" => write!(css_content, "flex-wrap: wrap;").is_ok(),
-            "wrap-reverse" => write!(css_content, "flex-wrap: wrap-reverse;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "nowrap" => writeln!(buffer, "flex-wrap: nowrap;")?,
+                "wrap" => writeln!(buffer, "flex-wrap: wrap;")?,
+                "wrap-reverse" => writeln!(buffer, "flex-wrap: wrap-reverse;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct GrowShrinkBasisPlugin;
 
 impl Plugin for GrowShrinkBasisPlugin {
@@ -100,62 +122,73 @@ impl Plugin for GrowShrinkBasisPlugin {
         "flex"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        if hint == "list" {
-            return true;
-        }
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => [
+                "1", "auto", "initial", "grow", "grow-0", "shrink", "shrink-0", "none",
+            ]
+            .contains(&&**value),
+            Modifier::Arbitrary { hint, value } => {
+                if hint == "list" {
+                    return true;
+                }
 
-        let mut split = val.split('_');
-        let mut is_matching = (false, false, false);
+                let mut split = value.split('_');
+                let mut is_matching = (false, false, false);
 
-        // flex-grow
-        // https://developer.mozilla.org/en-US/docs/Web/CSS/flex-grow#values
-        if let Some(val) = split.next() {
-            if is_matching_number(val) {
-                is_matching.0 = true;
+                // flex-grow
+                // https://developer.mozilla.org/en-US/docs/Web/CSS/flex-grow#values
+                if let Some(value) = split.next() {
+                    if is_matching_number(value) {
+                        is_matching.0 = true;
+                    }
+                }
+
+                // flex-shrink
+                // https://developer.mozilla.org/en-US/docs/Web/CSS/flex-shrink#values
+                if let Some(value) = split.next() {
+                    if is_matching_number(value) {
+                        is_matching.1 = true;
+                    }
+                }
+
+                // flex-basis
+                // https://developer.mozilla.org/en-US/docs/Web/CSS/flex-basis#values
+                if let Some(value) = split.next() {
+                    if is_matching_length(value) || is_matching_percentage(value) || value == "auto"
+                    {
+                        is_matching.2 = true;
+                    }
+                }
+
+                is_matching.0 && is_matching.1 && is_matching.2
             }
         }
-
-        // flex-shrink
-        // https://developer.mozilla.org/en-US/docs/Web/CSS/flex-shrink#values
-        if let Some(val) = split.next() {
-            if is_matching_number(val) {
-                is_matching.1 = true;
-            }
-        }
-
-        // flex-basis
-        // https://developer.mozilla.org/en-US/docs/Web/CSS/flex-basis#values
-        if let Some(val) = split.next() {
-            if is_matching_length(val) || is_matching_percentage(val) || val == "auto" {
-                is_matching.2 = true;
-            }
-        }
-
-        is_matching.0 && is_matching.1 && is_matching.2
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "flex: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "1" => self.css_template_value("1 1 0%", css_content),
-            "auto" => self.css_template_value("1 1 auto", css_content),
-            "initial" => self.css_template_value("0 1 auto", css_content),
-            "none" => self.css_template_value("none", css_content),
-            "grow" => write!(css_content, "flex-grow: 1;").is_ok(),
-            "grow-0" => write!(css_content, "flex-grow: 0;").is_ok(),
-            "shrink" => write!(css_content, "flex-shrink: 1;").is_ok(),
-            "shrink-0" => write!(css_content, "flex-shrink: 0;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "1" => writeln!(buffer, "flex: 1 1 0%;")?,
+                "auto" => writeln!(buffer, "flex: 1 1 auto;")?,
+                "initial" => writeln!(buffer, "flex: 0 1 auto;")?,
+                "none" => writeln!(buffer, "flex: none;")?,
+                "grow" => writeln!(buffer, "flex-grow: 1;")?,
+                "grow-0" => writeln!(buffer, "flex-grow: 0;")?,
+                "shrink" => writeln!(buffer, "flex-shrink: 1;")?,
+                "shrink-0" => writeln!(buffer, "flex-shrink: 0;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }

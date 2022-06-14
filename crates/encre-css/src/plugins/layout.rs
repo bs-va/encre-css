@@ -1,105 +1,213 @@
 use super::Plugin;
-use crate::utils::{default_lengths, value_matchers::*};
+use crate::utils::{default_lengths, indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use std::fmt::Write;
+use std::fmt::{self, Write};
 
-#[derive(Debug)]
 pub struct PositionPlugin;
 
 impl Plugin for PositionPlugin {
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["static", "fixed", "absolute", "relative", "sticky"].contains(&&**value)
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is_one_of(&["static", "fixed", "absolute", "relative", "sticky"]) {
-            write!(css_content, "position: {modifier};").is_ok()
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "position: {value};")?,
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct DisplayPlugin;
 
 impl Plugin for DisplayPlugin {
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => [
+                "hidden",
+                "contents",
+                "list-item",
+                "block",
+                "inline-block",
+                "flex",
+                "inline-flex",
+                "inline",
+                "table",
+                "inline-table",
+                "table-cell",
+                "table-caption",
+                "table-column",
+                "table-column-group",
+                "table-footer-group",
+                "table-header-group",
+                "table-row-group",
+                "table-row",
+                "flow-root",
+                "grid",
+                "inline-grid",
+            ]
+            .contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "hidden" => write!(css_content, "display: none;").is_ok(),
-            "contents" => write!(css_content, "display: contents;").is_ok(),
-            "list-item" => write!(css_content, "display: list-item;").is_ok(),
-            "block" => write!(css_content, "display: block;").is_ok(),
-            "inline-block" => write!(css_content, "display: inline-block;").is_ok(),
-            "flex" => write!(css_content, "display: flex;").is_ok(),
-            "inline-flex" => write!(css_content, "display: inline-flex;").is_ok(),
-            "inline" => write!(css_content, "display: inline;").is_ok(),
-            "table" => write!(css_content, "display: table;").is_ok(),
-            "inline-table" => write!(css_content, "display: inline-table;").is_ok(),
-            "table-cell" => write!(css_content, "display: table-cell;").is_ok(),
-            "table-caption" => write!(css_content, "display: table-caption;").is_ok(),
-            "table-column" => write!(css_content, "display: table-column;").is_ok(),
-            "table-column-group" => write!(css_content, "display: table-column-group;").is_ok(),
-            "table-footer-group" => write!(css_content, "display: table-footer-group;").is_ok(),
-            "table-header-group" => write!(css_content, "display: table-header-group;").is_ok(),
-            "table-row-group" => write!(css_content, "display: table-row-group;").is_ok(),
-            "table-row" => write!(css_content, "display: table-row;").is_ok(),
-            "flow-root" => write!(css_content, "display: flow-root;").is_ok(),
-            "grid" => write!(css_content, "display: grid;").is_ok(),
-            "inline-grid" => write!(css_content, "display: inline-grid;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "hidden" => writeln!(buffer, "display: none;")?,
+                "contents" => writeln!(buffer, "display: contents;")?,
+                "list-item" => writeln!(buffer, "display: list-item;")?,
+                "block" => writeln!(buffer, "display: block;")?,
+                "inline-block" => writeln!(buffer, "display: inline-block;")?,
+                "flex" => writeln!(buffer, "display: flex;")?,
+                "inline-flex" => writeln!(buffer, "display: inline-flex;")?,
+                "inline" => writeln!(buffer, "display: inline;")?,
+                "table" => writeln!(buffer, "display: table;")?,
+                "inline-table" => writeln!(buffer, "display: inline-table;")?,
+                "table-cell" => writeln!(buffer, "display: table-cell;")?,
+                "table-caption" => writeln!(buffer, "display: table-caption;")?,
+                "table-column" => writeln!(buffer, "display: table-column;")?,
+                "table-column-group" => writeln!(buffer, "display: table-column-group;")?,
+                "table-footer-group" => writeln!(buffer, "display: table-footer-group;")?,
+                "table-header-group" => writeln!(buffer, "display: table-header-group;")?,
+                "table-row-group" => writeln!(buffer, "display: table-row-group;")?,
+                "table-row" => writeln!(buffer, "display: table-row;")?,
+                "flow-root" => writeln!(buffer, "display: flow-root;")?,
+                "grid" => writeln!(buffer, "display: grid;")?,
+                "inline-grid" => writeln!(buffer, "display: inline-grid;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct VisibilityPlugin;
 
 impl Plugin for VisibilityPlugin {
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["visible", "invisible"].contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "visible" => write!(css_content, "visibility: visible;").is_ok(),
-            "invisible" => write!(css_content, "visibility: hidden;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "visible" => writeln!(buffer, "visibility: visible;")?,
+                "invisible" => writeln!(buffer, "visibility: hidden;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct IsolationPlugin;
 
 impl Plugin for IsolationPlugin {
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["isolate", "isolation-auto"].contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "isolate" => write!(css_content, "isolation: isolate;").is_ok(),
-            "isolation-auto" => write!(css_content, "isolation: auto;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "isolate" => writeln!(buffer, "isolation: isolate;")?,
+                "isolation-auto" => writeln!(buffer, "isolation: auto;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
+        }
+
+        Ok(())
+    }
+}
+
+pub fn position_can_handle(modifier: &Modifier) -> bool {
+    match modifier {
+        Modifier::Basic { is_negative, value } => {
+            default_lengths::get_extended(value, *is_negative).is_some()
+        }
+        Modifier::Arbitrary { value, .. } => {
+            is_matching_length(value) || is_matching_percentage(value) || value == "auto"
         }
     }
 }
 
-#[derive(Debug)]
+pub fn position_handle(
+    css_properties: &[&str],
+    modifier: &Modifier,
+    indentation: usize,
+    buffer: &mut String,
+) -> fmt::Result {
+    match modifier {
+        Modifier::Basic { is_negative, value } => {
+            for css_prop in css_properties {
+                indent(indentation, buffer)?;
+                writeln!(
+                    buffer,
+                    "{}: {};",
+                    css_prop,
+                    default_lengths::get_extended(value, *is_negative).unwrap(),
+                )?
+            }
+        }
+        Modifier::Arbitrary { value, .. } => {
+            for css_prop in css_properties {
+                indent(indentation, buffer)?;
+                writeln!(buffer, "{}: {};", css_prop, value)?;
+            }
+        }
+    }
+
+    Ok(())
+}
+
 pub struct InsetPlugin;
 
 impl Plugin for InsetPlugin {
@@ -107,39 +215,26 @@ impl Plugin for InsetPlugin {
         "inset"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val) || is_matching_percentage(val) || val == "auto"
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        position_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(
-            css_content,
-            "top: {val};
-right: {val};
-bottom: {val};
-left: {val};"
-        )
-        .is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) =
-            default_lengths::get_extended(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        position_handle(
+            &["top", "bottom", "left", "right"],
+            modifier,
+            indentation,
+            buffer,
+        )
     }
 }
 
-#[derive(Debug)]
 pub struct InsetXPlugin;
 
 impl Plugin for InsetXPlugin {
@@ -147,37 +242,21 @@ impl Plugin for InsetXPlugin {
         "inset-x"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val) || is_matching_percentage(val) || val == "auto"
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        position_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(
-            css_content,
-            "left: {val};
-right: {val};"
-        )
-        .is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) =
-            default_lengths::get_extended(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        position_handle(&["left", "right"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
 pub struct InsetYPlugin;
 
 impl Plugin for InsetYPlugin {
@@ -185,37 +264,21 @@ impl Plugin for InsetYPlugin {
         "inset-y"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val) || is_matching_percentage(val) || val == "auto"
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        position_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(
-            css_content,
-            "top: {val};
-bottom: {val};"
-        )
-        .is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) =
-            default_lengths::get_extended(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        position_handle(&["top", "bottom"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
 pub struct TopPlugin;
 
 impl Plugin for TopPlugin {
@@ -223,32 +286,21 @@ impl Plugin for TopPlugin {
         "top"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val) || is_matching_percentage(val) || val == "auto"
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        position_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "top: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) =
-            default_lengths::get_extended(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        position_handle(&["top"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
 pub struct BottomPlugin;
 
 impl Plugin for BottomPlugin {
@@ -256,32 +308,21 @@ impl Plugin for BottomPlugin {
         "bottom"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val) || is_matching_percentage(val) || val == "auto"
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        position_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "bottom: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) =
-            default_lengths::get_extended(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        position_handle(&["bottom"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
 pub struct LeftPlugin;
 
 impl Plugin for LeftPlugin {
@@ -289,32 +330,21 @@ impl Plugin for LeftPlugin {
         "left"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val) || is_matching_percentage(val) || val == "auto"
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        position_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "left: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) =
-            default_lengths::get_extended(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        position_handle(&["left"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
 pub struct RightPlugin;
 
 impl Plugin for RightPlugin {
@@ -322,32 +352,21 @@ impl Plugin for RightPlugin {
         "right"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_length(val) || is_matching_percentage(val) || val == "auto"
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        position_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "right: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) =
-            default_lengths::get_extended(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        position_handle(&["right"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
 pub struct ZIndexPlugin;
 
 impl Plugin for ZIndexPlugin {
@@ -355,23 +374,31 @@ impl Plugin for ZIndexPlugin {
         "z"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok() || value == "auto",
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        if modifier.to_f32().is_ok() || modifier.is("auto") {
-            write!(css_content, "z-index: {modifier};").is_ok()
-        } else {
-            false
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "z-index: {value};")?,
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct ContainerPlugin;
 
 impl Plugin for ContainerPlugin {
@@ -379,26 +406,40 @@ impl Plugin for ContainerPlugin {
         "container"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["sm", "md", "lg", "xl", "2xl", "none"].contains(&&**value)
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "none" => write!(css_content, "width: 100%;").is_ok(),
-            "sm" => write!(css_content, "max-width: 640px;").is_ok(),
-            "md" => write!(css_content, "max-width: 768px;").is_ok(),
-            "lg" => write!(css_content, "max-width: 1024px;").is_ok(),
-            "xl" => write!(css_content, "max-width: 1280px;").is_ok(),
-            "2xl" => write!(css_content, "max-width: 1536px;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "none" => writeln!(buffer, "width: 100%;")?,
+                "sm" => writeln!(buffer, "max-width: 640px;")?,
+                "md" => writeln!(buffer, "max-width: 768px;")?,
+                "lg" => writeln!(buffer, "max-width: 1024px;")?,
+                "xl" => writeln!(buffer, "max-width: 1280px;")?,
+                "2xl" => writeln!(buffer, "max-width: 1536px;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct BoxDecorationBreakPlugin;
 
 impl Plugin for BoxDecorationBreakPlugin {
@@ -406,22 +447,30 @@ impl Plugin for BoxDecorationBreakPlugin {
         "decoration"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["slice", "clone"].contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is_one_of(&["slice", "clone"]) {
-            write!(css_content, "box-decoration-break: {modifier};").is_ok()
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "box-decoration-break: {value};")?,
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct BoxSizingPlugin;
 
 impl Plugin for BoxSizingPlugin {
@@ -429,22 +478,30 @@ impl Plugin for BoxSizingPlugin {
         "box"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["border", "content"].contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is_one_of(&["border", "content"]) {
-            write!(css_content, "box-sizing: {modifier}-box;").is_ok()
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "box-sizing: {value}-box;")?,
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct FloatPlugin;
 
 impl Plugin for FloatPlugin {
@@ -452,22 +509,30 @@ impl Plugin for FloatPlugin {
         "float"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["left", "right", "none"].contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is_one_of(&["left", "right", "none"]) {
-            write!(css_content, "float: {modifier};").is_ok()
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "float: {value};")?,
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct ClearPlugin;
 
 impl Plugin for ClearPlugin {
@@ -475,22 +540,30 @@ impl Plugin for ClearPlugin {
         "clear"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["left", "right", "both", "none"].contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is_one_of(&["left", "right", "both", "none"]) {
-            write!(css_content, "clear: {modifier};").is_ok()
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "clear: {value};")?,
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct ObjectFitPlugin;
 
 impl Plugin for ObjectFitPlugin {
@@ -498,22 +571,32 @@ impl Plugin for ObjectFitPlugin {
         "object"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["contain", "cover", "fill", "scale-down", "none"].contains(&&**value)
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is_one_of(&["contain", "cover", "fill", "none", "scale-down"]) {
-            write!(css_content, "object-fit: {modifier};").is_ok()
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "object-fit: {value};")?,
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct ObjectPositionPlugin;
 
 impl Plugin for ObjectPositionPlugin {
@@ -521,37 +604,54 @@ impl Plugin for ObjectPositionPlugin {
         "object"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        val.split('_').all(is_matching_position)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => [
+                "bottom",
+                "center",
+                "left",
+                "left-bottom",
+                "left-top",
+                "right",
+                "right-bottom",
+                "right-top",
+                "top",
+            ]
+            .contains(&&**value),
+            Modifier::Arbitrary { hint, value } => {
+                hint == "list" || value.split('_').all(is_matching_position)
+            }
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "object-position: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "bottom" => self.css_template_value("bottom", css_content),
-            "center" => self.css_template_value("center", css_content),
-            "left" => self.css_template_value("left", css_content),
-            "left-bottom" => self.css_template_value("left bottom", css_content),
-            "left-top" => self.css_template_value("left top", css_content),
-            "right" => self.css_template_value("right", css_content),
-            "right-bottom" => self.css_template_value("right bottom", css_content),
-            "right-top" => self.css_template_value("right top", css_content),
-            "top" => self.css_template_value("top", css_content),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "bottom" => writeln!(buffer, "object-position: bottom;")?,
+                "center" => writeln!(buffer, "object-position: center;")?,
+                "left" => writeln!(buffer, "object-position: left;")?,
+                "left-bottom" => writeln!(buffer, "object-position: left bottom;")?,
+                "left-top" => writeln!(buffer, "object-position: left top;")?,
+                "right" => writeln!(buffer, "object-position: right;")?,
+                "right-bottom" => writeln!(buffer, "object-position: right bottom;")?,
+                "right-top" => writeln!(buffer, "object-position: right top;")?,
+                "top" => writeln!(buffer, "object-position: top;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "object-position: {value};")?,
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct OverflowPlugin;
 
 impl Plugin for OverflowPlugin {
@@ -559,32 +659,58 @@ impl Plugin for OverflowPlugin {
         "overflow"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => [
+                "auto",
+                "x-auto",
+                "y-auto",
+                "hidden",
+                "x-hidden",
+                "y-hidden",
+                "visible",
+                "x-visible",
+                "y-visible",
+                "scroll",
+                "x-scroll",
+                "y-scroll",
+            ]
+            .contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "auto" => write!(css_content, "overflow: auto;").is_ok(),
-            "x-auto" => write!(css_content, "overflow-x: auto;").is_ok(),
-            "y-auto" => write!(css_content, "overflow-y: auto;").is_ok(),
-            "hidden" => write!(css_content, "overflow: hidden;").is_ok(),
-            "x-hidden" => write!(css_content, "overflow-x: hidden;").is_ok(),
-            "y-hidden" => write!(css_content, "overflow-y: hidden;").is_ok(),
-            "visible" => write!(css_content, "overflow: visible;").is_ok(),
-            "x-visible" => write!(css_content, "overflow-x: visible;").is_ok(),
-            "y-visible" => write!(css_content, "overflow-y: visible;").is_ok(),
-            "scroll" => write!(css_content, "overflow: scroll;").is_ok(),
-            "x-scroll" => write!(css_content, "overflow-x: scroll;").is_ok(),
-            "y-scroll" => write!(css_content, "overflow-y: scroll;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "auto" => writeln!(buffer, "overflow: auto;")?,
+                "x-auto" => writeln!(buffer, "overflow-x: auto;")?,
+                "y-auto" => writeln!(buffer, "overflow-y: auto;")?,
+                "hidden" => writeln!(buffer, "overflow: hidden;")?,
+                "x-hidden" => writeln!(buffer, "overflow-x: hidden;")?,
+                "y-hidden" => writeln!(buffer, "overflow-y: hidden;")?,
+                "visible" => writeln!(buffer, "overflow: visible;")?,
+                "x-visible" => writeln!(buffer, "overflow-x: visible;")?,
+                "y-visible" => writeln!(buffer, "overflow-y: visible;")?,
+                "scroll" => writeln!(buffer, "overflow: scroll;")?,
+                "x-scroll" => writeln!(buffer, "overflow-x: scroll;")?,
+                "y-scroll" => writeln!(buffer, "overflow-y: scroll;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct OverscrollPlugin;
 
 impl Plugin for OverscrollPlugin {
@@ -592,24 +718,48 @@ impl Plugin for OverscrollPlugin {
         "overscroll"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => [
+                "auto",
+                "x-auto",
+                "y-auto",
+                "contain",
+                "x-contain",
+                "y-contain",
+                "none",
+                "x-none",
+                "y-none",
+            ]
+            .contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "auto" => write!(css_content, "overscroll-behavior: auto;").is_ok(),
-            "y-auto" => write!(css_content, "overscroll-behavior-y: auto;").is_ok(),
-            "x-auto" => write!(css_content, "overscroll-behavior-x: auto;").is_ok(),
-            "contain" => write!(css_content, "overscroll-behavior: contain;").is_ok(),
-            "y-contain" => write!(css_content, "overscroll-behavior-y: contain;").is_ok(),
-            "x-contain" => write!(css_content, "overscroll-behavior-x: contain;").is_ok(),
-            "none" => write!(css_content, "overscroll-behavior: none;").is_ok(),
-            "y-none" => write!(css_content, "overscroll-behavior-y: none;").is_ok(),
-            "x-none" => write!(css_content, "overscroll-behavior-x: none;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "auto" => writeln!(buffer, "overscroll-behavior: auto;")?,
+                "x-auto" => writeln!(buffer, "overscroll-behavior-x: auto;")?,
+                "y-auto" => writeln!(buffer, "overscroll-behavior-y: auto;")?,
+                "contain" => writeln!(buffer, "overscroll-behavior: contain;")?,
+                "x-contain" => writeln!(buffer, "overscroll-behavior-x: contain;")?,
+                "y-contain" => writeln!(buffer, "overscroll-behavior-y: contain;")?,
+                "none" => writeln!(buffer, "overscroll-behavior: none;")?,
+                "x-none" => writeln!(buffer, "overscroll-behavior-x: none;")?,
+                "y-none" => writeln!(buffer, "overscroll-behavior-y: none;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }

@@ -1,16 +1,19 @@
 use super::Plugin;
-use crate::utils::{default_colors, value_matchers::*};
+use crate::utils::{default_colors, indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::{borrow::Cow, fmt::Write};
+use smol_str::SmolStr;
+use std::{
+    borrow::Cow,
+    fmt::{self, Write},
+};
 
 lazy_static! {
     static ref OPACITY_IN_RGB_REGEX: Regex = Regex::new(r"/.*\)").unwrap();
 }
 
-#[derive(Debug)]
 pub struct ColorPlugin;
 
 impl Plugin for ColorPlugin {
@@ -18,46 +21,63 @@ impl Plugin for ColorPlugin {
         "bg"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "color" || is_matching_color(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        let property = if val.contains("url") {
-            "background-image"
-        } else {
-            "background-color"
-        };
-        
-        if val.contains("--en-opacity") {
-            write!(
-                css_content,
-                "--en-bg-opacity: 1;
-{property}: {};",
-                val.replace("--en-opacity", "--en-bg-opacity")
-            )
-            .is_ok()
-        } else {
-            write!(css_content, "{property}: {val};").is_ok()
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Arbitrary { hint, value } => {
+                hint == "color" || is_matching_color(value) || is_matching_url(value)
+            }
         }
     }
 
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(color) = default_colors::get(config, modifier.content()) {
-            self.css_template_value(&color, css_content)
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                let color = default_colors::get(config, value).unwrap();
+                if color.contains("--en-opacity") {
+                    writeln!(buffer, "--en-bg-opacity: 1;")?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "background-color: {};",
+                        color.replace("--en-opacity", "--en-bg-opacity")
+                    )?;
+                } else {
+                    writeln!(buffer, "background-color: {color};")?;
+                }
+            }
+            Modifier::Arbitrary { value, .. } => {
+                let property = if value.contains("url") {
+                    "background-image"
+                } else {
+                    "background-color"
+                };
+
+                if value.contains("--en-opacity") {
+                    writeln!(buffer, "--en-bg-opacity: 1;")?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "{property}: {};",
+                        value.replace("--en-opacity", "--en-bg-opacity")
+                    )?;
+                } else {
+                    writeln!(buffer, "{property}: {value};")?;
+                }
+            }
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct AttachmentPlugin;
 
 impl Plugin for AttachmentPlugin {
@@ -65,23 +85,35 @@ impl Plugin for AttachmentPlugin {
         "bg"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["fixed", "local", "scroll"].contains(&value.as_str()),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "fixed" => write!(css_content, "background-attachment: fixed;").is_ok(),
-            "local" => write!(css_content, "background-attachment: local;").is_ok(),
-            "scroll" => write!(css_content, "background-attachment: scroll;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "fixed" => writeln!(buffer, "background-attachment: fixed;")?,
+                "local" => writeln!(buffer, "background-attachment: local;")?,
+                "scroll" => writeln!(buffer, "background-attachment: scroll;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct ClipPlugin;
 
 impl Plugin for ClipPlugin {
@@ -89,24 +121,38 @@ impl Plugin for ClipPlugin {
         "bg-clip"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["border", "padding", "content", "text"].contains(&value.as_str())
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "border" => write!(css_content, "background-clip: border-box;").is_ok(),
-            "padding" => write!(css_content, "background-clip: padding-box;").is_ok(),
-            "content" => write!(css_content, "background-clip: content-box;").is_ok(),
-            "text" => write!(css_content, "background-clip: text;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "border" => writeln!(buffer, "background-clip: border-box;")?,
+                "padding" => writeln!(buffer, "background-clip: padding-box;")?,
+                "content" => writeln!(buffer, "background-clip: content-box;")?,
+                "text" => writeln!(buffer, "background-clip: text;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct OpacityPlugin;
 
 impl Plugin for OpacityPlugin {
@@ -114,23 +160,35 @@ impl Plugin for OpacityPlugin {
         "bg-opacity"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(opacity_value) = modifier.to_f32() {
-            write!(css_content, "--en-bg-opacity: {};", opacity_value / 100.).is_ok()
-        } else {
-            false
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(
+                buffer,
+                "--en-bg-opacity: {};",
+                value.parse::<usize>().unwrap() as f32 / 100.
+            )?,
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct ImagePlugin;
 
 impl Plugin for ImagePlugin {
@@ -138,62 +196,76 @@ impl Plugin for ImagePlugin {
         "bg"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        // FIXME: Is this really list? (probably because of comma)
-        hint == "list" || is_matching_image(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => [
+                "none",
+                "gradient-to-t",
+                "gradient-to-tr",
+                "gradient-to-r",
+                "gradient-to-br",
+                "gradient-to-b",
+                "grandient-to-bl",
+                "gradient-to-l",
+                "gradient-to-tl",
+            ]
+            .contains(&value.as_str()),
+            Modifier::Arbitrary { hint, value } => hint == "list" || is_matching_image(value),
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "background-image: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "bg-none" => self.css_template_value("none", css_content),
-            "gradient-to-t" => self.css_template_value(
-                "linear-gradient(to top, var(--en-gradient-stops))",
-                css_content,
-            ),
-            "gradient-to-tr" => self.css_template_value(
-                "linear-gradient(to top right, var(--en-gradient-stops))",
-                css_content,
-            ),
-            "gradient-to-r" => self.css_template_value(
-                "linear-gradient(to right, var(--en-gradient-stops))",
-                css_content,
-            ),
-            "gradient-to-br" => self.css_template_value(
-                "linear-gradient(to bottom right, var(--en-gradient-stops))",
-                css_content,
-            ),
-            "gradient-to-b" => self.css_template_value(
-                "linear-gradient(to bottom, var(--en-gradient-stops))",
-                css_content,
-            ),
-            "gradient-to-bl" => self.css_template_value(
-                "linear-gradient(to bottom left, var(--en-gradient-stops))",
-                css_content,
-            ),
-            "gradient-to-l" => self.css_template_value(
-                "linear-gradient(to left, var(--en-gradient-stops))",
-                css_content,
-            ),
-            "gradient-to-tl" => self.css_template_value(
-                "linear-gradient(to top left, var(--en-gradient-stops))",
-                css_content,
-            ),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "none" => writeln!(buffer, "background-image: none;")?,
+                "gradient-to-t" => writeln!(
+                    buffer,
+                    "background-image: linear-gradient(to top, var(--en-gradient-stops));"
+                )?,
+                "gradient-to-tr" => writeln!(
+                    buffer,
+                    "background-image: linear-gradient(to top right, var(--en-gradient-stops));"
+                )?,
+                "gradient-to-r" => writeln!(
+                    buffer,
+                    "background-image: linear-gradient(to right, var(--en-gradient-stops));"
+                )?,
+                "gradient-to-br" => writeln!(
+                    buffer,
+                    "background-image: linear-gradient(to bottom right, var(--en-gradient-stops));"
+                )?,
+                "gradient-to-b" => writeln!(
+                    buffer,
+                    "background-image: linear-gradient(to bottom, var(--en-gradient-stops));"
+                )?,
+                "gradient-to-bl" => writeln!(
+                    buffer,
+                    "background-image: linear-gradient(to bottom left, var(--en-gradient-stops));"
+                )?,
+                "gradient-to-l" => writeln!(
+                    buffer,
+                    "background-image: linear-gradient(to left, var(--en-gradient-stops));"
+                )?,
+                "gradient-to-tl" => writeln!(
+                    buffer,
+                    "background-image: linear-gradient(to top left, var(--en-gradient-stops));"
+                )?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "background-image: {value};")?,
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct GradientFromPlugin;
 
 impl Plugin for GradientFromPlugin {
@@ -201,47 +273,51 @@ impl Plugin for GradientFromPlugin {
         "from"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_color(val)
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        let default_to = if val == "inherit" || val == "currentColor" {
-            Cow::from("rgb(255 255 255 / 0)")
-        } else {
-            OPACITY_IN_RGB_REGEX.replace(val, "/ 0)")
-        };
-
-        let val = if val.contains("--en-opacity") {
-            Cow::from(val.replace(" / var(--en-opacity)", ""))
-        } else {
-            Cow::from(val)
-        };
-
-        write!(
-            css_content,
-            "--en-gradient-from: {val};
---en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to, {default_to});"
-        )
-        .is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(color) = default_colors::get(config, modifier.content()) {
-            self.css_template_value(&color, css_content)
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        let value = match modifier {
+            Modifier::Basic { value, .. } => {
+                SmolStr::from(default_colors::get(config, value).unwrap())
+            }
+            Modifier::Arbitrary { value, .. } => value.clone(),
+        };
+
+        let default_to = if value == "inherit" || value == "currentColor" {
+            Cow::from("rgb(255 255 255 / 0)")
         } else {
-            false
-        }
+            OPACITY_IN_RGB_REGEX.replace(&value, "/ 0)")
+        };
+
+        let value = if value.contains("--en-opacity") {
+            Cow::from(value.replace(" / var(--en-opacity)", ""))
+        } else {
+            Cow::from(&*value)
+        };
+
+        indent(indentation, buffer)?;
+        writeln!(buffer, "--en-gradient-from: {value};")?;
+        indent(indentation, buffer)?;
+        writeln!(
+            buffer,
+            "--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to, {default_to});"
+        )?;
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct GradientViaPlugin;
 
 impl Plugin for GradientViaPlugin {
@@ -249,47 +325,50 @@ impl Plugin for GradientViaPlugin {
         "via"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_color(val)
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        let default_to = if val == "inherit" || val == "currentColor" {
-            Cow::Borrowed("rgb(255 255 255 / 0)")
-        } else {
-            OPACITY_IN_RGB_REGEX.replace(val, "/ 0)")
-        };
-
-        let val = if val.contains("--en-opacity") {
-            Cow::from(val.replace(" / var(--en-opacity)", ""))
-        } else {
-            Cow::from(val)
-        };
-
-        write!(
-            css_content,
-            "--en-gradient-stops: var(--en-gradient-from), {}, var(--en-gradient-to, {});",
-            val, default_to
-        )
-        .is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(color) = default_colors::get(config, modifier.content()) {
-            self.css_template_value(&color, css_content)
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        let value = match modifier {
+            Modifier::Basic { value, .. } => {
+                SmolStr::from(default_colors::get(config, value).unwrap())
+            }
+            Modifier::Arbitrary { value, .. } => value.clone(),
+        };
+
+        let default_to = if value == "inherit" || value == "currentColor" {
+            Cow::from("rgb(255 255 255 / 0)")
         } else {
-            false
-        }
+            OPACITY_IN_RGB_REGEX.replace(&value, "/ 0)")
+        };
+
+        let value = if value.contains("--en-opacity") {
+            Cow::from(value.replace(" / var(--en-opacity)", ""))
+        } else {
+            Cow::from(&*value)
+        };
+
+        indent(indentation, buffer)?;
+        writeln!(
+            buffer,
+            "--en-gradient-stops: var(--en-gradient-from), {}, var(--en-gradient-to, {});",
+            value, default_to
+        )?;
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct GradientToPlugin;
 
 impl Plugin for GradientToPlugin {
@@ -297,36 +376,38 @@ impl Plugin for GradientToPlugin {
         "to"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_color(val)
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        let val = if val.contains("--en-opacity") {
-            Cow::from(val.replace(" / var(--en-opacity)", ""))
-        } else {
-            Cow::from(val)
-        };
-
-        write!(css_content, "--en-gradient-to: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(color) = default_colors::get(config, modifier.content()) {
-            self.css_template_value(&color, css_content)
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        let value = match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value).unwrap(),
+            Modifier::Arbitrary { value, .. } => Cow::from(&**value),
+        };
+
+        let value = if value.contains("--en-opacity") {
+            Cow::from(value.replace(" / var(--en-opacity)", ""))
         } else {
-            false
-        }
+            value
+        };
+
+        indent(indentation, buffer)?;
+        writeln!(buffer, "--en-gradient-to: {value};")?;
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct PositionPlugin;
 
 impl Plugin for PositionPlugin {
@@ -334,41 +415,58 @@ impl Plugin for PositionPlugin {
         "bg"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        // https://developer.mozilla.org/en-US/docs/Web/CSS/background-position
-        hint == "list"
-            || val
-                .split(',')
-                .all(|v| v.split('_').all(is_matching_position))
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => [
+                "bottom",
+                "center",
+                "left",
+                "left-bottom",
+                "left-top",
+                "right",
+                "right-bottom",
+                "right-top",
+                "top",
+            ]
+            .contains(&value.as_str()),
+            Modifier::Arbitrary { hint, value } => {
+                // https://developer.mozilla.org/en-US/docs/Web/CSS/background-position
+                hint == "list"
+                    || value
+                        .split(',')
+                        .all(|v| v.split('_').all(is_matching_position))
+            }
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "background-position: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "bottom" => self.css_template_value("bottom", css_content),
-            "center" => self.css_template_value("center", css_content),
-            "left" => self.css_template_value("left", css_content),
-            "left-bottom" => self.css_template_value("left-bottom", css_content),
-            "left-top" => self.css_template_value("left-top", css_content),
-            "right" => self.css_template_value("right", css_content),
-            "right-bottom" => self.css_template_value("right-bottom", css_content),
-            "right-top" => self.css_template_value("right-top", css_content),
-            "top" => self.css_template_value("top", css_content),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "bottom" => writeln!(buffer, "background-position: bottom;")?,
+                "center" => writeln!(buffer, "background-position: center;")?,
+                "left" => writeln!(buffer, "background-position: left;")?,
+                "left-bottom" => writeln!(buffer, "background-position: left-bottom;")?,
+                "left-top" => writeln!(buffer, "background-position: left-top;")?,
+                "right" => writeln!(buffer, "background-position: right;")?,
+                "right-bottom" => writeln!(buffer, "background-position: right-bottom;")?,
+                "right-top" => writeln!(buffer, "background-position: right-top;")?,
+                "top" => writeln!(buffer, "background-position: top;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "background-position: {value};")?,
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct RepeatPlugin;
 
 impl Plugin for RepeatPlugin {
@@ -376,26 +474,46 @@ impl Plugin for RepeatPlugin {
         "bg"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => [
+                "repeat",
+                "no-repeat",
+                "repeat-x",
+                "repeat-y",
+                "repeat-round",
+                "repeat-space",
+            ]
+            .contains(&value.as_str()),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "repeat" => write!(css_content, "background-repeat: repeat;").is_ok(),
-            "no-repeat" => write!(css_content, "background-repeat: no-repeat;").is_ok(),
-            "repeat-x" => write!(css_content, "background-repeat: repeat-x;").is_ok(),
-            "repeat-y" => write!(css_content, "background-repeat: repeat-y;").is_ok(),
-            "repeat-round" => write!(css_content, "background-repeat: round;").is_ok(),
-            "repeat-space" => write!(css_content, "background-repeat: space;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "repeat" => writeln!(buffer, "background-repeat: repeat;")?,
+                "no-repeat" => writeln!(buffer, "background-repeat: no-repeat;")?,
+                "repeat-x" => writeln!(buffer, "background-repeat: repeat-x;")?,
+                "repeat-y" => writeln!(buffer, "background-repeat: repeat-y;")?,
+                "repeat-round" => writeln!(buffer, "background-repeat: round;")?,
+                "repeat-space" => writeln!(buffer, "background-repeat: space;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct SizePlugin;
 
 impl Plugin for SizePlugin {
@@ -403,33 +521,40 @@ impl Plugin for SizePlugin {
         "bg"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length"
-            || val.split(',').all(|v| {
-                v.split('_').all(|v| {
-                    is_matching_length(v)
-                        || is_matching_percentage(v)
-                        || ["contain", "cover", "auto"].contains(&v)
-                })
-            })
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["contain", "cover", "auto"].contains(&value.as_str()),
+            Modifier::Arbitrary { hint, value } => {
+                hint == "length"
+                    || value.split(',').all(|v| {
+                        v.split('_').all(|v| {
+                            is_matching_length(v)
+                                || is_matching_percentage(v)
+                                || ["contain", "cover", "auto"].contains(&v)
+                        })
+                    })
+            }
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "background-size: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "auto" => self.css_template_value("auto", css_content),
-            "cover" => self.css_template_value("cover", css_content),
-            "contain" => self.css_template_value("contain", css_content),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "auto" => writeln!(buffer, "background-size: auto;")?,
+                "cover" => writeln!(buffer, "background-size: cover;")?,
+                "contain" => writeln!(buffer, "background-size: contain;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "background-size: {value};")?,
         }
+
+        Ok(())
     }
 }

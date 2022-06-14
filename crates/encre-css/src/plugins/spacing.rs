@@ -1,247 +1,54 @@
 use super::Plugin;
-use crate::utils::{default_lengths, value_matchers::*};
+use crate::utils::{default_lengths, indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use std::fmt::Write;
+use std::borrow::Cow;
+use std::fmt::{self, Write};
 
-// TODO: Boilerplate generator (just one structure for padding and another for margin)
-#[derive(Debug)]
-pub struct PaddingPlugin;
-
-impl Plugin for PaddingPlugin {
-    fn namespace(&self) -> &str {
-        "p"
-    }
-
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "padding: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
+pub fn margin_padding_can_handle(modifier: &Modifier) -> bool {
+    match modifier {
+        Modifier::Basic { is_negative, value } => {
+            value == "auto" || default_lengths::get_basic(value, *is_negative).is_some()
         }
+        Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
     }
 }
 
-#[derive(Debug)]
-pub struct PaddingXPlugin;
-
-impl Plugin for PaddingXPlugin {
-    fn namespace(&self) -> &str {
-        "px"
-    }
-
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(
-            css_content,
-            "padding-left: {val};
-padding-right: {val};"
-        )
-        .is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
+pub fn margin_padding_handle(
+    css_properties: &[&str],
+    modifier: &Modifier,
+    indentation: usize,
+    buffer: &mut String,
+) -> fmt::Result {
+    match modifier {
+        Modifier::Basic { is_negative, value } => {
+            for css_prop in css_properties {
+                indent(indentation, buffer)?;
+                writeln!(
+                    buffer,
+                    "{}: {};",
+                    css_prop,
+                    if value == "auto" {
+                        Cow::from("auto")
+                    } else {
+                        default_lengths::get_basic(value, *is_negative).unwrap()
+                    }
+                )?
+            }
+        }
+        Modifier::Arbitrary { value, .. } => {
+            for css_prop in css_properties {
+                indent(indentation, buffer)?;
+                writeln!(buffer, "{}: {};", css_prop, value)?;
+            }
         }
     }
-}
 
-#[derive(Debug)]
-pub struct PaddingYPlugin;
-
-impl Plugin for PaddingYPlugin {
-    fn namespace(&self) -> &str {
-        "py"
-    }
-
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(
-            css_content,
-            "padding-top: {val};
-padding-bottom: {val};"
-        )
-        .is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct PaddingLeftPlugin;
-
-impl Plugin for PaddingLeftPlugin {
-    fn namespace(&self) -> &str {
-        "pl"
-    }
-
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "padding-left: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct PaddingRightPlugin;
-
-impl Plugin for PaddingRightPlugin {
-    fn namespace(&self) -> &str {
-        "pr"
-    }
-
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "padding-right: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct PaddingTopPlugin;
-
-impl Plugin for PaddingTopPlugin {
-    fn namespace(&self) -> &str {
-        "pt"
-    }
-
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "padding-top: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct PaddingBottomPlugin;
-
-impl Plugin for PaddingBottomPlugin {
-    fn namespace(&self) -> &str {
-        "pb"
-    }
-
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "padding-bottom: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
-    }
+    Ok(())
 }
 
 // Margin
 
-#[derive(Debug)]
 pub struct MarginPlugin;
 
 impl Plugin for MarginPlugin {
@@ -249,35 +56,21 @@ impl Plugin for MarginPlugin {
         "m"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        margin_padding_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "margin: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is("auto") {
-            return self.css_template_value("auto", css_content);
-        }
-
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        margin_padding_handle(&["margin"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
 pub struct MarginXPlugin;
 
 impl Plugin for MarginXPlugin {
@@ -285,40 +78,26 @@ impl Plugin for MarginXPlugin {
         "mx"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        margin_padding_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(
-            css_content,
-            "margin-left: {val};
-margin-right: {val};"
-        )
-        .is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is("auto") {
-            return self.css_template_value("auto", css_content);
-        }
-
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        margin_padding_handle(
+            &["margin-left", "margin-right"],
+            modifier,
+            indentation,
+            buffer,
+        )
     }
 }
 
-#[derive(Debug)]
 pub struct MarginYPlugin;
 
 impl Plugin for MarginYPlugin {
@@ -326,112 +105,26 @@ impl Plugin for MarginYPlugin {
         "my"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        margin_padding_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(
-            css_content,
-            "margin-top: {val};
-margin-bottom: {val};"
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        margin_padding_handle(
+            &["margin-top", "margin-bottom"],
+            modifier,
+            indentation,
+            buffer,
         )
-        .is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is("auto") {
-            return self.css_template_value("auto", css_content);
-        }
-
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
     }
 }
 
-#[derive(Debug)]
-pub struct MarginLeftPlugin;
-
-impl Plugin for MarginLeftPlugin {
-    fn namespace(&self) -> &str {
-        "ml"
-    }
-
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "margin-left: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is("auto") {
-            return self.css_template_value("auto", css_content);
-        }
-
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct MarginRightPlugin;
-
-impl Plugin for MarginRightPlugin {
-    fn namespace(&self) -> &str {
-        "mr"
-    }
-
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "margin-right: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is("auto") {
-            return self.css_template_value("auto", css_content);
-        }
-
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
-    }
-}
-
-#[derive(Debug)]
 pub struct MarginTopPlugin;
 
 impl Plugin for MarginTopPlugin {
@@ -439,35 +132,21 @@ impl Plugin for MarginTopPlugin {
         "mt"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        margin_padding_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "margin-top: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is("auto") {
-            return self.css_template_value("auto", css_content);
-        }
-
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        margin_padding_handle(&["margin-top"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
 pub struct MarginBottomPlugin;
 
 impl Plugin for MarginBottomPlugin {
@@ -475,35 +154,233 @@ impl Plugin for MarginBottomPlugin {
         "mb"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        margin_padding_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "margin-bottom: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is("auto") {
-            return self.css_template_value("auto", css_content);
-        }
-
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        margin_padding_handle(&["margin-bottom"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
+pub struct MarginLeftPlugin;
+
+impl Plugin for MarginLeftPlugin {
+    fn namespace(&self) -> &str {
+        "ml"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        margin_padding_can_handle(modifier)
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        margin_padding_handle(&["margin-left"], modifier, indentation, buffer)
+    }
+}
+
+pub struct MarginRightPlugin;
+
+impl Plugin for MarginRightPlugin {
+    fn namespace(&self) -> &str {
+        "mr"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        margin_padding_can_handle(modifier)
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        margin_padding_handle(&["margin-right"], modifier, indentation, buffer)
+    }
+}
+
+// Padding
+
+pub struct PaddingPlugin;
+
+impl Plugin for PaddingPlugin {
+    fn namespace(&self) -> &str {
+        "p"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        margin_padding_can_handle(modifier)
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        margin_padding_handle(&["padding"], modifier, indentation, buffer)
+    }
+}
+
+pub struct PaddingXPlugin;
+
+impl Plugin for PaddingXPlugin {
+    fn namespace(&self) -> &str {
+        "px"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        margin_padding_can_handle(modifier)
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        margin_padding_handle(
+            &["padding-left", "padding-right"],
+            modifier,
+            indentation,
+            buffer,
+        )
+    }
+}
+
+pub struct PaddingYPlugin;
+
+impl Plugin for PaddingYPlugin {
+    fn namespace(&self) -> &str {
+        "py"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        margin_padding_can_handle(modifier)
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        margin_padding_handle(
+            &["padding-top", "padding-bottom"],
+            modifier,
+            indentation,
+            buffer,
+        )
+    }
+}
+
+pub struct PaddingTopPlugin;
+
+impl Plugin for PaddingTopPlugin {
+    fn namespace(&self) -> &str {
+        "pt"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        margin_padding_can_handle(modifier)
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        margin_padding_handle(&["padding-top"], modifier, indentation, buffer)
+    }
+}
+
+pub struct PaddingBottomPlugin;
+
+impl Plugin for PaddingBottomPlugin {
+    fn namespace(&self) -> &str {
+        "pb"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        margin_padding_can_handle(modifier)
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        margin_padding_handle(&["padding-bottom"], modifier, indentation, buffer)
+    }
+}
+
+pub struct PaddingLeftPlugin;
+
+impl Plugin for PaddingLeftPlugin {
+    fn namespace(&self) -> &str {
+        "pl"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        margin_padding_can_handle(modifier)
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        margin_padding_handle(&["padding-left"], modifier, indentation, buffer)
+    }
+}
+
+pub struct PaddingRightPlugin;
+
+impl Plugin for PaddingRightPlugin {
+    fn namespace(&self) -> &str {
+        "pr"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        margin_padding_can_handle(modifier)
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        margin_padding_handle(&["padding-right"], modifier, indentation, buffer)
+    }
+}
+
+// Spacing
+
 pub struct SpaceXPlugin;
 
 impl Plugin for SpaceXPlugin {
@@ -511,46 +388,62 @@ impl Plugin for SpaceXPlugin {
         "space-x"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if !css_content.contains("--en-space-x-reverse") {
-            writeln!(css_content, "--en-space-x-reverse: 0;").ok();
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { is_negative, value } => {
+                value == "reverse" || default_lengths::get_basic(value, *is_negative).is_some()
+            }
+            Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
         }
-
-        write!(
-            css_content,
-            "margin-left: calc({val} * calc(1 - var(--en-space-x-reverse)));
-margin-right: calc({val} * var(--en-space-x-reverse));"
-        )
-        .is_ok()
     }
 
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
         // TODO: class with `> :not([hidden]) ~ :not([hidden])`
-        if modifier.is("reverse") {
-            return write!(css_content, "--en-space-x-reverse: 1;").is_ok();
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { is_negative, value } => {
+                if value == "reverse" {
+                    return writeln!(buffer, "--en-space-x-reverse: 1;");
+                }
+
+                let length = default_lengths::get_basic(value, *is_negative).unwrap();
+                writeln!(buffer, "--en-space-x-reverse: 0;")?;
+                indent(indentation, buffer)?;
+                writeln!(
+                    buffer,
+                    "margin-left: calc({length} * calc(1 - var(--en-space-x-reverse)));"
+                )?;
+                indent(indentation, buffer)?;
+                writeln!(
+                    buffer,
+                    "margin-right: calc({length} * var(--en-space-x-reverse));"
+                )?;
+            }
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "--en-space-x-reverse: 0;")?;
+                indent(indentation, buffer)?;
+                writeln!(
+                    buffer,
+                    "margin-left: calc({value} * calc(1 - var(--en-space-x-reverse)));"
+                )?;
+                indent(indentation, buffer)?;
+                writeln!(
+                    buffer,
+                    "margin-right: calc({value} * var(--en-space-x-reverse));"
+                )?;
+            }
         }
 
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            writeln!(css_content, "--en-space-x-reverse: 0;").ok();
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct SpaceYPlugin;
 
 impl Plugin for SpaceYPlugin {
@@ -558,41 +451,58 @@ impl Plugin for SpaceYPlugin {
         "space-y"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if !css_content.contains("--en-space-y-reverse") {
-            writeln!(css_content, "--en-space-y-reverse: 0;").ok();
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { is_negative, value } => {
+                value == "reverse" || default_lengths::get_basic(value, *is_negative).is_some()
+            }
+            Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
         }
-
-        write!(
-            css_content,
-            "margin-top: calc({val} * calc(1 - var(--en-space-y-reverse)));
-margin-bottom: calc({val} * var(--en-space-y-reverse));"
-        )
-        .is_ok()
     }
 
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
         // TODO: class with `> :not([hidden]) ~ :not([hidden])`
-        if modifier.is("reverse") {
-            return write!(css_content, "--en-space-y-reverse: 1;").is_ok();
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { is_negative, value } => {
+                if value == "reverse" {
+                    return writeln!(buffer, "--en-space-y-reverse: 1;");
+                }
+
+                let length = default_lengths::get_basic(value, *is_negative).unwrap();
+                writeln!(buffer, "--en-space-y-reverse: 0;")?;
+                indent(indentation, buffer)?;
+                writeln!(
+                    buffer,
+                    "margin-top: calc({length} * calc(1 - var(--en-space-y-reverse)));"
+                )?;
+                indent(indentation, buffer)?;
+                writeln!(
+                    buffer,
+                    "margin-bottom: calc({length} * var(--en-space-y-reverse));"
+                )?;
+            }
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "--en-space-y-reverse: 0;")?;
+                indent(indentation, buffer)?;
+                writeln!(
+                    buffer,
+                    "margin-top: calc({value} * calc(1 - var(--en-space-y-reverse)));"
+                )?;
+                indent(indentation, buffer)?;
+                writeln!(
+                    buffer,
+                    "margin-bottom: calc({value} * var(--en-space-y-reverse));"
+                )?;
+            }
         }
 
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            writeln!(css_content, "--en-space-y-reverse: 0;").ok();
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        Ok(())
     }
 }

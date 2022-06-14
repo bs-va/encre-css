@@ -1,9 +1,8 @@
 use super::Plugin;
-use crate::{config::Config, selector::Modifier};
+use crate::{config::Config, selector::Modifier, utils::indent};
 
-use std::fmt::Write;
+use std::fmt::{self, Write};
 
-#[derive(Debug)]
 pub struct AlignContentPlugin;
 
 impl Plugin for AlignContentPlugin {
@@ -11,26 +10,40 @@ impl Plugin for AlignContentPlugin {
         "content"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["start", "center", "end", "between", "around", "evenly"].contains(&value.as_str())
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "start" => write!(css_content, "align-content: flex-start;").is_ok(),
-            "center" => write!(css_content, "align-content: center;").is_ok(),
-            "end" => write!(css_content, "align-content: flex-end;").is_ok(),
-            "between" => write!(css_content, "align-content: space-between;").is_ok(),
-            "around" => write!(css_content, "align-content: space-around;").is_ok(),
-            "evenly" => write!(css_content, "align-content: space-evenly;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "start" => writeln!(buffer, "align-content: flex-start;")?,
+                "center" => writeln!(buffer, "align-content: center;")?,
+                "end" => writeln!(buffer, "align-content: flex-end;")?,
+                "between" => writeln!(buffer, "align-content: space-between;")?,
+                "around" => writeln!(buffer, "align-content: space-around;")?,
+                "evenly" => writeln!(buffer, "align-content: space-evenly;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct AlignItemsPlugin;
 
 impl Plugin for AlignItemsPlugin {
@@ -38,25 +51,39 @@ impl Plugin for AlignItemsPlugin {
         "items"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["stretch", "start", "center", "end", "baseline"].contains(&value.as_str())
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "stretch" => write!(css_content, "align-items: stretch;").is_ok(),
-            "start" => write!(css_content, "align-items: flex-start;").is_ok(),
-            "center" => write!(css_content, "align-items: center;").is_ok(),
-            "end" => write!(css_content, "align-items: flex-end;").is_ok(),
-            "baseline" => write!(css_content, "align-items: baseline;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "stretch" => writeln!(buffer, "align-items: stretch;")?,
+                "start" => writeln!(buffer, "align-items: flex-start;")?,
+                "center" => writeln!(buffer, "align-items: center;")?,
+                "end" => writeln!(buffer, "align-items: flex-end;")?,
+                "baseline" => writeln!(buffer, "align-items: baseline;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct AlignSelfPlugin;
 
 impl Plugin for AlignSelfPlugin {
@@ -64,25 +91,39 @@ impl Plugin for AlignSelfPlugin {
         "self"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["auto", "start", "center", "end", "stretch"].contains(&value.as_str())
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "auto" => write!(css_content, "align-self: auto;").is_ok(),
-            "start" => write!(css_content, "align-self: flex-start;").is_ok(),
-            "center" => write!(css_content, "align-self: center;").is_ok(),
-            "end" => write!(css_content, "align-self: flex-end;").is_ok(),
-            "stretch" => write!(css_content, "align-self: stretch;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "auto" => writeln!(buffer, "align-self: auto;")?,
+                "start" => writeln!(buffer, "align-self: flex-start;")?,
+                "center" => writeln!(buffer, "align-self: center;")?,
+                "end" => writeln!(buffer, "align-self: flex-end;")?,
+                "stretch" => writeln!(buffer, "align-self: stretch;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct JustifyContentPlugin;
 
 impl Plugin for JustifyContentPlugin {
@@ -90,26 +131,40 @@ impl Plugin for JustifyContentPlugin {
         "justify"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["start", "center", "end", "between", "around", "evenly"].contains(&value.as_str())
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "start" => write!(css_content, "justify-content: flex-start;").is_ok(),
-            "center" => write!(css_content, "justify-content: center;").is_ok(),
-            "end" => write!(css_content, "justify-content: flex-end;").is_ok(),
-            "between" => write!(css_content, "justify-content: space-between;").is_ok(),
-            "around" => write!(css_content, "justify-content: space-around;").is_ok(),
-            "evenly" => write!(css_content, "justify-content: space-evenly;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "start" => writeln!(buffer, "justify-content: flex-start;")?,
+                "center" => writeln!(buffer, "justify-content: center;")?,
+                "end" => writeln!(buffer, "justify-content: flex-end;")?,
+                "between" => writeln!(buffer, "justify-content: space-between;")?,
+                "around" => writeln!(buffer, "justify-content: space-around;")?,
+                "evenly" => writeln!(buffer, "justify-content: space-evenly;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct JustifyItemsPlugin;
 
 impl Plugin for JustifyItemsPlugin {
@@ -117,25 +172,39 @@ impl Plugin for JustifyItemsPlugin {
         "justify-items"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["stretch", "start", "center", "end", "auto"].contains(&value.as_str())
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "stretch" => write!(css_content, "justify-items: stretch;").is_ok(),
-            "start" => write!(css_content, "justify-items: start;").is_ok(),
-            "center" => write!(css_content, "justify-items: center;").is_ok(),
-            "end" => write!(css_content, "justify-items: end;").is_ok(),
-            "auto" => write!(css_content, "justify-items: auto;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "stretch" => writeln!(buffer, "justify-items: stretch;")?,
+                "start" => writeln!(buffer, "justify-items: start;")?,
+                "center" => writeln!(buffer, "justify-items: center;")?,
+                "end" => writeln!(buffer, "justify-items: end;")?,
+                "auto" => writeln!(buffer, "justify-items: auto;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct JustifySelfPlugin;
 
 impl Plugin for JustifySelfPlugin {
@@ -143,25 +212,39 @@ impl Plugin for JustifySelfPlugin {
         "justify-self"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["stretch", "start", "center", "end", "auto"].contains(&value.as_str())
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "stretch" => write!(css_content, "justify-self: stretch;").is_ok(),
-            "start" => write!(css_content, "justify-self: start;").is_ok(),
-            "center" => write!(css_content, "justify-self: center;").is_ok(),
-            "end" => write!(css_content, "justify-self: end;").is_ok(),
-            "auto" => write!(css_content, "justify-self: auto;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "stretch" => writeln!(buffer, "justify-self: stretch;")?,
+                "start" => writeln!(buffer, "justify-self: start;")?,
+                "center" => writeln!(buffer, "justify-self: center;")?,
+                "end" => writeln!(buffer, "justify-self: end;")?,
+                "auto" => writeln!(buffer, "justify-self: auto;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct PlaceContentPlugin;
 
 impl Plugin for PlaceContentPlugin {
@@ -169,26 +252,40 @@ impl Plugin for PlaceContentPlugin {
         "place-content"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["start", "center", "end", "between", "around", "evenly"].contains(&value.as_str())
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "start" => write!(css_content, "place-content: start;").is_ok(),
-            "center" => write!(css_content, "place-content: center;").is_ok(),
-            "end" => write!(css_content, "place-content: end;").is_ok(),
-            "between" => write!(css_content, "place-content: space-between;").is_ok(),
-            "around" => write!(css_content, "place-content: space-around;").is_ok(),
-            "evenly" => write!(css_content, "place-content: space-evenly;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "start" => writeln!(buffer, "place-content: start;")?,
+                "center" => writeln!(buffer, "place-content: center;")?,
+                "end" => writeln!(buffer, "place-content: end;")?,
+                "between" => writeln!(buffer, "place-content: space-between;")?,
+                "around" => writeln!(buffer, "place-content: space-around;")?,
+                "evenly" => writeln!(buffer, "place-content: space-evenly;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct PlaceItemsPlugin;
 
 impl Plugin for PlaceItemsPlugin {
@@ -196,24 +293,38 @@ impl Plugin for PlaceItemsPlugin {
         "place-items"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["stretch", "start", "center", "end"].contains(&value.as_str())
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "stretch" => write!(css_content, "place-items: stretch;").is_ok(),
-            "start" => write!(css_content, "place-items: start;").is_ok(),
-            "center" => write!(css_content, "place-items: center;").is_ok(),
-            "end" => write!(css_content, "place-items: end;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "stretch" => writeln!(buffer, "place-items: stretch;")?,
+                "start" => writeln!(buffer, "place-items: start;")?,
+                "center" => writeln!(buffer, "place-items: center;")?,
+                "end" => writeln!(buffer, "place-items: end;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct PlaceSelfPlugin;
 
 impl Plugin for PlaceSelfPlugin {
@@ -221,20 +332,35 @@ impl Plugin for PlaceSelfPlugin {
         "place-self"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["auto", "start", "center", "end", "stretch"].contains(&value.as_str())
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "self-auto" => write!(css_content, "place-self: auto;").is_ok(),
-            "self-start" => write!(css_content, "place-self: start;").is_ok(),
-            "self-center" => write!(css_content, "place-self: center;").is_ok(),
-            "self-end" => write!(css_content, "place-self: end;").is_ok(),
-            "self-stretch" => write!(css_content, "place-self: stretch;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "auto" => writeln!(buffer, "place-self: auto;")?,
+                "start" => writeln!(buffer, "place-self: start;")?,
+                "center" => writeln!(buffer, "place-self: center;")?,
+                "end" => writeln!(buffer, "place-self: end;")?,
+                "stretch" => writeln!(buffer, "place-self: stretch;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }

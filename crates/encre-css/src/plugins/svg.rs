@@ -1,10 +1,9 @@
 use super::Plugin;
-use crate::utils::{default_colors, value_matchers::*};
+use crate::utils::{default_colors, indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use std::fmt::Write;
+use std::fmt::{self, Write};
 
-#[derive(Debug)]
 pub struct FillPlugin;
 
 impl Plugin for FillPlugin {
@@ -12,39 +11,51 @@ impl Plugin for FillPlugin {
         "fill"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "color" || is_matching_color(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--en-opacity") {
-            write!(
-                css_content,
-                "fill: {};",
-                val.replace("/ var(--en-opacity)", "")
-            )
-            .is_ok()
-        } else {
-            write!(css_content, "fill: {val};").is_ok()
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
 
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(color) = default_colors::get(config, modifier.content()) {
-            self.css_template_value(&color, css_content)
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                let color = default_colors::get(config, value).unwrap();
+                if color.contains("--en-opacity") {
+                    writeln!(
+                        buffer,
+                        "fill: {};",
+                        color.replace(" / var(--en-opacity)", "")
+                    )?;
+                } else {
+                    writeln!(buffer, "fill: {color};")?;
+                }
+            }
+            Modifier::Arbitrary { value, .. } => {
+                if value.contains("--en-opacity") {
+                    writeln!(
+                        buffer,
+                        "fill: {};",
+                        value.replace(" / var(--en-opacity)", "")
+                    )?;
+                } else {
+                    writeln!(buffer, "fill: {value};")?;
+                }
+            }
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct StrokeColorPlugin;
 
 impl Plugin for StrokeColorPlugin {
@@ -52,39 +63,51 @@ impl Plugin for StrokeColorPlugin {
         "stroke"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "color" || is_matching_color(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--en-opacity") {
-            write!(
-                css_content,
-                "stroke: {};",
-                val.replace("/ var(--en-opacity)", "")
-            )
-            .is_ok()
-        } else {
-            write!(css_content, "stroke: {val};").is_ok()
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
 
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(color) = default_colors::get(config, modifier.content()) {
-            self.css_template_value(&color, css_content)
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                let color = default_colors::get(config, value).unwrap();
+                if color.contains("--en-opacity") {
+                    writeln!(
+                        buffer,
+                        "stroke: {};",
+                        color.replace(" / var(--en-opacity)", "")
+                    )?;
+                } else {
+                    writeln!(buffer, "stroke: {color};")?;
+                }
+            }
+            Modifier::Arbitrary { value, .. } => {
+                if value.contains("--en-opacity") {
+                    writeln!(
+                        buffer,
+                        "stroke: {};",
+                        value.replace(" / var(--en-opacity)", "")
+                    )?;
+                } else {
+                    writeln!(buffer, "stroke: {value};")?;
+                }
+            }
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct StrokeWidthPlugin;
 
 impl Plugin for StrokeWidthPlugin {
@@ -92,26 +115,29 @@ impl Plugin for StrokeWidthPlugin {
         "stroke"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val) || is_matching_percentage(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
+            Modifier::Arbitrary { hint, value } => {
+                hint == "length" || is_matching_length(value) || is_matching_percentage(value)
+            }
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "stroke-width: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        if modifier.to_f32().is_ok() {
-            self.css_template_value(&format!("{}px", modifier), css_content)
-        } else {
-            false
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "stroke-width: {value}px;")?,
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "stroke-width: {value};")?,
         }
+
+        Ok(())
     }
 }

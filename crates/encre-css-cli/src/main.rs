@@ -1,13 +1,13 @@
-use std::{env, path::PathBuf};
 use clap::{Parser, Subcommand};
 use color_eyre::Report;
+use std::{env, path::PathBuf};
 use tracing_subscriber::EnvFilter;
 
-mod playground;
 mod build;
+mod playground;
 
-use playground::launch_playground;
 use build::build;
+use playground::launch_playground;
 
 pub const DEFAULT_CONFIG_FILE: &str = "encre.toml";
 
@@ -72,7 +72,13 @@ fn main() -> Result<(), Report> {
 
     match args.command {
         Commands::Playground { name } => launch_playground(name),
-        Commands::Build { config, input: extra_input, output, watch, display_time } => build(config, extra_input, output, watch, display_time),
+        Commands::Build {
+            config,
+            input: extra_input,
+            output,
+            watch,
+            display_time,
+        } => build(config, extra_input, output, watch, display_time),
     }
 
     Ok(())

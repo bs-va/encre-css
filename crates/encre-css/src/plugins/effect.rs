@@ -1,12 +1,11 @@
 use super::Plugin;
-use crate::utils::{default_colors, value_matchers::*};
+use crate::utils::{default_colors, indent, shadow, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use std::fmt::Write;
+use std::fmt::{self, Write};
 
 const CSS_SHADOW: &str = "box-shadow: var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow);";
 
-#[derive(Debug)]
 pub struct MixBlendModePlugin;
 
 impl Plugin for MixBlendModePlugin {
@@ -14,36 +13,66 @@ impl Plugin for MixBlendModePlugin {
         "mix-blend"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => [
+                "normal",
+                "multiply",
+                "screen",
+                "overlay",
+                "darken",
+                "lighten",
+                "color-dodge",
+                "color-burn",
+                "hard-light",
+                "soft-light",
+                "difference",
+                "exclusion",
+                "hue",
+                "saturation",
+                "color",
+                "luminosity",
+            ]
+            .contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "normal" => write!(css_content, "mix-blend-mode: normal;").is_ok(),
-            "multiply" => write!(css_content, "mix-blend-mode: multiply;").is_ok(),
-            "screen" => write!(css_content, "mix-blend-mode: screen;").is_ok(),
-            "overlay" => write!(css_content, "mix-blend-mode: overlay;").is_ok(),
-            "darken" => write!(css_content, "mix-blend-mode: darken;").is_ok(),
-            "lighten" => write!(css_content, "mix-blend-mode: lighten;").is_ok(),
-            "color-dodge" => write!(css_content, "mix-blend-mode: color-dodge;").is_ok(),
-            "color-burn" => write!(css_content, "mix-blend-mode: color-burn;").is_ok(),
-            "hard-light" => write!(css_content, "mix-blend-mode: hard-light;").is_ok(),
-            "soft-light" => write!(css_content, "mix-blend-mode: soft-light;").is_ok(),
-            "difference" => write!(css_content, "mix-blend-mode: difference;").is_ok(),
-            "exclusion" => write!(css_content, "mix-blend-mode: exclusion;").is_ok(),
-            "hue" => write!(css_content, "mix-blend-mode: hue;").is_ok(),
-            "saturation" => write!(css_content, "mix-blend-mode: saturation;").is_ok(),
-            "color" => write!(css_content, "mix-blend-mode: color;").is_ok(),
-            "luminosity" => write!(css_content, "mix-blend-mode: luminosity;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "normal" => writeln!(buffer, "mix-blend-mode: normal;")?,
+                "multiply" => writeln!(buffer, "mix-blend-mode: multiply;")?,
+                "screen" => writeln!(buffer, "mix-blend-mode: screen;")?,
+                "overlay" => writeln!(buffer, "mix-blend-mode: overlay;")?,
+                "darken" => writeln!(buffer, "mix-blend-mode: darken;")?,
+                "lighten" => writeln!(buffer, "mix-blend-mode: lighten;")?,
+                "color-dodge" => writeln!(buffer, "mix-blend-mode: color-dodge;")?,
+                "color-burn" => writeln!(buffer, "mix-blend-mode: color-burn;")?,
+                "hard-light" => writeln!(buffer, "mix-blend-mode: hard-light;")?,
+                "soft-light" => writeln!(buffer, "mix-blend-mode: soft-light;")?,
+                "difference" => writeln!(buffer, "mix-blend-mode: difference;")?,
+                "exclusion" => writeln!(buffer, "mix-blend-mode: exclusion;")?,
+                "hue" => writeln!(buffer, "mix-blend-mode: hue;")?,
+                "saturation" => writeln!(buffer, "mix-blend-mode: saturation;")?,
+                "color" => writeln!(buffer, "mix-blend-mode: color;")?,
+                "luminosity" => writeln!(buffer, "mix-blend-mode: luminosity;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct BackgroundBlendModePlugin;
 
 impl Plugin for BackgroundBlendModePlugin {
@@ -51,36 +80,66 @@ impl Plugin for BackgroundBlendModePlugin {
         "bg-blend"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => [
+                "normal",
+                "multiply",
+                "screen",
+                "overlay",
+                "darken",
+                "lighten",
+                "color-dodge",
+                "color-burn",
+                "hard-light",
+                "soft-light",
+                "difference",
+                "exclusion",
+                "hue",
+                "saturation",
+                "color",
+                "luminosity",
+            ]
+            .contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "normal" => write!(css_content, "background-blend-mode: normal;").is_ok(),
-            "multiply" => write!(css_content, "background-blend-mode: multiply;").is_ok(),
-            "screen" => write!(css_content, "background-blend-mode: screen;").is_ok(),
-            "overlay" => write!(css_content, "background-blend-mode: overlay;").is_ok(),
-            "darken" => write!(css_content, "background-blend-mode: darken;").is_ok(),
-            "lighten" => write!(css_content, "background-blend-mode: lighten;").is_ok(),
-            "color-dodge" => write!(css_content, "background-blend-mode: color-dodge;").is_ok(),
-            "color-burn" => write!(css_content, "background-blend-mode: color-burn;").is_ok(),
-            "hard-light" => write!(css_content, "background-blend-mode: hard-light;").is_ok(),
-            "soft-light" => write!(css_content, "background-blend-mode: soft-light;").is_ok(),
-            "difference" => write!(css_content, "background-blend-mode: difference;").is_ok(),
-            "exclusion" => write!(css_content, "background-blend-mode: exclusion;").is_ok(),
-            "hue" => write!(css_content, "background-blend-mode: hue;").is_ok(),
-            "saturation" => write!(css_content, "background-blend-mode: saturation;").is_ok(),
-            "color" => write!(css_content, "background-blend-mode: color;").is_ok(),
-            "luminosity" => write!(css_content, "background-blend-mode: luminosity;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "normal" => writeln!(buffer, "background-blend-mode: normal;")?,
+                "multiply" => writeln!(buffer, "background-blend-mode: multiply;")?,
+                "screen" => writeln!(buffer, "background-blend-mode: screen;")?,
+                "overlay" => writeln!(buffer, "background-blend-mode: overlay;")?,
+                "darken" => writeln!(buffer, "background-blend-mode: darken;")?,
+                "lighten" => writeln!(buffer, "background-blend-mode: lighten;")?,
+                "color-dodge" => writeln!(buffer, "background-blend-mode: color-dodge;")?,
+                "color-burn" => writeln!(buffer, "background-blend-mode: color-burn;")?,
+                "hard-light" => writeln!(buffer, "background-blend-mode: hard-light;")?,
+                "soft-light" => writeln!(buffer, "background-blend-mode: soft-light;")?,
+                "difference" => writeln!(buffer, "background-blend-mode: difference;")?,
+                "exclusion" => writeln!(buffer, "background-blend-mode: exclusion;")?,
+                "hue" => writeln!(buffer, "background-blend-mode: hue;")?,
+                "saturation" => writeln!(buffer, "background-blend-mode: saturation;")?,
+                "color" => writeln!(buffer, "background-blend-mode: color;")?,
+                "luminosity" => writeln!(buffer, "background-blend-mode: luminosity;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct BoxShadowPlugin;
 
 impl Plugin for BoxShadowPlugin {
@@ -88,60 +147,88 @@ impl Plugin for BoxShadowPlugin {
         "shadow"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_shadow(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["", "sm", "md", "lg", "xl", "2xl", "inner", "none"].contains(&&**value)
+            }
+            Modifier::Arbitrary { value, .. } => is_matching_shadow(value),
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "box-shadow: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "" => write!(
-                css_content,
-                "--en-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
---en-shadow-colored: 0 1px 3px 0 var(--en-shadow-color), 0 1px 2px -1px var(--en-shadow-color);
-{}", CSS_SHADOW).is_ok(),
-            "sm" => write!(css_content, "--en-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
---en-shadow-colored: 0 1px 2px 0 var(--en-shadow-color);
-{}", CSS_SHADOW).is_ok(),
-            "md" => write!(
-                css_content,
-                "--en-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
---en-shadow-colored: 0 4px 6px -1px var(--en-shadow-color), 0 2px 4px -2px var(--en-shadow-color);
-{}", CSS_SHADOW).is_ok(),
-            "lg" => write!(
-                css_content,
-                "--en-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
---en-shadow-colored: 0 10px 15px -3px var(--en-shadow-color), 0 4px 6px -4px var(--en-shadow-color);
-{}", CSS_SHADOW).is_ok(),
-            "xl" => write!(
-                css_content,
-                "--en-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
---en-shadow-colored: 0 20px 25px -5px var(--en-shadow-color), 0 8px 10px -6px var(--en-shadow-color);
-{}", CSS_SHADOW).is_ok(),
-            "2xl" => write!(css_content, "--en-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
---en-shadow-colored: 0 25px 50px -12px var(--en-shadow-color);
-{}", CSS_SHADOW).is_ok(),
-            "inner" => {
-                write!(css_content, "--en-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
---en-shadow-colored: inset 0 2px 4px 0 var(--en-shadow-color);
-{}", CSS_SHADOW).is_ok()
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "" => {
+                    writeln!(buffer, "--en-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);")?;
+                    indent(indentation, buffer)?;
+                    writeln!(buffer, "--en-shadow-colored: 0 1px 3px 0 var(--en-shadow-color), 0 1px 2px -1px var(--en-shadow-color);")?;
+                }
+                "sm" => {
+                    writeln!(buffer, "--en-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);")?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "--en-shadow-colored: 0 1px 2px 0 var(--en-shadow-color);"
+                    )?;
+                }
+                "md" => {
+                    writeln!(buffer, "--en-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);")?;
+                    indent(indentation, buffer)?;
+                    writeln!(buffer, "--en-shadow-colored: 0 4px 6px -1px var(--en-shadow-color), 0 2px 4px -2px var(--en-shadow-color);")?;
+                }
+                "lg" => {
+                    writeln!(buffer, "--en-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);")?;
+                    indent(indentation, buffer)?;
+                    writeln!(buffer, "--en-shadow-colored: 0 10px 15px -3px var(--en-shadow-color), 0 4px 6px -4px var(--en-shadow-color);")?;
+                }
+                "xl" => {
+                    writeln!(buffer, "--en-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);")?;
+                    indent(indentation, buffer)?;
+                    writeln!(buffer, "--en-shadow-colored: 0 20px 25px -5px var(--en-shadow-color), 0 8px 10px -6px var(--en-shadow-color);")?;
+                }
+                "2xl" => {
+                    writeln!(buffer, "--en-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);")?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "--en-shadow-colored: 0 25px 50px -12px var(--en-shadow-color);"
+                    )?;
+                }
+                "inner" => {
+                    writeln!(buffer, "--en-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);")?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "--en-shadow-colored: inset 0 2px 4px 0 var(--en-shadow-color);"
+                    )?;
+                }
+                "none" => writeln!(buffer, "box-shadow: none;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "--en-shadow: {value};")?;
+                indent(indentation, buffer)?;
+                let mut shadow = shadow::parse_shadow(value).unwrap();
+                shadow.replace_all_colors("var(--en-shadow-color)");
+                writeln!(buffer, "--en-shadow-colored: {};", shadow)?
             }
-            "none" => self.css_template_value("none", css_content),
-            _ => false,
         }
+
+        indent(indentation, buffer)?;
+        writeln!(buffer, "{}", CSS_SHADOW)?;
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct BoxShadowColorPlugin;
 
 impl Plugin for BoxShadowColorPlugin {
@@ -149,45 +236,57 @@ impl Plugin for BoxShadowColorPlugin {
         "shadow"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "color" || is_matching_color(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--en-opacity") {
-            write!(
-                css_content,
-                "--en-shadow-color: {};
---en-shadow: var(--en-shadow-colored);",
-                val.replace("/ var(--en-opacity)", "")
-            )
-            .is_ok()
-        } else {
-            write!(
-                css_content,
-                "--en-shadow-color: {val};
---en-shadow: var(--en-shadow-colored);"
-            )
-            .is_ok()
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
 
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(color) = default_colors::get(config, modifier.content()) {
-            self.css_template_value(&color, css_content)
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                let color = default_colors::get(config, value).unwrap();
+                if color.contains("--en-opacity") {
+                    writeln!(
+                        buffer,
+                        "--en-shadow-color: {};",
+                        color.replace(" / var(--en-opacity)", "")
+                    )?;
+                } else {
+                    writeln!(buffer, "--en-shadow-color: {color};")?;
+                }
+
+                indent(indentation, buffer)?;
+                writeln!(buffer, "--en-shadow: var(--en-shadow-colored);")?;
+            }
+            Modifier::Arbitrary { value, .. } => {
+                if value.contains("--en-opacity") {
+                    writeln!(
+                        buffer,
+                        "--en-shadow-color: {};",
+                        value.replace(" / var(--en-opacity)", "")
+                    )?;
+                } else {
+                    writeln!(buffer, "--en-shadow-color: {value};")?;
+                }
+
+                indent(indentation, buffer)?;
+                writeln!(buffer, "--en-shadow: var(--en-shadow-colored);")?;
+            }
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct OpacityPlugin;
 
 impl Plugin for OpacityPlugin {
@@ -195,18 +294,31 @@ impl Plugin for OpacityPlugin {
         "opacity"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(opacity_value) = modifier.to_f32() {
-            write!(css_content, "opacity: {};", opacity_value / 100.).is_ok()
-        } else {
-            false
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(
+                buffer,
+                "opacity: {};",
+                value.parse::<usize>().unwrap() as f32 / 100.
+            )?,
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }

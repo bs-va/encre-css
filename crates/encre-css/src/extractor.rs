@@ -28,9 +28,7 @@ impl Extractor {
     }
 
     /// Scan all files given and store all the selectors found
-    pub fn scan_files<T: AsRef<Path>>(
-        files: impl Iterator<Item = T>,
-    ) -> BTreeSet<Selector> {
+    pub fn scan_files<T: AsRef<Path>>(files: impl Iterator<Item = T>) -> BTreeSet<Selector> {
         // TODO: Error handling
         let mut file_contents: String = String::new();
 
@@ -53,7 +51,8 @@ impl Extractor {
             .reduce(|mut selectors1, selectors2| {
                 selectors1.extend(selectors2);
                 selectors1
-            }).unwrap_or_default();
+            })
+            .unwrap_or_default();
         debug!("Finished scanning files");
 
         result

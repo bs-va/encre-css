@@ -23,7 +23,7 @@ fn result_equal<T: PartialEq, E>(res1: Result<T, E>, res2: Result<T, E>) -> bool
 
 fn gen_css<T: AsRef<Path>>(generator: &EncreGenerator, output: Option<T>, display_time: bool) {
     let start = Instant::now();
-    let css = generator.generate();
+    let css = generator.generate().expect("failed to generate the CSS");
     let duration = start.elapsed();
 
     if let Some(file) = output {

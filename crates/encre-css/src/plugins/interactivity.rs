@@ -1,10 +1,9 @@
 use super::Plugin;
-use crate::utils::{default_colors, default_lengths, value_matchers::*};
+use crate::utils::{default_colors, default_lengths, indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use std::fmt::Write;
+use std::fmt::{self, Write};
 
-#[derive(Debug)]
 pub struct AccentColorPlugin;
 
 impl Plugin for AccentColorPlugin {
@@ -12,39 +11,51 @@ impl Plugin for AccentColorPlugin {
         "accent"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "color" || is_matching_color(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--en-opacity") {
-            write!(
-                css_content,
-                "accent-color: {};",
-                val.replace(" / var(--en-opacity)", "")
-            )
-            .is_ok()
-        } else {
-            write!(css_content, "accent-color: {val};").is_ok()
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
 
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(color) = default_colors::get(config, modifier.content()) {
-            self.css_template_value(&color, css_content)
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                let color = default_colors::get(config, value).unwrap();
+                if color.contains("--en-opacity") {
+                    writeln!(
+                        buffer,
+                        "accent-color: {};",
+                        value.replace(" / var(--en-opacity)", ""),
+                    )?;
+                } else {
+                    writeln!(buffer, "accent-color: {color};")?;
+                }
+            }
+            Modifier::Arbitrary { value, .. } => {
+                if value.contains("--en-opacity") {
+                    writeln!(
+                        buffer,
+                        "accent-color: {};",
+                        value.replace(" / var(--en-opacity)", ""),
+                    )?;
+                } else {
+                    writeln!(buffer, "accent-color: {value};")?;
+                }
+            }
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct AppearancePlugin;
 
 impl Plugin for AppearancePlugin {
@@ -52,28 +63,36 @@ impl Plugin for AppearancePlugin {
         "appearance"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => value == "none",
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is("none") {
-            write!(
-                css_content,
-                "-webkit-appearance: none;
-   -moz-appearance: none;
-        appearance: none;"
-            )
-            .is_ok()
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { .. } => {
+                writeln!(buffer, "-webkit-appearance: none;")?;
+                indent(indentation, buffer)?;
+                writeln!(buffer, "-moz-appearance: none;")?;
+                indent(indentation, buffer)?;
+                writeln!(buffer, "appearance: none;")?;
+            }
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct CursorPlugin;
 
 impl Plugin for CursorPlugin {
@@ -81,67 +100,68 @@ impl Plugin for CursorPlugin {
         "cursor"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_all(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => [
+                "auto",
+                "default",
+                "pointer",
+                "wait",
+                "text",
+                "move",
+                "help",
+                "not-allowed",
+                "none",
+                "context-menu",
+                "progress",
+                "cell",
+                "crosshair",
+                "vertical-text",
+                "alias",
+                "copy",
+                "no-drop",
+                "grab",
+                "grabbing",
+                "all-scroll",
+                "col-resize",
+                "row-resize",
+                "n-resize",
+                "e-resize",
+                "s-resize",
+                "w-resize",
+                "ne-resize",
+                "nw-resize",
+                "se-resize",
+                "sw-resize",
+                "ew-resize",
+                "ns-resize",
+                "nesw-resize",
+                "nwse-resize",
+                "zoom-in",
+                "zoom-out",
+            ]
+            .contains(&&**value),
+            Modifier::Arbitrary { value, .. } => is_matching_all(value), // TODO: Better matching
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "cursor: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is_one_of(&[
-            "auto",
-            "default",
-            "pointer",
-            "wait",
-            "text",
-            "move",
-            "help",
-            "not-allowed",
-            "none",
-            "context-menu",
-            "progress",
-            "cell",
-            "crosshair",
-            "vertical-text",
-            "alias",
-            "copy",
-            "no-drop",
-            "grab",
-            "grabbing",
-            "all-scroll",
-            "col-resize",
-            "row-resize",
-            "n-resize",
-            "e-resize",
-            "s-resize",
-            "w-resize",
-            "ne-resize",
-            "nw-resize",
-            "se-resize",
-            "sw-resize",
-            "ew-resize",
-            "ns-resize",
-            "nesw-resize",
-            "nwse-resize",
-            "zoom-in",
-            "zoom-out",
-        ]) {
-            self.css_template_value(modifier.content(), css_content)
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "cursor: {value};")?,
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "cursor: {value};")?,
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct CaretColorPlugin;
 
 impl Plugin for CaretColorPlugin {
@@ -149,39 +169,51 @@ impl Plugin for CaretColorPlugin {
         "caret"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "color" || is_matching_color(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--en-opacity") {
-            write!(
-                css_content,
-                "caret-color: {};",
-                val.replace(" / var(--en-opacity)", "")
-            )
-            .is_ok()
-        } else {
-            write!(css_content, "caret-color: {val};").is_ok()
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
 
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(color) = default_colors::get(config, modifier.content()) {
-            self.css_template_value(&color, css_content)
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                let color = default_colors::get(config, value).unwrap();
+                if color.contains("--en-opacity") {
+                    writeln!(
+                        buffer,
+                        "caret-color: {};",
+                        value.replace(" / var(--en-opacity)", ""),
+                    )?;
+                } else {
+                    writeln!(buffer, "caret-color: {color};")?;
+                }
+            }
+            Modifier::Arbitrary { value, .. } => {
+                if value.contains("--en-opacity") {
+                    writeln!(
+                        buffer,
+                        "caret-color: {};",
+                        value.replace(" / var(--en-opacity)", ""),
+                    )?;
+                } else {
+                    writeln!(buffer, "caret-color: {value};")?;
+                }
+            }
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct PointerEventsPlugin;
 
 impl Plugin for PointerEventsPlugin {
@@ -189,22 +221,30 @@ impl Plugin for PointerEventsPlugin {
         "pointer-events"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["auto", "none"].contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is_one_of(&["none", "auto"]) {
-            write!(css_content, "pointer-events: {modifier};").is_ok()
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "pointer-events: {value};")?,
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct ResizePlugin;
 
 impl Plugin for ResizePlugin {
@@ -212,24 +252,36 @@ impl Plugin for ResizePlugin {
         "resize"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["", "x", "y", "none"].contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "" => write!(css_content, "resize: both;").is_ok(),
-            "none" => write!(css_content, "resize: none;").is_ok(),
-            "x" => write!(css_content, "resize: horizontal;").is_ok(),
-            "y" => write!(css_content, "resize: vertical;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "" => writeln!(buffer, "resize: both;")?,
+                "none" => writeln!(buffer, "resize: none;")?,
+                "x" => writeln!(buffer, "resize: horizontal;")?,
+                "y" => writeln!(buffer, "resize: vertical;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct ScrollBehaviorPlugin;
 
 impl Plugin for ScrollBehaviorPlugin {
@@ -237,24 +289,70 @@ impl Plugin for ScrollBehaviorPlugin {
         "scroll"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["auto", "smooth"].contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is_one_of(&["auto", "smooth"]) {
-            write!(css_content, "scroll-behavior: {modifier};").is_ok()
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "scroll-behavior: {value};")?,
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
 // Scroll margin
 
-#[derive(Debug)]
+fn scroll_margin_padding_can_handle(modifier: &Modifier) -> bool {
+    match modifier {
+        Modifier::Basic { is_negative, value } => {
+            default_lengths::get_basic(value, *is_negative).is_some() || value == "auto"
+        }
+        Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
+    }
+}
+
+pub fn scroll_margin_padding_handle(
+    css_properties: &[&str],
+    modifier: &Modifier,
+    indentation: usize,
+    buffer: &mut String,
+) -> fmt::Result {
+    match modifier {
+        Modifier::Basic { is_negative, value } => {
+            for css_prop in css_properties {
+                indent(indentation, buffer)?;
+                writeln!(
+                    buffer,
+                    "{}: {};",
+                    css_prop,
+                    default_lengths::get_basic(value, *is_negative).unwrap(),
+                )?;
+            }
+        }
+        Modifier::Arbitrary { value, .. } => {
+            for css_prop in css_properties {
+                indent(indentation, buffer)?;
+                writeln!(buffer, "{}: {};", css_prop, value)?;
+            }
+        }
+    }
+
+    Ok(())
+}
+
 pub struct ScrollMarginPlugin;
 
 impl Plugin for ScrollMarginPlugin {
@@ -262,35 +360,21 @@ impl Plugin for ScrollMarginPlugin {
         "scroll-m"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        scroll_margin_padding_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "scroll-margin: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is("auto") {
-            return self.css_template_value("auto", css_content);
-        }
-
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-margin"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
 pub struct ScrollMarginXPlugin;
 
 impl Plugin for ScrollMarginXPlugin {
@@ -298,40 +382,26 @@ impl Plugin for ScrollMarginXPlugin {
         "scroll-mx"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        scroll_margin_padding_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(
-            css_content,
-            "scroll-margin-left: {val};
-scroll-margin-right: {val};"
-        )
-        .is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is("auto") {
-            return self.css_template_value("auto", css_content);
-        }
-
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        scroll_margin_padding_handle(
+            &["scroll-margin-left", "scroll-margin-right"],
+            modifier,
+            indentation,
+            buffer,
+        )
     }
 }
 
-#[derive(Debug)]
 pub struct ScrollMarginYPlugin;
 
 impl Plugin for ScrollMarginYPlugin {
@@ -339,40 +409,26 @@ impl Plugin for ScrollMarginYPlugin {
         "scroll-my"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        scroll_margin_padding_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(
-            css_content,
-            "scroll-margin-top: {val};
-scroll-margin-bottom: {val};"
-        )
-        .is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is("auto") {
-            return self.css_template_value("auto", css_content);
-        }
-
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        scroll_margin_padding_handle(
+            &["scroll-margin-top", "scroll-margin-bottom"],
+            modifier,
+            indentation,
+            buffer,
+        )
     }
 }
 
-#[derive(Debug)]
 pub struct ScrollMarginLeftPlugin;
 
 impl Plugin for ScrollMarginLeftPlugin {
@@ -380,35 +436,21 @@ impl Plugin for ScrollMarginLeftPlugin {
         "scroll-ml"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        scroll_margin_padding_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "scroll-margin-left: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is("auto") {
-            return self.css_template_value("auto", css_content);
-        }
-
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-margin-left"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
 pub struct ScrollMarginRightPlugin;
 
 impl Plugin for ScrollMarginRightPlugin {
@@ -416,35 +458,21 @@ impl Plugin for ScrollMarginRightPlugin {
         "scroll-mr"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        scroll_margin_padding_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "scroll-margin-right: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is("auto") {
-            return self.css_template_value("auto", css_content);
-        }
-
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-margin-right"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
 pub struct ScrollMarginTopPlugin;
 
 impl Plugin for ScrollMarginTopPlugin {
@@ -452,35 +480,21 @@ impl Plugin for ScrollMarginTopPlugin {
         "scroll-mt"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        scroll_margin_padding_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "scroll-margin-top: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is("auto") {
-            return self.css_template_value("auto", css_content);
-        }
-
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-margin-top"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
 pub struct ScrollMarginBottomPlugin;
 
 impl Plugin for ScrollMarginBottomPlugin {
@@ -488,37 +502,23 @@ impl Plugin for ScrollMarginBottomPlugin {
         "scroll-mb"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        scroll_margin_padding_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "scroll-margin-bottom: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is("auto") {
-            return self.css_template_value("auto", css_content);
-        }
-
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-margin-bottom"], modifier, indentation, buffer)
     }
 }
 
 // Scroll padding
 
-#[derive(Debug)]
 pub struct ScrollPaddingPlugin;
 
 impl Plugin for ScrollPaddingPlugin {
@@ -526,31 +526,21 @@ impl Plugin for ScrollPaddingPlugin {
         "scroll-p"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        scroll_margin_padding_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "scroll-padding: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-padding"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
 pub struct ScrollPaddingXPlugin;
 
 impl Plugin for ScrollPaddingXPlugin {
@@ -558,36 +548,26 @@ impl Plugin for ScrollPaddingXPlugin {
         "scroll-px"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        scroll_margin_padding_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(
-            css_content,
-            "scroll-padding-left: {val};
-scroll-padding-right: {val};"
-        )
-        .is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        scroll_margin_padding_handle(
+            &["scroll-padding-left", "scroll-padding-right"],
+            modifier,
+            indentation,
+            buffer,
+        )
     }
 }
 
-#[derive(Debug)]
 pub struct ScrollPaddingYPlugin;
 
 impl Plugin for ScrollPaddingYPlugin {
@@ -595,36 +575,26 @@ impl Plugin for ScrollPaddingYPlugin {
         "scroll-py"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        scroll_margin_padding_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(
-            css_content,
-            "scroll-padding-top: {val};
-scroll-padding-bottom: {val};"
-        )
-        .is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        scroll_margin_padding_handle(
+            &["scroll-padding-top", "scroll-padding-bottom"],
+            modifier,
+            indentation,
+            buffer,
+        )
     }
 }
 
-#[derive(Debug)]
 pub struct ScrollPaddingLeftPlugin;
 
 impl Plugin for ScrollPaddingLeftPlugin {
@@ -632,31 +602,21 @@ impl Plugin for ScrollPaddingLeftPlugin {
         "scroll-pl"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        scroll_margin_padding_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "scroll-padding-left: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-padding-left"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
 pub struct ScrollPaddingRightPlugin;
 
 impl Plugin for ScrollPaddingRightPlugin {
@@ -664,31 +624,21 @@ impl Plugin for ScrollPaddingRightPlugin {
         "scroll-pr"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        scroll_margin_padding_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "scroll-padding-right: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-padding-right"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
 pub struct ScrollPaddingTopPlugin;
 
 impl Plugin for ScrollPaddingTopPlugin {
@@ -696,31 +646,21 @@ impl Plugin for ScrollPaddingTopPlugin {
         "scroll-pt"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        scroll_margin_padding_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "scroll-padding-top: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-padding-top"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
 pub struct ScrollPaddingBottomPlugin;
 
 impl Plugin for ScrollPaddingBottomPlugin {
@@ -728,31 +668,21 @@ impl Plugin for ScrollPaddingBottomPlugin {
         "scroll-pb"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        scroll_margin_padding_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "scroll-padding-bottom: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(length) = default_lengths::get_basic(modifier.content(), modifier.is_negative())
-        {
-            self.css_template_value(&length, css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-padding-bottom"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
 pub struct ScrollSnapAlignPlugin;
 
 impl Plugin for ScrollSnapAlignPlugin {
@@ -760,24 +690,38 @@ impl Plugin for ScrollSnapAlignPlugin {
         "snap"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["start", "end", "center", "align-none"].contains(&&**value)
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "start" => write!(css_content, "scroll-snap-align: start;").is_ok(),
-            "end" => write!(css_content, "scroll-snap-align: end;").is_ok(),
-            "center" => write!(css_content, "scroll-snap-align: center;").is_ok(),
-            "align-none" => write!(css_content, "scroll-snap-align: none;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "start" => writeln!(buffer, "scroll-snap-align: start;")?,
+                "end" => writeln!(buffer, "scroll-snap-align: end;")?,
+                "center" => writeln!(buffer, "scroll-snap-align: center;")?,
+                "align-none" => writeln!(buffer, "scroll-snap-align: none;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct ScrollSnapStopPlugin;
 
 impl Plugin for ScrollSnapStopPlugin {
@@ -785,22 +729,34 @@ impl Plugin for ScrollSnapStopPlugin {
         "snap"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["normal", "always"].contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "normal" => write!(css_content, "scroll-snap-stop: normal;").is_ok(),
-            "always" => write!(css_content, "scroll-snap-stop: always;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "normal" => writeln!(buffer, "scroll-snap-stop: normal;")?,
+                "always" => writeln!(buffer, "scroll-snap-stop: always;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct ScrollSnapTypePlugin;
 
 impl Plugin for ScrollSnapTypePlugin {
@@ -808,46 +764,74 @@ impl Plugin for ScrollSnapTypePlugin {
         "snap"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["x", "y", "both", "mandatory", "proximity", "none"].contains(&&**value)
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "none" => write!(
-                css_content,
-                "-ms-scroll-snap-type: none;
-scroll-snap-type: none;"
-            )
-            .is_ok(),
-            "x" => write!(
-                css_content,
-                "-ms-scroll-snap-type: x var(--en-scroll-snap-strictness);
-scroll-snap-type: x var(--en-scroll-snap-strictness);"
-            )
-            .is_ok(),
-            "y" => write!(
-                css_content,
-                "-ms-scroll-snap-type: y var(--en-scroll-snap-strictness);
-scroll-snap-type: y var(--en-scroll-snap-strictness);"
-            )
-            .is_ok(),
-            "both" => write!(
-                css_content,
-                "-ms-scroll-snap-type: both var(--en-scroll-snap-strictness);
-scroll-snap-type: both var(--en-scroll-snap-strictness);"
-            )
-            .is_ok(),
-            "mandatory" => write!(css_content, "--en-scroll-snap-strictness: mandatory;").is_ok(),
-            "proximity" => write!(css_content, "--en-scroll-snap-strictness: proximity;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "none" => {
+                    writeln!(buffer, "-ms-scroll-snap-type: none;")?;
+                    indent(indentation, buffer)?;
+                    writeln!(buffer, "scroll-snap-type: none;")?;
+                }
+                "x" => {
+                    writeln!(
+                        buffer,
+                        "-ms-scroll-snap-type: x var(--en-scroll-snap-strictness);"
+                    )?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "scroll-snap-type: x var(--en-scroll-snap-strictness);"
+                    )?;
+                }
+                "y" => {
+                    writeln!(
+                        buffer,
+                        "-ms-scroll-snap-type: y var(--en-scroll-snap-strictness);"
+                    )?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "scroll-snap-type: y var(--en-scroll-snap-strictness);"
+                    )?;
+                }
+                "both" => {
+                    writeln!(
+                        buffer,
+                        "-ms-scroll-snap-type: both var(--en-scroll-snap-strictness);"
+                    )?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "scroll-snap-type: both var(--en-scroll-snap-strictness);"
+                    )?;
+                }
+                "mandatory" => writeln!(buffer, "--en-scroll-snap-strictness: mandatory;")?,
+                "proximity" => writeln!(buffer, "--en-scroll-snap-strictness: proximity;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct TouchActionPlugin;
 
 impl Plugin for TouchActionPlugin {
@@ -855,33 +839,42 @@ impl Plugin for TouchActionPlugin {
         "touch"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => [
+                "auto",
+                "pan-x",
+                "pan-left",
+                "pan-right",
+                "pan-y",
+                "pan-up",
+                "pan-down",
+                "pinch-zoom",
+                "manipulation",
+                "none",
+            ]
+            .contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is_one_of(&[
-            "auto",
-            "none",
-            "pan-x",
-            "pan-left",
-            "pan-right",
-            "pan-y",
-            "pan-up",
-            "pan-down",
-            "pinch-zoom",
-            "manipulation",
-        ]) {
-            write!(css_content, "touch-action: {modifier};").is_ok()
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "touch-action: {value};")?,
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct UserSelectPlugin;
 
 impl Plugin for UserSelectPlugin {
@@ -889,22 +882,30 @@ impl Plugin for UserSelectPlugin {
         "select"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["text", "all", "auto", "none"].contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is_one_of(&["none", "text", "all", "auto"]) {
-            write!(css_content, "user-select: {modifier};").is_ok()
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "user-select: {value};")?,
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct WillChangePlugin;
 
 impl Plugin for WillChangePlugin {
@@ -912,27 +913,34 @@ impl Plugin for WillChangePlugin {
         "will-change"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        is_matching_all(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["auto", "scroll", "contents", "transform"].contains(&&**value)
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "will-change: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "auto" => self.css_template_value("auto", css_content),
-            "scroll" => self.css_template_value("scroll-position", css_content),
-            "contents" => self.css_template_value("contents", css_content),
-            "transform" => self.css_template_value("transfrom", css_content),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "auto" => writeln!(buffer, "will-change: auto;")?,
+                "scroll" => writeln!(buffer, "will-change: scroll-position;")?,
+                "contents" => writeln!(buffer, "will-change: contents;")?,
+                "transform" => writeln!(buffer, "will-change: transfrom;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "will-change: {value};")?,
         }
+
+        Ok(())
     }
 }

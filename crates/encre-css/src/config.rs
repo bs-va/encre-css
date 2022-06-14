@@ -4,7 +4,7 @@ use serde::Deserialize;
 use std::{
     borrow::Cow,
     collections::BTreeMap,
-    fs,
+    fmt, fs,
     ops::{Deref, DerefMut},
     path::{Path, PathBuf},
 };
@@ -309,6 +309,35 @@ impl From<BTreeMap<Cow<'static, str>, Cow<'static, str>>> for ColorConfig {
     }
 }
 
+#[derive(Debug, PartialEq, Clone, Deserialize)]
+pub struct ModifierSeparator(Cow<'static, str>);
+
+impl Default for ModifierSeparator {
+    fn default() -> Self {
+        Self(Cow::from("-"))
+    }
+}
+
+impl fmt::Display for ModifierSeparator {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl From<Cow<'static, str>> for ModifierSeparator {
+    fn from(v: Cow<'static, str>) -> Self {
+        Self(v)
+    }
+}
+
+impl Deref for ModifierSeparator {
+    type Target = Cow<'static, str>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
 #[derive(Debug, PartialEq, Default, Deserialize)]
 pub struct ThemeConfig {
     #[serde(default)]
@@ -328,16 +357,29 @@ pub struct Config {
 
     #[serde(default)]
     pub theme: ThemeConfig,
+
+    /// A custom modifier separator
+    ///
+    /// For example in `bg-red-500`, `-` is the modifier separator
+    ///
+    /// NOTE: Custom configured colors must not take into account this separator, they are always
+    /// delimited with `-` in the configuration but usable with this separator after. For example,
+    /// if you have configured `_` as modifier separator and you want to add the new color `lime-500`,
+    /// you must write it using hyphens in the configuration, but you'll use it as `bg_lime_500`
+    /// and `text_lime_500`
+    #[serde(default)]
+    pub modifier_separator: ModifierSeparator,
     // custom_variants: Vec<VariantConfig>,
     // custom_plugins: Vec<PluginConfig>,
 
-    // TODO: Prefix (en-), preflight, safelist, separator for {variants, arbitrary values, modifiers}
+    // TODO: Prefix (en-), preflight, safelist, separator for {variants, arbitrary values}
 }
 
 impl Config {
     pub fn from_file<T: AsRef<Path>>(path: T) -> Result<Self> {
         let mut config: Config = toml::from_str(
-            &fs::read_to_string(&path).map_err(|e| Error::ConfigFileNotFound(path.as_ref().to_path_buf(), e))?,
+            &fs::read_to_string(&path)
+                .map_err(|e| Error::ConfigFileNotFound(path.as_ref().to_path_buf(), e))?,
         )?;
 
         if config.theme.colors != ColorConfig::default() {

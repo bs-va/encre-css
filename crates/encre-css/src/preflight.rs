@@ -426,6 +426,4 @@ Ensure the default browser behavior of the `hidden` attribute.
   --en-backdrop-opacity:  ;
   --en-backdrop-saturate:  ;
   --en-backdrop-sepia:  ;
-}
-
-"#;
+}"#;

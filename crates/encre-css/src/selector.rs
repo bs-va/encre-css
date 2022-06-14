@@ -1,104 +1,35 @@
+use crate::{config::Config, variant::VARIANT_SEPARATOR};
+
 use lazy_static::lazy_static;
 use regex::Regex;
 use smol_str::SmolStr;
-use std::{fmt, num};
-
-use crate::variant::VARIANT_SEPARATOR;
 
 lazy_static! {
-    static ref VARIANT_REGEX: Regex = Regex::new(r"^[^\[]*:").unwrap();
-    static ref ARBITRARY_VALUE_REGEX: Regex = Regex::new(r"\[([a-zA-Z0-9-_]+:)?(.+)\]$").unwrap();
+    static ref VARIANT_REGEX: Regex =
+        Regex::new(&format!(r"^[^\[]*{}", VARIANT_SEPARATOR)).unwrap();
+    static ref ARBITRARY_VALUE_REGEX: Regex =
+        Regex::new(&format!(r"\[([a-zA-Z0-9-_]+{})?(.+)\]$", VARIANT_SEPARATOR)).unwrap();
 }
 
-pub struct Modifier<'a> {
-    content: &'a str,
-    is_negative: bool,
-}
-
-impl<'a> Modifier<'a> {
-    pub fn new(content: &'a str, is_negative: bool) -> Self {
-        Self {
-            content,
-            is_negative,
-        }
-    }
-
-    /// Get the content of the modifier
-    #[inline]
-    pub fn content(&self) -> &str {
-        self.content
-    }
-
-    //// Check if the modifier is negative
-    #[inline]
-    pub fn is_negative(&self) -> bool {
-        self.is_negative
-    }
-
-    //// Check if the modifier content is equals to a string
-    #[inline]
-    pub fn is(&self, val: &str) -> bool {
-        self.content == val
-    }
-
-    //// Check if the modifier content is equals to at least one value in the given list
-    #[inline]
-    pub fn is_one_of(&self, values: &[&str]) -> bool {
-        values.contains(&self.content)
-    }
-
-    //// Check if the modifier is empty
-    #[inline]
-    pub fn is_empty(&self) -> bool {
-        self.content.is_empty()
-    }
-
-    /// Try to convert the modifier to an `f32`
-    #[inline]
-    pub fn to_f32(&self) -> Result<f32, num::ParseFloatError> {
-        if self.is_negative {
-            self.content.parse::<f32>().map(|v| -v)
-        } else {
-            self.content.parse::<f32>()
-        }
-    }
-
-    /// Try to convert the modifier to a `usize`
-    #[inline]
-    pub fn to_usize(&self) -> Result<usize, num::ParseIntError> {
-        self.content.parse::<usize>()
-    }
-
-    #[inline]
-    pub fn strip_prefix(&self, prefix: &str) -> Option<&str> {
-        self.content.strip_prefix(prefix)
-    }
-}
-
-impl<'a> fmt::Display for Modifier<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}{}",
-            if self.is_negative { "-" } else { "" },
-            self.content
-        )
-    }
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub enum Modifier {
+    Basic { is_negative: bool, value: SmolStr },
+    Arbitrary { value: SmolStr, hint: SmolStr },
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Selector {
-    pub(crate) full_name: SmolStr,
-    pub(crate) variants: Option<Vec<String>>,
+    pub(crate) full: SmolStr,
     pub(crate) content: String,
-    pub(crate) is_negative: bool,
+    pub(crate) variants: Option<Vec<String>>,
     pub(crate) is_important: bool,
+    pub(crate) is_negative: bool,
 }
 
 impl Selector {
     pub fn new<T: Into<SmolStr>>(data: T) -> Self {
         let mut data = data.into();
-        let full_name = data.clone();
+        let full = data.clone();
 
         // Strip the important flag before the negative one
         let mut is_important = false;
@@ -121,10 +52,12 @@ impl Selector {
             match ch {
                 '[' => in_square_bracket = true,
                 ']' => in_square_bracket = false,
-                VARIANT_SEPARATOR => if !in_square_bracket {
-                    next_variant = true;
-                    return;
-                },
+                VARIANT_SEPARATOR => {
+                    if !in_square_bracket {
+                        next_variant = true;
+                        return;
+                    }
+                }
                 _ => (),
             }
 
@@ -141,58 +74,40 @@ impl Selector {
         // The selector without variants is the remaining part of the list of variants
         let content = variants.pop().unwrap();
 
-        if !variants.is_empty() {
-            // Used to be compatible with TailwindCSS
-            variants.reverse();
-
-            Self {
-                full_name,
-                variants: Some(variants),
-                content,
-                is_negative,
-                is_important,
-            }
-        } else {
-            Self {
-                full_name,
-                variants: None,
-                content: data.to_string(),
-                is_negative,
-                is_important,
-            }
+        Self {
+            full,
+            variants: if !variants.is_empty() {
+                Some(variants)
+            } else {
+                None
+            },
+            content,
+            is_important,
+            is_negative,
         }
     }
 
-    /// Get the modifier of the selector from the namespace of a plugin
-    pub fn get_modifier(&self, namespace: &str) -> Modifier {
-        if namespace.is_empty() {
-            Modifier::new(&self.content, self.is_negative)
+    pub fn modifier(&self, config: &Config, namespace: &str) -> Option<Modifier> {
+        let modifier_part = self.content.strip_prefix(namespace)?;
+        let modifier_part = modifier_part
+            .strip_prefix(&**config.modifier_separator)
+            .unwrap_or(modifier_part);
+
+        if let Some(caps) = ARBITRARY_VALUE_REGEX.captures(modifier_part) {
+            Some(Modifier::Arbitrary {
+                hint: SmolStr::from(
+                    caps.get(1)
+                        .map(|c| c.as_str())
+                        .unwrap_or("")
+                        .trim_end_matches(':'),
+                ),
+                value: SmolStr::from(caps.get(2)?.as_str()),
+            })
         } else {
-            let modifier_start_index =
-                if self.content.chars().nth(namespace.len()).map(|v| v == '-') == Some(true) {
-                    namespace.len() + 1
-                } else {
-                    namespace.len()
-                };
-
-            Modifier::new(&self.content[modifier_start_index..], self.is_negative)
+            Some(Modifier::Basic {
+                is_negative: self.is_negative,
+                value: SmolStr::from(modifier_part),
+            })
         }
-    }
-
-    pub fn get_arbitrary_value(&self) -> Option<(&str, &str)> {
-        let caps = ARBITRARY_VALUE_REGEX.captures(&self.content)?;
-        Some((caps.get(1).map(|c| c.as_str()).unwrap_or("").trim_end_matches(':'), caps.get(2)?.as_str()))
-    }
-
-    /// Check whether an arbitrary string belongs to a namespace
-    #[inline]
-    pub fn check_namespace(&self, maybe_namespace: &str) -> bool {
-        self.content.starts_with(maybe_namespace)
-    }
-}
-
-impl fmt::Display for Selector {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.full_name)
     }
 }

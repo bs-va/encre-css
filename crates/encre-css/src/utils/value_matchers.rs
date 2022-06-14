@@ -6,6 +6,7 @@ pub const LENGTH_UNITS: [&str; 16] = [
     "vmax",
 ];
 pub const LINE_WIDTHS: [&str; 3] = ["thin", "medium", "thick"];
+pub const ANGLES: [&str; 4] = ["deg", "grad", "rad", "turn"];
 pub const GRADIENT_TYPES: [&str; 5] = [
     "linear-gradient",
     "radial-gradient",
@@ -13,7 +14,6 @@ pub const GRADIENT_TYPES: [&str; 5] = [
     "repeating-radial-gradient",
     "conic-gradient",
 ];
-pub const SHADOW_KEYWORDS: [&str; 5] = ["inset", "inherit", "initial", "revert", "unset"];
 pub const VALID_POSITIONS: [&str; 5] = ["center", "top", "right", "bottom", "left"];
 pub const GENERIC_NAMES: [&str; 13] = [
     "serif",
@@ -194,8 +194,7 @@ pub const NAMED_COLORS: [&str; 148] = [
 
 lazy_static! {
     static ref COLOR_REGEX: Regex =
-        Regex::new(r"^(#[a-f\d]{3}|#[a-f\d]{6}|rgba?\(([\d,_\.]+|var\(--.+\))[,_]([\d,_\.]+|var\(--.+\))[,_]([\d,_\.]+|var\(--.+\))((_+)?/(_+)?([\d_\.]+|var\(--.+\)))?\)|hsla?\(([\d_\.]+|var\(--.+\))(deg|rad|grad|turn)?[,_]([\d_\.%]+|var\(--.+\))[,_]([\d_\.%]+|var\(--.+\))([,_]([\d_\.%]+|var\(--.+\)))?((_+)?/(_+)?([\d_\.]+|var\(--.+\)))?\))$")
-            .unwrap();
+        Regex::new(r"^(#[a-f\d]{3}|#[a-f\d]{6}|rgba?\(.+\)|hsla?\(.+\))$").unwrap();
     static ref LENGTH_REGEX: Regex =
         Regex::new(&format!("(?-u)(?:{})$", LENGTH_UNITS.join("|"))).unwrap();
     static ref TIME_REGEX: Regex = Regex::new(r"(?-u)\d+m?s$").unwrap();
@@ -223,144 +222,96 @@ lazy_static! {
 // - global values like inherit, initial, revert, revert-layer, unset
 // - intrinsic sizing keywords: fill, max-content, min-content, fit-content
 
-pub fn is_matching_all(_val: &str) -> bool {
+pub fn is_matching_all(_value: &str) -> bool {
     true
 }
 
-pub fn is_matching_url(val: &str) -> bool {
-    val.starts_with("url(")
+pub fn is_matching_url(value: &str) -> bool {
+    value.starts_with("url(")
 }
 
-pub fn is_matching_var(val: &str) -> bool {
-    val.starts_with("var(")
+pub fn is_matching_var(value: &str) -> bool {
+    value.starts_with("var(")
 }
 
-pub fn is_matching_color(val: &str) -> bool {
-    COLOR_REGEX.is_match(val)
-        || !val.is_empty() && NAMED_COLORS.iter().any(|c| &val == c)
-        || is_matching_var(val)
+pub fn is_matching_color(value: &str) -> bool {
+    COLOR_REGEX.is_match(value)
+        || !value.is_empty() && NAMED_COLORS.iter().any(|c| &value == c)
+        || is_matching_var(value)
 }
 
-pub fn is_matching_length(val: &str) -> bool {
-    val.split('_').all(|v| {
-        v == "0"
-            || LENGTH_REGEX.is_match(v)
-            || LENGTH_CSS_FUNCTIONS_REGEXES.iter().any(|r| r.is_match(val))
-            || is_matching_percentage(val)
-    })
+pub fn is_matching_length(value: &str) -> bool {
+    is_matching_var(value)
+        || value.split('_').all(|v| {
+            v == "0"
+                || LENGTH_REGEX.is_match(v)
+                || LENGTH_CSS_FUNCTIONS_REGEXES.iter().any(|r| r.is_match(v))
+                || is_matching_percentage(v)
+        })
 }
 
-pub fn is_matching_number(val: &str) -> bool {
-    val.parse::<usize>().is_ok() || NUMBER_CSS_FUNCTIONS_REGEXES.iter().any(|r| r.is_match(val))
+pub fn is_matching_number(value: &str) -> bool {
+    value.parse::<usize>().is_ok()
+        || NUMBER_CSS_FUNCTIONS_REGEXES
+            .iter()
+            .any(|r| r.is_match(value))
 }
 
-pub fn is_matching_float(val: &str) -> bool {
-    val.parse::<f32>().is_ok() || NUMBER_CSS_FUNCTIONS_REGEXES.iter().any(|r| r.is_match(val))
+pub fn is_matching_float(value: &str) -> bool {
+    value.parse::<f32>().is_ok()
+        || NUMBER_CSS_FUNCTIONS_REGEXES
+            .iter()
+            .any(|r| r.is_match(value))
 }
 
-pub fn is_matching_percentage(val: &str) -> bool {
-    val.ends_with('%')
+pub fn is_matching_percentage(value: &str) -> bool {
+    value.ends_with('%')
         || PERCENTAGE_CSS_FUNCTIONS_REGEXES
             .iter()
-            .any(|r| r.is_match(val))
+            .any(|r| r.is_match(value))
 }
 
-pub fn is_matching_time(val: &str) -> bool {
-    TIME_REGEX.is_match(val)
+pub fn is_matching_time(value: &str) -> bool {
+    TIME_REGEX.is_match(value)
 }
 
-pub fn is_matching_shadow(val: &str) -> bool {
-    let mut in_parenthesis = false;
-    let mut current_part = String::new();
-    let mut part_index = 0;
-
-    if val.chars().find_map(|c| {
-        match c {
-            '(' => {
-                current_part.push('(');
-                in_parenthesis = true;
-            }
-            ')' => {
-                current_part.push(')');
-                in_parenthesis = false;
-            }
-            '_' if !in_parenthesis => {
-                if !(part_index == 0 && SHADOW_KEYWORDS.contains(&current_part.as_str()))
-                    && (part_index > 4
-                        || !is_matching_length(&current_part)
-                            && (part_index >= 2 && !is_matching_color(&current_part)))
-                {
-                    return Some(());
-                }
-
-                part_index += 1;
-                current_part.clear();
-            }
-            ',' if !in_parenthesis => {
-                if !(part_index == 0 && SHADOW_KEYWORDS.contains(&current_part.as_str()))
-                    && (part_index > 4
-                        || !is_matching_length(&current_part)
-                            && (part_index >= 2 && !is_matching_color(&current_part)))
-                {
-                    return Some(());
-                }
-
-                current_part.clear();
-                part_index = 0;
-            }
-            other => {
-                current_part.push(other);
-            }
-        }
-
-        None
-    }).is_some() {
-        return false;
-    }
-
-    if !current_part.is_empty() {
-        // Handle the last part (not suffixed by `_`)
-        if !(part_index == 0 && SHADOW_KEYWORDS.contains(&current_part.as_str()))
-            && (part_index > 4
-                || !is_matching_length(&current_part)
-                    && (part_index >= 2 && !is_matching_color(&current_part)))
-        {
-            return false;
-        }
-    }
-
-    true
+pub fn is_matching_shadow(value: &str) -> bool {
+    super::shadow::parse_shadow(&value.replace('_', " ")).is_some()
 }
 
-pub fn is_matching_gradient(val: &str) -> bool {
-    GRADIENT_TYPES.iter().any(|t| val.starts_with(t))
+pub fn is_matching_gradient(value: &str) -> bool {
+    GRADIENT_TYPES.iter().any(|t| value.starts_with(t))
 }
 
-pub fn is_matching_position(val: &str) -> bool {
-    VALID_POSITIONS.contains(&val)
-        || is_matching_length(val)
-        || is_matching_percentage(val)
-        || is_matching_var(val)
+pub fn is_matching_position(value: &str) -> bool {
+    VALID_POSITIONS.contains(&value)
+        || is_matching_length(value)
+        || is_matching_percentage(value)
+        || is_matching_var(value)
 }
 
-pub fn is_matching_line_width(val: &str) -> bool {
-    LINE_WIDTHS.contains(&val)
+pub fn is_matching_line_width(value: &str) -> bool {
+    LINE_WIDTHS.contains(&value)
 }
 
-pub fn is_matching_generic_name(val: &str) -> bool {
-    GENERIC_NAMES.contains(&val)
+pub fn is_matching_angle(value: &str) -> bool {
+    ANGLES.iter().any(|a| value.ends_with(a))
 }
 
-pub fn is_matching_absolute_size(val: &str) -> bool {
-    ABSOLUTE_SIZES.contains(&val)
+pub fn is_matching_generic_name(value: &str) -> bool {
+    GENERIC_NAMES.contains(&value)
 }
 
-pub fn is_matching_relative_size(val: &str) -> bool {
-    RELATIVE_SIZES.contains(&val)
+pub fn is_matching_absolute_size(value: &str) -> bool {
+    ABSOLUTE_SIZES.contains(&value)
 }
 
-pub fn is_matching_image(val: &str) -> bool {
-    val.split(',').all(|v| {
+pub fn is_matching_relative_size(value: &str) -> bool {
+    RELATIVE_SIZES.contains(&value)
+}
+
+pub fn is_matching_image(value: &str) -> bool {
+    value.split(',').all(|v| {
         is_matching_var(v)
             || is_matching_url(v)
             || is_matching_gradient(v)
@@ -458,6 +409,11 @@ mod tests {
     #[test]
     fn is_matching_line_width_test() {
         assert!(is_matching_line_width("thin"));
+    }
+
+    #[test]
+    fn is_matching_angle_test() {
+        assert!(is_matching_angle("0.2turn"));
     }
 
     #[test]

@@ -1,12 +1,11 @@
 use super::Plugin;
-use crate::utils::{default_colors, value_matchers::*};
+use crate::utils::{default_colors, indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use std::fmt::Write;
+use std::fmt::{self, Write};
 
 const CSS_RING_OFFSET_SHADOW: &str = "--en-ring-offset-shadow: var(--en-ring-inset) 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color);";
 
-#[derive(Debug)]
 pub struct ColorPlugin;
 
 impl Plugin for ColorPlugin {
@@ -14,372 +13,107 @@ impl Plugin for ColorPlugin {
         "border"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "color" || is_matching_color(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--en-opacity") {
-            write!(
-                css_content,
-                "--en-border-opacity: 1;
-border-color: {};",
-                val.replace("--en-opacity", "--en-border-opacity")
-            )
-            .is_ok()
-        } else {
-            write!(css_content, "border-color: {val};").is_ok()
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
 
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(color) = default_colors::get(config, modifier.content()) {
-            self.css_template_value(&color, css_content)
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                let color = default_colors::get(config, value).unwrap();
+                if color.contains("--en-opacity") {
+                    writeln!(buffer, "--en-border-opacity: 1;")?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "border-color: {};",
+                        color.replace("--en-opacity", "--en-border-opacity")
+                    )?;
+                } else {
+                    writeln!(buffer, "border-color: {color};")?;
+                }
+            }
+            Modifier::Arbitrary { value, .. } => {
+                if value.contains("--en-opacity") {
+                    writeln!(buffer, "--en-border-opacity: 1;")?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "border-color: {};",
+                        value.replace("--en-opacity", "--en-border-opacity")
+                    )?;
+                } else {
+                    writeln!(buffer, "border-color: {value};")?;
+                }
+            }
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
-pub struct RadiusPlugin;
-
-impl Plugin for RadiusPlugin {
-    fn namespace(&self) -> &str {
-        "rounded"
-    }
-
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        val.split('_')
-            .all(|v| is_matching_length(v) || is_matching_percentage(v))
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "border-radius: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "" => self.css_template_value("0.25rem", css_content),
-            "none" => self.css_template_value("0", css_content),
-            "sm" => self.css_template_value("0.125rem", css_content),
-            "md" => self.css_template_value("0.375rem", css_content),
-            "lg" => self.css_template_value("0.5rem", css_content),
-            "xl" => self.css_template_value("0.75rem", css_content),
-            "2xl" => self.css_template_value("1rem", css_content),
-            "3xl" => self.css_template_value("1.5rem", css_content),
-            "full" => self.css_template_value("9999px", css_content),
-            _ => false,
+pub fn radius_can_handle(modifier: &Modifier) -> bool {
+    match modifier {
+        Modifier::Basic { value, .. } => {
+            value.is_empty()
+                || ["sm", "md", "lg", "xl", "2xl", "3xl", "full", "none"].contains(&&**value)
         }
+        Modifier::Arbitrary { value, .. } => value
+            .split('_')
+            .all(|v| is_matching_length(v) || is_matching_percentage(v)),
     }
 }
 
-#[derive(Debug)]
-pub struct RadiusTopPlugin;
-
-impl Plugin for RadiusTopPlugin {
-    fn namespace(&self) -> &str {
-        "rounded-t"
-    }
-
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        val.split('_')
-            .all(|v| is_matching_length(v) || is_matching_percentage(v))
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(
-            css_content,
-            "border-top-left-radius: {val};
-border-top-right-radius: {val};"
-        )
-        .is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "" => self.css_template_value("0.25rem", css_content),
-            "none" => self.css_template_value("0", css_content),
-            "sm" => self.css_template_value("0.125rem", css_content),
-            "md" => self.css_template_value("0.375rem", css_content),
-            "lg" => self.css_template_value("0.5rem", css_content),
-            "xl" => self.css_template_value("0.75rem", css_content),
-            "2xl" => self.css_template_value("1rem", css_content),
-            "3xl" => self.css_template_value("1.5rem", css_content),
-            "full" => self.css_template_value("9999px", css_content),
-            _ => false,
+pub fn radius_handle(
+    css_properties: &[&str],
+    modifier: &Modifier,
+    indentation: usize,
+    buffer: &mut String,
+) -> fmt::Result {
+    match modifier {
+        Modifier::Basic { value, .. } => {
+            for css_prop in css_properties {
+                indent(indentation, buffer)?;
+                writeln!(
+                    buffer,
+                    "{}: {};",
+                    css_prop,
+                    match value.as_str() {
+                        "" => "0.25rem",
+                        "none" => "0",
+                        "sm" => "0.125rem",
+                        "md" => "0.375rem",
+                        "lg" => "0.5rem",
+                        "xl" => "0.75rem",
+                        "2xl" => "1rem",
+                        "3xl" => "1.5rem",
+                        "full" => "9999px",
+                        _ => unreachable!(),
+                    }
+                )?
+            }
+        }
+        Modifier::Arbitrary { value, .. } => {
+            for css_prop in css_properties {
+                indent(indentation, buffer)?;
+                writeln!(buffer, "{}: {};", css_prop, value)?;
+            }
         }
     }
+
+    Ok(())
 }
 
-#[derive(Debug)]
-pub struct RadiusBottomPlugin;
-
-impl Plugin for RadiusBottomPlugin {
-    fn namespace(&self) -> &str {
-        "rounded-b"
-    }
-
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        val.split('_')
-            .all(|v| is_matching_length(v) || is_matching_percentage(v))
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(
-            css_content,
-            "border-bottom-left-radius: {val};
-border-bottom-right-radius: {val};"
-        )
-        .is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "" => self.css_template_value("0.25rem", css_content),
-            "none" => self.css_template_value("0", css_content),
-            "sm" => self.css_template_value("0.125rem", css_content),
-            "md" => self.css_template_value("0.375rem", css_content),
-            "lg" => self.css_template_value("0.5rem", css_content),
-            "xl" => self.css_template_value("0.75rem", css_content),
-            "2xl" => self.css_template_value("1rem", css_content),
-            "3xl" => self.css_template_value("1.5rem", css_content),
-            "full" => self.css_template_value("9999px", css_content),
-            _ => false,
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct RadiusLeftPlugin;
-
-impl Plugin for RadiusLeftPlugin {
-    fn namespace(&self) -> &str {
-        "rounded-l"
-    }
-
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        val.split('_')
-            .all(|v| is_matching_length(v) || is_matching_percentage(v))
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(
-            css_content,
-            "border-top-left-radius: {val};
-border-bottom-left-radius: {val};"
-        )
-        .is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "" => self.css_template_value("0.25rem", css_content),
-            "none" => self.css_template_value("0", css_content),
-            "sm" => self.css_template_value("0.125rem", css_content),
-            "md" => self.css_template_value("0.375rem", css_content),
-            "lg" => self.css_template_value("0.5rem", css_content),
-            "xl" => self.css_template_value("0.75rem", css_content),
-            "2xl" => self.css_template_value("1rem", css_content),
-            "3xl" => self.css_template_value("1.5rem", css_content),
-            "full" => self.css_template_value("9999px", css_content),
-            _ => false,
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct RadiusRightPlugin;
-
-impl Plugin for RadiusRightPlugin {
-    fn namespace(&self) -> &str {
-        "rounded-r"
-    }
-
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        val.split('_')
-            .all(|v| is_matching_length(v) || is_matching_percentage(v))
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(
-            css_content,
-            "border-top-right-radius: {val};
-border-bottom-right-radius: {val};"
-        )
-        .is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "" => self.css_template_value("0.25rem", css_content),
-            "none" => self.css_template_value("0", css_content),
-            "sm" => self.css_template_value("0.125rem", css_content),
-            "md" => self.css_template_value("0.375rem", css_content),
-            "lg" => self.css_template_value("0.5rem", css_content),
-            "xl" => self.css_template_value("0.75rem", css_content),
-            "2xl" => self.css_template_value("1rem", css_content),
-            "3xl" => self.css_template_value("1.5rem", css_content),
-            "full" => self.css_template_value("9999px", css_content),
-            _ => false,
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct RadiusTopLeftPlugin;
-
-impl Plugin for RadiusTopLeftPlugin {
-    fn namespace(&self) -> &str {
-        "rounded-tl"
-    }
-
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        val.split('_')
-            .all(|v| is_matching_length(v) || is_matching_percentage(v))
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "border-top-left-radius: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "" => self.css_template_value("0.25rem", css_content),
-            "none" => self.css_template_value("0", css_content),
-            "sm" => self.css_template_value("0.125rem", css_content),
-            "md" => self.css_template_value("0.375rem", css_content),
-            "lg" => self.css_template_value("0.5rem", css_content),
-            "xl" => self.css_template_value("0.75rem", css_content),
-            "2xl" => self.css_template_value("1rem", css_content),
-            "3xl" => self.css_template_value("1.5rem", css_content),
-            "full" => self.css_template_value("9999px", css_content),
-            _ => false,
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct RadiusBottomLeftPlugin;
-
-impl Plugin for RadiusBottomLeftPlugin {
-    fn namespace(&self) -> &str {
-        "rounded-bl"
-    }
-
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        val.split('_')
-            .all(|v| is_matching_length(v) || is_matching_percentage(v))
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "border-bottom-left-radius: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "" => self.css_template_value("0.25rem", css_content),
-            "none" => self.css_template_value("0", css_content),
-            "sm" => self.css_template_value("0.125rem", css_content),
-            "md" => self.css_template_value("0.375rem", css_content),
-            "lg" => self.css_template_value("0.5rem", css_content),
-            "xl" => self.css_template_value("0.75rem", css_content),
-            "2xl" => self.css_template_value("1rem", css_content),
-            "3xl" => self.css_template_value("1.5rem", css_content),
-            "full" => self.css_template_value("9999px", css_content),
-            _ => false,
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct RadiusBottomRightPlugin;
-
-impl Plugin for RadiusBottomRightPlugin {
-    fn namespace(&self) -> &str {
-        "rounded-br"
-    }
-
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        val.split('_')
-            .all(|v| is_matching_length(v) || is_matching_percentage(v))
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "border-bottom-right-radius: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "" => self.css_template_value("0.25rem", css_content),
-            "none" => self.css_template_value("0", css_content),
-            "sm" => self.css_template_value("0.125rem", css_content),
-            "md" => self.css_template_value("0.375rem", css_content),
-            "lg" => self.css_template_value("0.5rem", css_content),
-            "xl" => self.css_template_value("0.75rem", css_content),
-            "2xl" => self.css_template_value("1rem", css_content),
-            "3xl" => self.css_template_value("1.5rem", css_content),
-            "full" => self.css_template_value("9999px", css_content),
-            _ => false,
-        }
-    }
-}
-
-#[derive(Debug)]
 pub struct RadiusTopRightPlugin;
 
 impl Plugin for RadiusTopRightPlugin {
@@ -387,38 +121,227 @@ impl Plugin for RadiusTopRightPlugin {
         "rounded-tr"
     }
 
-    fn is_matching_value(&self, _hint: &str, val: &str) -> bool {
-        val.split('_')
-            .all(|v| is_matching_length(v) || is_matching_percentage(v))
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        radius_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "border-top-right-radius: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "" => self.css_template_value("", css_content),
-            "none" => self.css_template_value("", css_content),
-            "sm" => self.css_template_value("", css_content),
-            "md" => self.css_template_value("", css_content),
-            "lg" => self.css_template_value("", css_content),
-            "xl" => self.css_template_value("", css_content),
-            "2xl" => self.css_template_value("", css_content),
-            "3xl" => self.css_template_value("", css_content),
-            "full" => self.css_template_value("", css_content),
-            _ => false,
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        radius_handle(&["border-top-right-radius"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
+pub struct RadiusTopLeftPlugin;
+
+impl Plugin for RadiusTopLeftPlugin {
+    fn namespace(&self) -> &str {
+        "rounded-tl"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        radius_can_handle(modifier)
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        radius_handle(&["border-top-left-radius"], modifier, indentation, buffer)
+    }
+}
+
+pub struct RadiusBottomRightPlugin;
+
+impl Plugin for RadiusBottomRightPlugin {
+    fn namespace(&self) -> &str {
+        "rounded-br"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        radius_can_handle(modifier)
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        radius_handle(
+            &["border-bottom-right-radius"],
+            modifier,
+            indentation,
+            buffer,
+        )
+    }
+}
+
+pub struct RadiusBottomLeftPlugin;
+
+impl Plugin for RadiusBottomLeftPlugin {
+    fn namespace(&self) -> &str {
+        "rounded-bl"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        radius_can_handle(modifier)
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        radius_handle(
+            &["border-bottom-left-radius"],
+            modifier,
+            indentation,
+            buffer,
+        )
+    }
+}
+
+pub struct RadiusTopPlugin;
+
+impl Plugin for RadiusTopPlugin {
+    fn namespace(&self) -> &str {
+        "rounded-t"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        radius_can_handle(modifier)
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        radius_handle(
+            &["border-top-left-radius", "border-top-right-radius"],
+            modifier,
+            indentation,
+            buffer,
+        )
+    }
+}
+
+pub struct RadiusBottomPlugin;
+
+impl Plugin for RadiusBottomPlugin {
+    fn namespace(&self) -> &str {
+        "rounded-b"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        radius_can_handle(modifier)
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        radius_handle(
+            &["border-bottom-left-radius", "border-bottom-right-radius"],
+            modifier,
+            indentation,
+            buffer,
+        )
+    }
+}
+
+pub struct RadiusLeftPlugin;
+
+impl Plugin for RadiusLeftPlugin {
+    fn namespace(&self) -> &str {
+        "rounded-l"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        radius_can_handle(modifier)
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        radius_handle(
+            &["border-top-left-radius", "border-bottom-left-radius"],
+            modifier,
+            indentation,
+            buffer,
+        )
+    }
+}
+
+pub struct RadiusRightPlugin;
+
+impl Plugin for RadiusRightPlugin {
+    fn namespace(&self) -> &str {
+        "rounded-r"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        radius_can_handle(modifier)
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        radius_handle(
+            &["border-top-right-radius", "border-bottom-right-radius"],
+            modifier,
+            indentation,
+            buffer,
+        )
+    }
+}
+
+pub struct RadiusPlugin;
+
+impl Plugin for RadiusPlugin {
+    fn namespace(&self) -> &str {
+        "rounded"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        radius_can_handle(modifier)
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        radius_handle(&["border-radius"], modifier, indentation, buffer)
+    }
+}
+
 pub struct StylePlugin;
 
 impl Plugin for StylePlugin {
@@ -426,140 +349,69 @@ impl Plugin for StylePlugin {
         "border"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["solid", "dashed", "dotted", "double", "hidden", "none"].contains(&value.as_str())
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is_one_of(&["solid", "dashed", "dotted", "double", "hidden", "none"]) {
-            write!(css_content, "border-style: {};", modifier).is_ok()
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "border-style: {};", value)?,
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
-pub struct WidthPlugin;
-
-impl Plugin for WidthPlugin {
-    fn namespace(&self) -> &str {
-        "border"
-    }
-
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "border-width: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is_empty() {
-            return self.css_template_value("1px", css_content);
-        }
-
-        // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(width) = modifier.to_usize() {
-            self.css_template_value(&format!("{width}px"), css_content)
-        } else {
-            false
-        }
+pub fn width_can_handle(modifier: &Modifier) -> bool {
+    match modifier {
+        Modifier::Basic { value, .. } => value.is_empty() || value.parse::<usize>().is_ok(),
+        Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
     }
 }
 
-#[derive(Debug)]
-pub struct WidthXPlugin;
-
-impl Plugin for WidthXPlugin {
-    fn namespace(&self) -> &str {
-        "border-x"
-    }
-
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(
-            css_content,
-            "border-left-width: {val};
-border-right-width: {val};"
-        )
-        .is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is_empty() {
-            return self.css_template_value("1px", css_content);
+pub fn width_handle(
+    css_properties: &[&str],
+    modifier: &Modifier,
+    indentation: usize,
+    buffer: &mut String,
+) -> fmt::Result {
+    // NOTE: Not-compatible with TailwindCSS, support all values
+    match modifier {
+        Modifier::Basic { value, .. } => {
+            for css_prop in css_properties {
+                indent(indentation, buffer)?;
+                writeln!(
+                    buffer,
+                    "{}: {}px;",
+                    css_prop,
+                    if value.is_empty() { "1" } else { value }
+                )?;
+            }
         }
-
-        // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(width) = modifier.to_usize() {
-            self.css_template_value(&format!("{width}px"), css_content)
-        } else {
-            false
+        Modifier::Arbitrary { value, .. } => {
+            for css_prop in css_properties {
+                indent(indentation, buffer)?;
+                writeln!(buffer, "{}: {};", css_prop, value)?;
+            }
         }
     }
+
+    Ok(())
 }
 
-#[derive(Debug)]
-pub struct WidthYPlugin;
-
-impl Plugin for WidthYPlugin {
-    fn namespace(&self) -> &str {
-        "border-y"
-    }
-
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(
-            css_content,
-            "border-top-width: {val};
-border-bottom-width: {val};"
-        )
-        .is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is_empty() {
-            return self.css_template_value("1px", css_content);
-        }
-
-        // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(width) = modifier.to_usize() {
-            self.css_template_value(&format!("{width}px"), css_content)
-        } else {
-            false
-        }
-    }
-}
-
-#[derive(Debug)]
 pub struct WidthTopPlugin;
 
 impl Plugin for WidthTopPlugin {
@@ -567,35 +419,21 @@ impl Plugin for WidthTopPlugin {
         "border-t"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        width_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "border-top-width: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is_empty() {
-            return self.css_template_value("1px", css_content);
-        }
-
-        // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(width) = modifier.to_usize() {
-            self.css_template_value(&format!("{width}px"), css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        width_handle(&["border-top-width"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
 pub struct WidthBottomPlugin;
 
 impl Plugin for WidthBottomPlugin {
@@ -603,35 +441,21 @@ impl Plugin for WidthBottomPlugin {
         "border-b"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        width_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "border-bottom-width: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is_empty() {
-            return self.css_template_value("1px", css_content);
-        }
-
-        // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(width) = modifier.to_usize() {
-            self.css_template_value(&format!("{width}px"), css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        width_handle(&["border-bottom-width"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
 pub struct WidthLeftPlugin;
 
 impl Plugin for WidthLeftPlugin {
@@ -639,35 +463,21 @@ impl Plugin for WidthLeftPlugin {
         "border-l"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        width_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "border-left-width: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is_empty() {
-            return self.css_template_value("1px", css_content);
-        }
-
-        // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(width) = modifier.to_usize() {
-            self.css_template_value(&format!("{width}px"), css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        width_handle(&["border-leftwidth"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
 pub struct WidthRightPlugin;
 
 impl Plugin for WidthRightPlugin {
@@ -675,35 +485,98 @@ impl Plugin for WidthRightPlugin {
         "border-r"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        width_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "border-right-width: {val};").is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is_empty() {
-            return self.css_template_value("1px", css_content);
-        }
-
-        // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(width) = modifier.to_usize() {
-            self.css_template_value(&format!("{width}px"), css_content)
-        } else {
-            false
-        }
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        width_handle(&["border-right-width"], modifier, indentation, buffer)
     }
 }
 
-#[derive(Debug)]
+pub struct WidthXPlugin;
+
+impl Plugin for WidthXPlugin {
+    fn namespace(&self) -> &str {
+        "border-x"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        width_can_handle(modifier)
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        width_handle(
+            &["border-left-width", "border-right-width"],
+            modifier,
+            indentation,
+            buffer,
+        )
+    }
+}
+
+pub struct WidthYPlugin;
+
+impl Plugin for WidthYPlugin {
+    fn namespace(&self) -> &str {
+        "border-y"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        width_can_handle(modifier)
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        width_handle(
+            &["border-top-width", "border-bottom-width"],
+            modifier,
+            indentation,
+            buffer,
+        )
+    }
+}
+
+pub struct WidthPlugin;
+
+impl Plugin for WidthPlugin {
+    fn namespace(&self) -> &str {
+        "border"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        width_can_handle(modifier)
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        width_handle(&["border-width"], modifier, indentation, buffer)
+    }
+}
+
 pub struct OpacityPlugin;
 
 impl Plugin for OpacityPlugin {
@@ -711,28 +584,35 @@ impl Plugin for OpacityPlugin {
         "border-opacity"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(opacity_value) = modifier.to_f32() {
-            write!(
-                css_content,
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(
+                buffer,
                 "--en-border-opacity: {};",
-                opacity_value / 100.
-            )
-            .is_ok()
-        } else {
-            false
+                value.parse::<usize>().unwrap() as f32 / 100.
+            )?,
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct DivideColorPlugin;
 
 impl Plugin for DivideColorPlugin {
@@ -740,40 +620,66 @@ impl Plugin for DivideColorPlugin {
         "divide"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "color" || is_matching_color(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--en-opacity") {
-            write!(
-                css_content,
-                "--en-divide-opacity: 1;
-border-color: {};",
-                val.replace("--en-opacity", "--en-divide-opacity")
-            )
-            .is_ok()
-        } else {
-            write!(css_content, "border-color: {val};").is_ok()
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
 
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(color) = default_colors::get(config, modifier.content()) {
-            self.css_template_value(&color, css_content)
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                let color = default_colors::get(config, value).unwrap();
+                if color.contains("--en-opacity") {
+                    writeln!(buffer, "--en-divide-opacity: 1;")?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "border-color: {};",
+                        color.replace("--en-opacity", "--en-divide-opacity")
+                    )?;
+                } else {
+                    writeln!(buffer, "border-color: {color};")?;
+                }
+            }
+            Modifier::Arbitrary { value, .. } => {
+                if value.contains("--en-opacity") {
+                    writeln!(buffer, "--en-divide-opacity: 1;")?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "border-color: {};",
+                        value.replace("--en-opacity", "--en-divide-opacity")
+                    )?;
+                } else {
+                    writeln!(buffer, "border-color: {value};")?;
+                }
+            }
+        }
+
+        Ok(())
+    }
+}
+
+pub fn divide_width_can_handle(modifier: &Modifier) -> bool {
+    match modifier {
+        Modifier::Basic { value, .. } => {
+            value.is_empty() || value == "reverse" || value.parse::<usize>().is_ok()
+        }
+        Modifier::Arbitrary { hint, value } => {
+            hint == "length" || is_matching_length(value) || is_matching_line_width(value)
         }
     }
 }
 
-#[derive(Debug)]
 pub struct DivideWidthXPlugin;
 
 impl Plugin for DivideWidthXPlugin {
@@ -781,58 +687,73 @@ impl Plugin for DivideWidthXPlugin {
         "divide-x"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val) || is_matching_line_width(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        divide_width_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if !css_content.contains("--en-divide-x-reverse") {
-            writeln!(css_content, "--en-divide-x-reverse: 0;").ok();
-        }
-
-        if is_matching_line_width(val) {
-            write!(
-                css_content,
-                "border-left-width: {val};
-border-right-width: {val};"
-            )
-            .is_ok()
-        } else {
-            write!(
-                css_content,
-                "border-left-width: calc({val} * calc(1 - var(--en-divide-x-reverse)));
-border-right-width: calc({val} * var(--en-divide-x-reverse));"
-            )
-            .is_ok()
-        }
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        // TODO: class with `> :not([hidden]) ~ :not([hidden])`
-        if modifier.is_empty() {
-            writeln!(css_content, "--en-divide-x-reverse: 0;").ok();
-            return self.css_template_value("1px", css_content);
-        } else if modifier.is("reverse") {
-            return write!(css_content, "--en-divide-x-reverse: 1;").is_ok();
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                if value == "reverse" {
+                    return writeln!(buffer, "--en-divide-x-reverse: 1;");
+                }
+
+                writeln!(buffer, "--en-divide-x-reverse: 0;")?;
+                indent(indentation, buffer)?;
+
+                // TODO: class with `> :not([hidden]) ~ :not([hidden])`
+                if is_matching_line_width(value) {
+                    writeln!(buffer, "border-left-width: {value};")?;
+                    indent(indentation, buffer)?;
+                    writeln!(buffer, "border-right-width: {value};")?;
+                } else {
+                    writeln!(
+                        buffer,
+                        "border-left-width: calc({}px * calc(1 - var(--en-divide-x-reverse)));",
+                        if value.is_empty() { "1" } else { value }
+                    )?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "border-right-width: calc({}px * var(--en-divide-x-reverse));",
+                        if value.is_empty() { "1" } else { value }
+                    )?;
+                }
+            }
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "--en-divide-x-reverse: 0;")?;
+                indent(indentation, buffer)?;
+
+                if is_matching_line_width(value) {
+                    writeln!(buffer, "border-left-width: {value};")?;
+                    indent(indentation, buffer)?;
+                    writeln!(buffer, "border-right-width: {value};")?;
+                } else {
+                    writeln!(
+                        buffer,
+                        "border-left-width: calc({value} * calc(1 - var(--en-divide-x-reverse)));"
+                    )?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "border-right-width: calc({value} * var(--en-divide-x-reverse));"
+                    )?;
+                }
+            }
         }
 
-        // NOTE: Not-compatible with TailwindCSS, support all values
-        if modifier.to_usize().is_ok() {
-            writeln!(css_content, "--en-divide-x-reverse: 0;").ok();
-            self.css_template_value(&format!("{}px", modifier), css_content)
-        } else {
-            false
-        }
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct DivideWidthYPlugin;
 
 impl Plugin for DivideWidthYPlugin {
@@ -840,58 +761,73 @@ impl Plugin for DivideWidthYPlugin {
         "divide-y"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val) || is_matching_line_width(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        divide_width_can_handle(modifier)
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if !css_content.contains("--en-divide-y-reverse") {
-            writeln!(css_content, "--en-divide-y-reverse: 0;").ok();
-        }
-
-        if is_matching_line_width(val) {
-            write!(
-                css_content,
-                "border-top-width: {val};
-border-bottom-width: {val};"
-            )
-            .is_ok()
-        } else {
-            write!(
-                css_content,
-                "border-top-width: calc({val} * calc(1 - var(--en-divide-y-reverse)));
-border-bottom-width: calc({val} * var(--en-divide-y-reverse));"
-            )
-            .is_ok()
-        }
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        // TODO: class with `> :not([hidden]) ~ :not([hidden])`
-        if modifier.is_empty() {
-            writeln!(css_content, "--en-divide-y-reverse: 0;").ok();
-            return self.css_template_value("1px", css_content);
-        } else if modifier.is("reverse") {
-            return write!(css_content, "--en-divide-y-reverse: 1;").is_ok();
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                if value == "reverse" {
+                    return writeln!(buffer, "--en-divide-y-reverse: 1;");
+                }
+
+                writeln!(buffer, "--en-divide-y-reverse: 0;")?;
+                indent(indentation, buffer)?;
+
+                // TODO: class with `> :not([hidden]) ~ :not([hidden])`
+                if is_matching_line_width(value) {
+                    writeln!(buffer, "border-top-width: {value};")?;
+                    indent(indentation, buffer)?;
+                    writeln!(buffer, "border-bottom-width: {value};")?;
+                } else {
+                    writeln!(
+                        buffer,
+                        "border-top-width: calc({} * calc(1 - var(--en-divide-y-reverse)));",
+                        if value.is_empty() { "1px" } else { value }
+                    )?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "border-bottom-width: calc({} * var(--en-divide-y-reverse));",
+                        if value.is_empty() { "1px" } else { value }
+                    )?;
+                }
+            }
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "--en-divide-y-reverse: 0;")?;
+                indent(indentation, buffer)?;
+
+                if is_matching_line_width(value) {
+                    writeln!(buffer, "border-top-width: {value};")?;
+                    indent(indentation, buffer)?;
+                    writeln!(buffer, "border-bottom-width: {value};")?;
+                } else {
+                    writeln!(
+                        buffer,
+                        "border-top-width: calc({value} * calc(1 - var(--en-divide-y-reverse)));"
+                    )?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "border-bottom-width: calc({value} * var(--en-divide-y-reverse));"
+                    )?;
+                }
+            }
         }
 
-        // NOTE: Not-compatible with TailwindCSS, support all values
-        if modifier.to_usize().is_ok() {
-            writeln!(css_content, "--en-divide-y-reverse: 0;").ok();
-            self.css_template_value(&format!("{}px", modifier), css_content)
-        } else {
-            false
-        }
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct DivideStylePlugin;
 
 impl Plugin for DivideStylePlugin {
@@ -899,25 +835,39 @@ impl Plugin for DivideStylePlugin {
         "divide"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["solid", "dashed", "dotted", "double", "none"].contains(&value.as_str())
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "solid" => write!(css_content, "border-style: solid;").is_ok(),
-            "dashed" => write!(css_content, "border-style: dashed;").is_ok(),
-            "dotted" => write!(css_content, "border-style: dotted;").is_ok(),
-            "double" => write!(css_content, "border-style: double;").is_ok(),
-            "none" => write!(css_content, "border-style: none;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "solid" => writeln!(buffer, "border-style: solid;")?,
+                "dashed" => writeln!(buffer, "border-style: dashed;")?,
+                "dotted" => writeln!(buffer, "border-style: dotted;")?,
+                "double" => writeln!(buffer, "border-style: double;")?,
+                "none" => writeln!(buffer, "border-style: none;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct DivideOpacityPlugin;
 
 impl Plugin for DivideOpacityPlugin {
@@ -925,28 +875,35 @@ impl Plugin for DivideOpacityPlugin {
         "divide-opacity"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(opacity_value) = modifier.to_f32() {
-            write!(
-                css_content,
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(
+                buffer,
                 "--en-divide-opacity: {};",
-                opacity_value / 100.
-            )
-            .is_ok()
-        } else {
-            false
+                value.parse::<usize>().unwrap() as f32 / 100.
+            )?,
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct RingColorPlugin;
 
 impl Plugin for RingColorPlugin {
@@ -954,104 +911,55 @@ impl Plugin for RingColorPlugin {
         "ring"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "color" || is_matching_color(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--en-opacity") {
-            write!(
-                css_content,
-                "--en-ring-opacity: 1;
---ring-color: {};",
-                val.replace("--en-opacity", "--en-ring-opacity")
-            )
-            .is_ok()
-        } else {
-            write!(css_content, "--ring-color: {val};").is_ok()
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
 
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(color) = default_colors::get(config, modifier.content()) {
-            self.css_template_value(&color, css_content)
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                let color = default_colors::get(config, value).unwrap();
+                if color.contains("--en-opacity") {
+                    writeln!(buffer, "--en-ring-opacity: 1;")?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "--ring-color: {};",
+                        color.replace("--en-opacity", "--en-ring-opacity")
+                    )?;
+                } else {
+                    writeln!(buffer, "--ring-color: {color};")?;
+                }
+            }
+            Modifier::Arbitrary { value, .. } => {
+                if value.contains("--en-opacity") {
+                    writeln!(buffer, "--en-ring-opacity: 1;")?;
+                    indent(indentation, buffer)?;
+                    writeln!(
+                        buffer,
+                        "--ring-color: {};",
+                        value.replace("--en-opacity", "--en-ring-opacity")
+                    )?;
+                } else {
+                    writeln!(buffer, "--ring-color: {value};")?;
+                }
+            }
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
-pub struct RingWidthPlugin;
-
-impl Plugin for RingWidthPlugin {
-    fn namespace(&self) -> &str {
-        "ring"
-    }
-
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "{}
---en-ring-shadow: var(--en-ring-inset) 0 0 0 calc({val} + var(--en-ring-offset-width)) var(--en-ring-color);
-box-shadow: var(--en-ring-offset-shadow), var(--en-ring-shadow), var(--en-shadow, 0 0 #0000);", CSS_RING_OFFSET_SHADOW).is_ok()
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if modifier.is_empty() {
-            return self.css_template_value("3px", css_content);
-        } else if modifier.is("inset") {
-            return write!(css_content, "--en-ring-inset: inset;").is_ok();
-        }
-
-        // NOTE: Not-compatible with TailwindCSS, support all values
-        if modifier.to_usize().is_ok() {
-            self.css_template_value(&format!("{}px", modifier), css_content)
-        } else {
-            false
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct RingOpacityPlugin;
-
-impl Plugin for RingOpacityPlugin {
-    fn namespace(&self) -> &str {
-        "ring-opacity"
-    }
-
-    fn get_css_for_modifier(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        // NOTE: Not-compatible with TailwindCSS, support all values
-        if let Ok(opacity_value) = modifier.to_f32() {
-            write!(css_content, "--en-ring-opacity: {};", opacity_value / 100.).is_ok()
-        } else {
-            false
-        }
-    }
-}
-
-#[derive(Debug)]
 pub struct RingOffsetColorPlugin;
 
 impl Plugin for RingOffsetColorPlugin {
@@ -1059,39 +967,53 @@ impl Plugin for RingOffsetColorPlugin {
         "ring-offset"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "color" || is_matching_color(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--en-opacity") {
-            write!(
-                css_content,
-                "--en-ring-offset-color: {};",
-                val.replace("/ var(--en-opacity)", "")
-            )
-            .is_ok()
-        } else {
-            write!(css_content, "--en-ring-offset-color: {val};").is_ok()
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
 
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(color) = default_colors::get(config, modifier.content()) {
-            self.css_template_value(&color, css_content)
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        writeln!(buffer, "{}", CSS_RING_OFFSET_SHADOW)?;
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                let color = default_colors::get(config, value).unwrap();
+                if color.contains("--en-opacity") {
+                    writeln!(
+                        buffer,
+                        "--en-ring-offset-color: {};",
+                        color.replace(" / var(--en-opacity)", "")
+                    )?;
+                } else {
+                    writeln!(buffer, "--en-ring-offset-color: {color};")?;
+                }
+            }
+            Modifier::Arbitrary { value, .. } => {
+                if value.contains("--en-opacity") {
+                    writeln!(
+                        buffer,
+                        "--en-ring-offset-color: {};",
+                        value.replace(" / var(--en-opacity)", "")
+                    )?;
+                } else {
+                    writeln!(buffer, "--en-ring-offset-color: {value};")?;
+                }
+            }
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct RingOffsetWidthPlugin;
 
 impl Plugin for RingOffsetWidthPlugin {
@@ -1099,71 +1021,166 @@ impl Plugin for RingOffsetWidthPlugin {
         "ring-offset"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
+            Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "--en-ring-offset-width: {val};",).is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        // NOTE: Not-compatible with TailwindCSS, support all values
-        if modifier.to_usize().is_ok() {
-            self.css_template_value(&format!("{}px", modifier), css_content)
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        writeln!(buffer, "{}", CSS_RING_OFFSET_SHADOW)?;
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                writeln!(buffer, "--en-ring-offset-width: {value}px;")?
+            }
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "--en-ring-offset-width: {value};")?
+            }
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
+pub struct RingWidthPlugin;
+
+impl Plugin for RingWidthPlugin {
+    fn namespace(&self) -> &str {
+        "ring"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                value.is_empty() || value == "inset" || value.parse::<usize>().is_ok()
+            }
+            Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
+        }
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                if value == "inset" {
+                    return writeln!(buffer, "--en-ring-inset: inset;");
+                }
+
+                writeln!(buffer, "--en-ring-shadow: var(--en-ring-inset) 0 0 0 calc({}px + var(--en-ring-offset-width)) var(--en-ring-color);", if value.is_empty() { "3px" } else { value })?;
+            }
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "--en-ring-shadow: var(--en-ring-inset) 0 0 0 calc({value} + var(--en-ring-offset-width)) var(--en-ring-color);")?,
+        }
+
+        indent(indentation, buffer)?;
+        writeln!(buffer, "box-shadow: var(--en-ring-offset-shadow), var(--en-ring-shadow), var(--en-shadow, 0 0 #0000);")?;
+
+        Ok(())
+    }
+}
+
+pub struct RingOpacityPlugin;
+
+impl Plugin for RingOpacityPlugin {
+    fn namespace(&self) -> &str {
+        "ring-opacity"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(
+                buffer,
+                "--en-ring-opacity: {};",
+                value.parse::<usize>().unwrap() as f32 / 100.
+            )?,
+            Modifier::Arbitrary { .. } => unreachable!(),
+        }
+
+        Ok(())
+    }
+}
+
 pub struct OutlineColorPlugin;
 
 impl Plugin for OutlineColorPlugin {
     fn namespace(&self) -> &str {
         "outline"
     }
-
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "color" || is_matching_color(val)
-    }
-
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        if val.contains("--en-opacity") {
-            write!(
-                css_content,
-                "outline-color: {};",
-                val.replace(" / var(--en-opacity)", "")
-            )
-            .is_ok()
-        } else {
-            write!(css_content, "outline-color: {val};").is_ok()
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
 
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        if let Some(color) = default_colors::get(config, modifier.content()) {
-            self.css_template_value(&color, css_content)
-        } else {
-            false
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                let color = default_colors::get(config, value).unwrap();
+                if color.contains("--en-opacity") {
+                    writeln!(
+                        buffer,
+                        "outline-color: {};",
+                        color.replace(" / var(--en-opacity)", "")
+                    )?;
+                } else {
+                    writeln!(buffer, "outline-color: {color};")?;
+                }
+            }
+            Modifier::Arbitrary { value, .. } => {
+                if value.contains("--en-opacity") {
+                    writeln!(
+                        buffer,
+                        "outline-color: {};",
+                        value.replace(" / var(--en-opacity)", "")
+                    )?;
+                } else {
+                    writeln!(buffer, "outline-color: {value};")?;
+                }
+            }
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct OutlineWidthPlugin;
 
 impl Plugin for OutlineWidthPlugin {
@@ -1171,31 +1188,31 @@ impl Plugin for OutlineWidthPlugin {
         "outline"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
+            Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "outline-width: {val};",).is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        if modifier.to_usize().is_ok() {
-            self.css_template_value(&format!("{}px", modifier), css_content)
-        } else {
-            false
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "outline-width: {value}px;")?,
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "outline-width: {value};")?,
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct OutlineStylePlugin;
 
 impl Plugin for OutlineStylePlugin {
@@ -1203,31 +1220,44 @@ impl Plugin for OutlineStylePlugin {
         "outline"
     }
 
-    fn get_css_for_modifier(
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                ["", "dashed", "dotted", "double", "hidden", "none"].contains(&&**value)
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
-        match modifier.content() {
-            "" => write!(css_content, "outline-style: solid;").is_ok(),
-            "none" => write!(
-                css_content,
-                "outline: 2px solid transparent;
-outline-offset: 2px;"
-            )
-            .is_ok(),
-            "dashed" => write!(css_content, "outline-style: dashed;").is_ok(),
-            "dotted" => write!(css_content, "outline-style: dotted;").is_ok(),
-            "double" => write!(css_content, "outline-style: double;").is_ok(),
-            "hidden" => write!(css_content, "outline-style: hidden;").is_ok(),
-            _ => false,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match value.as_str() {
+                "" => writeln!(buffer, "outline-style: solid;")?,
+                "none" => {
+                    writeln!(buffer, "outline: 2px solid transparent;")?;
+                    indent(indentation, buffer)?;
+                    writeln!(buffer, "outline-offset: 2px;")?;
+                }
+                "dashed" => writeln!(buffer, "outline-style: dashed;")?,
+                "dotted" => writeln!(buffer, "outline-style: dotted;")?,
+                "double" => writeln!(buffer, "outline-style: double;")?,
+                "hidden" => writeln!(buffer, "outline-style: hidden;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        Ok(())
     }
 }
 
-#[derive(Debug)]
 pub struct OutlineOffsetPlugin;
 
 impl Plugin for OutlineOffsetPlugin {
@@ -1235,26 +1265,27 @@ impl Plugin for OutlineOffsetPlugin {
         "outline-offset"
     }
 
-    fn is_matching_value(&self, hint: &str, val: &str) -> bool {
-        hint == "length" || is_matching_length(val)
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
+            Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
+        }
     }
 
-    fn css_template_value(&self, val: &str, css_content: &mut String) -> bool {
-        write!(css_content, "outline-offset: {val};",).is_ok()
-    }
-
-    fn get_css_for_modifier(
+    fn handle(
         &self,
         _config: &Config,
         modifier: &Modifier,
-        css_content: &mut String,
-        _custom_css: &mut String,
-    ) -> bool {
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        if modifier.to_usize().is_ok() {
-            self.css_template_value(&format!("{}px", modifier), css_content)
-        } else {
-            false
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "outline-offset: {value}px;")?,
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "outline-offset: {value};")?,
         }
+
+        Ok(())
     }
 }
