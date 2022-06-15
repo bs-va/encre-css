@@ -50,6 +50,7 @@ mod tests {
     fn scan_raw_test() {
         let config = Config::default();
         let expected = BTreeSet::from([
+            Selector::new("flex", &config).unwrap(),
             Selector::new("w-full", &config).unwrap(),
             Selector::new("h-full", &config).unwrap(),
             Selector::new("absolute", &config).unwrap(),
@@ -62,7 +63,7 @@ mod tests {
 
         let mut generator = EncreGenerator::from_config(config);
         generator.scan_raw(
-            r#"<div class="w-full h-full absolute bg-blue-500 foo-bar sm:focus:ring hover:bg-black border-[#333] text-[color:var(--hello)]"></div>"#
+            r#"<div class="flex w-full h-full absolute bg-blue-500 foo-bar sm:focus:ring hover:bg-black border-[#333] text-[color:var(--hello)]"></div>"#
         );
 
         assert_eq!(expected, generator.scanned_selectors,);

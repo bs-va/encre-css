@@ -2,7 +2,10 @@ use super::Plugin;
 use crate::utils::{default_colors, indent, shadow, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use std::{borrow::Cow, fmt::{self, Write}};
+use std::{
+    borrow::Cow,
+    fmt::{self, Write},
+};
 
 const CSS_SHADOW: &str = "box-shadow: var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow);";
 

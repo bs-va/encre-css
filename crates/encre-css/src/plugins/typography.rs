@@ -4,7 +4,10 @@ use crate::{config::Config, selector::Modifier};
 
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::{borrow::Cow, fmt::{self, Write}};
+use std::{
+    borrow::Cow,
+    fmt::{self, Write},
+};
 
 pub const CSS_FONT_VARIANT_NUMERIC: &str = "font-variant-numeric: var(--en-ordinal) var(--en-slashed-zero) var(--en-numeric-figure) var(--en-numeric-spacing) var(--en-numeric-fraction);";
 

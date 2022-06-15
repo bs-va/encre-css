@@ -2,7 +2,10 @@ use super::Plugin;
 use crate::utils::{default_colors, indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use std::{borrow::Cow, fmt::{self, Write}};
+use std::{
+    borrow::Cow,
+    fmt::{self, Write},
+};
 
 pub struct FillPlugin;
 
