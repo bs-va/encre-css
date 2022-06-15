@@ -1,4 +1,4 @@
-use std::{num::ParseIntError, path::PathBuf, fmt};
+use std::{fmt, num::ParseIntError, path::PathBuf};
 use thiserror::Error as ErrorTrait;
 
 pub type Result<T> = std::result::Result<T, Error>;

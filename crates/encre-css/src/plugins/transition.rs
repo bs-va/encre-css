@@ -228,29 +228,14 @@ impl Plugin for EasePlugin {
     }
 }
 
-pub struct AnimatePlugin {
-    is_spin_animation_already_defined: AtomicBool,
-    is_ping_animation_already_defined: AtomicBool,
-    is_pulse_animation_already_defined: AtomicBool,
-    is_bounce_animation_already_defined: AtomicBool,
-}
+pub static ANIMATIONS_ALREADY_DEFINED: [AtomicBool; 4] = [
+    AtomicBool::new(false), // Spin
+    AtomicBool::new(false), // Ping
+    AtomicBool::new(false), // Pulse
+    AtomicBool::new(false), // Bounce
+];
 
-impl AnimatePlugin {
-    pub fn new() -> Self {
-        Self {
-            is_spin_animation_already_defined: AtomicBool::new(false),
-            is_ping_animation_already_defined: AtomicBool::new(false),
-            is_pulse_animation_already_defined: AtomicBool::new(false),
-            is_bounce_animation_already_defined: AtomicBool::new(false),
-        }
-    }
-}
-
-impl Default for AnimatePlugin {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+pub struct AnimatePlugin;
 
 impl Plugin for AnimatePlugin {
     fn namespace(&self) -> &str {
@@ -262,10 +247,7 @@ impl Plugin for AnimatePlugin {
             Modifier::Basic { value, .. } => {
                 match value.as_str() {
                     "spin" => {
-                        if !self
-                            .is_spin_animation_already_defined
-                            .swap(true, Ordering::Relaxed)
-                        {
+                        if !ANIMATIONS_ALREADY_DEFINED[0].swap(true, Ordering::Relaxed) {
                             writeln!(
                                 buffer,
                                 "@-webkit-keyframes spin {{
@@ -286,10 +268,7 @@ impl Plugin for AnimatePlugin {
                         }
                     }
                     "ping" => {
-                        if !self
-                            .is_ping_animation_already_defined
-                            .swap(true, Ordering::Relaxed)
-                        {
+                        if !ANIMATIONS_ALREADY_DEFINED[1].swap(true, Ordering::Relaxed) {
                             writeln!(
                                 buffer,
                                 "@-webkit-keyframes ping {{
@@ -309,10 +288,7 @@ impl Plugin for AnimatePlugin {
                         }
                     }
                     "pulse" => {
-                        if !self
-                            .is_pulse_animation_already_defined
-                            .swap(true, Ordering::Relaxed)
-                        {
+                        if !ANIMATIONS_ALREADY_DEFINED[2].swap(true, Ordering::Relaxed) {
                             writeln!(
                                 buffer,
                                 "@-webkit-keyframes pulse {{
@@ -333,10 +309,7 @@ impl Plugin for AnimatePlugin {
                         }
                     }
                     "bounce" => {
-                        if !self
-                            .is_bounce_animation_already_defined
-                            .swap(true, Ordering::Relaxed)
-                        {
+                        if !ANIMATIONS_ALREADY_DEFINED[3].swap(true, Ordering::Relaxed) {
                             writeln!(
                                 buffer,
                                 "@-webkit-keyframes bounce {{

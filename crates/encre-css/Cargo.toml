@@ -20,6 +20,7 @@ wax = "0.5.0"
 thiserror = "1.0.31"
 smol_str = "0.1.23"
 tracing = "0.1.34"
+derivative = "2.2.0"
 
 [dev-dependencies]
 pretty_assertions = "1.2.1"

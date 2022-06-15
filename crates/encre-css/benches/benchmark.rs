@@ -36,7 +36,7 @@ fn generation(c: &mut Criterion) {
 
     c.bench_function("generate", |b| {
         b.iter(|| {
-            generator.generate();
+            generator.generate().unwrap();
         })
     });
 }

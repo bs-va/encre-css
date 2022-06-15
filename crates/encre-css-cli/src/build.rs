@@ -1,6 +1,6 @@
 use crate::DEFAULT_CONFIG_FILE;
 
-use encre_css::{extractor::Extractor, Config, EncreGenerator};
+use encre_css::{Config, EncreGenerator};
 use notify::{watcher, DebouncedEvent::*, RecursiveMode, Watcher};
 use std::{
     fs, iter,
@@ -150,21 +150,7 @@ pub fn build<T: AsRef<Path>>(
 
                         if need_reloading {
                             generator.reset();
-
-                            #[cfg(target_arch = "wasm32")]
-                            let iter = input.iter();
-
-                            #[cfg(not(target_arch = "wasm32"))]
-                            let iter = input.par_iter();
-
-                            let scanned_selectors = iter
-                                .map(Extractor::scan_path)
-                                .reduce_with(|mut selectors1, selectors2| {
-                                    selectors1.extend(selectors2);
-                                    selectors1
-                                })
-                                .unwrap_or_default();
-                            generator.add_selectors(scanned_selectors);
+                            input.iter().for_each(|p| generator.scan_path(p));
 
                             if let Some(ref path) = extra_input {
                                 generator.scan_path(path);

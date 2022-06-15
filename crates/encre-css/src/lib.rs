@@ -21,7 +21,6 @@ extern crate tracing;
 
 pub mod config;
 pub mod error;
-pub mod extractor;
 pub mod generator;
 pub mod plugins;
 pub mod preflight;
@@ -49,27 +48,26 @@ mod tests {
 
     #[test]
     fn scan_raw_test() {
-        let mut generator = EncreGenerator::from_config(Config::default());
+        let config = Config::default();
+        let expected = BTreeSet::from([
+            Selector::new("w-full", &config).unwrap(),
+            Selector::new("h-full", &config).unwrap(),
+            Selector::new("absolute", &config).unwrap(),
+            Selector::new("bg-blue-500", &config).unwrap(),
+            Selector::new("border-[#333]", &config).unwrap(),
+            Selector::new("text-[color:var(--hello)]", &config).unwrap(),
+            Selector::new("sm:focus:ring", &config).unwrap(),
+            Selector::new("hover:bg-black", &config).unwrap(),
+        ]);
+
+        let mut generator = EncreGenerator::from_config(config);
         generator.scan_raw(
             r#"<div class="w-full h-full absolute bg-blue-500 foo-bar sm:focus:ring hover:bg-black border-[#333] text-[color:var(--hello)]"></div>"#
         );
 
         assert_eq!(
+            expected,
             generator.scanned_selectors,
-            BTreeSet::from([
-                Selector::new("<div"),
-                Selector::new("class"),
-                Selector::new("w-full"),
-                Selector::new("h-full"),
-                Selector::new("absolute"),
-                Selector::new("bg-blue-500"),
-                Selector::new("foo-bar"),
-                Selector::new("border-[#333]"),
-                Selector::new("text-[color:var(--hello)]"),
-                Selector::new("</div"),
-                Selector::new("sm:focus:ring"),
-                Selector::new("hover:bg-black"),
-            ])
         );
     }
 
