@@ -4,7 +4,7 @@ use crate::{config::Config, selector::Modifier};
 
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::fmt::{self, Write};
+use std::{borrow::Cow, fmt::{self, Write}};
 
 pub const CSS_FONT_VARIANT_NUMERIC: &str = "font-variant-numeric: var(--en-ordinal) var(--en-slashed-zero) var(--en-numeric-figure) var(--en-numeric-spacing) var(--en-numeric-fraction);";
 
@@ -21,7 +21,9 @@ impl Plugin for ColorPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Basic { value, .. } => {
+                default_colors::get(config, value, Some("--en-text-opacity")).is_some()
+            }
             Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
@@ -36,32 +38,15 @@ impl Plugin for ColorPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => {
-                let color = default_colors::get(config, value).unwrap();
-                if color.contains("--en-opacity") {
+                let color = default_colors::get(config, value, Some("--en-text-opacity")).unwrap();
+                if color.contains("--en-text-opacity") {
                     writeln!(buffer, "--en-text-opacity: 1;")?;
                     indent(indentation, buffer)?;
-                    writeln!(
-                        buffer,
-                        "color: {};",
-                        color.replace("--en-opacity", "--en-text-opacity")
-                    )?;
-                } else {
-                    writeln!(buffer, "color: {color};")?;
                 }
+
+                writeln!(buffer, "color: {color};")?;
             }
-            Modifier::Arbitrary { value, .. } => {
-                if value.contains("--en-opacity") {
-                    writeln!(buffer, "--en-text-opacity: 1;")?;
-                    indent(indentation, buffer)?;
-                    writeln!(
-                        buffer,
-                        "color: {};",
-                        value.replace("--en-opacity", "--en-text-opacity")
-                    )?;
-                } else {
-                    writeln!(buffer, "color: {value};")?;
-                }
-            }
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "color: {value};")?,
         }
 
         Ok(())
@@ -570,7 +555,7 @@ impl Plugin for TextDecorationColorPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Basic { value, .. } => default_colors::get(config, value, None).is_some(),
             Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
@@ -583,35 +568,14 @@ impl Plugin for TextDecorationColorPlugin {
         buffer: &mut String,
     ) -> fmt::Result {
         indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => {
-                let color = default_colors::get(config, value).unwrap();
-                if color.contains("--en-opacity") {
-                    let color = color.replace(" / var(--en-opacity)", "");
-                    writeln!(buffer, "-webkit-text-decoration-color: {color};")?;
-                    indent(indentation, buffer)?;
-                    writeln!(buffer, "text-decoration-color: {color};")?;
-                } else {
-                    writeln!(buffer, "-webkit-text-decoration-color: {color};")?;
-                    indent(indentation, buffer)?;
-                    writeln!(buffer, "text-decoration-color: {color};")?;
-                }
-            }
-            Modifier::Arbitrary { value, .. } => {
-                if value.contains("--en-opacity") {
-                    let value = value.replace(" / var(--en-opacity)", "");
-                    writeln!(buffer, "-webkit-text-decoration-color: {value};")?;
-                    indent(indentation, buffer)?;
-                    writeln!(buffer, "text-decoration-color: {value};")?;
-                } else {
-                    writeln!(buffer, "-webkit-text-decoration-color: {value};")?;
-                    indent(indentation, buffer)?;
-                    writeln!(buffer, "text-decoration-color: {value};")?;
-                }
-            }
-        }
+        let value = match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value, None).unwrap(),
+            Modifier::Arbitrary { value, .. } => Cow::from(&**value),
+        };
 
-        Ok(())
+        writeln!(buffer, "-webkit-text-decoration-color: {value};")?;
+        indent(indentation, buffer)?;
+        writeln!(buffer, "text-decoration-color: {value};")
     }
 }
 

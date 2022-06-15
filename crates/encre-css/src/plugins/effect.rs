@@ -2,7 +2,7 @@ use super::Plugin;
 use crate::utils::{default_colors, indent, shadow, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use std::fmt::{self, Write};
+use std::{borrow::Cow, fmt::{self, Write}};
 
 const CSS_SHADOW: &str = "box-shadow: var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow);";
 
@@ -238,7 +238,7 @@ impl Plugin for BoxShadowColorPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Basic { value, .. } => default_colors::get(config, value, None).is_some(),
             Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
@@ -251,37 +251,14 @@ impl Plugin for BoxShadowColorPlugin {
         buffer: &mut String,
     ) -> fmt::Result {
         indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => {
-                let color = default_colors::get(config, value).unwrap();
-                if color.contains("--en-opacity") {
-                    writeln!(
-                        buffer,
-                        "--en-shadow-color: {};",
-                        color.replace(" / var(--en-opacity)", "")
-                    )?;
-                } else {
-                    writeln!(buffer, "--en-shadow-color: {color};")?;
-                }
+        let value = match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value, None).unwrap(),
+            Modifier::Arbitrary { value, .. } => Cow::from(&**value),
+        };
+        writeln!(buffer, "--en-shadow-color: {value};")?;
 
-                indent(indentation, buffer)?;
-                writeln!(buffer, "--en-shadow: var(--en-shadow-colored);")?;
-            }
-            Modifier::Arbitrary { value, .. } => {
-                if value.contains("--en-opacity") {
-                    writeln!(
-                        buffer,
-                        "--en-shadow-color: {};",
-                        value.replace(" / var(--en-opacity)", "")
-                    )?;
-                } else {
-                    writeln!(buffer, "--en-shadow-color: {value};")?;
-                }
-
-                indent(indentation, buffer)?;
-                writeln!(buffer, "--en-shadow: var(--en-shadow-colored);")?;
-            }
-        }
+        indent(indentation, buffer)?;
+        writeln!(buffer, "--en-shadow: var(--en-shadow-colored);")?;
 
         Ok(())
     }

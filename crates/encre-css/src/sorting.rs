@@ -31,7 +31,7 @@ impl Ord for Selector {
 
 #[cfg(test)]
 mod tests {
-    use crate::{selector::Selector, config::Config};
+    use crate::{config::Config, selector::Selector};
 
     use std::collections::BTreeSet;
 

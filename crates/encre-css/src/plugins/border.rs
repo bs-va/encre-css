@@ -2,7 +2,10 @@ use super::Plugin;
 use crate::utils::{default_colors, indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use std::fmt::{self, Write};
+use std::{
+    borrow::Cow,
+    fmt::{self, Write},
+};
 
 const CSS_RING_OFFSET_SHADOW: &str = "--en-ring-offset-shadow: var(--en-ring-inset) 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color);";
 
@@ -15,7 +18,9 @@ impl Plugin for ColorPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Basic { value, .. } => {
+                default_colors::get(config, value, Some("--en-border-opacity")).is_some()
+            }
             Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
@@ -30,32 +35,16 @@ impl Plugin for ColorPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => {
-                let color = default_colors::get(config, value).unwrap();
-                if color.contains("--en-opacity") {
+                let color =
+                    default_colors::get(config, value, Some("--en-border-opacity")).unwrap();
+                if color.contains("--en-border-opacity") {
                     writeln!(buffer, "--en-border-opacity: 1;")?;
                     indent(indentation, buffer)?;
-                    writeln!(
-                        buffer,
-                        "border-color: {};",
-                        color.replace("--en-opacity", "--en-border-opacity")
-                    )?;
-                } else {
-                    writeln!(buffer, "border-color: {color};")?;
                 }
+
+                writeln!(buffer, "border-color: {color};")?;
             }
-            Modifier::Arbitrary { value, .. } => {
-                if value.contains("--en-opacity") {
-                    writeln!(buffer, "--en-border-opacity: 1;")?;
-                    indent(indentation, buffer)?;
-                    writeln!(
-                        buffer,
-                        "border-color: {};",
-                        value.replace("--en-opacity", "--en-border-opacity")
-                    )?;
-                } else {
-                    writeln!(buffer, "border-color: {value};")?;
-                }
-            }
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "border-color: {value};")?,
         }
 
         Ok(())
@@ -622,7 +611,9 @@ impl Plugin for DivideColorPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Basic { value, .. } => {
+                default_colors::get(config, value, Some("--en-divide-opacity")).is_some()
+            }
             Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
@@ -637,32 +628,16 @@ impl Plugin for DivideColorPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => {
-                let color = default_colors::get(config, value).unwrap();
-                if color.contains("--en-opacity") {
+                let color =
+                    default_colors::get(config, value, Some("--en-divide-opacity")).unwrap();
+                if color.contains("--en-divide-opacity") {
                     writeln!(buffer, "--en-divide-opacity: 1;")?;
                     indent(indentation, buffer)?;
-                    writeln!(
-                        buffer,
-                        "border-color: {};",
-                        color.replace("--en-opacity", "--en-divide-opacity")
-                    )?;
-                } else {
-                    writeln!(buffer, "border-color: {color};")?;
                 }
+
+                writeln!(buffer, "border-color: {color};")?;
             }
-            Modifier::Arbitrary { value, .. } => {
-                if value.contains("--en-opacity") {
-                    writeln!(buffer, "--en-divide-opacity: 1;")?;
-                    indent(indentation, buffer)?;
-                    writeln!(
-                        buffer,
-                        "border-color: {};",
-                        value.replace("--en-opacity", "--en-divide-opacity")
-                    )?;
-                } else {
-                    writeln!(buffer, "border-color: {value};")?;
-                }
-            }
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "border-color: {value};")?,
         }
 
         Ok(())
@@ -913,7 +888,9 @@ impl Plugin for RingColorPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Basic { value, .. } => {
+                default_colors::get(config, value, Some("--en-ring-opacity")).is_some()
+            }
             Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
@@ -928,32 +905,15 @@ impl Plugin for RingColorPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => {
-                let color = default_colors::get(config, value).unwrap();
-                if color.contains("--en-opacity") {
+                let color = default_colors::get(config, value, Some("--en-ring-opacity")).unwrap();
+                if color.contains("--en-ring-opacity") {
                     writeln!(buffer, "--en-ring-opacity: 1;")?;
                     indent(indentation, buffer)?;
-                    writeln!(
-                        buffer,
-                        "--ring-color: {};",
-                        color.replace("--en-opacity", "--en-ring-opacity")
-                    )?;
-                } else {
-                    writeln!(buffer, "--ring-color: {color};")?;
                 }
+
+                writeln!(buffer, "--ring-color: {color};")?;
             }
-            Modifier::Arbitrary { value, .. } => {
-                if value.contains("--en-opacity") {
-                    writeln!(buffer, "--en-ring-opacity: 1;")?;
-                    indent(indentation, buffer)?;
-                    writeln!(
-                        buffer,
-                        "--ring-color: {};",
-                        value.replace("--en-opacity", "--en-ring-opacity")
-                    )?;
-                } else {
-                    writeln!(buffer, "--ring-color: {value};")?;
-                }
-            }
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "--ring-color: {value};")?,
         }
 
         Ok(())
@@ -969,7 +929,7 @@ impl Plugin for RingOffsetColorPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Basic { value, .. } => default_colors::get(config, value, None).is_some(),
             Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
@@ -983,34 +943,14 @@ impl Plugin for RingOffsetColorPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         writeln!(buffer, "{}", CSS_RING_OFFSET_SHADOW)?;
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => {
-                let color = default_colors::get(config, value).unwrap();
-                if color.contains("--en-opacity") {
-                    writeln!(
-                        buffer,
-                        "--en-ring-offset-color: {};",
-                        color.replace(" / var(--en-opacity)", "")
-                    )?;
-                } else {
-                    writeln!(buffer, "--en-ring-offset-color: {color};")?;
-                }
-            }
-            Modifier::Arbitrary { value, .. } => {
-                if value.contains("--en-opacity") {
-                    writeln!(
-                        buffer,
-                        "--en-ring-offset-color: {};",
-                        value.replace(" / var(--en-opacity)", "")
-                    )?;
-                } else {
-                    writeln!(buffer, "--en-ring-offset-color: {value};")?;
-                }
-            }
-        }
 
-        Ok(())
+        indent(indentation, buffer)?;
+        let value = match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value, None).unwrap(),
+            Modifier::Arbitrary { value, .. } => Cow::from(&**value),
+        };
+
+        writeln!(buffer, "--en-ring-offset-color: {value};")
     }
 }
 
@@ -1138,7 +1078,7 @@ impl Plugin for OutlineColorPlugin {
     }
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Basic { value, .. } => default_colors::get(config, value, None).is_some(),
             Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
@@ -1151,33 +1091,12 @@ impl Plugin for OutlineColorPlugin {
         buffer: &mut String,
     ) -> fmt::Result {
         indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => {
-                let color = default_colors::get(config, value).unwrap();
-                if color.contains("--en-opacity") {
-                    writeln!(
-                        buffer,
-                        "outline-color: {};",
-                        color.replace(" / var(--en-opacity)", "")
-                    )?;
-                } else {
-                    writeln!(buffer, "outline-color: {color};")?;
-                }
-            }
-            Modifier::Arbitrary { value, .. } => {
-                if value.contains("--en-opacity") {
-                    writeln!(
-                        buffer,
-                        "outline-color: {};",
-                        value.replace(" / var(--en-opacity)", "")
-                    )?;
-                } else {
-                    writeln!(buffer, "outline-color: {value};")?;
-                }
-            }
-        }
+        let value = match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value, None).unwrap(),
+            Modifier::Arbitrary { value, .. } => Cow::from(&**value),
+        };
 
-        Ok(())
+        writeln!(buffer, "outline-color: {value};")
     }
 }
 

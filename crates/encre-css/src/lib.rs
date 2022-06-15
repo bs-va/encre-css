@@ -65,10 +65,7 @@ mod tests {
             r#"<div class="w-full h-full absolute bg-blue-500 foo-bar sm:focus:ring hover:bg-black border-[#333] text-[color:var(--hello)]"></div>"#
         );
 
-        assert_eq!(
-            expected,
-            generator.scanned_selectors,
-        );
+        assert_eq!(expected, generator.scanned_selectors,);
     }
 
     #[test]

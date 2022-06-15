@@ -2,7 +2,7 @@ use super::Plugin;
 use crate::utils::{default_colors, default_lengths, indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use std::fmt::{self, Write};
+use std::{borrow::Cow, fmt::{self, Write}};
 
 pub struct AccentColorPlugin;
 
@@ -13,7 +13,7 @@ impl Plugin for AccentColorPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Basic { value, .. } => default_colors::get(config, value, None).is_some(),
             Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
@@ -26,33 +26,12 @@ impl Plugin for AccentColorPlugin {
         buffer: &mut String,
     ) -> fmt::Result {
         indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => {
-                let color = default_colors::get(config, value).unwrap();
-                if color.contains("--en-opacity") {
-                    writeln!(
-                        buffer,
-                        "accent-color: {};",
-                        value.replace(" / var(--en-opacity)", ""),
-                    )?;
-                } else {
-                    writeln!(buffer, "accent-color: {color};")?;
-                }
-            }
-            Modifier::Arbitrary { value, .. } => {
-                if value.contains("--en-opacity") {
-                    writeln!(
-                        buffer,
-                        "accent-color: {};",
-                        value.replace(" / var(--en-opacity)", ""),
-                    )?;
-                } else {
-                    writeln!(buffer, "accent-color: {value};")?;
-                }
-            }
-        }
+        let value = match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value, None).unwrap(),
+            Modifier::Arbitrary { value, .. } => Cow::from(&**value),
+        };
 
-        Ok(())
+        writeln!(buffer, "accent-color: {value};")
     }
 }
 
@@ -171,7 +150,7 @@ impl Plugin for CaretColorPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Basic { value, .. } => default_colors::get(config, value, None).is_some(),
             Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
@@ -184,33 +163,12 @@ impl Plugin for CaretColorPlugin {
         buffer: &mut String,
     ) -> fmt::Result {
         indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => {
-                let color = default_colors::get(config, value).unwrap();
-                if color.contains("--en-opacity") {
-                    writeln!(
-                        buffer,
-                        "caret-color: {};",
-                        value.replace(" / var(--en-opacity)", ""),
-                    )?;
-                } else {
-                    writeln!(buffer, "caret-color: {color};")?;
-                }
-            }
-            Modifier::Arbitrary { value, .. } => {
-                if value.contains("--en-opacity") {
-                    writeln!(
-                        buffer,
-                        "caret-color: {};",
-                        value.replace(" / var(--en-opacity)", ""),
-                    )?;
-                } else {
-                    writeln!(buffer, "caret-color: {value};")?;
-                }
-            }
-        }
+        let value = match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value, None).unwrap(),
+            Modifier::Arbitrary { value, .. } => Cow::from(&**value),
+        };
 
-        Ok(())
+        writeln!(buffer, "caret-color: {value};")
     }
 }
 

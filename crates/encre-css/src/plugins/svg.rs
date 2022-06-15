@@ -2,7 +2,7 @@ use super::Plugin;
 use crate::utils::{default_colors, indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use std::fmt::{self, Write};
+use std::{borrow::Cow, fmt::{self, Write}};
 
 pub struct FillPlugin;
 
@@ -13,7 +13,7 @@ impl Plugin for FillPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Basic { value, .. } => default_colors::get(config, value, None).is_some(),
             Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
@@ -26,33 +26,12 @@ impl Plugin for FillPlugin {
         buffer: &mut String,
     ) -> fmt::Result {
         indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => {
-                let color = default_colors::get(config, value).unwrap();
-                if color.contains("--en-opacity") {
-                    writeln!(
-                        buffer,
-                        "fill: {};",
-                        color.replace(" / var(--en-opacity)", "")
-                    )?;
-                } else {
-                    writeln!(buffer, "fill: {color};")?;
-                }
-            }
-            Modifier::Arbitrary { value, .. } => {
-                if value.contains("--en-opacity") {
-                    writeln!(
-                        buffer,
-                        "fill: {};",
-                        value.replace(" / var(--en-opacity)", "")
-                    )?;
-                } else {
-                    writeln!(buffer, "fill: {value};")?;
-                }
-            }
-        }
+        let value = match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value, None).unwrap(),
+            Modifier::Arbitrary { value, .. } => Cow::from(&**value),
+        };
 
-        Ok(())
+        writeln!(buffer, "fill: {value};")
     }
 }
 
@@ -65,7 +44,7 @@ impl Plugin for StrokeColorPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Basic { value, .. } => default_colors::get(config, value, None).is_some(),
             Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
@@ -78,33 +57,12 @@ impl Plugin for StrokeColorPlugin {
         buffer: &mut String,
     ) -> fmt::Result {
         indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => {
-                let color = default_colors::get(config, value).unwrap();
-                if color.contains("--en-opacity") {
-                    writeln!(
-                        buffer,
-                        "stroke: {};",
-                        color.replace(" / var(--en-opacity)", "")
-                    )?;
-                } else {
-                    writeln!(buffer, "stroke: {color};")?;
-                }
-            }
-            Modifier::Arbitrary { value, .. } => {
-                if value.contains("--en-opacity") {
-                    writeln!(
-                        buffer,
-                        "stroke: {};",
-                        value.replace(" / var(--en-opacity)", "")
-                    )?;
-                } else {
-                    writeln!(buffer, "stroke: {value};")?;
-                }
-            }
-        }
+        let value = match modifier {
+            Modifier::Basic { value, .. } => default_colors::get(config, value, None).unwrap(),
+            Modifier::Arbitrary { value, .. } => Cow::from(&**value),
+        };
 
-        Ok(())
+        writeln!(buffer, "stroke: {value};")
     }
 }
 

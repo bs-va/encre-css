@@ -1,11 +1,11 @@
 use crate::{
     config::Config,
     error::{Error, Result},
+    plugins::transition,
     preflight::ENCRE_PREFLIGHT_CSS,
     selector::{Modifier, Selector},
     utils::indent,
     variant::{init_variants, Variant},
-    plugins::transition,
 };
 
 use lazy_static::lazy_static;
@@ -16,10 +16,10 @@ use std::{
     collections::{BTreeMap, BTreeSet},
     fmt::Write,
     fs,
-    iter,
     io::Read,
+    iter,
     path::Path,
-    sync::{Arc, atomic::Ordering},
+    sync::{atomic::Ordering, Arc},
 };
 use wax::Glob;
 
@@ -162,20 +162,19 @@ impl EncreGenerator {
         let mut file_contents: String = String::new();
 
         debug!("Start scanning files");
-        files
-            .for_each(|file_path| {
-                let mut file = match fs::File::open(&file_path) {
-                    Ok(f) => f,
-                    Err(e) => panic!("Failed to read the file {:?}: {:?}", file_path.as_ref(), e),
-                };
-                file_contents.clear();
+        files.for_each(|file_path| {
+            let mut file = match fs::File::open(&file_path) {
+                Ok(f) => f,
+                Err(e) => panic!("Failed to read the file {:?}: {:?}", file_path.as_ref(), e),
+            };
+            file_contents.clear();
 
-                if file.read_to_string(&mut file_contents).is_ok() {
-                    self.scan_raw(&file_contents)
-                } else {
-                    // TODO: Display a warning otherwise
-                }
-            });
+            if file.read_to_string(&mut file_contents).is_ok() {
+                self.scan_raw(&file_contents)
+            } else {
+                // TODO: Display a warning otherwise
+            }
+        });
         debug!("Finished scanning files");
     }
 
@@ -289,7 +288,10 @@ impl EncreGenerator {
 
             // Rule content
             let modifier = match &selector.modifier {
-                Modifier::Basic { is_negative, value } => Modifier::Basic { is_negative: *is_negative, value: value.clone() },
+                Modifier::Basic { is_negative, value } => Modifier::Basic {
+                    is_negative: *is_negative,
+                    value: value.clone(),
+                },
                 Modifier::Arbitrary { hint, value } => {
                     // Transform the mangled CSS content of the selector into a real CSS rule
                     Modifier::Arbitrary {
@@ -300,12 +302,9 @@ impl EncreGenerator {
             };
 
             // TODO: Support the important prefix
-            selector.plugin.handle(
-                &self.config,
-                &modifier,
-                indentation + 1,
-                &mut buffer,
-            )?;
+            selector
+                .plugin
+                .handle(&self.config, &modifier, indentation + 1, &mut buffer)?;
 
             // After rule
             for i in (1..indentation + 1).rev() {
@@ -329,6 +328,8 @@ impl EncreGenerator {
         self.scanned_selectors.clear();
 
         // Make sure animations are not defined
-        transition::ANIMATIONS_ALREADY_DEFINED.iter().for_each(|animation| animation.store(false, Ordering::Relaxed));
+        transition::ANIMATIONS_ALREADY_DEFINED
+            .iter()
+            .for_each(|animation| animation.store(false, Ordering::Relaxed));
     }
 }

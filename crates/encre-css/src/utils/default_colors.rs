@@ -40,7 +40,11 @@ pub fn hex_to_rgb(hex: &str) -> Result<[u8; 3]> {
 }
 
 /// Get a color from a modifier
-pub fn get<'a>(config: &Config, modifier: &'a str) -> Option<Cow<'a, str>> {
+pub fn get<'a>(
+    config: &Config,
+    modifier: &'a str,
+    opacity: Option<&'static str>,
+) -> Option<Cow<'a, str>> {
     let modifier = if &**config.modifier_separator != "-" {
         Cow::from(modifier.replace(&**config.modifier_separator, "-"))
     } else {
@@ -48,7 +52,7 @@ pub fn get<'a>(config: &Config, modifier: &'a str) -> Option<Cow<'a, str>> {
     };
 
     // Handle the new opacity syntax (e.g. `bg-red-500/25`)
-    let (mut opacity, modifier) =
+    let (mut opacity_from_syntax, modifier) =
         if let Some(opacity_suffix) = OPACITY_SUFFIX_REGEX.captures(&modifier) {
             let new_modifier = &OPACITY_SUFFIX_REGEX.replace(&modifier, "");
             (
@@ -75,8 +79,8 @@ pub fn get<'a>(config: &Config, modifier: &'a str) -> Option<Cow<'a, str>> {
         };
 
     let rgb_result = if modifier == "transparent" {
-        if opacity.is_none() {
-            opacity = Some(0.0);
+        if opacity_from_syntax.is_none() {
+            opacity_from_syntax = Some(0.0);
         }
 
         Some([0, 0, 0])
@@ -93,15 +97,19 @@ pub fn get<'a>(config: &Config, modifier: &'a str) -> Option<Cow<'a, str>> {
     // Convert the array to a CSS color with an opacity value (if the color is found)
     rgb_result.map(|rgb_result| {
         Cow::from(format!(
-            "rgb({} {} {} / {})",
+            "rgb({} {} {}{})",
             rgb_result[0],
             rgb_result[1],
             rgb_result[2],
             if let Some(opacity) = opacity {
-                Cow::from(opacity.to_string())
+                if let Some(opacity_from_syntax) = opacity_from_syntax {
+                    Cow::from(format!(" / {}", opacity_from_syntax))
+                } else {
+                    Cow::from(format!(" / var({})", opacity))
+                }
             } else {
-                Cow::from("var(--en-opacity)")
-            }
+                Cow::from("")
+            },
         ))
     })
 }

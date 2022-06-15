@@ -2,17 +2,11 @@ use super::Plugin;
 use crate::utils::{default_colors, indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use lazy_static::lazy_static;
-use regex::Regex;
 use smol_str::SmolStr;
 use std::{
     borrow::Cow,
     fmt::{self, Write},
 };
-
-lazy_static! {
-    static ref OPACITY_IN_RGB_REGEX: Regex = Regex::new(r"/.*\)").unwrap();
-}
 
 pub struct ColorPlugin;
 
@@ -23,7 +17,9 @@ impl Plugin for ColorPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Basic { value, .. } => {
+                default_colors::get(config, value, Some("--en-bg-opacity")).is_some()
+            }
             Modifier::Arbitrary { hint, value } => {
                 hint == "color" || is_matching_color(value) || is_matching_url(value)
             }
@@ -40,18 +36,13 @@ impl Plugin for ColorPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => {
-                let color = default_colors::get(config, value).unwrap();
-                if color.contains("--en-opacity") {
+                let color = default_colors::get(config, value, Some("--en-bg-opacity")).unwrap();
+                if color.contains("--en-bg-opacity") {
                     writeln!(buffer, "--en-bg-opacity: 1;")?;
                     indent(indentation, buffer)?;
-                    writeln!(
-                        buffer,
-                        "background-color: {};",
-                        color.replace("--en-opacity", "--en-bg-opacity")
-                    )?;
-                } else {
-                    writeln!(buffer, "background-color: {color};")?;
                 }
+
+                writeln!(buffer, "background-color: {color};")?;
             }
             Modifier::Arbitrary { value, .. } => {
                 let property = if value.contains("url") {
@@ -60,17 +51,7 @@ impl Plugin for ColorPlugin {
                     "background-color"
                 };
 
-                if value.contains("--en-opacity") {
-                    writeln!(buffer, "--en-bg-opacity: 1;")?;
-                    indent(indentation, buffer)?;
-                    writeln!(
-                        buffer,
-                        "{property}: {};",
-                        value.replace("--en-opacity", "--en-bg-opacity")
-                    )?;
-                } else {
-                    writeln!(buffer, "{property}: {value};")?;
-                }
+                writeln!(buffer, "{property}: {value};")?;
             }
         }
 
@@ -275,7 +256,7 @@ impl Plugin for GradientFromPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Basic { value, .. } => default_colors::get(config, value, None).is_some(),
             Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
@@ -289,7 +270,7 @@ impl Plugin for GradientFromPlugin {
     ) -> fmt::Result {
         let value = match modifier {
             Modifier::Basic { value, .. } => {
-                SmolStr::from(default_colors::get(config, value).unwrap())
+                SmolStr::from(default_colors::get(config, value, None).unwrap())
             }
             Modifier::Arbitrary { value, .. } => value.clone(),
         };
@@ -297,13 +278,10 @@ impl Plugin for GradientFromPlugin {
         let default_to = if value == "inherit" || value == "currentColor" {
             Cow::from("rgb(255 255 255 / 0)")
         } else {
-            OPACITY_IN_RGB_REGEX.replace(&value, "/ 0)")
-        };
-
-        let value = if value.contains("--en-opacity") {
-            Cow::from(value.replace(" / var(--en-opacity)", ""))
-        } else {
-            Cow::from(&*value)
+            let mut default = value.to_string();
+            default.pop(); // Remove the last `)`
+            default += "/ 0)";
+            Cow::from(default)
         };
 
         indent(indentation, buffer)?;
@@ -327,7 +305,7 @@ impl Plugin for GradientViaPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Basic { value, .. } => default_colors::get(config, value, None).is_some(),
             Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
@@ -341,7 +319,7 @@ impl Plugin for GradientViaPlugin {
     ) -> fmt::Result {
         let value = match modifier {
             Modifier::Basic { value, .. } => {
-                SmolStr::from(default_colors::get(config, value).unwrap())
+                SmolStr::from(default_colors::get(config, value, None).unwrap())
             }
             Modifier::Arbitrary { value, .. } => value.clone(),
         };
@@ -349,13 +327,10 @@ impl Plugin for GradientViaPlugin {
         let default_to = if value == "inherit" || value == "currentColor" {
             Cow::from("rgb(255 255 255 / 0)")
         } else {
-            OPACITY_IN_RGB_REGEX.replace(&value, "/ 0)")
-        };
-
-        let value = if value.contains("--en-opacity") {
-            Cow::from(value.replace(" / var(--en-opacity)", ""))
-        } else {
-            Cow::from(&*value)
+            let mut default = value.to_string();
+            default.pop(); // Remove the last `)`
+            default += "/ 0)";
+            Cow::from(default)
         };
 
         indent(indentation, buffer)?;
@@ -378,7 +353,7 @@ impl Plugin for GradientToPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value).is_some(),
+            Modifier::Basic { value, .. } => default_colors::get(config, value, None).is_some(),
             Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
@@ -391,14 +366,8 @@ impl Plugin for GradientToPlugin {
         buffer: &mut String,
     ) -> fmt::Result {
         let value = match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value).unwrap(),
+            Modifier::Basic { value, .. } => default_colors::get(config, value, None).unwrap(),
             Modifier::Arbitrary { value, .. } => Cow::from(&**value),
-        };
-
-        let value = if value.contains("--en-opacity") {
-            Cow::from(value.replace(" / var(--en-opacity)", ""))
-        } else {
-            value
         };
 
         indent(indentation, buffer)?;
