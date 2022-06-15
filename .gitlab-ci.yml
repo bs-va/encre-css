@@ -3,7 +3,11 @@ image: rust:latest
 cache:
   key: shared-cache
   paths:
-      - target/
+    - target/
+    - cargo/
+
+variables:
+  CARGO_HOME: $CI_PROJECT_DIR/cargo
 
 check:test:
   stage: test
