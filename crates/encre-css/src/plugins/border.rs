@@ -463,7 +463,7 @@ impl Plugin for WidthLeftPlugin {
         indentation: usize,
         buffer: &mut String,
     ) -> fmt::Result {
-        width_handle(&["border-leftwidth"], modifier, indentation, buffer)
+        width_handle(&["border-left-width"], modifier, indentation, buffer)
     }
 }
 
