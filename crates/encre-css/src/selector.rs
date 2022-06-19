@@ -2,9 +2,11 @@ use crate::{config::Config, plugins::*, variant::VARIANT_SEPARATOR};
 
 use derivative::Derivative;
 use lazy_static::lazy_static;
-use rayon::prelude::*;
 use regex::Regex;
 use smol_str::SmolStr;
+
+#[cfg(not(target_arch = "wasm32"))]
+use rayon::prelude::*;
 
 lazy_static! {
     static ref VARIANT_REGEX: Regex =
@@ -297,7 +299,7 @@ impl Selector {
         let content = variants.pop().unwrap();
 
         // Find the right plugin for handling this selector
-        let result = BUILTIN_PLUGINS.par_iter().find_map_first(|plugin| {
+        let find_fn = |plugin: &&'static (dyn Plugin + Send + Sync)| {
             // Find the modifier
             if let Some(modifier_part) =
                 content.strip_prefix(&plugin.namespace().replace('-', &*config.modifier_separator))
@@ -331,7 +333,13 @@ impl Selector {
             } else {
                 None
             }
-        });
+        };
+
+        #[cfg(target_arch = "wasm32")]
+        let result = BUILTIN_PLUGINS.iter().find_map(find_fn);
+
+        #[cfg(not(target_arch = "wasm32"))]
+        let result = BUILTIN_PLUGINS.par_iter().find_map_first(find_fn);
 
         if let Some(result) = result {
             Some(Self {
