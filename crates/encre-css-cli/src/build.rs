@@ -21,20 +21,14 @@ fn result_equal<T: PartialEq, E>(res1: Result<T, E>, res2: Result<T, E>) -> bool
     }
 }
 
-fn gen_css<T: AsRef<Path>>(generator: &EncreGenerator, output: Option<T>, display_time: bool) {
-    let start = Instant::now();
+fn gen_css<T: AsRef<Path>>(generator: &EncreGenerator, output: Option<T>) {
     let css = generator.generate().expect("failed to generate the CSS");
-    let duration = start.elapsed();
 
     if let Some(file) = output {
         fs::write(file, css).expect("failed to write to the file");
     } else {
         // If no file is specified, the CSS generated is written to the standard output
         println!("{}", css);
-    }
-
-    if display_time {
-        println!("CSS generated in {:?}", duration);
     }
 }
 
@@ -75,7 +69,7 @@ pub fn build<T: AsRef<Path>>(
         }
 
         // Initial generation
-        gen_css(&generator, output.as_ref(), display_time);
+        gen_css(&generator, output.as_ref());
 
         println!("`encre-css` successfully launched in watch mode");
 
@@ -149,6 +143,7 @@ pub fn build<T: AsRef<Path>>(
                         }
 
                         if need_reloading {
+                            let start = Instant::now();
                             generator.reset();
                             input.iter().for_each(|p| generator.scan_path(p));
 
@@ -156,7 +151,12 @@ pub fn build<T: AsRef<Path>>(
                                 generator.scan_path(path);
                             }
 
-                            gen_css(&generator, output.as_ref(), display_time);
+                            gen_css(&generator, output.as_ref());
+                            let duration = start.elapsed();
+
+                            if display_time {
+                                println!("CSS generated in {:?}", duration);
+                            }
                         }
                     }
                 }
@@ -164,12 +164,18 @@ pub fn build<T: AsRef<Path>>(
             }
         }
     } else {
+        let start = Instant::now();
         let mut generator = EncreGenerator::new(config_file);
 
         if let Some(path) = extra_input {
             generator.scan_path(&path);
         }
 
-        gen_css(&generator, output, display_time);
+        gen_css(&generator, output);
+        let duration = start.elapsed();
+
+        if display_time {
+            println!("CSS generated in {:?}", duration);
+        }
     }
 }
