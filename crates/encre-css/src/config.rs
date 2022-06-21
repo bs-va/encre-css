@@ -6,7 +6,7 @@ use std::{
     collections::BTreeMap,
     fmt, fs,
     ops::{Deref, DerefMut},
-    path::{Path, PathBuf},
+    path::Path,
 };
 
 #[derive(Debug, PartialEq, Deserialize)]
@@ -352,8 +352,16 @@ pub struct ThemeConfig {
 
 #[derive(Default, PartialEq, Debug, Deserialize)]
 pub struct Config {
+    /// <span class="item-info">
+    ///   <div class="stab portability">
+    ///     Only available when the <strong>glob_scanning</strong> feature is enabled.
+    ///   </div>
+    /// </span>
+    ///
+    /// Specify which files should be scanned using globs.
+    #[cfg(feature = "glob_scanning")]
     #[serde(default)]
-    pub input: Vec<PathBuf>,
+    pub input: Vec<std::path::PathBuf>,
 
     #[serde(default)]
     pub theme: ThemeConfig,
@@ -362,9 +370,11 @@ pub struct Config {
     ///
     /// For example in `bg-red-500`, `-` is the modifier separator
     ///
-    /// NOTE: Custom configured colors must not take into account this separator, they are always
+    /// ### Be careful when changing the default modifier and defining new colors
+    ///
+    /// Custom configured colors must not take into account this separator, they are always
     /// delimited with `-` in the configuration but usable with this separator after. For example,
-    /// if you have configured `_` as modifier separator and you want to add the new color `lime-500`,
+    /// if you have configured `_` as the modifier separator and you want to add the new color `lime-500`,
     /// you must write it using hyphens in the configuration, but you'll use it as `bg_lime_500`
     /// and `text_lime_500`
     #[serde(default)]

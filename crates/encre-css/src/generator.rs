@@ -17,11 +17,9 @@ use std::{
     fmt::Write,
     fs,
     io::Read,
-    iter,
     path::Path,
     sync::{atomic::Ordering, Arc},
 };
-use wax::Glob;
 
 lazy_static! {
     static ref URL_REGEX: Regex = Regex::new(r"url\((.+)\)").unwrap();
@@ -106,6 +104,7 @@ impl EncreGenerator {
     pub fn from_config(config: Config) -> Self {
         let config = Arc::new(config);
 
+        #[allow(unused_mut)]
         let mut result_self = Self {
             variants: init_variants(&config),
             config: Arc::clone(&config),
@@ -113,7 +112,9 @@ impl EncreGenerator {
         };
 
         // Scan the files listed in the `input` configuration
+        #[cfg(feature = "glob_scanning")]
         config.input.iter().for_each(|p| result_self.scan_path(p));
+
         result_self
     }
 
@@ -178,9 +179,17 @@ impl EncreGenerator {
         debug!("Finished scanning files");
     }
 
-    /// Scan all files in a path using the glob syntax
+    /// <span class="item-info">
+    ///   <div class="stab portability">
+    ///     Only available when the <strong>glob_scanning</strong> feature is enabled.
+    ///   </div>
+    /// </span>
+    ///
+    /// Scan all files in a path using the glob syntax.
+    #[cfg(feature = "glob_scanning")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "glob_scanning")))]
     pub fn scan_path<T: AsRef<Path>>(&mut self, glob_path: T) {
-        let (prefix, glob) = match Glob::new(
+        let (prefix, glob) = match wax::Glob::new(
             glob_path
                 .as_ref()
                 .to_str()
@@ -191,20 +200,24 @@ impl EncreGenerator {
         };
 
         if prefix == glob_path.as_ref() {
-            self.scan_files(iter::once(glob_path));
+            self.scan_files(std::iter::once(glob_path));
         } else {
             self.scan_files(glob.walk(prefix).map(|e| e.unwrap().into_path()));
         }
     }
 
-    /// Generate the CSS styles needed based on the scanned selectors
+    /// Generate the CSS styles needed based on the scanned selectors.
     ///
-    /// NOTE: Don't forget to scan selectors using either [scan_files] or [scan_raw] or by
-    /// adding individual selectors using [add_selector]
+    /// Don't forget to scan selectors before, using:
+    /// - [add_selector] to add individual selectors to the scanned list;
+    /// - [scan_raw] to scan raw input;
+    /// - [scan_files] to scan several files on the filesystem;
+    /// - [scan_path] (only if the `glob_scanning` feature is enabled) to scan files using a glob.
     ///
-    /// [scan_files]: EncreGenerator::scan_files
-    /// [scan_raw]: EncreGenerator::scan_raw
     /// [add_selector]: EncreGenerator::add_selector
+    /// [scan_raw]: EncreGenerator::scan_raw
+    /// [scan_files]: EncreGenerator::scan_files
+    /// [scan_path]: EncreGenerator::scan_path
     pub fn generate(&self) -> Result<String> {
         debug!("Start generating CSS");
         let mut buffer = String::with_capacity(10 * self.scanned_selectors.len()); // TODO: More accurate value
