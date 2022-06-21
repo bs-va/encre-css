@@ -100,7 +100,9 @@ impl Plugin for FontFamilyPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => ["sans", "serif", "mono"].contains(&&**value),
-            Modifier::Arbitrary { value, .. } => value.split(',').all(|v| !START_WITH_INT_REGEX.is_match(v)),
+            Modifier::Arbitrary { value, .. } => {
+                value.split(',').all(|v| !START_WITH_INT_REGEX.is_match(v))
+            }
         }
     }
 
@@ -133,8 +135,16 @@ impl Plugin for FontFamilyPlugin {
             // containing spaces, they are added later
             Modifier::Arbitrary { value, .. } => writeln!(
                 buffer,
-                "font-family: {maybe_quote}{value}{maybe_quote};",
-                maybe_quote = if value.contains(' ') { "\"" } else { "" }
+                "font-family: {};",
+                value
+                    .split(',')
+                    .map(|v| if v.trim().contains(' ') {
+                        Cow::from(format!(r#""{}""#, v))
+                    } else {
+                        Cow::from(v)
+                    })
+                    .collect::<Vec<Cow<str>>>()
+                    .join(","),
             )?,
         }
 

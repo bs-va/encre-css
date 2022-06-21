@@ -197,24 +197,30 @@ static COLOR_REGEX: Lazy<Regex> =
 static LENGTH_REGEX: Lazy<Regex> =
     Lazy::new(|| Regex::new(&format!("(?-u)(?:{})$", LENGTH_UNITS.join("|"))).unwrap());
 static TIME_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"(?-u)\d+m?s$").unwrap());
-static NUMBER_CSS_FUNCTIONS_REGEXES: Lazy<[Regex; 4]> = Lazy::new(|| [
-    Regex::new(r"^min\(.+?").unwrap(),
-    Regex::new(r"^max\(.+?").unwrap(),
-    Regex::new(r"^clamp\(.+?").unwrap(),
-    Regex::new(r"^calc\(.+?").unwrap(),
-]);
-static PERCENTAGE_CSS_FUNCTIONS_REGEXES: Lazy<[Regex; 4]> = Lazy::new(|| [
-    Regex::new(r"^min\(.+?%").unwrap(),
-    Regex::new(r"^max\(.+?%").unwrap(),
-    Regex::new(r"^clamp\(.+?%").unwrap(),
-    Regex::new(r"^calc\(.+?%").unwrap(),
-]);
-static LENGTH_CSS_FUNCTIONS_REGEXES: Lazy<[Regex; 4]> = Lazy::new(|| [
-    Regex::new(&format!(r"^min\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
-    Regex::new(&format!(r"^max\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
-    Regex::new(&format!(r"^clamp\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
-    Regex::new(&format!(r"^calc\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
-]);
+static NUMBER_CSS_FUNCTIONS_REGEXES: Lazy<[Regex; 4]> = Lazy::new(|| {
+    [
+        Regex::new(r"^min\(.+?").unwrap(),
+        Regex::new(r"^max\(.+?").unwrap(),
+        Regex::new(r"^clamp\(.+?").unwrap(),
+        Regex::new(r"^calc\(.+?").unwrap(),
+    ]
+});
+static PERCENTAGE_CSS_FUNCTIONS_REGEXES: Lazy<[Regex; 4]> = Lazy::new(|| {
+    [
+        Regex::new(r"^min\(.+?%").unwrap(),
+        Regex::new(r"^max\(.+?%").unwrap(),
+        Regex::new(r"^clamp\(.+?%").unwrap(),
+        Regex::new(r"^calc\(.+?%").unwrap(),
+    ]
+});
+static LENGTH_CSS_FUNCTIONS_REGEXES: Lazy<[Regex; 4]> = Lazy::new(|| {
+    [
+        Regex::new(&format!(r"^min\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
+        Regex::new(&format!(r"^max\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
+        Regex::new(&format!(r"^clamp\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
+        Regex::new(&format!(r"^calc\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
+    ]
+});
 
 // TODO: Support:
 // - global values like inherit, initial, revert, revert-layer, unset

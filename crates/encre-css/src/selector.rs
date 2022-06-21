@@ -211,7 +211,6 @@ static BUILTIN_PLUGINS: [&'static (dyn Plugin + Send + Sync); 206] = [
     &effect::BackgroundBlendModePlugin,
     &effect::BoxShadowPlugin,
     &effect::BoxShadowColorPlugin,
-
     // It is better to include the following plugins at the end because they match the "" namespace
     &layout::DisplayPlugin,
     &layout::PositionPlugin,

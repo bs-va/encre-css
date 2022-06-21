@@ -415,6 +415,29 @@ mod tests {
     }
 
     #[test]
+    fn gen_selector_css_for_font_with_spaces_test() {
+        let mut generator = EncreGenerator::from_config(Config::default());
+        generator.add_selector("font-[Times_New_Roman,Helvetica,serif]");
+        generator.add_selector("font-[Roboto,_sans-serif]");
+
+        assert_eq!(
+            generator.generate().unwrap(),
+            format!(
+                r#"{}
+
+.font-\[Roboto\,_sans-serif\] {{
+  font-family: Roboto, sans-serif;
+}}
+
+.font-\[Times_New_Roman\,Helvetica\,serif\] {{
+  font-family: "Times New Roman",Helvetica,serif;
+}}"#,
+                preflight::ENCRE_PREFLIGHT_CSS,
+            )
+        );
+    }
+
+    #[test]
     fn gen_selector_css_with_dark_variant_test() {
         let mut generator = EncreGenerator::from_config(Config::default());
         generator.add_selector("dark:mt-px");
