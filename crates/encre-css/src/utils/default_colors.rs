@@ -3,13 +3,11 @@ use crate::{
     error::{Error, Result},
 };
 
-use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
 use regex::Regex;
 use std::borrow::Cow;
 
-lazy_static! {
-    static ref OPACITY_SUFFIX_REGEX: Regex = Regex::new(r"(?-u)/(\d*)$").unwrap();
-}
+static OPACITY_SUFFIX_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"(?-u)/(\d*)$").unwrap());
 
 pub fn hex_to_rgb(hex: &str) -> Result<[u8; 3]> {
     // Remove the useless `#` from the start of the color

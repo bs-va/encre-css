@@ -1,4 +1,4 @@
-use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
 use regex::Regex;
 
 pub const LENGTH_UNITS: [&str; 16] = [
@@ -192,31 +192,29 @@ pub const NAMED_COLORS: [&str; 148] = [
     "yellowgreen",
 ];
 
-lazy_static! {
-    static ref COLOR_REGEX: Regex =
-        Regex::new(r"^(#[a-f\d]{3}|#[a-f\d]{6}|rgba?\(.+\)|hsla?\(.+\))$").unwrap();
-    static ref LENGTH_REGEX: Regex =
-        Regex::new(&format!("(?-u)(?:{})$", LENGTH_UNITS.join("|"))).unwrap();
-    static ref TIME_REGEX: Regex = Regex::new(r"(?-u)\d+m?s$").unwrap();
-    static ref NUMBER_CSS_FUNCTIONS_REGEXES: [Regex; 4] = [
-        Regex::new(r"^min\(.+?").unwrap(),
-        Regex::new(r"^max\(.+?").unwrap(),
-        Regex::new(r"^clamp\(.+?").unwrap(),
-        Regex::new(r"^calc\(.+?").unwrap(),
-    ];
-    static ref PERCENTAGE_CSS_FUNCTIONS_REGEXES: [Regex; 4] = [
-        Regex::new(r"^min\(.+?%").unwrap(),
-        Regex::new(r"^max\(.+?%").unwrap(),
-        Regex::new(r"^clamp\(.+?%").unwrap(),
-        Regex::new(r"^calc\(.+?%").unwrap(),
-    ];
-    static ref LENGTH_CSS_FUNCTIONS_REGEXES: [Regex; 4] = [
-        Regex::new(&format!(r"^min\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
-        Regex::new(&format!(r"^max\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
-        Regex::new(&format!(r"^clamp\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
-        Regex::new(&format!(r"^calc\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
-    ];
-}
+static COLOR_REGEX: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"^(#[a-f\d]{3}|#[a-f\d]{6}|rgba?\(.+\)|hsla?\(.+\))$").unwrap());
+static LENGTH_REGEX: Lazy<Regex> =
+    Lazy::new(|| Regex::new(&format!("(?-u)(?:{})$", LENGTH_UNITS.join("|"))).unwrap());
+static TIME_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"(?-u)\d+m?s$").unwrap());
+static NUMBER_CSS_FUNCTIONS_REGEXES: Lazy<[Regex; 4]> = Lazy::new(|| [
+    Regex::new(r"^min\(.+?").unwrap(),
+    Regex::new(r"^max\(.+?").unwrap(),
+    Regex::new(r"^clamp\(.+?").unwrap(),
+    Regex::new(r"^calc\(.+?").unwrap(),
+]);
+static PERCENTAGE_CSS_FUNCTIONS_REGEXES: Lazy<[Regex; 4]> = Lazy::new(|| [
+    Regex::new(r"^min\(.+?%").unwrap(),
+    Regex::new(r"^max\(.+?%").unwrap(),
+    Regex::new(r"^clamp\(.+?%").unwrap(),
+    Regex::new(r"^calc\(.+?%").unwrap(),
+]);
+static LENGTH_CSS_FUNCTIONS_REGEXES: Lazy<[Regex; 4]> = Lazy::new(|| [
+    Regex::new(&format!(r"^min\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
+    Regex::new(&format!(r"^max\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
+    Regex::new(&format!(r"^clamp\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
+    Regex::new(&format!(r"^calc\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
+]);
 
 // TODO: Support:
 // - global values like inherit, initial, revert, revert-layer, unset

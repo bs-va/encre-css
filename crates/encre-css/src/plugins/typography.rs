@@ -2,7 +2,7 @@ use super::Plugin;
 use crate::utils::{default_colors, indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
 use regex::Regex;
 use std::{
     borrow::Cow,
@@ -11,9 +11,7 @@ use std::{
 
 pub const CSS_FONT_VARIANT_NUMERIC: &str = "font-variant-numeric: var(--en-ordinal) var(--en-slashed-zero) var(--en-numeric-figure) var(--en-numeric-spacing) var(--en-numeric-fraction);";
 
-lazy_static! {
-    static ref START_WITH_INT_REGEX: Regex = Regex::new(r"(?-u)^\d").unwrap();
-}
+static START_WITH_INT_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"(?-u)^\d").unwrap());
 
 pub struct ColorPlugin;
 
@@ -102,13 +100,7 @@ impl Plugin for FontFamilyPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => ["sans", "serif", "mono"].contains(&&**value),
-            Modifier::Arbitrary { value, .. } => value.split(',').all(|v| {
-                if is_matching_generic_name(v) || is_matching_var(v) {
-                    true
-                } else {
-                    !START_WITH_INT_REGEX.is_match(v)
-                }
-            }),
+            Modifier::Arbitrary { value, .. } => value.split(',').all(|v| !START_WITH_INT_REGEX.is_match(v)),
         }
     }
 

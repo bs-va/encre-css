@@ -8,7 +8,7 @@ use crate::{
     variant::{init_variants, Variant},
 };
 
-use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
 use regex::{Captures, Regex};
 use smol_str::SmolStr;
 use std::{
@@ -21,12 +21,9 @@ use std::{
     sync::{atomic::Ordering, Arc},
 };
 
-lazy_static! {
-    static ref URL_REGEX: Regex = Regex::new(r"url\((.+)\)").unwrap();
-    static ref URL_REGEX_STRICT: Regex = Regex::new(r"^url\((.+)\)$").unwrap();
-    static ref CALC_REGEX: Regex = Regex::new(r"calc\((.+)\)").unwrap();
-    static ref SPLIT_REGEX: Regex = Regex::new(r#"(?-u)[\s'"`;>=]+"#).unwrap();
-}
+static URL_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"url\((.+)\)").unwrap());
+static CALC_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"calc\((.+)\)").unwrap());
+static SPLIT_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?-u)[\s'"`;>=]+"#).unwrap());
 
 pub const VALID_PLUGIN_HINT: [&str; 4] = ["color", "length", "angle", "list"];
 const WILL_BE_REPLACED_BY_UNDERSCORE: &str = "WILL-BE-REPLACED-BY-UNDERSCORE";

@@ -2,16 +2,10 @@ use super::Plugin;
 use crate::utils::{indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use lazy_static::lazy_static;
-use regex::Regex;
 use std::{
     fmt::{self, Write},
     sync::atomic::{AtomicBool, Ordering},
 };
-
-lazy_static! {
-    static ref PROPERTY_REGEX: Regex = Regex::new(r"[^\d]+").unwrap();
-}
 
 pub struct PropertyPlugin;
 
@@ -32,7 +26,7 @@ impl Plugin for PropertyPlugin {
                 "transform",
             ]
             .contains(&&**value),
-            Modifier::Arbitrary { value, .. } => PROPERTY_REGEX.is_match(value),
+            Modifier::Arbitrary { value, .. } => is_matching_all(value),
         }
     }
 
