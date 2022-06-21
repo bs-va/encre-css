@@ -5,7 +5,7 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use smol_str::SmolStr;
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
 lazy_static! {
@@ -335,10 +335,10 @@ impl Selector {
             }
         };
 
-        #[cfg(target_arch = "wasm32")]
+        #[cfg(not(feature = "rayon"))]
         let result = BUILTIN_PLUGINS.iter().find_map(find_fn);
 
-        #[cfg(not(target_arch = "wasm32"))]
+        #[cfg(feature = "rayon")]
         let result = BUILTIN_PLUGINS.par_iter().find_map_first(find_fn);
 
         if let Some(result) = result {

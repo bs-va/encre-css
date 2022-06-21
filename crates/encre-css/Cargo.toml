@@ -15,7 +15,7 @@ toml = "0.5.9"
 serde = { version = "1.0.137", features = ["derive"] }
 lazy_static = "1.4.0"
 regex = "1.5.5"
-rayon = "1.5.2"
+rayon = { version = "1.5.2", optional = true }
 wax = { version = "0.5.0", optional = true }
 thiserror = "1.0.31"
 smol_str = "0.1.23"

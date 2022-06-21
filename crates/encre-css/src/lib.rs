@@ -1,6 +1,6 @@
 //! A TailwindCSS-compatible CSS generation library written in Rust
 //!
-//! # Example
+//! ### Example
 //!
 //! ```rust
 //! use encre_css::{EncreGenerator, Config};
@@ -14,6 +14,11 @@
 //!   background-color: rgb(239 68 68 / var(--en-bg-opacity));
 //! }"#));
 //! ```
+//!
+//! ### Cargo features
+//!
+//! - `glob_scanning`: enables scan of files using [glob patterns](https://en.wikipedia.org/wiki/Glob_(programming))
+//! - `rayon`: enables [rayon](https://docs.rs/rayon/latest/rayon) parallel iterators
 
 // Used for the info!, trace!, debug!, warn!, error! macros
 #[macro_use]
