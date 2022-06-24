@@ -1,13 +1,9 @@
 use crate::{
-    config::Config,
+    config::{Config, BUILTIN_COLORS},
     error::{Error, Result},
 };
 
-use once_cell::sync::Lazy;
-use regex::Regex;
 use std::borrow::Cow;
-
-static OPACITY_SUFFIX_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"(?-u)/(\d*)$").unwrap());
 
 pub fn hex_to_rgb(hex: &str) -> Result<[u8; 3]> {
     // Remove the useless `#` from the start of the color
@@ -37,44 +33,43 @@ pub fn hex_to_rgb(hex: &str) -> Result<[u8; 3]> {
     Ok([r, g, b])
 }
 
+pub fn is_matching_basic_color(config: &Config, mut modifier: &str) -> bool {
+    if ["current", "inherit", "transparent", "black", "white"].contains(&modifier) {
+        return true;
+    }
+
+    // Trim the opacity suffix, if present
+    if let Some((new_modifier, _)) = modifier.split_once('/') {
+        modifier = new_modifier;
+    }
+
+    BUILTIN_COLORS.iter().any(|color| color.0 == modifier)
+        || config.theme.colors.contains_key(modifier)
+}
+
 /// Get a color from a modifier
 pub fn get<'a>(
     config: &Config,
     modifier: &'a str,
     opacity: Option<&'static str>,
 ) -> Option<Cow<'a, str>> {
-    let modifier = if &**config.modifier_separator != "-" {
-        Cow::from(modifier.replace(&**config.modifier_separator, "-"))
-    } else {
-        Cow::from(modifier)
-    };
-
     // Handle the new opacity syntax (e.g. `bg-red-500/25`)
-    let (mut opacity_from_syntax, modifier) =
-        if let Some(opacity_suffix) = OPACITY_SUFFIX_REGEX.captures(&modifier) {
-            let new_modifier = &OPACITY_SUFFIX_REGEX.replace(&modifier, "");
-            (
-                Some(
-                    opacity_suffix
-                        .get(1)
-                        .unwrap()
-                        .as_str()
-                        .parse::<usize>()
-                        .unwrap() as f32
-                        / 100.,
-                ),
-                new_modifier.clone(),
-            )
-        } else {
-            // The `current` and `inherit` modifiers cannot have their opacity changed
-            if modifier == "current" {
-                return Some(Cow::from("currentColor"));
-            } else if modifier == "inherit" {
-                return Some(Cow::from("inherit"));
+    let (mut opacity_from_syntax, modifier) = {
+        // The `current` and `inherit` modifiers cannot have their opacity changed
+        if modifier == "current" {
+            (None, "currentColor")
+        } else if modifier == "inherit" {
+            (None, "inherit")
+        } else if let Some((new_modifier, opacity_suffix)) = modifier.split_once('/') {
+            if let Ok(opacity_number) = opacity_suffix.parse::<usize>() {
+                (Some(opacity_number as f32 / 100.), new_modifier)
+            } else {
+                (None, modifier)
             }
-
+        } else {
             (None, modifier)
-        };
+        }
+    };
 
     let rgb_result = if modifier == "transparent" {
         if opacity_from_syntax.is_none() {
@@ -86,10 +81,14 @@ pub fn get<'a>(
         Some([0, 0, 0])
     } else if modifier == "white" {
         Some([0xff, 0xff, 0xff])
-    } else if let Some(hex_color) = config.theme.colors.get(&modifier) {
+    } else if let Some(hex_color) = config.theme.colors.get(modifier) {
+        // Custom theme values override builtin colors
         hex_to_rgb(hex_color).ok()
     } else {
-        None
+        BUILTIN_COLORS
+            .iter()
+            .find(|color| color.0 == modifier)
+            .map(|color| color.1)
     };
 
     // Convert the array to a CSS color with an opacity value (if the color is found)

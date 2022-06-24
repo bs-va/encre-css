@@ -1,19 +1,44 @@
 use crate::DEFAULT_CONFIG_FILE;
 
-use encre_css::{Config, EncreGenerator};
+use encre_css::{
+    error::{Error, Result},
+    Config as EncreConfig, EncreGenerator,
+};
 use notify::{watcher, DebouncedEvent::*, RecursiveMode, Watcher};
+use serde::Deserialize;
 use std::{
-    fs, iter,
+    fs,
+    io::{BufReader, Read},
+    iter,
     path::{Path, PathBuf},
-    sync::mpsc::channel,
-    time::{Duration, Instant},
+    result,
+    sync::{mpsc::channel, Arc},
+    time::Duration,
 };
 use wax::Glob;
 
 #[cfg(not(target_arch = "wasm32"))]
 use rayon::prelude::*;
 
-fn result_equal<T: PartialEq, E>(res1: Result<T, E>, res2: Result<T, E>) -> bool {
+#[derive(Default, PartialEq, Debug, Deserialize)]
+struct Config {
+    /// Specify which files should be scanned using globs.
+    #[serde(default)]
+    input: Vec<std::path::PathBuf>,
+
+    #[serde(flatten)]
+    encre_config: EncreConfig,
+}
+
+impl Config {
+    fn from_file<T: AsRef<Path>>(path: T) -> Result<Self> {
+        Ok(toml::from_str(&fs::read_to_string(&path).map_err(
+            |e| Error::ConfigFileNotFound(path.as_ref().to_path_buf(), e),
+        )?)?)
+    }
+}
+
+fn result_equal<T: PartialEq, E>(res1: result::Result<T, E>, res2: result::Result<T, E>) -> bool {
     if let (Ok(res1), Ok(res2)) = (res1, res2) {
         res1 == res2
     } else {
@@ -32,28 +57,80 @@ fn gen_css<T: AsRef<Path>>(generator: &EncreGenerator, output: Option<T>) {
     }
 }
 
-pub fn build<T: AsRef<Path>>(
-    config: Option<String>,
-    extra_input: Option<T>,
-    output: Option<String>,
-    watch: bool,
-    display_time: bool,
-) {
-    let config_file = if let Some(ref config_file) = config {
-        config_file
-    } else {
-        DEFAULT_CONFIG_FILE
+fn scan_path<T: AsRef<Path>>(glob_path: T, buffer: &mut String) {
+    let (prefix, glob) = match wax::Glob::new(
+        glob_path
+            .as_ref()
+            .to_str()
+            .expect("failed to convert the glob to a string"),
+    ) {
+        Ok(g) => g.partition(),
+        Err(e) => panic!("{}", e),
     };
 
-    if watch {
-        let (tx, rx) = channel();
+    if prefix == glob_path.as_ref() {
+        match fs::File::open(&glob_path) {
+            Ok(mut file) => {
+                buffer.reserve(file.metadata().unwrap().len() as usize); // TODO: Error handling
+                if let Err(e) = file.read_to_string(buffer) {
+                    eprintln!("Failed to read the file {:?}: {:?}", glob_path.as_ref(), e);
+                }
+            }
+            Err(e) => eprintln!("Failed to open the file {:?}: {:?}", glob_path.as_ref(), e),
+        }
+    } else {
+        glob.walk(prefix).for_each(|entry| {
+            if let Ok(entry) = entry {
+                match fs::File::open(entry.path()) {
+                    Ok(file) => {
+                        let mut reader = BufReader::new(file);
+                        if let Err(e) = reader.read_to_string(buffer) {
+                            eprintln!("Failed to read the file {:?}: {:?}", glob_path.as_ref(), e);
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("Failed to open the file {:?}: {:?}", glob_path.as_ref(), e)
+                    }
+                }
+            }
+        });
+    }
+}
 
-        let mut watcher = watcher(tx, Duration::from_millis(500)).unwrap();
+fn build_single<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, output: Option<String>) {
+    let config = match Config::from_file(config_file) {
+        Ok(config) => config,
+        Err(e) => {
+            eprintln!("{}", e);
+            Config::default()
+        }
+    };
 
-        // Due to https://github.com/notify-rs/notify/issues/247, the whole current directory is
-        // watched
-        watcher.watch(".", RecursiveMode::Recursive).unwrap();
+    let mut buffer = String::new();
+    let mut generator = EncreGenerator::from_config(config.encre_config);
 
+    if let Some(glob_path) = extra_input {
+        scan_path(glob_path, &mut buffer);
+    }
+
+    config.input.iter().for_each(|glob_path| {
+        scan_path(glob_path, &mut buffer);
+    });
+
+    generator.scan(&buffer);
+    gen_css(&generator, output);
+}
+
+fn watch<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, output: Option<String>) {
+    let (tx, rx) = channel();
+
+    let mut watcher = watcher(tx, Duration::from_millis(500)).unwrap();
+
+    // Due to https://github.com/notify-rs/notify/issues/247, the whole current directory is
+    // watched
+    watcher.watch(".", RecursiveMode::Recursive).unwrap();
+
+    let (mut input, mut config) = {
         let config = match Config::from_file(config_file) {
             Ok(config) => config,
             Err(e) => {
@@ -62,74 +139,81 @@ pub fn build<T: AsRef<Path>>(
             }
         };
 
-        let mut generator = EncreGenerator::from_config(config);
+        (Arc::new(config.input), Arc::new(config.encre_config))
+    };
 
-        if let Some(ref path) = extra_input {
-            generator.scan_path(path);
+    let mut buffer = String::new();
+
+    // Initial generation
+    {
+        let mut generator = EncreGenerator::from_config(Arc::clone(&config));
+
+        if let Some(ref glob_path) = extra_input {
+            scan_path(glob_path, &mut buffer);
         }
 
-        // Initial generation
+        input.iter().for_each(|glob_path| {
+            scan_path(glob_path, &mut buffer);
+        });
+
+        generator.scan(&buffer);
         gen_css(&generator, output.as_ref());
+    }
 
-        println!("`encre-css` successfully launched in watch mode");
+    println!("`encre-css` successfully launched in watch mode");
 
-        loop {
-            match rx.recv() {
-                Ok(event) => {
-                    if let Create(ref path)
-                    | Write(ref path)
-                    | Remove(ref path)
-                    | Rename(_, ref path) = event
-                    {
-                        let mut need_reloading = false;
-                        let input = &generator.get_config().input;
+    loop {
+        match rx.recv() {
+            Ok(event) => {
+                if let Create(ref path) | Write(ref path) | Remove(ref path) | Rename(_, ref path) =
+                    event
+                {
+                    let mut need_reloading = false;
 
-                        #[cfg(target_arch = "wasm32")]
-                        let iter = input.iter();
+                    #[cfg(target_arch = "wasm32")]
+                    let iter = input.iter();
 
-                        #[cfg(not(target_arch = "wasm32"))]
-                        let iter = input.par_iter();
+                    #[cfg(not(target_arch = "wasm32"))]
+                    let iter = input.par_iter();
 
-                        let files = iter.flat_map(|glob_path| {
-                            let (prefix, glob) = match Glob::new(
-                                glob_path
-                                    .to_str()
-                                    .expect("failed to convert the glob to a string"),
-                            ) {
-                                Ok(g) => g.partition(),
-                                Err(e) => panic!("{}", e),
-                            };
-
-                            if &prefix == glob_path {
-                                iter::once(glob_path.clone()).collect::<Vec<PathBuf>>()
-                            } else {
-                                glob.walk(prefix)
-                                    .map(|e| e.unwrap().into_path())
-                                    .collect::<Vec<PathBuf>>()
-                            }
-                        });
-
-                        // Check that the changed file is watched
-                        if files.any(|file_path| {
-                            result_equal(
-                                file_path.canonicalize(),
-                                PathBuf::from(path).canonicalize(),
-                            )
-                        }) || extra_input.is_some()
-                            && result_equal(
-                                extra_input.as_ref().unwrap().as_ref().canonicalize(),
-                                PathBuf::from(path).canonicalize(),
-                            )
-                        {
-                            println!("Changes detected. Reloading…");
-                            need_reloading = true;
-                        } else if result_equal(
-                            PathBuf::from(path).canonicalize(),
-                            PathBuf::from(DEFAULT_CONFIG_FILE).canonicalize(),
+                    let files = iter.flat_map(|glob_path| {
+                        let (prefix, glob) = match Glob::new(
+                            glob_path
+                                .to_str()
+                                .expect("failed to convert the glob to a string"),
                         ) {
-                            // Handle configuration changes
-                            println!("Configuration file changed. Reloading…");
+                            Ok(g) => g.partition(),
+                            Err(e) => panic!("{}", e),
+                        };
 
+                        if &prefix == glob_path {
+                            iter::once(glob_path.clone()).collect::<Vec<PathBuf>>()
+                        } else {
+                            glob.walk(prefix)
+                                .map(|e| e.unwrap().into_path())
+                                .collect::<Vec<PathBuf>>()
+                        }
+                    });
+
+                    // Check that the changed file is watched
+                    if files.any(|file_path| {
+                        result_equal(file_path.canonicalize(), PathBuf::from(path).canonicalize())
+                    }) || extra_input.is_some()
+                        && result_equal(
+                            extra_input.as_ref().unwrap().as_ref().canonicalize(),
+                            PathBuf::from(path).canonicalize(),
+                        )
+                    {
+                        println!("Changes detected. Reloading…");
+                        need_reloading = true;
+                    } else if result_equal(
+                        PathBuf::from(path).canonicalize(),
+                        PathBuf::from(DEFAULT_CONFIG_FILE).canonicalize(),
+                    ) {
+                        // Handle configuration changes
+                        println!("Configuration file changed. Reloading…");
+
+                        let (new_input, new_config) = {
                             let config = match Config::from_file(config_file) {
                                 Ok(config) => config,
                                 Err(e) => {
@@ -138,44 +222,52 @@ pub fn build<T: AsRef<Path>>(
                                 }
                             };
 
-                            generator.set_config(config);
-                            need_reloading = true;
+                            (Arc::new(config.input), Arc::new(config.encre_config))
+                        };
+
+                        input = new_input;
+                        config = new_config;
+                        need_reloading = true;
+                    }
+
+                    if need_reloading {
+                        let mut generator = EncreGenerator::from_config(Arc::clone(&config));
+                        buffer.clear();
+
+                        if let Some(ref glob_path) = extra_input {
+                            scan_path(glob_path, &mut buffer);
                         }
 
-                        if need_reloading {
-                            let start = Instant::now();
-                            generator.reset();
-                            input.iter().for_each(|p| generator.scan_path(p));
+                        input.iter().for_each(|glob_path| {
+                            scan_path(glob_path, &mut buffer);
+                        });
 
-                            if let Some(ref path) = extra_input {
-                                generator.scan_path(path);
-                            }
-
-                            gen_css(&generator, output.as_ref());
-                            let duration = start.elapsed();
-
-                            if display_time {
-                                println!("CSS generated in {:?}", duration);
-                            }
-                        }
+                        generator.scan(&buffer);
+                        gen_css(&generator, output.as_ref());
+                        drop(generator);
                     }
                 }
-                Err(e) => println!("watch error: {:?}", e),
             }
+            Err(e) => println!("watch error: {:?}", e),
         }
+    }
+}
+
+pub(crate) fn build<T: AsRef<Path>>(
+    config: Option<String>,
+    extra_input: Option<T>,
+    output: Option<String>,
+    need_watch: bool,
+) {
+    let config_file = if let Some(ref config_file) = config {
+        config_file
     } else {
-        let start = Instant::now();
-        let mut generator = EncreGenerator::new(config_file);
+        DEFAULT_CONFIG_FILE
+    };
 
-        if let Some(path) = extra_input {
-            generator.scan_path(&path);
-        }
-
-        gen_css(&generator, output);
-        let duration = start.elapsed();
-
-        if display_time {
-            println!("CSS generated in {:?}", duration);
-        }
+    if need_watch {
+        watch(config_file, extra_input, output);
+    } else {
+        build_single(config_file, extra_input, output);
     }
 }

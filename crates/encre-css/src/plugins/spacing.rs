@@ -1,5 +1,5 @@
-use super::Plugin;
-use crate::utils::{default_lengths, indent, value_matchers::*};
+use super::{to_css_value, Plugin};
+use crate::utils::{indent, length, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
 use std::borrow::Cow;
@@ -8,9 +8,9 @@ use std::fmt::{self, Write};
 pub fn margin_padding_can_handle(modifier: &Modifier) -> bool {
     match modifier {
         Modifier::Basic { is_negative, value } => {
-            value == "auto" || default_lengths::get_basic(value, *is_negative).is_some()
+            *value == "auto" || length::get_basic(value, *is_negative).is_some()
         }
-        Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
+        Modifier::Arbitrary { value, .. } => is_matching_length(value),
     }
 }
 
@@ -28,15 +28,16 @@ pub fn margin_padding_handle(
                     buffer,
                     "{}: {};",
                     css_prop,
-                    if value == "auto" {
+                    if *value == "auto" {
                         Cow::from("auto")
                     } else {
-                        default_lengths::get_basic(value, *is_negative).unwrap()
+                        length::get_basic(value, *is_negative).unwrap()
                     }
                 )?
             }
         }
         Modifier::Arbitrary { value, .. } => {
+            let value = to_css_value(value);
             for css_prop in css_properties {
                 indent(indentation, buffer)?;
                 writeln!(buffer, "{}: {};", css_prop, value)?;
@@ -49,6 +50,7 @@ pub fn margin_padding_handle(
 
 // Margin
 
+#[derive(Debug)]
 pub struct MarginPlugin;
 
 impl Plugin for MarginPlugin {
@@ -71,6 +73,7 @@ impl Plugin for MarginPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct MarginXPlugin;
 
 impl Plugin for MarginXPlugin {
@@ -98,6 +101,7 @@ impl Plugin for MarginXPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct MarginYPlugin;
 
 impl Plugin for MarginYPlugin {
@@ -125,6 +129,7 @@ impl Plugin for MarginYPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct MarginTopPlugin;
 
 impl Plugin for MarginTopPlugin {
@@ -147,6 +152,7 @@ impl Plugin for MarginTopPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct MarginBottomPlugin;
 
 impl Plugin for MarginBottomPlugin {
@@ -169,6 +175,7 @@ impl Plugin for MarginBottomPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct MarginLeftPlugin;
 
 impl Plugin for MarginLeftPlugin {
@@ -191,6 +198,7 @@ impl Plugin for MarginLeftPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct MarginRightPlugin;
 
 impl Plugin for MarginRightPlugin {
@@ -215,6 +223,7 @@ impl Plugin for MarginRightPlugin {
 
 // Padding
 
+#[derive(Debug)]
 pub struct PaddingPlugin;
 
 impl Plugin for PaddingPlugin {
@@ -237,6 +246,7 @@ impl Plugin for PaddingPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct PaddingXPlugin;
 
 impl Plugin for PaddingXPlugin {
@@ -264,6 +274,7 @@ impl Plugin for PaddingXPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct PaddingYPlugin;
 
 impl Plugin for PaddingYPlugin {
@@ -291,6 +302,7 @@ impl Plugin for PaddingYPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct PaddingTopPlugin;
 
 impl Plugin for PaddingTopPlugin {
@@ -313,6 +325,7 @@ impl Plugin for PaddingTopPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct PaddingBottomPlugin;
 
 impl Plugin for PaddingBottomPlugin {
@@ -335,6 +348,7 @@ impl Plugin for PaddingBottomPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct PaddingLeftPlugin;
 
 impl Plugin for PaddingLeftPlugin {
@@ -357,6 +371,7 @@ impl Plugin for PaddingLeftPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct PaddingRightPlugin;
 
 impl Plugin for PaddingRightPlugin {
@@ -381,6 +396,7 @@ impl Plugin for PaddingRightPlugin {
 
 // Spacing
 
+#[derive(Debug)]
 pub struct SpaceXPlugin;
 
 impl Plugin for SpaceXPlugin {
@@ -391,9 +407,9 @@ impl Plugin for SpaceXPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { is_negative, value } => {
-                value == "reverse" || default_lengths::get_basic(value, *is_negative).is_some()
+                *value == "reverse" || length::get_basic(value, *is_negative).is_some()
             }
-            Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
+            Modifier::Arbitrary { value, .. } => is_matching_length(value),
         }
     }
 
@@ -408,11 +424,11 @@ impl Plugin for SpaceXPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { is_negative, value } => {
-                if value == "reverse" {
+                if *value == "reverse" {
                     return writeln!(buffer, "--en-space-x-reverse: 1;");
                 }
 
-                let length = default_lengths::get_basic(value, *is_negative).unwrap();
+                let length = length::get_basic(value, *is_negative).unwrap();
                 writeln!(buffer, "--en-space-x-reverse: 0;")?;
                 indent(indentation, buffer)?;
                 writeln!(
@@ -426,6 +442,7 @@ impl Plugin for SpaceXPlugin {
                 )?;
             }
             Modifier::Arbitrary { value, .. } => {
+                let value = to_css_value(value);
                 writeln!(buffer, "--en-space-x-reverse: 0;")?;
                 indent(indentation, buffer)?;
                 writeln!(
@@ -444,6 +461,7 @@ impl Plugin for SpaceXPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct SpaceYPlugin;
 
 impl Plugin for SpaceYPlugin {
@@ -454,9 +472,9 @@ impl Plugin for SpaceYPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { is_negative, value } => {
-                value == "reverse" || default_lengths::get_basic(value, *is_negative).is_some()
+                *value == "reverse" || length::get_basic(value, *is_negative).is_some()
             }
-            Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
+            Modifier::Arbitrary { value, .. } => is_matching_length(value),
         }
     }
 
@@ -471,11 +489,11 @@ impl Plugin for SpaceYPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { is_negative, value } => {
-                if value == "reverse" {
+                if *value == "reverse" {
                     return writeln!(buffer, "--en-space-y-reverse: 1;");
                 }
 
-                let length = default_lengths::get_basic(value, *is_negative).unwrap();
+                let length = length::get_basic(value, *is_negative).unwrap();
                 writeln!(buffer, "--en-space-y-reverse: 0;")?;
                 indent(indentation, buffer)?;
                 writeln!(
@@ -489,6 +507,7 @@ impl Plugin for SpaceYPlugin {
                 )?;
             }
             Modifier::Arbitrary { value, .. } => {
+                let value = to_css_value(value);
                 writeln!(buffer, "--en-space-y-reverse: 0;")?;
                 indent(indentation, buffer)?;
                 writeln!(

@@ -1,15 +1,11 @@
 use crate::{config::Config, plugins::*, variant::VARIANT_SEPARATOR};
 
-use derivative::Derivative;
-use once_cell::sync::Lazy;
-use regex::Regex;
-use smol_str::SmolStr;
+use std::cmp::Ordering;
 
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
-static ARBITRARY_VALUE_REGEX: Lazy<Regex> =
-    Lazy::new(|| Regex::new(&format!(r"\[([a-zA-Z0-9-_]+{})?(.+)\]$", VARIANT_SEPARATOR)).unwrap());
+pub const VALID_PLUGIN_HINT: [&str; 4] = ["color", "length", "angle", "list"];
 
 /// The list of builtin plugins
 // TODO: Better sorting (colors and lengths after all the other utilities (because they have
@@ -225,98 +221,82 @@ static BUILTIN_PLUGINS: [&'static (dyn Plugin + Send + Sync); 206] = [
 ];
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub enum Modifier {
-    Basic { is_negative: bool, value: SmolStr },
-    Arbitrary { value: SmolStr, hint: SmolStr },
+pub enum Modifier<'a> {
+    Basic { is_negative: bool, value: &'a str },
+    Arbitrary { value: &'a str, hint: &'a str },
 }
 
-#[derive(Clone, Derivative)]
-#[derivative(Debug, PartialEq, Eq)]
-pub struct Selector {
-    pub(crate) full: SmolStr,
-    pub(crate) content: String,
-    pub(crate) modifier: Modifier,
-    pub(crate) variants: Option<Vec<String>>,
+#[derive(Clone, Debug)]
+pub struct Selector<'a> {
+    pub(crate) full: &'a str,
+    pub(crate) modifier: Modifier<'a>,
+    pub(crate) variants: &'a str,
     pub(crate) is_important: bool,
     pub(crate) is_negative: bool,
-
-    #[derivative(Debug = "ignore")]
-    #[derivative(PartialEq = "ignore")]
     pub(crate) plugin: &'static (dyn Plugin + Sync + Send),
 }
 
-impl Selector {
-    pub fn new<T: Into<SmolStr>>(data: T, config: &Config) -> Option<Self> {
-        let mut data = data.into();
-        let full = data.clone();
-
+impl<'a> Selector<'a> {
+    pub fn new(mut full: &'a str, config: &Config) -> Option<Self> {
         // Strip the important flag before the negative one
         let mut is_important = false;
-        if let Some(new_data) = data.strip_prefix('!') {
-            data = SmolStr::new(new_data);
+        if full.starts_with('!') {
+            full = &full[1..];
             is_important = true;
         }
 
         let mut is_negative = false;
-        if let Some(new_data) = data.strip_prefix('-') {
-            data = SmolStr::new(new_data);
+        if full.starts_with('-') {
+            full = &full[1..];
             is_negative = true;
         }
 
-        let mut variants = vec![];
-        let mut next_variant = true;
-        let mut in_square_bracket = false;
-
-        data.chars().for_each(|ch| {
-            match ch {
-                '[' => in_square_bracket = true,
-                ']' => in_square_bracket = false,
-                VARIANT_SEPARATOR => {
-                    if !in_square_bracket {
-                        next_variant = true;
-                        return;
-                    }
-                }
-                _ => (),
-            }
-
-            if next_variant {
-                variants.push(ch.to_string());
-                next_variant = false;
-            } else {
-                // We can safely unwrap because `next_variant` is `true` by default, so the `Vec`
-                // is bound to contain at least one element
-                variants.last_mut().unwrap().push(ch);
-            }
-        });
+        // We need to ignore all characters in arbitrary values (wrapped in `[]`) and we know that
+        // nothing interesting is placed after them, so we can just split by `[` and take the first
+        // value
+        let variants = {
+            let before_arbitrary = full.split('[').next().unwrap();
+            &before_arbitrary[..before_arbitrary.rfind(VARIANT_SEPARATOR).unwrap_or(0)]
+        };
 
         // The selector without variants is the remaining part of the list of variants
-        let content = variants.pop().unwrap();
+        let content = if variants.is_empty() {
+            full
+        } else {
+            full.strip_prefix(variants)?.strip_prefix(':')?
+        };
 
         // Find the right plugin for handling this selector
         let find_fn = |plugin: &&'static (dyn Plugin + Send + Sync)| {
             // Find the modifier
-            if let Some(modifier_part) =
-                content.strip_prefix(&plugin.namespace().replace('-', &*config.modifier_separator))
-            {
-                let modifier_part = modifier_part
-                    .strip_prefix(&**config.modifier_separator)
-                    .unwrap_or(modifier_part);
+            if let Some(modifier_part) = content.strip_prefix(&plugin.namespace()) {
+                let modifier_part = modifier_part.strip_prefix('-').unwrap_or(modifier_part);
 
-                let modifier = if let Some(caps) = ARBITRARY_VALUE_REGEX.captures(modifier_part) {
-                    Modifier::Arbitrary {
-                        hint: SmolStr::from(
-                            caps.get(1)
-                                .map(|c| c.as_str())
-                                .unwrap_or("")
-                                .trim_end_matches(':'),
-                        ),
-                        value: SmolStr::from(caps.get(2)?.as_str()),
+                let modifier = if let Some((_, mut after)) = modifier_part.split_once('[') {
+                    after = after.strip_suffix(']')?;
+
+                    if let Some((maybe_hint, rest)) = after.split_once(':') {
+                        if VALID_PLUGIN_HINT.contains(&maybe_hint) {
+                            Modifier::Arbitrary {
+                                hint: maybe_hint,
+                                value: rest,
+                            }
+                        } else {
+                            Modifier::Arbitrary {
+                                hint: "",
+                                value: after,
+                            }
+                        }
+                    } else {
+                        Modifier::Arbitrary {
+                            hint: "",
+                            value: after,
+                        }
                     }
                 } else {
                     Modifier::Basic {
                         is_negative,
-                        value: SmolStr::from(modifier_part),
+                        value: modifier_part,
                     }
                 };
 
@@ -339,20 +319,69 @@ impl Selector {
         if let Some(result) = result {
             Some(Self {
                 full,
-                variants: if !variants.is_empty() {
-                    Some(variants)
-                } else {
-                    None
-                },
-                content,
+                variants,
                 modifier: result.1,
                 is_important,
                 is_negative,
                 plugin: result.0,
             })
         } else {
-            trace!("Plugin not found for handling `{}`", full);
             None
         }
+    }
+}
+
+impl<'a> PartialEq for Selector<'a> {
+    fn eq(&self, other: &Self) -> bool {
+        self.full == other.full
+    }
+}
+
+impl<'a> Eq for Selector<'a> {}
+
+impl<'a> PartialOrd for Selector<'a> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(if self.variants.is_empty() && !other.variants.is_empty() {
+            Ordering::Less
+        } else if !self.variants.is_empty() && other.variants.is_empty() {
+            Ordering::Greater
+        } else {
+            self.full.cmp(other.full)
+        })
+    }
+}
+
+impl<'a> Ord for Selector<'a> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        if self.variants.is_empty() && !other.variants.is_empty() {
+            Ordering::Less
+        } else if !self.variants.is_empty() && other.variants.is_empty() {
+            Ordering::Greater
+        } else {
+            self.full.cmp(other.full)
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{config::Config, selector::Selector};
+
+    use std::collections::BTreeSet;
+
+    #[test]
+    fn sorting_test() {
+        let config = Config::default();
+        let mut selectors = BTreeSet::new();
+        selectors.insert(Selector::new("lg:bg-red-500", &config).unwrap());
+        selectors.insert(Selector::new("bg-red-500", &config).unwrap());
+
+        assert_eq!(
+            selectors.iter().collect::<Vec<&Selector>>(),
+            vec![
+                &Selector::new("bg-red-500", &config).unwrap(),
+                &Selector::new("lg:bg-red-500", &config).unwrap(),
+            ]
+        );
     }
 }

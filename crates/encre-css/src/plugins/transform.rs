@@ -1,5 +1,5 @@
-use super::Plugin;
-use crate::utils::{default_lengths, format_negative, indent, value_matchers::*};
+use super::{to_css_value, Plugin};
+use crate::utils::{format_negative, indent, length, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
 use std::fmt::{self, Write};
@@ -7,6 +7,7 @@ use std::fmt::{self, Write};
 // TODO: Avoid repeating this CSS in all transform classes
 pub const CSS_TRANSFORM: &str = "transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));";
 
+#[derive(Debug)]
 pub struct OriginPlugin;
 
 impl Plugin for OriginPlugin {
@@ -27,7 +28,7 @@ impl Plugin for OriginPlugin {
                 "left",
                 "top-left",
             ]
-            .contains(&value.as_str()),
+            .contains(value),
             Modifier::Arbitrary { value, .. } => value.split('_').all(is_matching_position),
         }
     }
@@ -42,7 +43,7 @@ impl Plugin for OriginPlugin {
         match modifier {
             Modifier::Basic { value, .. } | Modifier::Arbitrary { value, .. } => {
                 indent(indentation, buffer)?;
-                writeln!(buffer, "transform-origin: {value};")?;
+                writeln!(buffer, "transform-origin: {};", to_css_value(value))?;
             }
         }
 
@@ -53,9 +54,9 @@ impl Plugin for OriginPlugin {
 pub fn translate_can_handle(modifier: &Modifier) -> bool {
     match modifier {
         Modifier::Basic { is_negative, value } => {
-            default_lengths::get_extended(value, *is_negative).is_some()
+            length::get_extended(value, *is_negative).is_some()
         }
-        Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
+        Modifier::Arbitrary { value, .. } => is_matching_length(value),
     }
 }
 
@@ -71,9 +72,11 @@ pub fn translate_handle(
             buffer,
             "{}: {};",
             css_prop,
-            default_lengths::get_extended(value, *is_negative).unwrap()
+            length::get_extended(value, *is_negative).unwrap()
         )?,
-        Modifier::Arbitrary { value, .. } => writeln!(buffer, "{}: {value};", css_prop)?,
+        Modifier::Arbitrary { value, .. } => {
+            writeln!(buffer, "{}: {};", css_prop, to_css_value(value))?
+        }
     }
 
     indent(indentation, buffer)?;
@@ -81,6 +84,7 @@ pub fn translate_handle(
     Ok(())
 }
 
+#[derive(Debug)]
 pub struct TranslateXPlugin;
 
 impl Plugin for TranslateXPlugin {
@@ -103,6 +107,7 @@ impl Plugin for TranslateXPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct TranslateYPlugin;
 
 impl Plugin for TranslateYPlugin {
@@ -125,6 +130,7 @@ impl Plugin for TranslateYPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct RotatePlugin;
 
 impl Plugin for RotatePlugin {
@@ -135,7 +141,7 @@ impl Plugin for RotatePlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
-            Modifier::Arbitrary { hint, value } => hint == "angle" || is_matching_angle(value),
+            Modifier::Arbitrary { value, .. } => is_matching_angle(value),
         }
     }
 
@@ -154,7 +160,9 @@ impl Plugin for RotatePlugin {
                 format_negative(is_negative),
                 value.parse::<usize>().unwrap(),
             )?,
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "--en-rotate: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "--en-rotate: {};", to_css_value(value))?
+            }
         }
 
         indent(indentation, buffer)?;
@@ -198,6 +206,7 @@ pub fn scale_handle(
     Ok(())
 }
 
+#[derive(Debug)]
 pub struct ScalePlugin;
 
 impl Plugin for ScalePlugin {
@@ -225,6 +234,7 @@ impl Plugin for ScalePlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ScaleXPlugin;
 
 impl Plugin for ScaleXPlugin {
@@ -247,6 +257,7 @@ impl Plugin for ScaleXPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ScaleYPlugin;
 
 impl Plugin for ScaleYPlugin {
@@ -272,7 +283,7 @@ impl Plugin for ScaleYPlugin {
 pub fn skew_can_handle(modifier: &Modifier) -> bool {
     match modifier {
         Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
-        Modifier::Arbitrary { hint, value } => hint == "angle" || is_matching_angle(value),
+        Modifier::Arbitrary { value, .. } => is_matching_angle(value),
     }
 }
 
@@ -291,7 +302,9 @@ pub fn skew_handle(
             css_prop,
             format_negative(is_negative),
         )?,
-        Modifier::Arbitrary { value, .. } => writeln!(buffer, "{}: {value};", css_prop)?,
+        Modifier::Arbitrary { value, .. } => {
+            writeln!(buffer, "{}: {};", css_prop, to_css_value(value))?
+        }
     }
 
     indent(indentation, buffer)?;
@@ -299,6 +312,7 @@ pub fn skew_handle(
     Ok(())
 }
 
+#[derive(Debug)]
 pub struct SkewXPlugin;
 
 impl Plugin for SkewXPlugin {
@@ -321,6 +335,7 @@ impl Plugin for SkewXPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct SkewYPlugin;
 
 impl Plugin for SkewYPlugin {

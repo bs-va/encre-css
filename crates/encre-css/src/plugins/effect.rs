@@ -1,14 +1,12 @@
-use super::Plugin;
-use crate::utils::{default_colors, indent, shadow, value_matchers::*};
+use super::{to_css_value, Plugin};
+use crate::utils::{color, indent, shadow, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use std::{
-    borrow::Cow,
-    fmt::{self, Write},
-};
+use std::fmt::{self, Write};
 
 const CSS_SHADOW: &str = "box-shadow: var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow);";
 
+#[derive(Debug)]
 pub struct MixBlendModePlugin;
 
 impl Plugin for MixBlendModePlugin {
@@ -50,7 +48,7 @@ impl Plugin for MixBlendModePlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "normal" => writeln!(buffer, "mix-blend-mode: normal;")?,
                 "multiply" => writeln!(buffer, "mix-blend-mode: multiply;")?,
                 "screen" => writeln!(buffer, "mix-blend-mode: screen;")?,
@@ -76,6 +74,7 @@ impl Plugin for MixBlendModePlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct BackgroundBlendModePlugin;
 
 impl Plugin for BackgroundBlendModePlugin {
@@ -117,7 +116,7 @@ impl Plugin for BackgroundBlendModePlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "normal" => writeln!(buffer, "background-blend-mode: normal;")?,
                 "multiply" => writeln!(buffer, "background-blend-mode: multiply;")?,
                 "screen" => writeln!(buffer, "background-blend-mode: screen;")?,
@@ -143,6 +142,7 @@ impl Plugin for BackgroundBlendModePlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct BoxShadowPlugin;
 
 impl Plugin for BoxShadowPlugin {
@@ -168,7 +168,7 @@ impl Plugin for BoxShadowPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "" => {
                     writeln!(buffer, "--en-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);")?;
                     indent(indentation, buffer)?;
@@ -217,9 +217,10 @@ impl Plugin for BoxShadowPlugin {
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
+                let value = to_css_value(value);
                 writeln!(buffer, "--en-shadow: {value};")?;
                 indent(indentation, buffer)?;
-                let mut shadow = shadow::parse_shadow(value).unwrap();
+                let mut shadow = shadow::parse_shadow(&value).unwrap();
                 shadow.replace_all_colors("var(--en-shadow-color)");
                 writeln!(buffer, "--en-shadow-colored: {};", shadow)?
             }
@@ -232,6 +233,7 @@ impl Plugin for BoxShadowPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct BoxShadowColorPlugin;
 
 impl Plugin for BoxShadowColorPlugin {
@@ -241,8 +243,10 @@ impl Plugin for BoxShadowColorPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value, None).is_some(),
-            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+            Modifier::Arbitrary { hint, value } => {
+                *hint == "color" || (hint.is_empty() && is_matching_color(value))
+            }
         }
     }
 
@@ -255,8 +259,8 @@ impl Plugin for BoxShadowColorPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         let value = match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value, None).unwrap(),
-            Modifier::Arbitrary { value, .. } => Cow::from(&**value),
+            Modifier::Basic { value, .. } => color::get(config, value, None).unwrap(),
+            Modifier::Arbitrary { value, .. } => to_css_value(*value),
         };
         writeln!(buffer, "--en-shadow-color: {value};")?;
 
@@ -267,6 +271,7 @@ impl Plugin for BoxShadowColorPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct OpacityPlugin;
 
 impl Plugin for OpacityPlugin {

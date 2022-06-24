@@ -3,12 +3,13 @@ use crate::{config::Config, selector::Modifier, utils::indent};
 
 use std::fmt::{self, Write};
 
+#[derive(Debug)]
 pub struct ScreenReaderPlugin;
 
 impl Plugin for ScreenReaderPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => value == "sr-only" || value == "not-sr-only",
+            Modifier::Basic { value, .. } => *value == "sr-only" || *value == "not-sr-only",
             Modifier::Arbitrary { .. } => false,
         }
     }
@@ -21,7 +22,7 @@ impl Plugin for ScreenReaderPlugin {
         buffer: &mut String,
     ) -> fmt::Result {
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "sr-only" => {
                     indent(indentation, buffer)?;
                     writeln!(buffer, "position: absolute;")?;

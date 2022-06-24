@@ -1,9 +1,10 @@
-use super::Plugin;
+use super::{to_css_value, Plugin};
 use crate::utils::{indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
 use std::fmt::{self, Write};
 
+#[derive(Debug)]
 pub struct OrderPlugin;
 
 impl Plugin for OrderPlugin {
@@ -27,19 +28,22 @@ impl Plugin for OrderPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "first" => return writeln!(buffer, "order: -9999;"),
                 "last" => return writeln!(buffer, "order: 9999;"),
                 "none" => return writeln!(buffer, "order: 0;"),
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "order: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "order: {};", to_css_value(value))?
+            }
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
 pub struct DirectionPlugin;
 
 impl Plugin for DirectionPlugin {
@@ -65,7 +69,7 @@ impl Plugin for DirectionPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "row" => writeln!(buffer, "flex-direction: row;")?,
                 "row-reverse" => writeln!(buffer, "flex-direction: row-reverse;")?,
                 "col" => writeln!(buffer, "flex-direction: column;")?,
@@ -79,6 +83,7 @@ impl Plugin for DirectionPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct WrapPlugin;
 
 impl Plugin for WrapPlugin {
@@ -102,7 +107,7 @@ impl Plugin for WrapPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "nowrap" => writeln!(buffer, "flex-wrap: nowrap;")?,
                 "wrap" => writeln!(buffer, "flex-wrap: wrap;")?,
                 "wrap-reverse" => writeln!(buffer, "flex-wrap: wrap-reverse;")?,
@@ -115,6 +120,7 @@ impl Plugin for WrapPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct GrowShrinkBasisPlugin;
 
 impl Plugin for GrowShrinkBasisPlugin {
@@ -128,11 +134,7 @@ impl Plugin for GrowShrinkBasisPlugin {
                 "1", "auto", "initial", "grow", "grow-0", "shrink", "shrink-0", "none",
             ]
             .contains(&&**value),
-            Modifier::Arbitrary { hint, value } => {
-                if hint == "list" {
-                    return true;
-                }
-
+            Modifier::Arbitrary { value, .. } => {
                 let mut split = value.split('_');
                 let mut is_matching = (false, false, false);
 
@@ -175,7 +177,7 @@ impl Plugin for GrowShrinkBasisPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "1" => writeln!(buffer, "flex: 1 1 0%;")?,
                 "auto" => writeln!(buffer, "flex: 1 1 auto;")?,
                 "initial" => writeln!(buffer, "flex: 0 1 auto;")?,
@@ -186,7 +188,9 @@ impl Plugin for GrowShrinkBasisPlugin {
                 "shrink-0" => writeln!(buffer, "flex-shrink: 0;")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { .. } => unreachable!(),
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "flex: {};", to_css_value(value))?
+            }
         }
 
         Ok(())

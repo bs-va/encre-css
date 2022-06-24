@@ -1,12 +1,10 @@
-use super::Plugin;
-use crate::utils::{default_colors, indent, value_matchers::*};
+use super::{to_css_value, Plugin};
+use crate::utils::{color, indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use std::{
-    borrow::Cow,
-    fmt::{self, Write},
-};
+use std::fmt::{self, Write};
 
+#[derive(Debug)]
 pub struct FillPlugin;
 
 impl Plugin for FillPlugin {
@@ -16,8 +14,8 @@ impl Plugin for FillPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value, None).is_some(),
-            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+            Modifier::Arbitrary { value, .. } => is_matching_color(value),
         }
     }
 
@@ -30,14 +28,15 @@ impl Plugin for FillPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         let value = match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value, None).unwrap(),
-            Modifier::Arbitrary { value, .. } => Cow::from(&**value),
+            Modifier::Basic { value, .. } => color::get(config, value, None).unwrap(),
+            Modifier::Arbitrary { value, .. } => to_css_value(*value),
         };
 
         writeln!(buffer, "fill: {value};")
     }
 }
 
+#[derive(Debug)]
 pub struct StrokeColorPlugin;
 
 impl Plugin for StrokeColorPlugin {
@@ -47,8 +46,8 @@ impl Plugin for StrokeColorPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value, None).is_some(),
-            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+            Modifier::Arbitrary { value, .. } => is_matching_color(value),
         }
     }
 
@@ -61,14 +60,15 @@ impl Plugin for StrokeColorPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         let value = match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value, None).unwrap(),
-            Modifier::Arbitrary { value, .. } => Cow::from(&**value),
+            Modifier::Basic { value, .. } => color::get(config, value, None).unwrap(),
+            Modifier::Arbitrary { value, .. } => to_css_value(*value),
         };
 
         writeln!(buffer, "stroke: {value};")
     }
 }
 
+#[derive(Debug)]
 pub struct StrokeWidthPlugin;
 
 impl Plugin for StrokeWidthPlugin {
@@ -79,8 +79,8 @@ impl Plugin for StrokeWidthPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
-            Modifier::Arbitrary { hint, value } => {
-                hint == "length" || is_matching_length(value) || is_matching_percentage(value)
+            Modifier::Arbitrary { value, .. } => {
+                is_matching_length(value) || is_matching_percentage(value)
             }
         }
     }
@@ -96,7 +96,9 @@ impl Plugin for StrokeWidthPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => writeln!(buffer, "stroke-width: {value}px;")?,
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "stroke-width: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "stroke-width: {};", to_css_value(value))?
+            }
         }
 
         Ok(())

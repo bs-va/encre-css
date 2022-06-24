@@ -1,6 +1,3 @@
-use once_cell::sync::Lazy;
-use regex::Regex;
-
 pub const LENGTH_UNITS: [&str; 16] = [
     "cm", "mm", "Q", "in", "pc", "pt", "px", "em", "ex", "ch", "rem", "lh", "vw", "vh", "vmin",
     "vmax",
@@ -192,36 +189,6 @@ pub const NAMED_COLORS: [&str; 148] = [
     "yellowgreen",
 ];
 
-static COLOR_REGEX: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"^(#[a-f\d]{3}|#[a-f\d]{6}|rgba?\(.+\)|hsla?\(.+\))$").unwrap());
-static LENGTH_REGEX: Lazy<Regex> =
-    Lazy::new(|| Regex::new(&format!("(?-u)(?:{})$", LENGTH_UNITS.join("|"))).unwrap());
-static TIME_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"(?-u)\d+m?s$").unwrap());
-static NUMBER_CSS_FUNCTIONS_REGEXES: Lazy<[Regex; 4]> = Lazy::new(|| {
-    [
-        Regex::new(r"^min\(.+?").unwrap(),
-        Regex::new(r"^max\(.+?").unwrap(),
-        Regex::new(r"^clamp\(.+?").unwrap(),
-        Regex::new(r"^calc\(.+?").unwrap(),
-    ]
-});
-static PERCENTAGE_CSS_FUNCTIONS_REGEXES: Lazy<[Regex; 4]> = Lazy::new(|| {
-    [
-        Regex::new(r"^min\(.+?%").unwrap(),
-        Regex::new(r"^max\(.+?%").unwrap(),
-        Regex::new(r"^clamp\(.+?%").unwrap(),
-        Regex::new(r"^calc\(.+?%").unwrap(),
-    ]
-});
-static LENGTH_CSS_FUNCTIONS_REGEXES: Lazy<[Regex; 4]> = Lazy::new(|| {
-    [
-        Regex::new(&format!(r"^min\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
-        Regex::new(&format!(r"^max\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
-        Regex::new(&format!(r"^clamp\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
-        Regex::new(&format!(r"^calc\(.+?(?:{})", LENGTH_UNITS.join("|"))).unwrap(),
-    ]
-});
-
 // TODO: Support:
 // - global values like inherit, initial, revert, revert-layer, unset
 // - intrinsic sizing keywords: fill, max-content, min-content, fit-content
@@ -238,45 +205,43 @@ pub fn is_matching_var(value: &str) -> bool {
     value.starts_with("var(")
 }
 
+pub fn is_matching_computational_css_function(value: &str) -> bool {
+    value.starts_with("min")
+        || value.starts_with("max")
+        || value.starts_with("clamp")
+        || value.starts_with("calc")
+}
+
 pub fn is_matching_color(value: &str) -> bool {
-    COLOR_REGEX.is_match(value)
-        || !value.is_empty() && NAMED_COLORS.iter().any(|c| &value == c)
+    (value.starts_with('#') && (value.len() == 4 || value.len() == 7))
+        || value.starts_with("rgb")
+        || value.starts_with("rgba")
+        || value.starts_with("hsl")
+        || value.starts_with("hsla")
+        || NAMED_COLORS.iter().any(|c| &value == c)
         || is_matching_var(value)
 }
 
 pub fn is_matching_length(value: &str) -> bool {
-    is_matching_var(value)
-        || value.split('_').all(|v| {
-            v == "0"
-                || LENGTH_REGEX.is_match(v)
-                || LENGTH_CSS_FUNCTIONS_REGEXES.iter().any(|r| r.is_match(v))
-                || is_matching_percentage(v)
-        })
+    value.split('_').all(|v| {
+        v == "0" || LENGTH_UNITS.iter().any(|u| v.ends_with(u)) || is_matching_percentage(v)
+    }) || is_matching_var(value)
 }
 
 pub fn is_matching_number(value: &str) -> bool {
-    value.parse::<usize>().is_ok()
-        || NUMBER_CSS_FUNCTIONS_REGEXES
-            .iter()
-            .any(|r| r.is_match(value))
+    value.parse::<usize>().is_ok() || is_matching_computational_css_function(value)
 }
 
 pub fn is_matching_float(value: &str) -> bool {
-    value.parse::<f32>().is_ok()
-        || NUMBER_CSS_FUNCTIONS_REGEXES
-            .iter()
-            .any(|r| r.is_match(value))
+    value.parse::<f32>().is_ok() || is_matching_computational_css_function(value)
 }
 
 pub fn is_matching_percentage(value: &str) -> bool {
-    value.ends_with('%')
-        || PERCENTAGE_CSS_FUNCTIONS_REGEXES
-            .iter()
-            .any(|r| r.is_match(value))
+    value.ends_with('%') || is_matching_computational_css_function(value)
 }
 
 pub fn is_matching_time(value: &str) -> bool {
-    TIME_REGEX.is_match(value)
+    value.ends_with('s') || value.ends_with("ms")
 }
 
 pub fn is_matching_shadow(value: &str) -> bool {
@@ -288,10 +253,7 @@ pub fn is_matching_gradient(value: &str) -> bool {
 }
 
 pub fn is_matching_position(value: &str) -> bool {
-    VALID_POSITIONS.contains(&value)
-        || is_matching_length(value)
-        || is_matching_percentage(value)
-        || is_matching_var(value)
+    VALID_POSITIONS.contains(&value) || is_matching_length(value) || is_matching_percentage(value)
 }
 
 pub fn is_matching_line_width(value: &str) -> bool {
@@ -316,8 +278,7 @@ pub fn is_matching_relative_size(value: &str) -> bool {
 
 pub fn is_matching_image(value: &str) -> bool {
     value.split(',').all(|v| {
-        is_matching_var(v)
-            || is_matching_url(v)
+        is_matching_url(v)
             || is_matching_gradient(v)
             || ["element(", "image(", "cross-fade(", "image-set("]
                 .iter()

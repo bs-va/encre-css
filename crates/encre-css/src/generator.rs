@@ -3,86 +3,37 @@ use crate::{
     error::{Error, Result},
     plugins::transition,
     preflight::ENCRE_PREFLIGHT_CSS,
-    selector::{Modifier, Selector},
+    selector::Selector,
     utils::indent,
-    variant::{init_variants, Variant},
+    variant::{init_variants, Variant, BUILTIN_VARIANTS, VARIANT_SEPARATOR},
 };
 
-use once_cell::sync::Lazy;
-use regex::{Captures, Regex};
-use smol_str::SmolStr;
 use std::{
     borrow::Cow,
-    collections::{BTreeMap, BTreeSet},
+    collections::BTreeSet,
     fmt::Write,
-    fs,
-    io::Read,
     path::Path,
     sync::{atomic::Ordering, Arc},
 };
 
-static URL_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"url\((.+)\)").unwrap());
-static CALC_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"calc\((.+)\)").unwrap());
-static SPLIT_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?-u)[\s'"`;>=]+"#).unwrap());
-
-pub const VALID_PLUGIN_HINT: [&str; 4] = ["color", "length", "angle", "list"];
-const WILL_BE_REPLACED_BY_UNDERSCORE: &str = "WILL-BE-REPLACED-BY-UNDERSCORE";
-
-/// Convert an arbitrary value into a CSS value
-///
-///  -  `_` (underscores) are converted to ` ` (spaces) (not in `url`s)
-pub fn to_css_value(value: &str) -> SmolStr {
-    // Don't replace `_` if it is a URL
-    let value = if value.contains("url") {
-        // If the value contains an url, it won't contain a calculation, so we can safely return here
-        URL_REGEX.replace(value, |caps: &Captures| {
-            format!(
-                "url({})",
-                caps[1].replace('_', WILL_BE_REPLACED_BY_UNDERSCORE)
-            )
-        })
-    } else {
-        Cow::from(value)
-    };
-
-    // Don't replace `_` if prefixed by a `\`
-    let value = value
-        .replace("\\_", WILL_BE_REPLACED_BY_UNDERSCORE)
-        .replace('_', " ")
-        .replace(WILL_BE_REPLACED_BY_UNDERSCORE, "_");
-
-    if value.contains("calc") {
-        SmolStr::from(
-            CALC_REGEX
-                .replace(&value, |caps: &Captures| {
-                    format!(
-                        "calc({})",
-                        caps[1]
-                            .replace('-', " - ")
-                            .replace('+', " + ")
-                            .replace('/', " / ")
-                            .replace('*', "*")
-                    )
-                })
-                .to_string(),
-        )
-    } else {
-        SmolStr::from(value)
-    }
-}
-
 /// Main structure used to generate CSS from selectors
-pub struct EncreGenerator {
+///
+/// It is common to build this structure each time the CSS needs to be generated for the file
+/// contents (due to lifetimes, the file contents must live as long as the [`EncreGenerator`]
+/// structure and if you call several times the [`EncreGenerator::generate`] function, you will
+/// need to clear the buffer and the scanned selectors will be in an undefined state). In this
+/// case, [`EncreGenerator::from_config`] can take an [`Arc<Config>`] to avoid cloning the
+/// configuration.
+pub struct EncreGenerator<'a> {
     config: Arc<Config>,
-    variants: BTreeMap<Cow<'static, str>, Variant>,
-    pub(crate) scanned_selectors: BTreeSet<Selector>,
+    pub(crate) scanned_selectors: BTreeSet<Selector<'a>>,
 }
 
-impl EncreGenerator {
-    /// Create a new [`EncreGenerator`] by trying to read a configuration file
+impl<'a> EncreGenerator<'a> {
+    /// Create a new [`EncreGenerator`] by trying to read a configuration file.
     ///
     /// If the file does not exist, a warning will be emitted and the default configuration will be
-    /// used
+    /// used.
     pub fn new<T: AsRef<Path>>(path: T) -> Self {
         let config = match Config::from_file(path) {
             Ok(config) => config,
@@ -95,53 +46,30 @@ impl EncreGenerator {
         Self::from_config(config)
     }
 
-    /// Create a new [`EncreGenerator`] using a given configuration
+    /// Create a new [`EncreGenerator`] using a given configuration.
     ///
-    /// The paths in the [`Config::input`] field of the configuration will be scanned
-    pub fn from_config(config: Config) -> Self {
-        let config = Arc::new(config);
-
-        #[allow(unused_mut)]
-        let mut result_self = Self {
-            variants: init_variants(&config),
-            config: Arc::clone(&config),
+    /// The configuration can either be a [`Config`] structure or an [`Arc<Config>`].
+    pub fn from_config<T: Into<Arc<Config>>>(config: T) -> Self {
+        Self {
+            config: config.into(),
             scanned_selectors: BTreeSet::new(),
-        };
-
-        // Scan the files listed in the `input` configuration
-        #[cfg(feature = "glob_scanning")]
-        config.input.iter().for_each(|p| result_self.scan_path(p));
-
-        result_self
+        }
     }
 
-    /// Get the configuration
-    pub fn get_config(&self) -> Arc<Config> {
-        self.config.clone()
-    }
-
-    /// Set the configuration
-    pub fn set_config(&mut self, config: Config) {
-        self.config = Arc::new(config);
-    }
-
-    /// Add a new selector which will have its CSS generated
+    /// Add a new selector which will have its CSS generated.
     ///
-    /// This function automatically handles duplicated selectors
-    pub fn add_selector(&mut self, val: &str) {
+    /// This function automatically handles duplicated selectors and sorting.
+    pub fn add_selector(&mut self, val: &'a str) {
         Selector::new(val, &self.config).map(|s| self.scanned_selectors.insert(s));
     }
 
-    /// Add a list of new selectors which will have their CSS generated
-    pub fn add_selectors(&mut self, val: BTreeSet<Selector>) {
-        self.scanned_selectors.extend(val);
-    }
-
-    /// Scan the contents of a file and store all the selectors found
-    pub fn scan_raw(&mut self, content: &str) {
+    /// Scan the contents of a file and store all the selectors found.
+    ///
+    /// This function automatically handles duplicated selectors and sorting.
+    pub fn scan(&mut self, content: &'a str) {
         self.scanned_selectors.extend(
-            SPLIT_REGEX
-                .split(content)
+            content
+                .split(|ch| ch == ' ' || ch == '"' || ch == '\'' || ch == '`' || ch == '\n')
                 .filter_map(|val| {
                     // The shortest selector is `m-1`
                     if val.len() >= 3 {
@@ -154,69 +82,28 @@ impl EncreGenerator {
         );
     }
 
-    /// Scan all files given and store all the selectors found
-    pub fn scan_files<T: AsRef<Path>>(&mut self, files: impl Iterator<Item = T>) {
-        // TODO: Error handling
-        let mut file_contents: String = String::new();
-
-        debug!("Start scanning files");
-        files.for_each(|file_path| {
-            let mut file = match fs::File::open(&file_path) {
-                Ok(f) => f,
-                Err(e) => panic!("Failed to read the file {:?}: {:?}", file_path.as_ref(), e),
-            };
-            file_contents.clear();
-
-            if file.read_to_string(&mut file_contents).is_ok() {
-                self.scan_raw(&file_contents)
-            } else {
-                // TODO: Display a warning otherwise
-            }
-        });
-        debug!("Finished scanning files");
-    }
-
-    /// <span class="item-info">
-    ///   <div class="stab portability">
-    ///     Only available when the <strong>glob_scanning</strong> feature is enabled.
-    ///   </div>
-    /// </span>
-    ///
-    /// Scan all files in a path using the glob syntax.
-    #[cfg(feature = "glob_scanning")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "glob_scanning")))]
-    pub fn scan_path<T: AsRef<Path>>(&mut self, glob_path: T) {
-        let (prefix, glob) = match wax::Glob::new(
-            glob_path
-                .as_ref()
-                .to_str()
-                .expect("failed to convert the glob to a string"),
-        ) {
-            Ok(g) => g.partition(),
-            Err(e) => panic!("{}", e),
-        };
-
-        if prefix == glob_path.as_ref() {
-            self.scan_files(std::iter::once(glob_path));
-        } else {
-            self.scan_files(glob.walk(prefix).map(|e| e.unwrap().into_path()));
-        }
-    }
-
     /// Generate the CSS styles needed based on the scanned selectors.
     ///
     /// Don't forget to scan selectors before, using:
     /// - [add_selector] to add individual selectors to the scanned list;
-    /// - [scan_raw] to scan raw input;
-    /// - [scan_files] to scan several files on the filesystem;
-    /// - [scan_path] (only if the `glob_scanning` feature is enabled) to scan files using a glob.
+    /// - [scan] to scan a string (e.g. the content of a file);
     ///
     /// [add_selector]: EncreGenerator::add_selector
-    /// [scan_raw]: EncreGenerator::scan_raw
-    /// [scan_files]: EncreGenerator::scan_files
-    /// [scan_path]: EncreGenerator::scan_path
+    /// [scan]: EncreGenerator::scan
     pub fn generate(&self) -> Result<String> {
-        debug!("Start generating CSS");
+        // Make sure that animations are not defined
+        transition::ANIMATIONS_ALREADY_DEFINED
+            .iter()
+            .for_each(|animation| animation.store(false, Ordering::Relaxed));
+
+        let custom_variants = init_variants(&self.config);
+        let get_variant = |variant| {
+            BUILTIN_VARIANTS
+                .iter()
+                .find_map(|v| if v.0 == variant { Some(&v.1) } else { None })
+                .or_else(|| custom_variants.get(&variant))
+        };
+
         let mut buffer = String::with_capacity(10 * self.scanned_selectors.len()); // TODO: More accurate value
         buffer.push_str(ENCRE_PREFLIGHT_CSS); // TODO: Push and reserve at the same time
 
@@ -231,37 +118,46 @@ impl EncreGenerator {
             let mut indentation = 0;
 
             // Before rule
-            if let Some(ref variants) = selector.variants {
-                variants.iter().try_for_each(|variant| {
-                    if let Some(Variant::BeforeRule(variant)) =
-                        self.variants.get(&Cow::from(variant))
-                    {
-                        indent(indentation, &mut buffer)?;
-                        writeln!(buffer, "{} {{", variant)?;
-                        indentation += 1;
-                    }
+            if !selector.variants.is_empty() {
+                selector
+                    .variants
+                    .split(VARIANT_SEPARATOR)
+                    .try_for_each(|variant| {
+                        if let Some(Variant::BeforeRule(variant)) = get_variant(Cow::from(variant))
+                        {
+                            indent(indentation, &mut buffer)?;
+                            writeln!(buffer, "{} {{", variant)?;
+                            indentation += 1;
+                        }
 
-                    Ok::<(), Error>(())
-                })?;
+                        Ok::<(), Error>(())
+                    })?;
             }
 
             // Before class
             indent(indentation, &mut buffer)?;
-            if let Some(ref variants) = selector.variants {
+            if !selector.variants.is_empty() {
                 // Variants are reversed to be compatible with TailwindCSS
-                variants.iter().rev().try_for_each(|variant| {
-                    if let Some(Variant::BeforeClass(variant)) =
-                        self.variants.get(&Cow::from(variant))
-                    {
-                        write!(buffer, "{}", variant)?;
-                    }
+                selector
+                    .variants
+                    .split(VARIANT_SEPARATOR)
+                    .rev()
+                    .try_for_each(|variant| {
+                        if let Some(Variant::BeforeClass(variant)) = get_variant(Cow::from(variant))
+                        {
+                            write!(buffer, "{}", variant)?;
+                        }
 
-                    Ok::<(), Error>(())
-                })?;
+                        Ok::<(), Error>(())
+                    })?;
             }
 
             // Class
             write!(buffer, ".")?;
+
+            if selector.is_negative {
+                write!(buffer, "-")?;
+            }
 
             selector.full.chars().enumerate().try_for_each(|(i, ch)| {
                 if i == 0 {
@@ -281,40 +177,33 @@ impl EncreGenerator {
             })?;
 
             // After class
-            if let Some(ref variants) = selector.variants {
+            if !selector.variants.is_empty() {
                 // Variants are reversed to be compatible with TailwindCSS
-                variants.iter().rev().try_for_each(|variant| {
-                    if let Some(Variant::AfterClass(variant)) =
-                        self.variants.get(&Cow::from(variant))
-                    {
-                        write!(buffer, "{}", variant)?;
-                    }
+                selector
+                    .variants
+                    .split(VARIANT_SEPARATOR)
+                    .rev()
+                    .try_for_each(|variant| {
+                        if let Some(Variant::AfterClass(variant)) = get_variant(Cow::from(variant))
+                        {
+                            write!(buffer, "{}", variant)?;
+                        }
 
-                    Ok::<(), Error>(())
-                })?;
+                        Ok::<(), Error>(())
+                    })?;
             }
 
             writeln!(buffer, " {{")?;
 
             // Rule content
-            let modifier = match &selector.modifier {
-                Modifier::Basic { is_negative, value } => Modifier::Basic {
-                    is_negative: *is_negative,
-                    value: value.clone(),
-                },
-                Modifier::Arbitrary { hint, value } => {
-                    // Transform the mangled CSS content of the selector into a real CSS rule
-                    Modifier::Arbitrary {
-                        hint: hint.clone(),
-                        value: to_css_value(value),
-                    }
-                }
-            };
 
             // TODO: Support the important prefix
-            selector
-                .plugin
-                .handle(&self.config, &modifier, indentation + 1, &mut buffer)?;
+            selector.plugin.handle(
+                &self.config,
+                &selector.modifier,
+                indentation + 1,
+                &mut buffer,
+            )?;
 
             // After rule
             for i in (1..indentation + 1).rev() {
@@ -327,19 +216,6 @@ impl EncreGenerator {
             Ok::<(), Error>(())
         })?;
 
-        debug!("Finished generating CSS");
-
         Ok(buffer)
-    }
-
-    /// Restore the default state of the generator (without any scanned selectors)
-    /// Useful when repeatedly calling [`EncreGenerator::generate`]
-    pub fn reset(&mut self) {
-        self.scanned_selectors.clear();
-
-        // Make sure animations are not defined
-        transition::ANIMATIONS_ALREADY_DEFINED
-            .iter()
-            .for_each(|animation| animation.store(false, Ordering::Relaxed));
     }
 }

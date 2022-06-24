@@ -1,12 +1,10 @@
-use super::Plugin;
-use crate::utils::{default_colors, default_lengths, indent, value_matchers::*};
+use super::{to_css_value, Plugin};
+use crate::utils::{color, indent, length, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use std::{
-    borrow::Cow,
-    fmt::{self, Write},
-};
+use std::fmt::{self, Write};
 
+#[derive(Debug)]
 pub struct AccentColorPlugin;
 
 impl Plugin for AccentColorPlugin {
@@ -16,8 +14,8 @@ impl Plugin for AccentColorPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value, None).is_some(),
-            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+            Modifier::Arbitrary { value, .. } => is_matching_color(value),
         }
     }
 
@@ -30,14 +28,15 @@ impl Plugin for AccentColorPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         let value = match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value, None).unwrap(),
-            Modifier::Arbitrary { value, .. } => Cow::from(&**value),
+            Modifier::Basic { value, .. } => color::get(config, value, None).unwrap(),
+            Modifier::Arbitrary { value, .. } => to_css_value(*value),
         };
 
         writeln!(buffer, "accent-color: {value};")
     }
 }
 
+#[derive(Debug)]
 pub struct AppearancePlugin;
 
 impl Plugin for AppearancePlugin {
@@ -47,7 +46,7 @@ impl Plugin for AppearancePlugin {
 
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => value == "none",
+            Modifier::Basic { value, .. } => *value == "none",
             Modifier::Arbitrary { .. } => false,
         }
     }
@@ -75,6 +74,7 @@ impl Plugin for AppearancePlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct CursorPlugin;
 
 impl Plugin for CursorPlugin {
@@ -137,13 +137,16 @@ impl Plugin for CursorPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => writeln!(buffer, "cursor: {value};")?,
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "cursor: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "cursor: {};", to_css_value(value))?
+            }
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
 pub struct CaretColorPlugin;
 
 impl Plugin for CaretColorPlugin {
@@ -153,8 +156,8 @@ impl Plugin for CaretColorPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value, None).is_some(),
-            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+            Modifier::Arbitrary { value, .. } => is_matching_color(value),
         }
     }
 
@@ -167,14 +170,15 @@ impl Plugin for CaretColorPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         let value = match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value, None).unwrap(),
-            Modifier::Arbitrary { value, .. } => Cow::from(&**value),
+            Modifier::Basic { value, .. } => color::get(config, value, None).unwrap(),
+            Modifier::Arbitrary { value, .. } => to_css_value(*value),
         };
 
         writeln!(buffer, "caret-color: {value};")
     }
 }
 
+#[derive(Debug)]
 pub struct PointerEventsPlugin;
 
 impl Plugin for PointerEventsPlugin {
@@ -206,6 +210,7 @@ impl Plugin for PointerEventsPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ResizePlugin;
 
 impl Plugin for ResizePlugin {
@@ -229,7 +234,7 @@ impl Plugin for ResizePlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "" => writeln!(buffer, "resize: both;")?,
                 "none" => writeln!(buffer, "resize: none;")?,
                 "x" => writeln!(buffer, "resize: horizontal;")?,
@@ -243,6 +248,7 @@ impl Plugin for ResizePlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ScrollBehaviorPlugin;
 
 impl Plugin for ScrollBehaviorPlugin {
@@ -279,9 +285,9 @@ impl Plugin for ScrollBehaviorPlugin {
 fn scroll_margin_padding_can_handle(modifier: &Modifier) -> bool {
     match modifier {
         Modifier::Basic { is_negative, value } => {
-            default_lengths::get_basic(value, *is_negative).is_some() || value == "auto"
+            length::get_basic(value, *is_negative).is_some() || *value == "auto"
         }
-        Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
+        Modifier::Arbitrary { value, .. } => is_matching_length(value),
     }
 }
 
@@ -299,11 +305,12 @@ pub fn scroll_margin_padding_handle(
                     buffer,
                     "{}: {};",
                     css_prop,
-                    default_lengths::get_basic(value, *is_negative).unwrap(),
+                    length::get_basic(value, *is_negative).unwrap(),
                 )?;
             }
         }
         Modifier::Arbitrary { value, .. } => {
+            let value = to_css_value(value);
             for css_prop in css_properties {
                 indent(indentation, buffer)?;
                 writeln!(buffer, "{}: {};", css_prop, value)?;
@@ -314,6 +321,7 @@ pub fn scroll_margin_padding_handle(
     Ok(())
 }
 
+#[derive(Debug)]
 pub struct ScrollMarginPlugin;
 
 impl Plugin for ScrollMarginPlugin {
@@ -336,6 +344,7 @@ impl Plugin for ScrollMarginPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ScrollMarginXPlugin;
 
 impl Plugin for ScrollMarginXPlugin {
@@ -363,6 +372,7 @@ impl Plugin for ScrollMarginXPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ScrollMarginYPlugin;
 
 impl Plugin for ScrollMarginYPlugin {
@@ -390,6 +400,7 @@ impl Plugin for ScrollMarginYPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ScrollMarginLeftPlugin;
 
 impl Plugin for ScrollMarginLeftPlugin {
@@ -412,6 +423,7 @@ impl Plugin for ScrollMarginLeftPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ScrollMarginRightPlugin;
 
 impl Plugin for ScrollMarginRightPlugin {
@@ -434,6 +446,7 @@ impl Plugin for ScrollMarginRightPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ScrollMarginTopPlugin;
 
 impl Plugin for ScrollMarginTopPlugin {
@@ -456,6 +469,7 @@ impl Plugin for ScrollMarginTopPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ScrollMarginBottomPlugin;
 
 impl Plugin for ScrollMarginBottomPlugin {
@@ -480,6 +494,7 @@ impl Plugin for ScrollMarginBottomPlugin {
 
 // Scroll padding
 
+#[derive(Debug)]
 pub struct ScrollPaddingPlugin;
 
 impl Plugin for ScrollPaddingPlugin {
@@ -502,6 +517,7 @@ impl Plugin for ScrollPaddingPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ScrollPaddingXPlugin;
 
 impl Plugin for ScrollPaddingXPlugin {
@@ -529,6 +545,7 @@ impl Plugin for ScrollPaddingXPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ScrollPaddingYPlugin;
 
 impl Plugin for ScrollPaddingYPlugin {
@@ -556,6 +573,7 @@ impl Plugin for ScrollPaddingYPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ScrollPaddingLeftPlugin;
 
 impl Plugin for ScrollPaddingLeftPlugin {
@@ -578,6 +596,7 @@ impl Plugin for ScrollPaddingLeftPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ScrollPaddingRightPlugin;
 
 impl Plugin for ScrollPaddingRightPlugin {
@@ -600,6 +619,7 @@ impl Plugin for ScrollPaddingRightPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ScrollPaddingTopPlugin;
 
 impl Plugin for ScrollPaddingTopPlugin {
@@ -622,6 +642,7 @@ impl Plugin for ScrollPaddingTopPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ScrollPaddingBottomPlugin;
 
 impl Plugin for ScrollPaddingBottomPlugin {
@@ -644,6 +665,7 @@ impl Plugin for ScrollPaddingBottomPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ScrollSnapAlignPlugin;
 
 impl Plugin for ScrollSnapAlignPlugin {
@@ -669,7 +691,7 @@ impl Plugin for ScrollSnapAlignPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "start" => writeln!(buffer, "scroll-snap-align: start;")?,
                 "end" => writeln!(buffer, "scroll-snap-align: end;")?,
                 "center" => writeln!(buffer, "scroll-snap-align: center;")?,
@@ -683,6 +705,7 @@ impl Plugin for ScrollSnapAlignPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ScrollSnapStopPlugin;
 
 impl Plugin for ScrollSnapStopPlugin {
@@ -706,7 +729,7 @@ impl Plugin for ScrollSnapStopPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "normal" => writeln!(buffer, "scroll-snap-stop: normal;")?,
                 "always" => writeln!(buffer, "scroll-snap-stop: always;")?,
                 _ => unreachable!(),
@@ -718,6 +741,7 @@ impl Plugin for ScrollSnapStopPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ScrollSnapTypePlugin;
 
 impl Plugin for ScrollSnapTypePlugin {
@@ -743,7 +767,7 @@ impl Plugin for ScrollSnapTypePlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "none" => {
                     writeln!(buffer, "-ms-scroll-snap-type: none;")?;
                     indent(indentation, buffer)?;
@@ -793,6 +817,7 @@ impl Plugin for ScrollSnapTypePlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct TouchActionPlugin;
 
 impl Plugin for TouchActionPlugin {
@@ -836,6 +861,7 @@ impl Plugin for TouchActionPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct UserSelectPlugin;
 
 impl Plugin for UserSelectPlugin {
@@ -867,6 +893,7 @@ impl Plugin for UserSelectPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct WillChangePlugin;
 
 impl Plugin for WillChangePlugin {
@@ -892,7 +919,7 @@ impl Plugin for WillChangePlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "auto" => writeln!(buffer, "will-change: auto;")?,
                 "scroll" => writeln!(buffer, "will-change: scroll-position;")?,
                 "contents" => writeln!(buffer, "will-change: contents;")?,

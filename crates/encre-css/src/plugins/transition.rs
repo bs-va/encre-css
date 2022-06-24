@@ -1,4 +1,4 @@
-use super::Plugin;
+use super::{to_css_value, Plugin};
 use crate::utils::{indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
@@ -7,6 +7,7 @@ use std::{
     sync::atomic::{AtomicBool, Ordering},
 };
 
+#[derive(Debug)]
 pub struct PropertyPlugin;
 
 impl Plugin for PropertyPlugin {
@@ -39,7 +40,7 @@ impl Plugin for PropertyPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "" => {
                     writeln!(buffer, "transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;")?;
                     indent(indentation, buffer)?;
@@ -103,13 +104,16 @@ impl Plugin for PropertyPlugin {
                 }
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "transition-property: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "transition-property: {};", to_css_value(value))?
+            }
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
 pub struct DurationPlugin;
 
 impl Plugin for DurationPlugin {
@@ -135,13 +139,16 @@ impl Plugin for DurationPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => writeln!(buffer, "transition-duration: {value}ms;")?,
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "transition-duration: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "transition-duration: {};", to_css_value(value))?
+            }
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
 pub struct DelayPlugin;
 
 impl Plugin for DelayPlugin {
@@ -167,13 +174,16 @@ impl Plugin for DelayPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => writeln!(buffer, "transition-delay: {value}ms;")?,
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "transition-delay: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "transition-delay: {};", to_css_value(value))?
+            }
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
 pub struct EasePlugin;
 
 impl Plugin for EasePlugin {
@@ -197,7 +207,7 @@ impl Plugin for EasePlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "linear" => writeln!(buffer, "transition-timing-function: linear;")?,
                 "in" => writeln!(
                     buffer,
@@ -213,9 +223,11 @@ impl Plugin for EasePlugin {
                 )?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "transition-timing-function: {value};")?
-            }
+            Modifier::Arbitrary { value, .. } => writeln!(
+                buffer,
+                "transition-timing-function: {};",
+                to_css_value(value)
+            )?,
         }
 
         Ok(())
@@ -229,6 +241,7 @@ pub static ANIMATIONS_ALREADY_DEFINED: [AtomicBool; 4] = [
     AtomicBool::new(false), // Bounce
 ];
 
+#[derive(Debug)]
 pub struct AnimatePlugin;
 
 impl Plugin for AnimatePlugin {
@@ -239,7 +252,7 @@ impl Plugin for AnimatePlugin {
     fn css_before_rule(&self, modifier: &Modifier, buffer: &mut String) -> fmt::Result {
         match modifier {
             Modifier::Basic { value, .. } => {
-                match value.as_str() {
+                match *value {
                     "spin" => {
                         if !ANIMATIONS_ALREADY_DEFINED[0].swap(true, Ordering::Relaxed) {
                             writeln!(
@@ -347,7 +360,7 @@ impl Plugin for AnimatePlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => {
-                ["spin", "ping", "pulse", "bounce", "none"].contains(&value.as_str())
+                ["spin", "ping", "pulse", "bounce", "none"].contains(value)
             }
             Modifier::Arbitrary { value, .. } => is_matching_all(value),
         }
@@ -362,7 +375,7 @@ impl Plugin for AnimatePlugin {
     ) -> fmt::Result {
         match modifier {
             Modifier::Basic { value, .. } => {
-                let animation = match value.as_str() {
+                let animation = match *value {
                     "none" => "none",
                     "spin" => "spin 1s linear infinite",
                     "ping" => "ping 1s cubic-bezier(0, 0, 0.2, 1) infinite",
@@ -377,6 +390,7 @@ impl Plugin for AnimatePlugin {
                 writeln!(buffer, "animation: {animation};")?;
             }
             Modifier::Arbitrary { value, .. } => {
+                let value = to_css_value(value);
                 indent(indentation, buffer)?;
                 writeln!(buffer, "-webkit-animation: {value};")?;
                 indent(indentation, buffer)?;

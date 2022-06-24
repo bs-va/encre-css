@@ -1,14 +1,12 @@
-use super::Plugin;
-use crate::utils::{default_colors, indent, value_matchers::*};
+use super::{to_css_value, Plugin};
+use crate::utils::{color, indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use std::{
-    borrow::Cow,
-    fmt::{self, Write},
-};
+use std::fmt::{self, Write};
 
 const CSS_RING_OFFSET_SHADOW: &str = "--en-ring-offset-shadow: var(--en-ring-inset) 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color);";
 
+#[derive(Debug)]
 pub struct ColorPlugin;
 
 impl Plugin for ColorPlugin {
@@ -18,10 +16,10 @@ impl Plugin for ColorPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => {
-                default_colors::get(config, value, Some("--en-border-opacity")).is_some()
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+            Modifier::Arbitrary { hint, value } => {
+                *hint == "color" || (hint.is_empty() && is_matching_color(value))
             }
-            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
 
@@ -35,8 +33,7 @@ impl Plugin for ColorPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => {
-                let color =
-                    default_colors::get(config, value, Some("--en-border-opacity")).unwrap();
+                let color = color::get(config, value, Some("--en-border-opacity")).unwrap();
                 if color.contains("--en-border-opacity") {
                     writeln!(buffer, "--en-border-opacity: 1;")?;
                     indent(indentation, buffer)?;
@@ -44,7 +41,9 @@ impl Plugin for ColorPlugin {
 
                 writeln!(buffer, "border-color: {color};")?;
             }
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "border-color: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "border-color: {};", to_css_value(value))?
+            }
         }
 
         Ok(())
@@ -77,7 +76,7 @@ pub fn radius_handle(
                     buffer,
                     "{}: {};",
                     css_prop,
-                    match value.as_str() {
+                    match *value {
                         "" => "0.25rem",
                         "none" => "0",
                         "sm" => "0.125rem",
@@ -95,7 +94,7 @@ pub fn radius_handle(
         Modifier::Arbitrary { value, .. } => {
             for css_prop in css_properties {
                 indent(indentation, buffer)?;
-                writeln!(buffer, "{}: {};", css_prop, value)?;
+                writeln!(buffer, "{}: {};", css_prop, to_css_value(value))?;
             }
         }
     }
@@ -103,6 +102,7 @@ pub fn radius_handle(
     Ok(())
 }
 
+#[derive(Debug)]
 pub struct RadiusTopRightPlugin;
 
 impl Plugin for RadiusTopRightPlugin {
@@ -125,6 +125,7 @@ impl Plugin for RadiusTopRightPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct RadiusTopLeftPlugin;
 
 impl Plugin for RadiusTopLeftPlugin {
@@ -147,6 +148,7 @@ impl Plugin for RadiusTopLeftPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct RadiusBottomRightPlugin;
 
 impl Plugin for RadiusBottomRightPlugin {
@@ -174,6 +176,7 @@ impl Plugin for RadiusBottomRightPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct RadiusBottomLeftPlugin;
 
 impl Plugin for RadiusBottomLeftPlugin {
@@ -201,6 +204,7 @@ impl Plugin for RadiusBottomLeftPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct RadiusTopPlugin;
 
 impl Plugin for RadiusTopPlugin {
@@ -228,6 +232,7 @@ impl Plugin for RadiusTopPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct RadiusBottomPlugin;
 
 impl Plugin for RadiusBottomPlugin {
@@ -255,6 +260,7 @@ impl Plugin for RadiusBottomPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct RadiusLeftPlugin;
 
 impl Plugin for RadiusLeftPlugin {
@@ -282,6 +288,7 @@ impl Plugin for RadiusLeftPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct RadiusRightPlugin;
 
 impl Plugin for RadiusRightPlugin {
@@ -309,6 +316,7 @@ impl Plugin for RadiusRightPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct RadiusPlugin;
 
 impl Plugin for RadiusPlugin {
@@ -331,6 +339,7 @@ impl Plugin for RadiusPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct StylePlugin;
 
 impl Plugin for StylePlugin {
@@ -341,7 +350,7 @@ impl Plugin for StylePlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => {
-                ["solid", "dashed", "dotted", "double", "hidden", "none"].contains(&value.as_str())
+                ["solid", "dashed", "dotted", "double", "hidden", "none"].contains(value)
             }
             Modifier::Arbitrary { .. } => false,
         }
@@ -367,7 +376,9 @@ impl Plugin for StylePlugin {
 pub fn width_can_handle(modifier: &Modifier) -> bool {
     match modifier {
         Modifier::Basic { value, .. } => value.is_empty() || value.parse::<usize>().is_ok(),
-        Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
+        Modifier::Arbitrary { hint, value } => {
+            *hint == "length" || (hint.is_empty() && is_matching_length(value))
+        }
     }
 }
 
@@ -391,6 +402,7 @@ pub fn width_handle(
             }
         }
         Modifier::Arbitrary { value, .. } => {
+            let value = to_css_value(value);
             for css_prop in css_properties {
                 indent(indentation, buffer)?;
                 writeln!(buffer, "{}: {};", css_prop, value)?;
@@ -401,6 +413,7 @@ pub fn width_handle(
     Ok(())
 }
 
+#[derive(Debug)]
 pub struct WidthTopPlugin;
 
 impl Plugin for WidthTopPlugin {
@@ -423,6 +436,7 @@ impl Plugin for WidthTopPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct WidthBottomPlugin;
 
 impl Plugin for WidthBottomPlugin {
@@ -445,6 +459,7 @@ impl Plugin for WidthBottomPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct WidthLeftPlugin;
 
 impl Plugin for WidthLeftPlugin {
@@ -467,6 +482,7 @@ impl Plugin for WidthLeftPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct WidthRightPlugin;
 
 impl Plugin for WidthRightPlugin {
@@ -489,6 +505,7 @@ impl Plugin for WidthRightPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct WidthXPlugin;
 
 impl Plugin for WidthXPlugin {
@@ -516,6 +533,7 @@ impl Plugin for WidthXPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct WidthYPlugin;
 
 impl Plugin for WidthYPlugin {
@@ -543,6 +561,7 @@ impl Plugin for WidthYPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct WidthPlugin;
 
 impl Plugin for WidthPlugin {
@@ -566,6 +585,7 @@ impl Plugin for WidthPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct OpacityPlugin;
 
 impl Plugin for OpacityPlugin {
@@ -602,6 +622,7 @@ impl Plugin for OpacityPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct DivideColorPlugin;
 
 impl Plugin for DivideColorPlugin {
@@ -611,10 +632,10 @@ impl Plugin for DivideColorPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => {
-                default_colors::get(config, value, Some("--en-divide-opacity")).is_some()
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+            Modifier::Arbitrary { hint, value } => {
+                *hint == "color" || (hint.is_empty() && is_matching_color(value))
             }
-            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
 
@@ -628,8 +649,7 @@ impl Plugin for DivideColorPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => {
-                let color =
-                    default_colors::get(config, value, Some("--en-divide-opacity")).unwrap();
+                let color = color::get(config, value, Some("--en-divide-opacity")).unwrap();
                 if color.contains("--en-divide-opacity") {
                     writeln!(buffer, "--en-divide-opacity: 1;")?;
                     indent(indentation, buffer)?;
@@ -637,7 +657,9 @@ impl Plugin for DivideColorPlugin {
 
                 writeln!(buffer, "border-color: {color};")?;
             }
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "border-color: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "border-color: {};", to_css_value(value))?
+            }
         }
 
         Ok(())
@@ -647,14 +669,16 @@ impl Plugin for DivideColorPlugin {
 pub fn divide_width_can_handle(modifier: &Modifier) -> bool {
     match modifier {
         Modifier::Basic { value, .. } => {
-            value.is_empty() || value == "reverse" || value.parse::<usize>().is_ok()
+            value.is_empty() || *value == "reverse" || value.parse::<usize>().is_ok()
         }
         Modifier::Arbitrary { hint, value } => {
-            hint == "length" || is_matching_length(value) || is_matching_line_width(value)
+            *hint == "length"
+                || (hint.is_empty() && (is_matching_length(value) || is_matching_line_width(value)))
         }
     }
 }
 
+#[derive(Debug)]
 pub struct DivideWidthXPlugin;
 
 impl Plugin for DivideWidthXPlugin {
@@ -677,7 +701,7 @@ impl Plugin for DivideWidthXPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => {
-                if value == "reverse" {
+                if *value == "reverse" {
                     return writeln!(buffer, "--en-divide-x-reverse: 1;");
                 }
 
@@ -708,10 +732,12 @@ impl Plugin for DivideWidthXPlugin {
                 indent(indentation, buffer)?;
 
                 if is_matching_line_width(value) {
+                    let value = to_css_value(value);
                     writeln!(buffer, "border-left-width: {value};")?;
                     indent(indentation, buffer)?;
                     writeln!(buffer, "border-right-width: {value};")?;
                 } else {
+                    let value = to_css_value(value);
                     writeln!(
                         buffer,
                         "border-left-width: calc({value} * calc(1 - var(--en-divide-x-reverse)));"
@@ -729,6 +755,7 @@ impl Plugin for DivideWidthXPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct DivideWidthYPlugin;
 
 impl Plugin for DivideWidthYPlugin {
@@ -751,7 +778,7 @@ impl Plugin for DivideWidthYPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => {
-                if value == "reverse" {
+                if *value == "reverse" {
                     return writeln!(buffer, "--en-divide-y-reverse: 1;");
                 }
 
@@ -782,10 +809,12 @@ impl Plugin for DivideWidthYPlugin {
                 indent(indentation, buffer)?;
 
                 if is_matching_line_width(value) {
+                    let value = to_css_value(value);
                     writeln!(buffer, "border-top-width: {value};")?;
                     indent(indentation, buffer)?;
                     writeln!(buffer, "border-bottom-width: {value};")?;
                 } else {
+                    let value = to_css_value(value);
                     writeln!(
                         buffer,
                         "border-top-width: calc({value} * calc(1 - var(--en-divide-y-reverse)));"
@@ -803,6 +832,7 @@ impl Plugin for DivideWidthYPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct DivideStylePlugin;
 
 impl Plugin for DivideStylePlugin {
@@ -813,7 +843,7 @@ impl Plugin for DivideStylePlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => {
-                ["solid", "dashed", "dotted", "double", "none"].contains(&value.as_str())
+                ["solid", "dashed", "dotted", "double", "none"].contains(value)
             }
             Modifier::Arbitrary { .. } => false,
         }
@@ -828,7 +858,7 @@ impl Plugin for DivideStylePlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "solid" => writeln!(buffer, "border-style: solid;")?,
                 "dashed" => writeln!(buffer, "border-style: dashed;")?,
                 "dotted" => writeln!(buffer, "border-style: dotted;")?,
@@ -843,6 +873,7 @@ impl Plugin for DivideStylePlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct DivideOpacityPlugin;
 
 impl Plugin for DivideOpacityPlugin {
@@ -879,6 +910,7 @@ impl Plugin for DivideOpacityPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct RingColorPlugin;
 
 impl Plugin for RingColorPlugin {
@@ -888,10 +920,10 @@ impl Plugin for RingColorPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => {
-                default_colors::get(config, value, Some("--en-ring-opacity")).is_some()
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+            Modifier::Arbitrary { hint, value } => {
+                *hint == "color" || (hint.is_empty() && is_matching_color(value))
             }
-            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
 
@@ -905,7 +937,7 @@ impl Plugin for RingColorPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => {
-                let color = default_colors::get(config, value, Some("--en-ring-opacity")).unwrap();
+                let color = color::get(config, value, Some("--en-ring-opacity")).unwrap();
                 if color.contains("--en-ring-opacity") {
                     writeln!(buffer, "--en-ring-opacity: 1;")?;
                     indent(indentation, buffer)?;
@@ -913,77 +945,8 @@ impl Plugin for RingColorPlugin {
 
                 writeln!(buffer, "--ring-color: {color};")?;
             }
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "--ring-color: {value};")?,
-        }
-
-        Ok(())
-    }
-}
-
-pub struct RingOffsetColorPlugin;
-
-impl Plugin for RingOffsetColorPlugin {
-    fn namespace(&self) -> &str {
-        "ring-offset"
-    }
-
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value, None).is_some(),
-            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
-        }
-    }
-
-    fn handle(
-        &self,
-        config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_RING_OFFSET_SHADOW)?;
-
-        indent(indentation, buffer)?;
-        let value = match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value, None).unwrap(),
-            Modifier::Arbitrary { value, .. } => Cow::from(&**value),
-        };
-
-        writeln!(buffer, "--en-ring-offset-color: {value};")
-    }
-}
-
-pub struct RingOffsetWidthPlugin;
-
-impl Plugin for RingOffsetWidthPlugin {
-    fn namespace(&self) -> &str {
-        "ring-offset"
-    }
-
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
-            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
-            Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
-        }
-    }
-
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_RING_OFFSET_SHADOW)?;
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => {
-                writeln!(buffer, "--en-ring-offset-width: {value}px;")?
-            }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "--en-ring-offset-width: {value};")?
+                writeln!(buffer, "--ring-color: {};", to_css_value(value))?
             }
         }
 
@@ -991,6 +954,7 @@ impl Plugin for RingOffsetWidthPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct RingWidthPlugin;
 
 impl Plugin for RingWidthPlugin {
@@ -1001,9 +965,11 @@ impl Plugin for RingWidthPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => {
-                value.is_empty() || value == "inset" || value.parse::<usize>().is_ok()
+                value.is_empty() || *value == "inset" || value.parse::<usize>().is_ok()
             }
-            Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
+            Modifier::Arbitrary { hint, value } => {
+                *hint == "length" || (hint.is_empty() && is_matching_length(value))
+            }
         }
     }
 
@@ -1018,13 +984,13 @@ impl Plugin for RingWidthPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => {
-                if value == "inset" {
+                if *value == "inset" {
                     return writeln!(buffer, "--en-ring-inset: inset;");
                 }
 
                 writeln!(buffer, "--en-ring-shadow: var(--en-ring-inset) 0 0 0 calc({}px + var(--en-ring-offset-width)) var(--en-ring-color);", if value.is_empty() { "3px" } else { value })?;
             }
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "--en-ring-shadow: var(--en-ring-inset) 0 0 0 calc({value} + var(--en-ring-offset-width)) var(--en-ring-color);")?,
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "--en-ring-shadow: var(--en-ring-inset) 0 0 0 calc({} + var(--en-ring-offset-width)) var(--en-ring-color);", to_css_value(value))?,
         }
 
         indent(indentation, buffer)?;
@@ -1034,6 +1000,7 @@ impl Plugin for RingWidthPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct RingOpacityPlugin;
 
 impl Plugin for RingOpacityPlugin {
@@ -1070,6 +1037,84 @@ impl Plugin for RingOpacityPlugin {
     }
 }
 
+#[derive(Debug)]
+pub struct RingOffsetColorPlugin;
+
+impl Plugin for RingOffsetColorPlugin {
+    fn namespace(&self) -> &str {
+        "ring-offset"
+    }
+
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+            Modifier::Arbitrary { hint, value } => {
+                *hint == "color" || (hint.is_empty() && is_matching_color(value))
+            }
+        }
+    }
+
+    fn handle(
+        &self,
+        config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        writeln!(buffer, "{}", CSS_RING_OFFSET_SHADOW)?;
+
+        indent(indentation, buffer)?;
+        let value = match modifier {
+            Modifier::Basic { value, .. } => color::get(config, value, None).unwrap(),
+            Modifier::Arbitrary { value, .. } => to_css_value(*value),
+        };
+
+        writeln!(buffer, "--en-ring-offset-color: {value};")
+    }
+}
+
+#[derive(Debug)]
+pub struct RingOffsetWidthPlugin;
+
+impl Plugin for RingOffsetWidthPlugin {
+    fn namespace(&self) -> &str {
+        "ring-offset"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
+            Modifier::Arbitrary { hint, value } => {
+                *hint == "length" || (hint.is_empty() && is_matching_length(value))
+            }
+        }
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        writeln!(buffer, "{}", CSS_RING_OFFSET_SHADOW)?;
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                writeln!(buffer, "--en-ring-offset-width: {value}px;")?
+            }
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "--en-ring-offset-width: {};", to_css_value(value))?
+            }
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Debug)]
 pub struct OutlineColorPlugin;
 
 impl Plugin for OutlineColorPlugin {
@@ -1078,8 +1123,10 @@ impl Plugin for OutlineColorPlugin {
     }
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value, None).is_some(),
-            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+            Modifier::Arbitrary { hint, value } => {
+                *hint == "color" || (hint.is_empty() && is_matching_color(value))
+            }
         }
     }
 
@@ -1092,14 +1139,15 @@ impl Plugin for OutlineColorPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         let value = match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value, None).unwrap(),
-            Modifier::Arbitrary { value, .. } => Cow::from(&**value),
+            Modifier::Basic { value, .. } => color::get(config, value, None).unwrap(),
+            Modifier::Arbitrary { value, .. } => to_css_value(*value),
         };
 
         writeln!(buffer, "outline-color: {value};")
     }
 }
 
+#[derive(Debug)]
 pub struct OutlineWidthPlugin;
 
 impl Plugin for OutlineWidthPlugin {
@@ -1110,7 +1158,9 @@ impl Plugin for OutlineWidthPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
-            Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
+            Modifier::Arbitrary { hint, value } => {
+                *hint == "length" || (hint.is_empty() && is_matching_length(value))
+            }
         }
     }
 
@@ -1125,13 +1175,16 @@ impl Plugin for OutlineWidthPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => writeln!(buffer, "outline-width: {value}px;")?,
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "outline-width: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "outline-width: {};", to_css_value(value))?
+            }
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
 pub struct OutlineStylePlugin;
 
 impl Plugin for OutlineStylePlugin {
@@ -1157,7 +1210,7 @@ impl Plugin for OutlineStylePlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "" => writeln!(buffer, "outline-style: solid;")?,
                 "none" => {
                     writeln!(buffer, "outline: 2px solid transparent;")?;
@@ -1177,6 +1230,7 @@ impl Plugin for OutlineStylePlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct OutlineOffsetPlugin;
 
 impl Plugin for OutlineOffsetPlugin {
@@ -1187,7 +1241,7 @@ impl Plugin for OutlineOffsetPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
-            Modifier::Arbitrary { hint, value } => hint == "length" || is_matching_length(value),
+            Modifier::Arbitrary { value, .. } => is_matching_length(value),
         }
     }
 
@@ -1202,7 +1256,9 @@ impl Plugin for OutlineOffsetPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => writeln!(buffer, "outline-offset: {value}px;")?,
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "outline-offset: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "outline-offset: {};", to_css_value(value))?
+            }
         }
 
         Ok(())

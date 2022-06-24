@@ -4,6 +4,7 @@ use crate::{config::Config, selector::Modifier};
 
 use std::fmt::{self, Write};
 
+#[derive(Debug)]
 pub struct BorderCollapsePlugin;
 
 impl Plugin for BorderCollapsePlugin {
@@ -27,7 +28,7 @@ impl Plugin for BorderCollapsePlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "collapse" => writeln!(buffer, "border-collapse: collapse;")?,
                 "separate" => writeln!(buffer, "border-collapse: separate;")?,
                 _ => unreachable!(),
@@ -39,6 +40,7 @@ impl Plugin for BorderCollapsePlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct TableLayoutPlugin;
 
 impl Plugin for TableLayoutPlugin {
@@ -62,7 +64,7 @@ impl Plugin for TableLayoutPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "auto" => writeln!(buffer, "table-layout: auto;")?,
                 "fixed" => writeln!(buffer, "table-layout: fixed;")?,
                 _ => unreachable!(),

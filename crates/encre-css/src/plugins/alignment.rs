@@ -3,6 +3,7 @@ use crate::{config::Config, selector::Modifier, utils::indent};
 
 use std::fmt::{self, Write};
 
+#[derive(Debug)]
 pub struct AlignContentPlugin;
 
 impl Plugin for AlignContentPlugin {
@@ -13,7 +14,7 @@ impl Plugin for AlignContentPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => {
-                ["start", "center", "end", "between", "around", "evenly"].contains(&value.as_str())
+                ["start", "center", "end", "between", "around", "evenly"].contains(value)
             }
             Modifier::Arbitrary { .. } => false,
         }
@@ -28,7 +29,7 @@ impl Plugin for AlignContentPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "start" => writeln!(buffer, "align-content: flex-start;")?,
                 "center" => writeln!(buffer, "align-content: center;")?,
                 "end" => writeln!(buffer, "align-content: flex-end;")?,
@@ -44,6 +45,7 @@ impl Plugin for AlignContentPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct AlignItemsPlugin;
 
 impl Plugin for AlignItemsPlugin {
@@ -54,7 +56,7 @@ impl Plugin for AlignItemsPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => {
-                ["stretch", "start", "center", "end", "baseline"].contains(&value.as_str())
+                ["stretch", "start", "center", "end", "baseline"].contains(value)
             }
             Modifier::Arbitrary { .. } => false,
         }
@@ -69,7 +71,7 @@ impl Plugin for AlignItemsPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "stretch" => writeln!(buffer, "align-items: stretch;")?,
                 "start" => writeln!(buffer, "align-items: flex-start;")?,
                 "center" => writeln!(buffer, "align-items: center;")?,
@@ -84,6 +86,7 @@ impl Plugin for AlignItemsPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct AlignSelfPlugin;
 
 impl Plugin for AlignSelfPlugin {
@@ -94,7 +97,7 @@ impl Plugin for AlignSelfPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => {
-                ["auto", "start", "center", "end", "stretch"].contains(&value.as_str())
+                ["auto", "start", "center", "end", "stretch"].contains(value)
             }
             Modifier::Arbitrary { .. } => false,
         }
@@ -109,7 +112,7 @@ impl Plugin for AlignSelfPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "auto" => writeln!(buffer, "align-self: auto;")?,
                 "start" => writeln!(buffer, "align-self: flex-start;")?,
                 "center" => writeln!(buffer, "align-self: center;")?,
@@ -124,6 +127,7 @@ impl Plugin for AlignSelfPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct JustifyContentPlugin;
 
 impl Plugin for JustifyContentPlugin {
@@ -134,7 +138,7 @@ impl Plugin for JustifyContentPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => {
-                ["start", "center", "end", "between", "around", "evenly"].contains(&value.as_str())
+                ["start", "center", "end", "between", "around", "evenly"].contains(value)
             }
             Modifier::Arbitrary { .. } => false,
         }
@@ -149,7 +153,7 @@ impl Plugin for JustifyContentPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "start" => writeln!(buffer, "justify-content: flex-start;")?,
                 "center" => writeln!(buffer, "justify-content: center;")?,
                 "end" => writeln!(buffer, "justify-content: flex-end;")?,
@@ -165,6 +169,7 @@ impl Plugin for JustifyContentPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct JustifyItemsPlugin;
 
 impl Plugin for JustifyItemsPlugin {
@@ -175,7 +180,7 @@ impl Plugin for JustifyItemsPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => {
-                ["stretch", "start", "center", "end", "auto"].contains(&value.as_str())
+                ["stretch", "start", "center", "end", "auto"].contains(value)
             }
             Modifier::Arbitrary { .. } => false,
         }
@@ -190,7 +195,7 @@ impl Plugin for JustifyItemsPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "stretch" => writeln!(buffer, "justify-items: stretch;")?,
                 "start" => writeln!(buffer, "justify-items: start;")?,
                 "center" => writeln!(buffer, "justify-items: center;")?,
@@ -205,6 +210,7 @@ impl Plugin for JustifyItemsPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct JustifySelfPlugin;
 
 impl Plugin for JustifySelfPlugin {
@@ -215,7 +221,7 @@ impl Plugin for JustifySelfPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => {
-                ["stretch", "start", "center", "end", "auto"].contains(&value.as_str())
+                ["stretch", "start", "center", "end", "auto"].contains(value)
             }
             Modifier::Arbitrary { .. } => false,
         }
@@ -230,7 +236,7 @@ impl Plugin for JustifySelfPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "stretch" => writeln!(buffer, "justify-self: stretch;")?,
                 "start" => writeln!(buffer, "justify-self: start;")?,
                 "center" => writeln!(buffer, "justify-self: center;")?,
@@ -245,6 +251,7 @@ impl Plugin for JustifySelfPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct PlaceContentPlugin;
 
 impl Plugin for PlaceContentPlugin {
@@ -255,7 +262,7 @@ impl Plugin for PlaceContentPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => {
-                ["start", "center", "end", "between", "around", "evenly"].contains(&value.as_str())
+                ["start", "center", "end", "between", "around", "evenly"].contains(value)
             }
             Modifier::Arbitrary { .. } => false,
         }
@@ -270,7 +277,7 @@ impl Plugin for PlaceContentPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "start" => writeln!(buffer, "place-content: start;")?,
                 "center" => writeln!(buffer, "place-content: center;")?,
                 "end" => writeln!(buffer, "place-content: end;")?,
@@ -286,6 +293,7 @@ impl Plugin for PlaceContentPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct PlaceItemsPlugin;
 
 impl Plugin for PlaceItemsPlugin {
@@ -295,9 +303,7 @@ impl Plugin for PlaceItemsPlugin {
 
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => {
-                ["stretch", "start", "center", "end"].contains(&value.as_str())
-            }
+            Modifier::Basic { value, .. } => ["stretch", "start", "center", "end"].contains(value),
             Modifier::Arbitrary { .. } => false,
         }
     }
@@ -311,7 +317,7 @@ impl Plugin for PlaceItemsPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "stretch" => writeln!(buffer, "place-items: stretch;")?,
                 "start" => writeln!(buffer, "place-items: start;")?,
                 "center" => writeln!(buffer, "place-items: center;")?,
@@ -325,6 +331,7 @@ impl Plugin for PlaceItemsPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct PlaceSelfPlugin;
 
 impl Plugin for PlaceSelfPlugin {
@@ -335,7 +342,7 @@ impl Plugin for PlaceSelfPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => {
-                ["auto", "start", "center", "end", "stretch"].contains(&value.as_str())
+                ["auto", "start", "center", "end", "stretch"].contains(value)
             }
             Modifier::Arbitrary { .. } => false,
         }
@@ -350,7 +357,7 @@ impl Plugin for PlaceSelfPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "auto" => writeln!(buffer, "place-self: auto;")?,
                 "start" => writeln!(buffer, "place-self: start;")?,
                 "center" => writeln!(buffer, "place-self: center;")?,

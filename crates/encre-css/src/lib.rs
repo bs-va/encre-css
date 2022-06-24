@@ -7,7 +7,7 @@
 //!
 //! let mut generator = EncreGenerator::from_config(Config::default());
 //! // Or let mut generator = EncreGenerator::new("encre.toml"); if your current directory contains an `encre.toml` file
-//! generator.scan_raw(r#"class="bg-red-500""#);
+//! generator.scan(r#"class="bg-red-500""#);
 //!
 //! assert!(generator.generate().expect("failed to generate the CSS").contains(r#".bg-red-500 {
 //!   --en-bg-opacity: 1;
@@ -17,12 +17,7 @@
 //!
 //! ### Cargo features
 //!
-//! - `glob_scanning`: enables scan of files using [glob patterns](https://en.wikipedia.org/wiki/Glob_(programming))
 //! - `rayon`: enables [rayon](https://docs.rs/rayon/latest/rayon) parallel iterators
-
-// Used for the info!, trace!, debug!, warn!, error! macros
-#[macro_use]
-extern crate tracing;
 
 pub mod config;
 pub mod error;
@@ -30,7 +25,6 @@ pub mod generator;
 pub mod plugins;
 pub mod preflight;
 pub mod selector;
-pub mod sorting;
 pub mod utils;
 pub mod variant;
 
@@ -41,18 +35,18 @@ pub use generator::EncreGenerator;
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::config::{ColorConfig, DarkModeConfig, ScreenConfig};
+    use crate::config::DarkModeConfig;
     use crate::selector::Selector;
 
     use pretty_assertions::assert_eq;
     use std::{
         borrow::Cow,
         collections::{BTreeMap, BTreeSet},
-        iter,
+        fs,
     };
 
     #[test]
-    fn scan_raw_test() {
+    fn scan_test() {
         let config = Config::default();
         let expected = BTreeSet::from([
             Selector::new("flex", &config).unwrap(),
@@ -67,11 +61,11 @@ mod tests {
         ]);
 
         let mut generator = EncreGenerator::from_config(config);
-        generator.scan_raw(
+        generator.scan(
             r#"<div class="flex w-full h-full absolute bg-blue-500 foo-bar sm:focus:ring hover:bg-black border-[#333] text-[color:var(--hello)]"></div>"#
         );
 
-        assert_eq!(expected, generator.scanned_selectors,);
+        assert_eq!(expected, generator.scanned_selectors);
     }
 
     #[test]
@@ -129,7 +123,6 @@ mod tests {
 
     #[test]
     fn gen_selector_css_arbitrary_value_test() {
-        // TODO: Support --en-bg-opacity in arbitrary values
         let mut generator = EncreGenerator::from_config(Config::default());
         generator.add_selector("w-[12px]");
         generator.add_selector("bg-[red]");
@@ -170,7 +163,6 @@ mod tests {
 
     #[test]
     fn gen_selector_css_arbitrary_value_hint_test() {
-        // TODO: Support --en-bg-opacity in arbitrary values
         let mut generator = EncreGenerator::from_config(Config::default());
         generator.add_selector("bg-[color:red]");
         generator.add_selector("hover:bg-[color:red]");
@@ -361,7 +353,7 @@ mod tests {
     #[test]
     fn default_modifier_values_for_rounded_test() {
         let mut generator = EncreGenerator::from_config(Config::default());
-        generator.scan_raw("rounded-tr rounded-tr-md rounded rounded-md rounded-t-sm rounded-bl-xl border-x border border-4 border-t-2");
+        generator.scan("rounded-tr rounded-tr-md rounded rounded-md rounded-t-sm rounded-bl-xl border-x border border-4 border-t-2");
 
         assert_eq!(
             generator.generate().unwrap(),
@@ -484,12 +476,11 @@ mod tests {
         screens.insert(Cow::from("3xl"), Cow::from("1600px"));
 
         let mut config = Config::default();
-        config.theme.colors = ColorConfig::from(colors);
-        config.theme.screens = ScreenConfig::from(screens);
-        config.modifier_separator = Cow::from("$").into();
+        config.theme.colors = colors;
+        config.theme.screens = screens;
 
         let mut generator = EncreGenerator::from_config(config);
-        generator.add_selector("3xl:text$rosa$500");
+        generator.add_selector("3xl:text-rosa-500");
 
         assert_eq!(
             generator.generate().unwrap(),
@@ -497,7 +488,7 @@ mod tests {
                 r#"{}
 
 @media (min-width: 1600px) {{
-  .\33xl\:text\$rosa\$500 {{
+  .\33xl\:text-rosa-500 {{
     --en-text-opacity: 1;
     color: rgb(229 24 106 / var(--en-text-opacity));
   }}
@@ -586,9 +577,9 @@ mod tests {
 
     #[test]
     fn arbitrary_values_test() {
+        let file_content = fs::read_to_string("tests/fixtures/arbitrary-values.html").unwrap();
         let mut generator = EncreGenerator::from_config(Config::default());
-        generator.scan_files(iter::once("tests/fixtures/arbitrary-values.html"));
+        generator.scan(&file_content);
         generator.generate().unwrap();
-        // TODO: Assert
     }
 }

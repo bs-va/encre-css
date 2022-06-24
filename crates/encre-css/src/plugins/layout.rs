@@ -1,9 +1,10 @@
-use super::Plugin;
-use crate::utils::{default_lengths, indent, value_matchers::*};
+use super::{to_css_value, Plugin};
+use crate::utils::{indent, length, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
 use std::fmt::{self, Write};
 
+#[derive(Debug)]
 pub struct PositionPlugin;
 
 impl Plugin for PositionPlugin {
@@ -33,6 +34,7 @@ impl Plugin for PositionPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct DisplayPlugin;
 
 impl Plugin for DisplayPlugin {
@@ -75,7 +77,7 @@ impl Plugin for DisplayPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "hidden" => writeln!(buffer, "display: none;")?,
                 "contents" => writeln!(buffer, "display: contents;")?,
                 "list-item" => writeln!(buffer, "display: list-item;")?,
@@ -106,6 +108,7 @@ impl Plugin for DisplayPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct VisibilityPlugin;
 
 impl Plugin for VisibilityPlugin {
@@ -125,7 +128,7 @@ impl Plugin for VisibilityPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "visible" => writeln!(buffer, "visibility: visible;")?,
                 "invisible" => writeln!(buffer, "visibility: hidden;")?,
                 _ => unreachable!(),
@@ -137,6 +140,7 @@ impl Plugin for VisibilityPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct IsolationPlugin;
 
 impl Plugin for IsolationPlugin {
@@ -156,7 +160,7 @@ impl Plugin for IsolationPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "isolate" => writeln!(buffer, "isolation: isolate;")?,
                 "isolation-auto" => writeln!(buffer, "isolation: auto;")?,
                 _ => unreachable!(),
@@ -171,10 +175,10 @@ impl Plugin for IsolationPlugin {
 pub fn position_can_handle(modifier: &Modifier) -> bool {
     match modifier {
         Modifier::Basic { is_negative, value } => {
-            default_lengths::get_extended(value, *is_negative).is_some()
+            length::get_extended(value, *is_negative).is_some()
         }
         Modifier::Arbitrary { value, .. } => {
-            is_matching_length(value) || is_matching_percentage(value) || value == "auto"
+            is_matching_length(value) || is_matching_percentage(value) || *value == "auto"
         }
     }
 }
@@ -193,11 +197,12 @@ pub fn position_handle(
                     buffer,
                     "{}: {};",
                     css_prop,
-                    default_lengths::get_extended(value, *is_negative).unwrap(),
+                    length::get_extended(value, *is_negative).unwrap(),
                 )?
             }
         }
         Modifier::Arbitrary { value, .. } => {
+            let value = to_css_value(value);
             for css_prop in css_properties {
                 indent(indentation, buffer)?;
                 writeln!(buffer, "{}: {};", css_prop, value)?;
@@ -208,6 +213,7 @@ pub fn position_handle(
     Ok(())
 }
 
+#[derive(Debug)]
 pub struct InsetPlugin;
 
 impl Plugin for InsetPlugin {
@@ -235,6 +241,7 @@ impl Plugin for InsetPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct InsetXPlugin;
 
 impl Plugin for InsetXPlugin {
@@ -257,6 +264,7 @@ impl Plugin for InsetXPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct InsetYPlugin;
 
 impl Plugin for InsetYPlugin {
@@ -279,6 +287,7 @@ impl Plugin for InsetYPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct TopPlugin;
 
 impl Plugin for TopPlugin {
@@ -301,6 +310,7 @@ impl Plugin for TopPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct BottomPlugin;
 
 impl Plugin for BottomPlugin {
@@ -323,6 +333,7 @@ impl Plugin for BottomPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct LeftPlugin;
 
 impl Plugin for LeftPlugin {
@@ -345,6 +356,7 @@ impl Plugin for LeftPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct RightPlugin;
 
 impl Plugin for RightPlugin {
@@ -367,6 +379,7 @@ impl Plugin for RightPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ZIndexPlugin;
 
 impl Plugin for ZIndexPlugin {
@@ -376,7 +389,7 @@ impl Plugin for ZIndexPlugin {
 
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok() || value == "auto",
+            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok() || *value == "auto",
             Modifier::Arbitrary { .. } => false,
         }
     }
@@ -399,6 +412,7 @@ impl Plugin for ZIndexPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ContainerPlugin;
 
 impl Plugin for ContainerPlugin {
@@ -424,7 +438,7 @@ impl Plugin for ContainerPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "none" => writeln!(buffer, "width: 100%;")?,
                 "sm" => writeln!(buffer, "max-width: 640px;")?,
                 "md" => writeln!(buffer, "max-width: 768px;")?,
@@ -440,6 +454,7 @@ impl Plugin for ContainerPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct BoxDecorationBreakPlugin;
 
 impl Plugin for BoxDecorationBreakPlugin {
@@ -471,6 +486,7 @@ impl Plugin for BoxDecorationBreakPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct BoxSizingPlugin;
 
 impl Plugin for BoxSizingPlugin {
@@ -502,6 +518,7 @@ impl Plugin for BoxSizingPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct FloatPlugin;
 
 impl Plugin for FloatPlugin {
@@ -533,6 +550,7 @@ impl Plugin for FloatPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ClearPlugin;
 
 impl Plugin for ClearPlugin {
@@ -564,6 +582,7 @@ impl Plugin for ClearPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ObjectFitPlugin;
 
 impl Plugin for ObjectFitPlugin {
@@ -597,6 +616,7 @@ impl Plugin for ObjectFitPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ObjectPositionPlugin;
 
 impl Plugin for ObjectPositionPlugin {
@@ -618,9 +638,7 @@ impl Plugin for ObjectPositionPlugin {
                 "top",
             ]
             .contains(&&**value),
-            Modifier::Arbitrary { hint, value } => {
-                hint == "list" || value.split('_').all(is_matching_position)
-            }
+            Modifier::Arbitrary { value, .. } => value.split('_').all(is_matching_position),
         }
     }
 
@@ -633,7 +651,7 @@ impl Plugin for ObjectPositionPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "bottom" => writeln!(buffer, "object-position: bottom;")?,
                 "center" => writeln!(buffer, "object-position: center;")?,
                 "left" => writeln!(buffer, "object-position: left;")?,
@@ -645,13 +663,16 @@ impl Plugin for ObjectPositionPlugin {
                 "top" => writeln!(buffer, "object-position: top;")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "object-position: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "object-position: {};", to_css_value(value))?
+            }
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
 pub struct OverflowPlugin;
 
 impl Plugin for OverflowPlugin {
@@ -689,7 +710,7 @@ impl Plugin for OverflowPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "auto" => writeln!(buffer, "overflow: auto;")?,
                 "x-auto" => writeln!(buffer, "overflow-x: auto;")?,
                 "y-auto" => writeln!(buffer, "overflow-y: auto;")?,
@@ -711,6 +732,7 @@ impl Plugin for OverflowPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct OverscrollPlugin;
 
 impl Plugin for OverscrollPlugin {
@@ -745,7 +767,7 @@ impl Plugin for OverscrollPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "auto" => writeln!(buffer, "overscroll-behavior: auto;")?,
                 "x-auto" => writeln!(buffer, "overscroll-behavior-x: auto;")?,
                 "y-auto" => writeln!(buffer, "overscroll-behavior-y: auto;")?,

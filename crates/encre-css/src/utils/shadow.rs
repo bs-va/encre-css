@@ -189,15 +189,11 @@ impl<'a> ShadowList<'a> {
 
 impl<'a> fmt::Display for ShadowList<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            self.0
-                .iter()
-                .map(|v| v.to_string())
-                .collect::<Vec<String>>()
-                .join(",")
-        )
+        for (i, v) in self.0.iter().enumerate() {
+            write!(f, "{}{}", v, if i != self.0.len() - 1 { "," } else { "" })?;
+        }
+
+        Ok(())
     }
 }
 

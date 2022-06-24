@@ -1,4 +1,4 @@
-use super::Plugin;
+use super::{to_css_value, Plugin};
 use crate::{
     config::Config,
     selector::Modifier,
@@ -11,6 +11,7 @@ const CSS_FILTER: &str = "filter: var(--en-blur) var(--en-brightness) var(--en-c
 const CSS_BACKDROP_FILTER_1: &str = "-webkit-backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);";
 const CSS_BACKDROP_FILTER_2: &str = "backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);";
 
+#[derive(Debug)]
 pub struct FilterPlugin;
 
 impl Plugin for FilterPlugin {
@@ -34,7 +35,7 @@ impl Plugin for FilterPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "" => writeln!(buffer, "{}", CSS_FILTER)?,
                 "none" => writeln!(buffer, "filter: none;")?,
                 _ => unreachable!(),
@@ -46,6 +47,7 @@ impl Plugin for FilterPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct BlurPlugin;
 
 impl Plugin for BlurPlugin {
@@ -71,7 +73,7 @@ impl Plugin for BlurPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "" => writeln!(buffer, "--en-blur: blur(8px);")?,
                 "sm" => writeln!(buffer, "--en-blur: blur(4px);")?,
                 "md" => writeln!(buffer, "--en-blur: blur(12px);")?,
@@ -82,7 +84,9 @@ impl Plugin for BlurPlugin {
                 "none" => writeln!(buffer, "--en-blur: blur(0);")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "--en-blur: blur({value});")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "--en-blur: blur({});", to_css_value(value))?
+            }
         }
 
         indent(indentation, buffer)?;
@@ -92,6 +96,7 @@ impl Plugin for BlurPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct BrightnessPlugin;
 
 impl Plugin for BrightnessPlugin {
@@ -131,6 +136,7 @@ impl Plugin for BrightnessPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ContrastPlugin;
 
 impl Plugin for ContrastPlugin {
@@ -170,6 +176,7 @@ impl Plugin for ContrastPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct DropShadowPlugin;
 
 impl Plugin for DropShadowPlugin {
@@ -195,7 +202,7 @@ impl Plugin for DropShadowPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "" => writeln!(buffer, "--en-drop-shadow: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));")?,
                 "sm" => writeln!(buffer, "--en-drop-shadow: drop-shadow(0 1px 1px rgb(0 0 0 / 0.05));")?,
                 "md" => writeln!(buffer, "--en-drop-shadow: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));")?,
@@ -205,7 +212,7 @@ impl Plugin for DropShadowPlugin {
                 "none" => writeln!(buffer, "--en-drop-shadow: drop-shadow(0 0 #0000);")?,
                 _ => unreachable!(),
             }
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "--en-drop-shadow: drop-shadow({value});")?,
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "--en-drop-shadow: drop-shadow({});", to_css_value(value))?,
         }
 
         indent(indentation, buffer)?;
@@ -215,6 +222,7 @@ impl Plugin for DropShadowPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct GrayscalePlugin;
 
 impl Plugin for GrayscalePlugin {
@@ -240,14 +248,16 @@ impl Plugin for GrayscalePlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "" => writeln!(buffer, "--en-grayscale: grayscale(100%);")?,
                 "0" => writeln!(buffer, "--en-grayscale: grayscale(0);")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "--en-grayscale: grayscale({value});")?
-            }
+            Modifier::Arbitrary { value, .. } => writeln!(
+                buffer,
+                "--en-grayscale: grayscale({});",
+                to_css_value(value)
+            )?,
         }
 
         indent(indentation, buffer)?;
@@ -257,6 +267,7 @@ impl Plugin for GrayscalePlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct HueRotatePlugin;
 
 impl Plugin for HueRotatePlugin {
@@ -286,9 +297,11 @@ impl Plugin for HueRotatePlugin {
                 format_negative(is_negative),
                 value
             )?,
-            Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "--en-hue-rotate: hue-rotate({value});")?
-            }
+            Modifier::Arbitrary { value, .. } => writeln!(
+                buffer,
+                "--en-hue-rotate: hue-rotate({});",
+                to_css_value(value)
+            )?,
         }
 
         indent(indentation, buffer)?;
@@ -298,6 +311,7 @@ impl Plugin for HueRotatePlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct InvertPlugin;
 
 impl Plugin for InvertPlugin {
@@ -323,12 +337,14 @@ impl Plugin for InvertPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "" => writeln!(buffer, "--en-invert: invert(100%);")?,
                 "0" => writeln!(buffer, "--en-invert: invert(0);")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "--en-invert: invert({value});")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "--en-invert: invert({});", to_css_value(value))?
+            }
         }
 
         indent(indentation, buffer)?;
@@ -338,6 +354,7 @@ impl Plugin for InvertPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct SaturatePlugin;
 
 impl Plugin for SaturatePlugin {
@@ -377,6 +394,7 @@ impl Plugin for SaturatePlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct SepiaPlugin;
 
 impl Plugin for SepiaPlugin {
@@ -402,12 +420,14 @@ impl Plugin for SepiaPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "" => writeln!(buffer, "--en-sepia: sepia(100%);")?,
                 "0" => writeln!(buffer, "--en-sepia: sepia(0);")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "--en-sepia: sepia({value});")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "--en-sepia: sepia({});", to_css_value(value))?
+            }
         }
 
         indent(indentation, buffer)?;
@@ -419,6 +439,7 @@ impl Plugin for SepiaPlugin {
 
 // Backdrop
 
+#[derive(Debug)]
 pub struct BackdropFilterPlugin;
 
 impl Plugin for BackdropFilterPlugin {
@@ -442,7 +463,7 @@ impl Plugin for BackdropFilterPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "" => {
                     writeln!(buffer, "{}", CSS_BACKDROP_FILTER_1)?;
                     indent(indentation, buffer)?;
@@ -458,6 +479,7 @@ impl Plugin for BackdropFilterPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct BackdropBlurPlugin;
 
 impl Plugin for BackdropBlurPlugin {
@@ -483,7 +505,7 @@ impl Plugin for BackdropBlurPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "" => writeln!(buffer, "--en-backdrop-blur: blur(8px);")?,
                 "sm" => writeln!(buffer, "--en-backdrop-blur: blur(4px);")?,
                 "md" => writeln!(buffer, "--en-backdrop-blur: blur(12px);")?,
@@ -495,7 +517,7 @@ impl Plugin for BackdropBlurPlugin {
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "--en-backdrop-blur: blur({value});")?
+                writeln!(buffer, "--en-backdrop-blur: blur({});", to_css_value(value))?
             }
         }
 
@@ -508,6 +530,7 @@ impl Plugin for BackdropBlurPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct BackdropBrightnessPlugin;
 
 impl Plugin for BackdropBrightnessPlugin {
@@ -549,6 +572,7 @@ impl Plugin for BackdropBrightnessPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct BackdropContrastPlugin;
 
 impl Plugin for BackdropContrastPlugin {
@@ -590,6 +614,7 @@ impl Plugin for BackdropContrastPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct BackdropGrayscalePlugin;
 
 impl Plugin for BackdropGrayscalePlugin {
@@ -615,14 +640,16 @@ impl Plugin for BackdropGrayscalePlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "" => writeln!(buffer, "--en-backdrop-grayscale: grayscale(100%);")?,
                 "0" => writeln!(buffer, "--en-backdrop-grayscale: grayscale(0);")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "--en-backdrop-grayscale: grayscale({value});")?
-            }
+            Modifier::Arbitrary { value, .. } => writeln!(
+                buffer,
+                "--en-backdrop-grayscale: grayscale({});",
+                to_css_value(value)
+            )?,
         }
 
         indent(indentation, buffer)?;
@@ -634,6 +661,7 @@ impl Plugin for BackdropGrayscalePlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct BackdropHueRotatePlugin;
 
 impl Plugin for BackdropHueRotatePlugin {
@@ -663,9 +691,11 @@ impl Plugin for BackdropHueRotatePlugin {
                 format_negative(is_negative),
                 value
             )?,
-            Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "--en-backdrop-hue-rotate: hue-rotate({value});")?
-            }
+            Modifier::Arbitrary { value, .. } => writeln!(
+                buffer,
+                "--en-backdrop-hue-rotate: hue-rotate({});",
+                to_css_value(value)
+            )?,
         }
 
         indent(indentation, buffer)?;
@@ -677,6 +707,7 @@ impl Plugin for BackdropHueRotatePlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct BackdropInvertPlugin;
 
 impl Plugin for BackdropInvertPlugin {
@@ -702,14 +733,16 @@ impl Plugin for BackdropInvertPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "" => writeln!(buffer, "--en-backdrop-invert: invert(100%);")?,
                 "0" => writeln!(buffer, "--en-backdrop-invert: invert(0);")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "--en-backdrop-invert: invert({value});")?
-            }
+            Modifier::Arbitrary { value, .. } => writeln!(
+                buffer,
+                "--en-backdrop-invert: invert({});",
+                to_css_value(value)
+            )?,
         }
 
         indent(indentation, buffer)?;
@@ -721,6 +754,7 @@ impl Plugin for BackdropInvertPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct BackdropOpacityPlugin;
 
 impl Plugin for BackdropOpacityPlugin {
@@ -757,6 +791,7 @@ impl Plugin for BackdropOpacityPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct BackdropSaturatePlugin;
 
 impl Plugin for BackdropSaturatePlugin {
@@ -798,6 +833,7 @@ impl Plugin for BackdropSaturatePlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct BackdropSepiaPlugin;
 
 impl Plugin for BackdropSepiaPlugin {
@@ -823,14 +859,16 @@ impl Plugin for BackdropSepiaPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "" => writeln!(buffer, "--en-backdrop-sepia: sepia(100%);")?,
                 "0" => writeln!(buffer, "--en-backdrop-sepia: sepia(0);")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "--en-backdrop-sepia: sepia({value});")?
-            }
+            Modifier::Arbitrary { value, .. } => writeln!(
+                buffer,
+                "--en-backdrop-sepia: sepia({});",
+                to_css_value(value)
+            )?,
         }
 
         indent(indentation, buffer)?;

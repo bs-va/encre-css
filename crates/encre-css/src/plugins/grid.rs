@@ -1,9 +1,10 @@
-use super::Plugin;
-use crate::utils::{default_lengths, indent, value_matchers::*};
+use super::{to_css_value, Plugin};
+use crate::utils::{indent, length, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
 use std::fmt::{self, Write};
 
+#[derive(Debug)]
 pub struct ColumnsPlugin;
 
 impl Plugin for ColumnsPlugin {
@@ -13,7 +14,7 @@ impl Plugin for ColumnsPlugin {
 
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok() || value == "none",
+            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok() || *value == "none",
             Modifier::Arbitrary { value, .. } => is_matching_all(value), // TODO: Better matching
         }
     }
@@ -28,7 +29,7 @@ impl Plugin for ColumnsPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => {
-                if value == "none" {
+                if *value == "none" {
                     return writeln!(buffer, "grid-template-columns: none;");
                 }
 
@@ -40,7 +41,7 @@ impl Plugin for ColumnsPlugin {
                 )?;
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "grid-template-columns: {value};")?
+                writeln!(buffer, "grid-template-columns: {};", to_css_value(value))?
             }
         }
 
@@ -48,6 +49,7 @@ impl Plugin for ColumnsPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct RowsPlugin;
 
 impl Plugin for RowsPlugin {
@@ -57,7 +59,7 @@ impl Plugin for RowsPlugin {
 
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok() || value == "none",
+            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok() || *value == "none",
             Modifier::Arbitrary { value, .. } => is_matching_all(value), // TODO: Better matching
         }
     }
@@ -72,7 +74,7 @@ impl Plugin for RowsPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => {
-                if value == "none" {
+                if *value == "none" {
                     return writeln!(buffer, "grid-template-rows: none;");
                 }
 
@@ -83,13 +85,16 @@ impl Plugin for RowsPlugin {
                     value.parse::<usize>().unwrap(),
                 )?;
             }
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "grid-template-rows: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "grid-template-rows: {};", to_css_value(value))?
+            }
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
 pub struct StartEndSpanColumnPlugin;
 
 impl Plugin for StartEndSpanColumnPlugin {
@@ -97,20 +102,20 @@ impl Plugin for StartEndSpanColumnPlugin {
         "col"
     }
 
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => {
-                value == "auto"
+                *value == "auto"
                     || value
-                        .strip_prefix(&format!("span{}", config.modifier_separator))
+                        .strip_prefix("span-")
                         .map(|v| v == "full" || v.parse::<usize>().is_ok())
                         .unwrap_or(false)
                     || value
-                        .strip_prefix(&format!("start{}", config.modifier_separator))
+                        .strip_prefix("start-")
                         .map(|v| v == "auto" || v.parse::<usize>().is_ok())
                         .unwrap_or(false)
                     || value
-                        .strip_prefix(&format!("end{}", config.modifier_separator))
+                        .strip_prefix("end-")
                         .map(|v| v == "auto" || v.parse::<usize>().is_ok())
                         .unwrap_or(false)
             }
@@ -128,7 +133,7 @@ impl Plugin for StartEndSpanColumnPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => {
-                if value == "auto" {
+                if *value == "auto" {
                     return writeln!(buffer, "grid-column: auto;");
                 }
 
@@ -155,13 +160,16 @@ impl Plugin for StartEndSpanColumnPlugin {
                     writeln!(buffer, "grid-column-end: {value};")?;
                 }
             }
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "grid-column: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "grid-column: {};", to_css_value(value))?
+            }
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
 pub struct StartEndSpanRowPlugin;
 
 impl Plugin for StartEndSpanRowPlugin {
@@ -169,20 +177,20 @@ impl Plugin for StartEndSpanRowPlugin {
         "row"
     }
 
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => {
-                value == "auto"
+                *value == "auto"
                     || value
-                        .strip_prefix(&format!("span{}", config.modifier_separator))
+                        .strip_prefix("span-")
                         .map(|v| v == "full" || v.parse::<usize>().is_ok())
                         .unwrap_or(false)
                     || value
-                        .strip_prefix(&format!("start{}", config.modifier_separator))
+                        .strip_prefix("start-")
                         .map(|v| v == "auto" || v.parse::<usize>().is_ok())
                         .unwrap_or(false)
                     || value
-                        .strip_prefix(&format!("end{}", config.modifier_separator))
+                        .strip_prefix("end-")
                         .map(|v| v == "auto" || v.parse::<usize>().is_ok())
                         .unwrap_or(false)
             }
@@ -200,7 +208,7 @@ impl Plugin for StartEndSpanRowPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => {
-                if value == "auto" {
+                if *value == "auto" {
                     return writeln!(buffer, "grid-row: auto;");
                 }
 
@@ -227,13 +235,16 @@ impl Plugin for StartEndSpanRowPlugin {
                     writeln!(buffer, "grid-row-end: {value};")?;
                 }
             }
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "grid-row: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "grid-row: {};", to_css_value(value))?
+            }
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
 pub struct AutoFlowPlugin;
 
 impl Plugin for AutoFlowPlugin {
@@ -259,7 +270,7 @@ impl Plugin for AutoFlowPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "row" => writeln!(buffer, "grid-auto-flow: row;")?,
                 "col" => writeln!(buffer, "grid-auto-flow: column;")?,
                 "row-dense" => writeln!(buffer, "grid-auto-flow: row dense;")?,
@@ -273,6 +284,7 @@ impl Plugin for AutoFlowPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct AutoColumnsPlugin;
 
 impl Plugin for AutoColumnsPlugin {
@@ -296,20 +308,23 @@ impl Plugin for AutoColumnsPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "auto" => writeln!(buffer, "grid-auto-columns: auto;")?,
                 "min" => writeln!(buffer, "grid-auto-columns: min-content;")?,
                 "max" => writeln!(buffer, "grid-auto-columns: max-content;")?,
                 "fr" => writeln!(buffer, "grid-auto-columns: minmax(0, 1fr);")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "grid-auto-columns: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "grid-auto-columns: {};", to_css_value(value))?
+            }
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
 pub struct AutoRowsPlugin;
 
 impl Plugin for AutoRowsPlugin {
@@ -333,20 +348,23 @@ impl Plugin for AutoRowsPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "auto" => writeln!(buffer, "grid-auto-rows: auto;")?,
                 "min" => writeln!(buffer, "grid-auto-rows: min-content;")?,
                 "max" => writeln!(buffer, "grid-auto-rows: max-content;")?,
                 "fr" => writeln!(buffer, "grid-auto-rows: minmax(0, 1fr);")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "grid-auto-rows: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "grid-auto-rows: {};", to_css_value(value))?
+            }
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
 pub struct GapPlugin;
 
 impl Plugin for GapPlugin {
@@ -357,7 +375,7 @@ impl Plugin for GapPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { is_negative, value } => {
-                default_lengths::get_basic(value, *is_negative).is_some()
+                length::get_basic(value, *is_negative).is_some()
             }
             Modifier::Arbitrary { value, .. } => is_matching_length(value),
         }
@@ -375,15 +393,16 @@ impl Plugin for GapPlugin {
             Modifier::Basic { is_negative, value } => writeln!(
                 buffer,
                 "gap: {};",
-                default_lengths::get_basic(value, *is_negative).unwrap()
+                length::get_basic(value, *is_negative).unwrap()
             )?,
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "gap: {value};")?,
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "gap: {};", to_css_value(value))?,
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
 pub struct GapXPlugin;
 
 impl Plugin for GapXPlugin {
@@ -394,7 +413,7 @@ impl Plugin for GapXPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { is_negative, value } => {
-                default_lengths::get_basic(value, *is_negative).is_some()
+                length::get_basic(value, *is_negative).is_some()
             }
             Modifier::Arbitrary { value, .. } => is_matching_length(value),
         }
@@ -412,15 +431,18 @@ impl Plugin for GapXPlugin {
             Modifier::Basic { is_negative, value } => writeln!(
                 buffer,
                 "column-gap: {};",
-                default_lengths::get_basic(value, *is_negative).unwrap()
+                length::get_basic(value, *is_negative).unwrap()
             )?,
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "column-gap: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "column-gap: {};", to_css_value(value))?
+            }
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
 pub struct GapYPlugin;
 
 impl Plugin for GapYPlugin {
@@ -431,7 +453,7 @@ impl Plugin for GapYPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { is_negative, value } => {
-                default_lengths::get_basic(value, *is_negative).is_some()
+                length::get_basic(value, *is_negative).is_some()
             }
             Modifier::Arbitrary { value, .. } => is_matching_length(value),
         }
@@ -449,9 +471,11 @@ impl Plugin for GapYPlugin {
             Modifier::Basic { is_negative, value } => writeln!(
                 buffer,
                 "row-gap: {};",
-                default_lengths::get_basic(value, *is_negative).unwrap()
+                length::get_basic(value, *is_negative).unwrap()
             )?,
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "row-gap: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "row-gap: {};", to_css_value(value))?
+            }
         }
 
         Ok(())

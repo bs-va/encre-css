@@ -1,7 +1,6 @@
 use clap::{Parser, Subcommand};
 use color_eyre::Report;
 use std::{env, path::PathBuf};
-use tracing_subscriber::EnvFilter;
 
 mod build;
 mod playground;
@@ -37,10 +36,6 @@ enum Commands {
         /// Watch for changes
         #[clap(short, long)]
         watch: bool,
-
-        /// Whether to display the time taken to generate the CSS
-        #[clap(long)]
-        display_time: bool,
     },
 }
 
@@ -59,15 +54,6 @@ fn main() -> Result<(), Report> {
 
     color_eyre::install()?;
 
-    // Enable tracing using the RUST_LOG environment variable
-    if env::var("RUST_LOG").is_err() {
-        env::set_var("RUST_LOG", "info");
-    }
-
-    tracing_subscriber::fmt::fmt()
-        .with_env_filter(EnvFilter::from_default_env())
-        .init();
-
     let args = Cli::parse();
 
     match args.command {
@@ -77,8 +63,7 @@ fn main() -> Result<(), Report> {
             input: extra_input,
             output,
             watch,
-            display_time,
-        } => build(config, extra_input, output, watch, display_time),
+        } => build(config, extra_input, output, watch),
     }
 
     Ok(())

@@ -1,7 +1,7 @@
 use std::fmt::{self, Write};
 
-pub mod default_colors;
-pub mod default_lengths;
+pub mod color;
+pub mod length;
 pub mod shadow;
 pub mod value_matchers;
 

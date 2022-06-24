@@ -1,9 +1,7 @@
-use super::Plugin;
-use crate::utils::{default_colors, indent, value_matchers::*};
+use super::{to_css_value, Plugin};
+use crate::utils::{color, indent, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
-use once_cell::sync::Lazy;
-use regex::Regex;
 use std::{
     borrow::Cow,
     fmt::{self, Write},
@@ -11,8 +9,7 @@ use std::{
 
 pub const CSS_FONT_VARIANT_NUMERIC: &str = "font-variant-numeric: var(--en-ordinal) var(--en-slashed-zero) var(--en-numeric-figure) var(--en-numeric-spacing) var(--en-numeric-fraction);";
 
-static START_WITH_INT_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"(?-u)^\d").unwrap());
-
+#[derive(Debug)]
 pub struct ColorPlugin;
 
 impl Plugin for ColorPlugin {
@@ -22,10 +19,10 @@ impl Plugin for ColorPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => {
-                default_colors::get(config, value, Some("--en-text-opacity")).is_some()
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+            Modifier::Arbitrary { hint, value } => {
+                *hint == "color" || (hint.is_empty() && is_matching_color(value))
             }
-            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
         }
     }
 
@@ -39,7 +36,7 @@ impl Plugin for ColorPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => {
-                let color = default_colors::get(config, value, Some("--en-text-opacity")).unwrap();
+                let color = color::get(config, value, Some("--en-text-opacity")).unwrap();
                 if color.contains("--en-text-opacity") {
                     writeln!(buffer, "--en-text-opacity: 1;")?;
                     indent(indentation, buffer)?;
@@ -47,13 +44,16 @@ impl Plugin for ColorPlugin {
 
                 writeln!(buffer, "color: {color};")?;
             }
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "color: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "color: {};", to_css_value(value))?
+            }
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
 pub struct OpacityPlugin;
 
 impl Plugin for OpacityPlugin {
@@ -90,6 +90,7 @@ impl Plugin for OpacityPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct FontFamilyPlugin;
 
 impl Plugin for FontFamilyPlugin {
@@ -101,7 +102,7 @@ impl Plugin for FontFamilyPlugin {
         match modifier {
             Modifier::Basic { value, .. } => ["sans", "serif", "mono"].contains(&&**value),
             Modifier::Arbitrary { value, .. } => {
-                value.split(',').all(|v| !START_WITH_INT_REGEX.is_match(v))
+                value.split(',').all(|v| v.parse::<usize>().is_err())
             }
         }
     }
@@ -115,7 +116,7 @@ impl Plugin for FontFamilyPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "sans" => writeln!(
                     buffer,
                     r#"font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";"#
@@ -136,7 +137,7 @@ impl Plugin for FontFamilyPlugin {
             Modifier::Arbitrary { value, .. } => writeln!(
                 buffer,
                 "font-family: {};",
-                value
+                to_css_value(value)
                     .split(',')
                     .map(|v| if v.trim().contains(' ') {
                         Cow::from(format!(r#""{}""#, v))
@@ -152,6 +153,7 @@ impl Plugin for FontFamilyPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct FontSizePlugin;
 
 impl Plugin for FontSizePlugin {
@@ -167,10 +169,11 @@ impl Plugin for FontSizePlugin {
             ]
             .contains(&&**value),
             Modifier::Arbitrary { hint, value } => {
-                hint == "length"
-                    || is_matching_length(value)
-                    || is_matching_absolute_size(value)
-                    || is_matching_relative_size(value)
+                *hint == "length"
+                    || (hint.is_empty()
+                        && (is_matching_length(value)
+                            || is_matching_absolute_size(value)
+                            || is_matching_relative_size(value)))
             }
         }
     }
@@ -184,7 +187,7 @@ impl Plugin for FontSizePlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "xs" => {
                     writeln!(buffer, "font-size: 0.75rem;")?;
                     indent(indentation, buffer)?;
@@ -252,13 +255,16 @@ impl Plugin for FontSizePlugin {
                 }
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "font-size: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "font-size: {};", to_css_value(value))?
+            }
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
 pub struct FontWeightPlugin;
 
 impl Plugin for FontWeightPlugin {
@@ -297,7 +303,7 @@ impl Plugin for FontWeightPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "thin" => writeln!(buffer, "font-weight: 100;")?,
                 "extralight" => writeln!(buffer, "font-weight: 200;")?,
                 "light" => writeln!(buffer, "font-weight: 300;")?,
@@ -309,13 +315,16 @@ impl Plugin for FontWeightPlugin {
                 "black" => writeln!(buffer, "font-weight: 900;")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "font-weight: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "font-weight: {};", to_css_value(value))?
+            }
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
 pub struct TextAlignmentPlugin;
 
 impl Plugin for TextAlignmentPlugin {
@@ -341,7 +350,7 @@ impl Plugin for TextAlignmentPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "left" => writeln!(buffer, "text-align: left;")?,
                 "center" => writeln!(buffer, "text-align: center;")?,
                 "right" => writeln!(buffer, "text-align: right;")?,
@@ -355,6 +364,7 @@ impl Plugin for TextAlignmentPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct TextTransformPlugin;
 
 impl Plugin for TextTransformPlugin {
@@ -376,7 +386,7 @@ impl Plugin for TextTransformPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "uppercase" => writeln!(buffer, "text-transform: uppercase;")?,
                 "lowercase" => writeln!(buffer, "text-transform: lowercase;")?,
                 "capitalize" => writeln!(buffer, "text-transform: capitalize;")?,
@@ -390,6 +400,7 @@ impl Plugin for TextTransformPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct TrackingPlugin;
 
 impl Plugin for TrackingPlugin {
@@ -401,7 +412,7 @@ impl Plugin for TrackingPlugin {
             Modifier::Basic { value, .. } => {
                 ["tighter", "tight", "normal", "wide", "wider", "widest"].contains(&&**value)
             }
-            Modifier::Arbitrary { value, .. } => value == "normal" || is_matching_length(value),
+            Modifier::Arbitrary { value, .. } => *value == "normal" || is_matching_length(value),
         }
     }
 
@@ -414,7 +425,7 @@ impl Plugin for TrackingPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "tighter" => writeln!(buffer, "letter-spacing: -0.05em;")?,
                 "tight" => writeln!(buffer, "letter-spacing: -0.025em;")?,
                 "normal" => writeln!(buffer, "letter-spacing: 0;")?,
@@ -423,13 +434,16 @@ impl Plugin for TrackingPlugin {
                 "widest" => writeln!(buffer, "letter-spacing: 0.1em;")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "letter-spacing: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "letter-spacing: {};", to_css_value(value))?
+            }
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
 pub struct LeadingPlugin;
 
 impl Plugin for LeadingPlugin {
@@ -445,7 +459,7 @@ impl Plugin for LeadingPlugin {
             .contains(&&**value),
             // https://developer.mozilla.org/en-US/docs/Web/CSS/line-height#values
             Modifier::Arbitrary { value, .. } => {
-                value == "normal"
+                *value == "normal"
                     || is_matching_float(value)
                     || is_matching_length(value)
                     || is_matching_percentage(value)
@@ -462,7 +476,7 @@ impl Plugin for LeadingPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "none" => writeln!(buffer, "line-height: 1;")?,
                 "tight" => writeln!(buffer, "line-height: 1.25;")?,
                 "snug" => writeln!(buffer, "line-height: 1.375;")?,
@@ -479,13 +493,16 @@ impl Plugin for LeadingPlugin {
                 "10" => writeln!(buffer, "line-height: 2.5rem;")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "line-height: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "line-height: {};", to_css_value(value))?
+            }
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
 pub struct ItalicPlugin;
 
 impl Plugin for ItalicPlugin {
@@ -505,7 +522,7 @@ impl Plugin for ItalicPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "italic" => writeln!(buffer, "font-style: italic;")?,
                 "no-italic" => writeln!(buffer, "font-style: normal;")?,
                 _ => unreachable!(),
@@ -517,13 +534,14 @@ impl Plugin for ItalicPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct TextDecorationPlugin;
 
 impl Plugin for TextDecorationPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => {
-                ["underline", "overline", "line-through", "no-underline"].contains(&value.as_str())
+                ["underline", "overline", "line-through", "no-underline"].contains(value)
             }
             Modifier::Arbitrary { .. } => false,
         }
@@ -551,6 +569,7 @@ impl Plugin for TextDecorationPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct TextDecorationColorPlugin;
 
 impl Plugin for TextDecorationColorPlugin {
@@ -560,8 +579,10 @@ impl Plugin for TextDecorationColorPlugin {
 
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value, None).is_some(),
-            Modifier::Arbitrary { hint, value } => hint == "color" || is_matching_color(value),
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+            Modifier::Arbitrary { hint, value } => {
+                *hint == "color" || (hint.is_empty() && is_matching_color(value))
+            }
         }
     }
 
@@ -574,8 +595,8 @@ impl Plugin for TextDecorationColorPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         let value = match modifier {
-            Modifier::Basic { value, .. } => default_colors::get(config, value, None).unwrap(),
-            Modifier::Arbitrary { value, .. } => Cow::from(&**value),
+            Modifier::Basic { value, .. } => color::get(config, value, None).unwrap(),
+            Modifier::Arbitrary { value, .. } => to_css_value(*value),
         };
 
         writeln!(buffer, "-webkit-text-decoration-color: {value};")?;
@@ -584,6 +605,7 @@ impl Plugin for TextDecorationColorPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct TextDecorationStylePlugin;
 
 impl Plugin for TextDecorationStylePlugin {
@@ -617,6 +639,7 @@ impl Plugin for TextDecorationStylePlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct TextDecorationThicknessPlugin;
 
 impl Plugin for TextDecorationThicknessPlugin {
@@ -629,11 +652,11 @@ impl Plugin for TextDecorationThicknessPlugin {
                 ["auto", "from-font"].contains(&&**value) || value.parse::<usize>().is_ok()
             }
             Modifier::Arbitrary { hint, value } => {
-                hint == "length"
-                    || hint == "percentage"
-                    || ["auto", "from-font"].contains(&&**value)
-                    || is_matching_length(value)
-                    || is_matching_percentage(value)
+                *hint == "length"
+                    || (hint.is_empty()
+                        && (["auto", "from-font"].contains(&&**value)
+                            || is_matching_length(value)
+                            || is_matching_percentage(value)))
             }
         }
     }
@@ -655,15 +678,18 @@ impl Plugin for TextDecorationThicknessPlugin {
                 // NOTE: Not-compatible with TailwindCSS, support all values
                 writeln!(buffer, "text-decoration-thickness: {value}px;")?;
             }
-            Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "text-decoration-thickness: {value};")?
-            }
+            Modifier::Arbitrary { value, .. } => writeln!(
+                buffer,
+                "text-decoration-thickness: {};",
+                to_css_value(value)
+            )?,
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
 pub struct TextDecorationOffsetPlugin;
 
 impl Plugin for TextDecorationOffsetPlugin {
@@ -673,13 +699,9 @@ impl Plugin for TextDecorationOffsetPlugin {
 
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok() || value == "auto",
-            Modifier::Arbitrary { hint, value } => {
-                hint == "length"
-                    || hint == "percentage"
-                    || value == "auto"
-                    || is_matching_length(value)
-                    || is_matching_percentage(value)
+            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok() || *value == "auto",
+            Modifier::Arbitrary { value, .. } => {
+                *value == "auto" || is_matching_length(value) || is_matching_percentage(value)
             }
         }
     }
@@ -694,7 +716,7 @@ impl Plugin for TextDecorationOffsetPlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => {
-                if value == "auto" {
+                if *value == "auto" {
                     return writeln!(buffer, "text-underline-offset: auto;");
                 }
 
@@ -702,7 +724,7 @@ impl Plugin for TextDecorationOffsetPlugin {
                 writeln!(buffer, "text-underline-offset: {value}px;")?;
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "text-underline-offset: {value};")?
+                writeln!(buffer, "text-underline-offset: {};", to_css_value(value))?
             }
         }
 
@@ -710,6 +732,7 @@ impl Plugin for TextDecorationOffsetPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ContentPlugin;
 
 impl Plugin for ContentPlugin {
@@ -719,7 +742,7 @@ impl Plugin for ContentPlugin {
 
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => value == "none",
+            Modifier::Basic { value, .. } => *value == "none",
             Modifier::Arbitrary { value, .. } => is_matching_all(value),
         }
     }
@@ -741,7 +764,7 @@ impl Plugin for ContentPlugin {
             Modifier::Arbitrary { value, .. } => {
                 // NOTE: Not-compatible with TailwindCSS, it is not needed to add quotes to `content`
                 // containing spaces, they are added later
-                writeln!(buffer, "--en-content: \"{value}\";")?;
+                writeln!(buffer, "--en-content: \"{}\";", to_css_value(value))?;
                 indent(indentation, buffer)?;
                 writeln!(buffer, "content: var(--en-content);")?;
             }
@@ -751,6 +774,7 @@ impl Plugin for ContentPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct FontVariantNumericPlugin;
 
 impl Plugin for FontVariantNumericPlugin {
@@ -781,7 +805,7 @@ impl Plugin for FontVariantNumericPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "normal-nums" => return writeln!(buffer, "font-variant-numeric: normal;"),
                 "ordinal" => writeln!(buffer, "--en-ordinal: ordinal;")?,
                 "slashed-zero" => writeln!(buffer, "--en-slashed-zero: slashed-zero;")?,
@@ -809,6 +833,7 @@ impl Plugin for FontVariantNumericPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct FontSmoothingPlugin;
 
 impl Plugin for FontSmoothingPlugin {
@@ -830,7 +855,7 @@ impl Plugin for FontSmoothingPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "antialised" => {
                     writeln!(buffer, "-webkit-font-smoothing: antialiased;")?;
                     indent(indentation, buffer)?;
@@ -850,6 +875,7 @@ impl Plugin for FontSmoothingPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct ListStyleTypePlugin;
 
 impl Plugin for ListStyleTypePlugin {
@@ -874,13 +900,16 @@ impl Plugin for ListStyleTypePlugin {
         indent(indentation, buffer)?;
         match modifier {
             Modifier::Basic { value, .. } => writeln!(buffer, "list-style-type: {value};")?,
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "list-style-type: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "list-style-type: {};", to_css_value(value))?
+            }
         }
 
         Ok(())
     }
 }
 
+#[derive(Debug)]
 pub struct ListStylePositionPlugin;
 
 impl Plugin for ListStylePositionPlugin {
@@ -912,6 +941,7 @@ impl Plugin for ListStylePositionPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct VerticalAlignPlugin;
 
 impl Plugin for VerticalAlignPlugin {
@@ -953,6 +983,7 @@ impl Plugin for VerticalAlignPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct TextOverflowPlugin;
 
 impl Plugin for TextOverflowPlugin {
@@ -974,7 +1005,7 @@ impl Plugin for TextOverflowPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "truncate" => {
                     writeln!(buffer, "overflow: hidden;")?;
                     indent(indentation, buffer)?;
@@ -993,6 +1024,7 @@ impl Plugin for TextOverflowPlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct WhitespacePlugin;
 
 impl Plugin for WhitespacePlugin {
@@ -1026,6 +1058,7 @@ impl Plugin for WhitespacePlugin {
     }
 }
 
+#[derive(Debug)]
 pub struct WordBreakPlugin;
 
 impl Plugin for WordBreakPlugin {
@@ -1049,7 +1082,7 @@ impl Plugin for WordBreakPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match value.as_str() {
+            Modifier::Basic { value, .. } => match *value {
                 "normal" => {
                     writeln!(buffer, "overflow-wrap: normal;")?;
                     indent(indentation, buffer)?;
