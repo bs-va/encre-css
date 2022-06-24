@@ -305,6 +305,7 @@ mod tests {
         generator.add_selector("-translate-x-52");
         generator.add_selector("-mb-8");
         generator.add_selector("-hue-rotate-60");
+        generator.add_selector("hover:-hue-rotate-60");
 
         assert_eq!(
             generator.generate().unwrap(),
@@ -323,6 +324,11 @@ mod tests {
 .-translate-x-52 {{
   --en-translate-x: -13rem;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
+}}
+
+.hover\:-hue-rotate-60:hover {{
+  --en-hue-rotate: hue-rotate(-60deg);
+  filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
 }}"#,
                 preflight::ENCRE_PREFLIGHT_CSS
             )

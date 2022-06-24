@@ -232,25 +232,11 @@ pub struct Selector<'a> {
     pub(crate) modifier: Modifier<'a>,
     pub(crate) variants: &'a str,
     pub(crate) is_important: bool,
-    pub(crate) is_negative: bool,
     pub(crate) plugin: &'static (dyn Plugin + Sync + Send),
 }
 
 impl<'a> Selector<'a> {
-    pub fn new(mut full: &'a str, config: &Config) -> Option<Self> {
-        // Strip the important flag before the negative one
-        let mut is_important = false;
-        if full.starts_with('!') {
-            full = &full[1..];
-            is_important = true;
-        }
-
-        let mut is_negative = false;
-        if full.starts_with('-') {
-            full = &full[1..];
-            is_negative = true;
-        }
-
+    pub fn new(full: &'a str, config: &Config) -> Option<Self> {
         // We need to ignore all characters in arbitrary values (wrapped in `[]`) and we know that
         // nothing interesting is placed after them, so we can just split by `[` and take the first
         // value
@@ -260,11 +246,24 @@ impl<'a> Selector<'a> {
         };
 
         // The selector without variants is the remaining part of the list of variants
-        let content = if variants.is_empty() {
+        let mut content = if variants.is_empty() {
             full
         } else {
             full.strip_prefix(variants)?.strip_prefix(':')?
         };
+
+        // Strip the important flag before the negative one
+        let mut is_important = false;
+        if content.starts_with('!') {
+            content = &content[1..];
+            is_important = true;
+        }
+
+        let mut is_negative = false;
+        if content.starts_with('-') {
+            content = &content[1..];
+            is_negative = true;
+        }
 
         // Find the right plugin for handling this selector
         let find_fn = |plugin: &&'static (dyn Plugin + Send + Sync)| {
@@ -322,7 +321,6 @@ impl<'a> Selector<'a> {
                 variants,
                 modifier: result.1,
                 is_important,
-                is_negative,
                 plugin: result.0,
             })
         } else {

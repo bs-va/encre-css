@@ -155,10 +155,6 @@ impl<'a> EncreGenerator<'a> {
             // Class
             write!(buffer, ".")?;
 
-            if selector.is_negative {
-                write!(buffer, "-")?;
-            }
-
             selector.full.chars().enumerate().try_for_each(|(i, ch)| {
                 if i == 0 {
                     if ch.is_numeric() {
