@@ -55,11 +55,11 @@ pub fn get<'a>(
 ) -> Option<Cow<'a, str>> {
     // Handle the new opacity syntax (e.g. `bg-red-500/25`)
     let (mut opacity_from_syntax, modifier) = {
-        // The `current` and `inherit` modifiers cannot have their opacity changed
+        // The `current` and `inherit` modifiers have static values
         if modifier == "current" {
-            (None, "currentColor")
+            return Some(Cow::from("currentColor"));
         } else if modifier == "inherit" {
-            (None, "inherit")
+            return Some(Cow::from("inherit"));
         } else if let Some((new_modifier, opacity_suffix)) = modifier.split_once('/') {
             if let Ok(opacity_number) = opacity_suffix.parse::<usize>() {
                 (Some(opacity_number as f32 / 100.), new_modifier)
