@@ -195,14 +195,43 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, output: Opti
                         }
                     });
 
+                    let extra_input_files = if let Some(ref extra_input) = extra_input {
+                        let (prefix, glob) = match Glob::new(
+                            extra_input
+                                .as_ref()
+                                .to_str()
+                                .expect("failed to convert the glob to a string"),
+                        ) {
+                            Ok(g) => g.partition(),
+                            Err(e) => panic!("{}", e),
+                        };
+
+                        if prefix == extra_input.as_ref() {
+                            Some(
+                                iter::once(extra_input.as_ref().to_path_buf())
+                                    .collect::<Vec<PathBuf>>(),
+                            )
+                        } else {
+                            Some(
+                                glob.walk(prefix)
+                                    .map(|e| e.unwrap().into_path())
+                                    .collect::<Vec<PathBuf>>(),
+                            )
+                        }
+                    } else {
+                        None
+                    };
+
                     // Check that the changed file is watched
                     if files.any(|file_path| {
                         result_equal(file_path.canonicalize(), PathBuf::from(path).canonicalize())
-                    }) || extra_input.is_some()
-                        && result_equal(
-                            extra_input.as_ref().unwrap().as_ref().canonicalize(),
-                            PathBuf::from(path).canonicalize(),
-                        )
+                    }) || (extra_input_files.is_some()
+                        && extra_input_files.unwrap().iter().any(|file_path| {
+                            result_equal(
+                                file_path.canonicalize(),
+                                PathBuf::from(path).canonicalize(),
+                            )
+                        }))
                     {
                         println!("Changes detected. Reloading…");
                         need_reloading = true;
