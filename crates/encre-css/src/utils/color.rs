@@ -98,15 +98,13 @@ pub fn get<'a>(
             rgb_result[0],
             rgb_result[1],
             rgb_result[2],
-            if let Some(opacity) = opacity {
-                if let Some(opacity_from_syntax) = opacity_from_syntax {
-                    Cow::from(format!(" / {}", opacity_from_syntax))
-                } else {
-                    Cow::from(format!(" / var({})", opacity))
-                }
+            if let Some(opacity_from_syntax) = opacity_from_syntax {
+                Cow::from(format!(" / {}", opacity_from_syntax))
+            } else if let Some(opacity) = opacity {
+                Cow::from(format!(" / var({})", opacity))
             } else {
                 Cow::from("")
-            },
+            }
         ))
     })
 }
