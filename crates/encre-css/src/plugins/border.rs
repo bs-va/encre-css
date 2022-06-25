@@ -6,6 +6,47 @@ use std::fmt::{self, Write};
 
 const CSS_RING_OFFSET_SHADOW: &str = "--en-ring-offset-shadow: var(--en-ring-inset) 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color);";
 
+pub fn color_can_handle(config: &Config, modifier: &Modifier) -> bool {
+    match modifier {
+        Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+        Modifier::Arbitrary { hint, value, .. } => {
+            *hint == "color" || (hint.is_empty() && is_matching_color(value))
+        }
+    }
+}
+
+pub fn color_handle(
+    config: &Config,
+    css_props: &[&str],
+    modifier: &Modifier,
+    indentation: usize,
+    buffer: &mut String,
+) -> fmt::Result {
+    indent(indentation, buffer)?;
+    match modifier {
+        Modifier::Basic { value, .. } => {
+            let color = color::get(config, value, Some("--en-border-opacity")).unwrap();
+            if color.contains("--en-border-opacity") {
+                writeln!(buffer, "--en-border-opacity: 1;")?;
+                indent(indentation, buffer)?;
+            }
+
+            for css_prop in css_props {
+                writeln!(buffer, "{css_prop}: {color};")?;
+            }
+        }
+        Modifier::Arbitrary { value, .. } => {
+            let value = to_css_value(value);
+
+            for css_prop in css_props {
+                writeln!(buffer, "{css_prop}: {value};")?
+            }
+        }
+    }
+
+    Ok(())
+}
+
 #[derive(Debug)]
 pub struct ColorPlugin;
 
@@ -17,8 +58,14 @@ impl Plugin for ColorPlugin {
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
-            Modifier::Arbitrary { hint, value } => {
-                *hint == "color" || (hint.is_empty() && is_matching_color(value))
+            Modifier::Arbitrary {
+                prefix,
+                hint,
+                value,
+                ..
+            } => {
+                prefix.is_empty()
+                    && (*hint == "color" || (hint.is_empty() && is_matching_color(value)))
             }
         }
     }
@@ -30,23 +77,175 @@ impl Plugin for ColorPlugin {
         indentation: usize,
         buffer: &mut String,
     ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => {
-                let color = color::get(config, value, Some("--en-border-opacity")).unwrap();
-                if color.contains("--en-border-opacity") {
-                    writeln!(buffer, "--en-border-opacity: 1;")?;
-                    indent(indentation, buffer)?;
-                }
+        color_handle(config, &["border-color"], modifier, indentation, buffer)
+    }
+}
 
-                writeln!(buffer, "border-color: {color};")?;
-            }
-            Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "border-color: {};", to_css_value(value))?
-            }
-        }
+#[derive(Debug)]
+pub struct ColorXPlugin;
 
-        Ok(())
+impl Plugin for ColorXPlugin {
+    fn namespace(&self) -> &str {
+        "border-x"
+    }
+
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        color_can_handle(config, modifier)
+    }
+
+    fn handle(
+        &self,
+        config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        color_handle(
+            config,
+            &["border-left-color", "border-right-color"],
+            modifier,
+            indentation,
+            buffer,
+        )
+    }
+}
+
+#[derive(Debug)]
+pub struct ColorYPlugin;
+
+impl Plugin for ColorYPlugin {
+    fn namespace(&self) -> &str {
+        "border-y"
+    }
+
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        color_can_handle(config, modifier)
+    }
+
+    fn handle(
+        &self,
+        config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        color_handle(
+            config,
+            &["border-top-color", "border-bottom-color"],
+            modifier,
+            indentation,
+            buffer,
+        )
+    }
+}
+
+#[derive(Debug)]
+pub struct ColorLeftPlugin;
+
+impl Plugin for ColorLeftPlugin {
+    fn namespace(&self) -> &str {
+        "border-l"
+    }
+
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        color_can_handle(config, modifier)
+    }
+
+    fn handle(
+        &self,
+        config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        color_handle(
+            config,
+            &["border-left-color"],
+            modifier,
+            indentation,
+            buffer,
+        )
+    }
+}
+
+#[derive(Debug)]
+pub struct ColorRightPlugin;
+
+impl Plugin for ColorRightPlugin {
+    fn namespace(&self) -> &str {
+        "border-r"
+    }
+
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        color_can_handle(config, modifier)
+    }
+
+    fn handle(
+        &self,
+        config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        color_handle(
+            config,
+            &["border-right-color"],
+            modifier,
+            indentation,
+            buffer,
+        )
+    }
+}
+
+#[derive(Debug)]
+pub struct ColorTopPlugin;
+
+impl Plugin for ColorTopPlugin {
+    fn namespace(&self) -> &str {
+        "border-t"
+    }
+
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        color_can_handle(config, modifier)
+    }
+
+    fn handle(
+        &self,
+        config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        color_handle(config, &["border-top-color"], modifier, indentation, buffer)
+    }
+}
+
+#[derive(Debug)]
+pub struct ColorBottomPlugin;
+
+impl Plugin for ColorBottomPlugin {
+    fn namespace(&self) -> &str {
+        "border-b"
+    }
+
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        color_can_handle(config, modifier)
+    }
+
+    fn handle(
+        &self,
+        config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        color_handle(
+            config,
+            &["border-bottom-color"],
+            modifier,
+            indentation,
+            buffer,
+        )
     }
 }
 
@@ -100,6 +299,40 @@ pub fn radius_handle(
     }
 
     Ok(())
+}
+
+#[derive(Debug)]
+pub struct RadiusPlugin;
+
+impl Plugin for RadiusPlugin {
+    fn namespace(&self) -> &str {
+        "rounded"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                value.is_empty()
+                    || ["sm", "md", "lg", "xl", "2xl", "3xl", "full", "none"].contains(&&**value)
+            }
+            Modifier::Arbitrary { prefix, value, .. } => {
+                prefix.is_empty()
+                    && value
+                        .split('_')
+                        .all(|v| is_matching_length(v) || is_matching_percentage(v))
+            }
+        }
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        radius_handle(&["border-radius"], modifier, indentation, buffer)
+    }
 }
 
 #[derive(Debug)]
@@ -317,29 +550,6 @@ impl Plugin for RadiusRightPlugin {
 }
 
 #[derive(Debug)]
-pub struct RadiusPlugin;
-
-impl Plugin for RadiusPlugin {
-    fn namespace(&self) -> &str {
-        "rounded"
-    }
-
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        radius_can_handle(modifier)
-    }
-
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        radius_handle(&["border-radius"], modifier, indentation, buffer)
-    }
-}
-
-#[derive(Debug)]
 pub struct StylePlugin;
 
 impl Plugin for StylePlugin {
@@ -376,8 +586,9 @@ impl Plugin for StylePlugin {
 pub fn width_can_handle(modifier: &Modifier) -> bool {
     match modifier {
         Modifier::Basic { value, .. } => value.is_empty() || value.parse::<usize>().is_ok(),
-        Modifier::Arbitrary { hint, value } => {
-            *hint == "length" || (hint.is_empty() && is_matching_length(value))
+        Modifier::Arbitrary { hint, value, .. } => {
+            *hint == "length"
+                || (hint.is_empty() && (is_matching_length(value) || is_matching_line_width(value)))
         }
     }
 }
@@ -411,6 +622,43 @@ pub fn width_handle(
     }
 
     Ok(())
+}
+
+#[derive(Debug)]
+pub struct WidthPlugin;
+
+impl Plugin for WidthPlugin {
+    fn namespace(&self) -> &str {
+        "border"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => value.is_empty() || value.parse::<usize>().is_ok(),
+            Modifier::Arbitrary {
+                prefix,
+                hint,
+                value,
+                ..
+            } => {
+                prefix.is_empty()
+                    && (*hint == "length"
+                        || (hint.is_empty()
+                            && (is_matching_length(value) || is_matching_line_width(value))))
+            }
+        }
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        // NOTE: Not-compatible with TailwindCSS, support all values
+        width_handle(&["border-width"], modifier, indentation, buffer)
+    }
 }
 
 #[derive(Debug)]
@@ -562,30 +810,6 @@ impl Plugin for WidthYPlugin {
 }
 
 #[derive(Debug)]
-pub struct WidthPlugin;
-
-impl Plugin for WidthPlugin {
-    fn namespace(&self) -> &str {
-        "border"
-    }
-
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        width_can_handle(modifier)
-    }
-
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        // NOTE: Not-compatible with TailwindCSS, support all values
-        width_handle(&["border-width"], modifier, indentation, buffer)
-    }
-}
-
-#[derive(Debug)]
 pub struct OpacityPlugin;
 
 impl Plugin for OpacityPlugin {
@@ -633,7 +857,7 @@ impl Plugin for DivideColorPlugin {
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
-            Modifier::Arbitrary { hint, value } => {
+            Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "color" || (hint.is_empty() && is_matching_color(value))
             }
         }
@@ -671,7 +895,7 @@ pub fn divide_width_can_handle(modifier: &Modifier) -> bool {
         Modifier::Basic { value, .. } => {
             value.is_empty() || *value == "reverse" || value.parse::<usize>().is_ok()
         }
-        Modifier::Arbitrary { hint, value } => {
+        Modifier::Arbitrary { hint, value, .. } => {
             *hint == "length"
                 || (hint.is_empty() && (is_matching_length(value) || is_matching_line_width(value)))
         }
@@ -921,7 +1145,7 @@ impl Plugin for RingColorPlugin {
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
-            Modifier::Arbitrary { hint, value } => {
+            Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "color" || (hint.is_empty() && is_matching_color(value))
             }
         }
@@ -967,7 +1191,7 @@ impl Plugin for RingWidthPlugin {
             Modifier::Basic { value, .. } => {
                 value.is_empty() || *value == "inset" || value.parse::<usize>().is_ok()
             }
-            Modifier::Arbitrary { hint, value } => {
+            Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "length" || (hint.is_empty() && is_matching_length(value))
             }
         }
@@ -1048,7 +1272,7 @@ impl Plugin for RingOffsetColorPlugin {
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
-            Modifier::Arbitrary { hint, value } => {
+            Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "color" || (hint.is_empty() && is_matching_color(value))
             }
         }
@@ -1085,7 +1309,7 @@ impl Plugin for RingOffsetWidthPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
-            Modifier::Arbitrary { hint, value } => {
+            Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "length" || (hint.is_empty() && is_matching_length(value))
             }
         }
@@ -1124,7 +1348,7 @@ impl Plugin for OutlineColorPlugin {
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
-            Modifier::Arbitrary { hint, value } => {
+            Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "color" || (hint.is_empty() && is_matching_color(value))
             }
         }
@@ -1158,7 +1382,7 @@ impl Plugin for OutlineWidthPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
-            Modifier::Arbitrary { hint, value } => {
+            Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "length" || (hint.is_empty() && is_matching_length(value))
             }
         }

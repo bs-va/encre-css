@@ -469,7 +469,11 @@ impl Plugin for BackdropFilterPlugin {
                     indent(indentation, buffer)?;
                     writeln!(buffer, "{}", CSS_BACKDROP_FILTER_2)?;
                 }
-                "none" => writeln!(buffer, "filter: none;")?,
+                "none" => {
+                    writeln!(buffer, "-webkit-backdrop-filter: none;")?;
+                    indent(indentation, buffer)?;
+                    writeln!(buffer, "backdrop-filter: none;")?;
+                }
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),

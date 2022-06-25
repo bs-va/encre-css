@@ -35,9 +35,9 @@ impl Plugin for ScreenReaderPlugin {
                     indent(indentation, buffer)?;
                     writeln!(buffer, "margin: -1px;")?;
                     indent(indentation, buffer)?;
-                    writeln!(buffer, "overflow: hidden")?;
+                    writeln!(buffer, "overflow: hidden;")?;
                     indent(indentation, buffer)?;
-                    writeln!(buffer, "clip: rect(0, 0, 0, 0)")?;
+                    writeln!(buffer, "clip: rect(0, 0, 0, 0);")?;
                     indent(indentation, buffer)?;
                     writeln!(buffer, "white-space: nowrap;")?;
                     indent(indentation, buffer)?;

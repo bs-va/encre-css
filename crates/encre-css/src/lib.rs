@@ -135,20 +135,20 @@ mod tests {
             format!(
                 r#"{}
 
-.bg-\[red\] {{
-  background-color: red;
-}}
-
-.bg-\[url\(\'\.\.\/img\/image_with_underscores\.png\'\)\] {{
-  background-image: url('../img/image_with_underscores.png');
-}}
-
 .mt-\[calc\(100\%-10px\)\] {{
   margin-top: calc(100% - 10px);
 }}
 
 .w-\[12px\] {{
   width: 12px;
+}}
+
+.bg-\[red\] {{
+  background-color: red;
+}}
+
+.bg-\[url\(\'\.\.\/img\/image_with_underscores\.png\'\)\] {{
+  background-image: url('../img/image_with_underscores.png');
 }}
 
 @media (min-width: 1536px) {{
@@ -265,6 +265,13 @@ mod tests {
   }}
 }}
 
+@media (min-width: 640px) {{
+  .sm\:hover\:bg-red-400:hover {{
+    --en-bg-opacity: 1;
+    background-color: rgb(248 113 113 / var(--en-bg-opacity));
+  }}
+}}
+
 @media print {{
   @media (min-width: 1280px) {{
     [dir="ltr"] .print\:ltr\:xl\:hover\:focus\:active\:text-yellow-300:active:focus:hover {{
@@ -286,13 +293,6 @@ mod tests {
     --en-content: "Hello world!";
     content: var(--en-content);
   }}
-}}
-
-@media (min-width: 640px) {{
-  .sm\:hover\:bg-red-400:hover {{
-    --en-bg-opacity: 1;
-    background-color: rgb(248 113 113 / var(--en-bg-opacity));
-  }}
 }}"#,
                 preflight::ENCRE_PREFLIGHT_CSS
             )
@@ -312,11 +312,6 @@ mod tests {
             format!(
                 r#"{}
 
-.-hue-rotate-60 {{
-  --en-hue-rotate: hue-rotate(-60deg);
-  filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
-}}
-
 .-mb-8 {{
   margin-bottom: -2rem;
 }}
@@ -324,6 +319,11 @@ mod tests {
 .-translate-x-52 {{
   --en-translate-x: -13rem;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
+}}
+
+.-hue-rotate-60 {{
+  --en-hue-rotate: hue-rotate(-60deg);
+  filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
 }}
 
 .hover\:-hue-rotate-60:hover {{
@@ -366,29 +366,8 @@ mod tests {
             format!(
                 r#"{}
 
-.border {{
-  border-width: 1px;
-}}
-
-.border-4 {{
-  border-width: 4px;
-}}
-
-.border-t-2 {{
-  border-top-width: 2px;
-}}
-
-.border-x {{
-  border-left-width: 1px;
-  border-right-width: 1px;
-}}
-
 .rounded {{
   border-radius: 0.25rem;
-}}
-
-.rounded-bl-xl {{
-  border-bottom-left-radius: 0.75rem;
 }}
 
 .rounded-md {{
@@ -406,6 +385,27 @@ mod tests {
 
 .rounded-tr-md {{
   border-top-right-radius: 0.375rem;
+}}
+
+.rounded-bl-xl {{
+  border-bottom-left-radius: 0.75rem;
+}}
+
+.border {{
+  border-width: 1px;
+}}
+
+.border-4 {{
+  border-width: 4px;
+}}
+
+.border-x {{
+  border-left-width: 1px;
+  border-right-width: 1px;
+}}
+
+.border-t-2 {{
+  border-top-width: 2px;
 }}"#,
                 preflight::ENCRE_PREFLIGHT_CSS
             )
@@ -563,17 +563,17 @@ mod tests {
   background-color: rgb(255 239 14 / var(--en-bg-opacity));
 }}
 
-@media (min-width: 1600px) {{
-  .\33xl\:underline {{
-    -webkit-text-decoration-line: underline;
-    text-decoration-line: underline;
-  }}
-}}
-
 @media (min-width: 2000px) {{
   .lg\:text-rosa-500 {{
     --en-text-opacity: 1;
     color: rgb(229 24 106 / var(--en-text-opacity));
+  }}
+}}
+
+@media (min-width: 1600px) {{
+  .\33xl\:underline {{
+    -webkit-text-decoration-line: underline;
+    text-decoration-line: underline;
   }}
 }}"#,
                 preflight::ENCRE_PREFLIGHT_CSS

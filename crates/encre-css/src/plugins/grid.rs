@@ -5,9 +5,9 @@ use crate::{config::Config, selector::Modifier};
 use std::fmt::{self, Write};
 
 #[derive(Debug)]
-pub struct ColumnsPlugin;
+pub struct TemplateColumnsPlugin;
 
-impl Plugin for ColumnsPlugin {
+impl Plugin for TemplateColumnsPlugin {
     fn namespace(&self) -> &str {
         "grid-cols"
     }
@@ -50,9 +50,9 @@ impl Plugin for ColumnsPlugin {
 }
 
 #[derive(Debug)]
-pub struct RowsPlugin;
+pub struct TemplateRowsPlugin;
 
-impl Plugin for RowsPlugin {
+impl Plugin for TemplateRowsPlugin {
     fn namespace(&self) -> &str {
         "grid-rows"
     }
@@ -377,7 +377,9 @@ impl Plugin for GapPlugin {
             Modifier::Basic { is_negative, value } => {
                 length::get_basic(value, *is_negative).is_some()
             }
-            Modifier::Arbitrary { value, .. } => is_matching_length(value),
+            Modifier::Arbitrary { prefix, value, .. } => {
+                prefix.is_empty() && is_matching_length(value)
+            }
         }
     }
 

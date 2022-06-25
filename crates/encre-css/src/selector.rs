@@ -8,181 +8,206 @@ use rayon::prelude::*;
 pub const VALID_PLUGIN_HINT: [&str; 4] = ["color", "length", "angle", "list"];
 
 /// The list of builtin plugins
-// TODO: Better sorting (colors and lengths after all the other utilities (because they have
-// hints))
-static BUILTIN_PLUGINS: [&'static (dyn Plugin + Send + Sync); 206] = [
+///
+/// Sorted following https://github.com/avencera/rustywind/blob/master/src/defaults.rs
+static BUILTIN_PLUGINS: [&'static (dyn Plugin + Send + Sync); 223] = [
+    &layout::ContainerPlugin,
+    &accessibility::ScreenReaderPlugin,
+    &interactivity::PointerEventsPlugin,
+    &layout::VisibilityPlugin,
+    &layout::PositionPlugin,
+    &layout::InsetPlugin,
+    &layout::InsetXPlugin,
+    &layout::InsetYPlugin,
+    &layout::TopPlugin,
+    &layout::RightPlugin,
+    &layout::BottomPlugin,
+    &layout::LeftPlugin,
+    &layout::IsolationPlugin,
+    &layout::ZIndexPlugin,
+    &flexbox::OrderPlugin,
+    &grid::StartEndSpanColumnPlugin,
+    &grid::StartEndSpanRowPlugin,
+    &layout::FloatPlugin,
+    &layout::ClearPlugin,
+    &spacing::MarginPlugin,
+    &spacing::MarginXPlugin,
+    &spacing::MarginYPlugin,
+    &spacing::MarginTopPlugin,
+    &spacing::MarginRightPlugin,
+    &spacing::MarginBottomPlugin,
+    &spacing::MarginLeftPlugin,
+    &layout::BoxSizingPlugin,
+    &layout::DisplayPlugin,
+    &layout::AspectRatioPlugin,
+    &sizing::HeightPlugin,
+    &sizing::MaxHeightPlugin,
+    &sizing::MinHeightPlugin,
+    &sizing::WidthPlugin,
+    &sizing::MinWidthPlugin,
+    &sizing::MaxWidthPlugin,
+    &flexbox::GrowShrinkBasisPlugin,
+    &table::TableLayoutPlugin,
+    &table::BorderCollapsePlugin,
+    &table::BorderSpacingPlugin,
+    &table::BorderSpacingXPlugin,
+    &table::BorderSpacingYPlugin,
+    &transform::OriginPlugin,
+    &transform::TranslateXPlugin,
+    &transform::TranslateYPlugin,
+    &transform::RotatePlugin,
+    &transform::SkewXPlugin,
+    &transform::SkewYPlugin,
+    &transform::ScalePlugin,
+    &transform::ScaleXPlugin,
+    &transform::ScaleYPlugin,
+    &transform::TransformPlugin,
+    &transition::AnimatePlugin,
+    &interactivity::CursorPlugin,
+    &interactivity::TouchActionPlugin,
+    &interactivity::UserSelectPlugin,
+    &interactivity::ResizePlugin,
+    &interactivity::ScrollSnapTypePlugin,
+    &interactivity::ScrollSnapAlignPlugin,
+    &interactivity::ScrollSnapStopPlugin,
+    &interactivity::ScrollMarginPlugin,
+    &interactivity::ScrollMarginXPlugin,
+    &interactivity::ScrollMarginYPlugin,
+    &interactivity::ScrollMarginTopPlugin,
+    &interactivity::ScrollMarginRightPlugin,
+    &interactivity::ScrollMarginBottomPlugin,
+    &interactivity::ScrollMarginLeftPlugin,
+    &interactivity::ScrollPaddingPlugin,
+    &interactivity::ScrollPaddingXPlugin,
+    &interactivity::ScrollPaddingYPlugin,
+    &interactivity::ScrollPaddingTopPlugin,
+    &interactivity::ScrollPaddingRightPlugin,
+    &interactivity::ScrollPaddingBottomPlugin,
+    &interactivity::ScrollPaddingLeftPlugin,
+    &typography::ListStylePositionPlugin,
+    &typography::ListStyleTypePlugin,
+    &interactivity::AppearancePlugin,
+    &layout::ColumnsPlugin,
+    &layout::BreakBeforePlugin,
+    &layout::BreakInsidePlugin,
+    &layout::BreakAfterPlugin,
+    &grid::AutoColumnsPlugin,
+    &grid::AutoFlowPlugin,
+    &grid::AutoRowsPlugin,
+    &grid::TemplateColumnsPlugin,
+    &grid::TemplateRowsPlugin,
+    &flexbox::DirectionPlugin,
+    &flexbox::WrapPlugin,
+    &alignment::PlaceContentPlugin,
+    &alignment::PlaceItemsPlugin,
+    &alignment::AlignContentPlugin,
+    &alignment::AlignItemsPlugin,
+    &alignment::JustifyContentPlugin,
+    &alignment::JustifyItemsPlugin,
+    &grid::GapPlugin,
+    &grid::GapXPlugin,
+    &grid::GapYPlugin,
+    &spacing::SpaceYPlugin,
+    &spacing::SpaceXPlugin,
+    &border::DivideWidthXPlugin,
+    &border::DivideWidthYPlugin,
+    &border::DivideStylePlugin,
+    &border::DivideColorPlugin,
+    &border::DivideOpacityPlugin,
+    &alignment::PlaceSelfPlugin,
+    &alignment::AlignSelfPlugin,
+    &alignment::JustifySelfPlugin,
+    &layout::OverflowPlugin,
+    &layout::OverscrollPlugin,
+    &interactivity::ScrollBehaviorPlugin,
+    &typography::TextOverflowPlugin,
+    &typography::WhitespacePlugin,
+    &typography::WordBreakPlugin,
+    &border::RadiusPlugin,
+    &border::RadiusTopPlugin,
+    &border::RadiusRightPlugin,
+    &border::RadiusBottomPlugin,
+    &border::RadiusLeftPlugin,
+    &border::RadiusTopLeftPlugin,
+    &border::RadiusTopRightPlugin,
+    &border::RadiusBottomRightPlugin,
+    &border::RadiusBottomLeftPlugin,
+    &border::WidthPlugin,
+    &border::WidthXPlugin,
+    &border::WidthYPlugin,
+    &border::WidthTopPlugin,
+    &border::WidthRightPlugin,
+    &border::WidthBottomPlugin,
+    &border::WidthLeftPlugin,
+    &border::StylePlugin,
+    &border::ColorPlugin,
+    &border::ColorXPlugin,
+    &border::ColorYPlugin,
+    &border::ColorTopPlugin,
+    &border::ColorRightPlugin,
+    &border::ColorBottomPlugin,
+    &border::ColorLeftPlugin,
+    &border::OpacityPlugin,
     &background::ColorPlugin,
-    &background::AttachmentPlugin,
-    &background::ClipPlugin,
     &background::OpacityPlugin,
     &background::ImagePlugin,
     &background::GradientFromPlugin,
     &background::GradientViaPlugin,
     &background::GradientToPlugin,
+    &layout::BoxDecorationBreakPlugin,
+    &background::SizePlugin,
+    &background::AttachmentPlugin,
+    &background::ClipPlugin,
     &background::PositionPlugin,
     &background::RepeatPlugin,
-    &background::SizePlugin,
-    &border::ColorPlugin,
-    &border::RadiusTopRightPlugin,
-    &border::RadiusTopLeftPlugin,
-    &border::RadiusBottomRightPlugin,
-    &border::RadiusBottomLeftPlugin,
-    &border::RadiusTopPlugin,
-    &border::RadiusBottomPlugin,
-    &border::RadiusLeftPlugin,
-    &border::RadiusRightPlugin,
-    &border::RadiusPlugin,
-    &border::StylePlugin,
-    &border::WidthTopPlugin,
-    &border::WidthBottomPlugin,
-    &border::WidthLeftPlugin,
-    &border::WidthRightPlugin,
-    &border::WidthXPlugin,
-    &border::WidthYPlugin,
-    &border::WidthPlugin,
-    &border::OpacityPlugin,
-    &border::DivideColorPlugin,
-    &border::DivideWidthXPlugin,
-    &border::DivideWidthYPlugin,
-    &border::DivideStylePlugin,
-    &border::DivideOpacityPlugin,
-    &border::RingOffsetColorPlugin,
-    &border::RingOffsetWidthPlugin,
-    &border::RingColorPlugin,
-    &border::RingWidthPlugin,
-    &border::RingOpacityPlugin,
-    &border::OutlineColorPlugin,
-    &border::OutlineWidthPlugin,
-    &border::OutlineStylePlugin,
-    &border::OutlineOffsetPlugin,
-    &typography::ColorPlugin,
-    &typography::OpacityPlugin,
-    &typography::FontFamilyPlugin,
-    &typography::FontSizePlugin,
-    &typography::FontWeightPlugin,
-    &typography::TextAlignmentPlugin,
-    &typography::TrackingPlugin,
-    &typography::LeadingPlugin,
-    &typography::TextDecorationColorPlugin,
-    &typography::TextDecorationStylePlugin,
-    &typography::TextDecorationThicknessPlugin,
-    &typography::TextDecorationOffsetPlugin,
-    &typography::ContentPlugin,
-    &typography::ListStyleTypePlugin,
-    &typography::ListStylePositionPlugin,
-    &typography::VerticalAlignPlugin,
-    &typography::WhitespacePlugin,
-    &typography::WordBreakPlugin,
-    &sizing::WidthPlugin,
-    &sizing::MinWidthPlugin,
-    &sizing::MaxWidthPlugin,
-    &sizing::HeightPlugin,
-    &sizing::MinHeightPlugin,
-    &sizing::MaxHeightPlugin,
-    &spacing::PaddingLeftPlugin,
-    &spacing::PaddingRightPlugin,
-    &spacing::PaddingTopPlugin,
-    &spacing::PaddingBottomPlugin,
-    &spacing::PaddingXPlugin,
-    &spacing::PaddingYPlugin,
-    &spacing::PaddingPlugin,
-    &spacing::MarginLeftPlugin,
-    &spacing::MarginRightPlugin,
-    &spacing::MarginTopPlugin,
-    &spacing::MarginBottomPlugin,
-    &spacing::MarginXPlugin,
-    &spacing::MarginYPlugin,
-    &spacing::MarginPlugin,
-    &spacing::SpaceXPlugin,
-    &spacing::SpaceYPlugin,
-    &flexbox::OrderPlugin,
-    &flexbox::DirectionPlugin,
-    &flexbox::WrapPlugin,
-    &flexbox::GrowShrinkBasisPlugin,
-    &layout::InsetPlugin,
-    &layout::InsetXPlugin,
-    &layout::InsetYPlugin,
-    &layout::TopPlugin,
-    &layout::BottomPlugin,
-    &layout::LeftPlugin,
-    &layout::RightPlugin,
-    &layout::ZIndexPlugin,
-    &layout::ContainerPlugin,
-    &layout::BoxDecorationBreakPlugin,
-    &layout::BoxSizingPlugin,
-    &layout::FloatPlugin,
-    &layout::ClearPlugin,
-    &layout::IsolationPlugin,
-    &layout::ObjectFitPlugin,
-    &layout::ObjectPositionPlugin,
-    &layout::OverflowPlugin,
-    &layout::OverscrollPlugin,
-    &alignment::AlignContentPlugin,
-    &alignment::AlignItemsPlugin,
-    &alignment::AlignSelfPlugin,
-    &alignment::JustifyContentPlugin,
-    &alignment::JustifyItemsPlugin,
-    &alignment::JustifySelfPlugin,
-    &alignment::PlaceContentPlugin,
-    &alignment::PlaceItemsPlugin,
-    &alignment::PlaceSelfPlugin,
-    &transition::DurationPlugin,
-    &transition::DelayPlugin,
-    &transition::EasePlugin,
-    &transition::PropertyPlugin,
-    &transition::AnimatePlugin,
-    &grid::ColumnsPlugin,
-    &grid::RowsPlugin,
-    &grid::GapPlugin,
-    &grid::GapXPlugin,
-    &grid::GapYPlugin,
-    &grid::StartEndSpanColumnPlugin,
-    &grid::StartEndSpanRowPlugin,
-    &grid::AutoFlowPlugin,
-    &grid::AutoColumnsPlugin,
-    &grid::AutoRowsPlugin,
-    &interactivity::AccentColorPlugin,
-    &interactivity::AppearancePlugin,
-    &interactivity::CursorPlugin,
-    &interactivity::CaretColorPlugin,
-    &interactivity::PointerEventsPlugin,
-    &interactivity::ResizePlugin,
-    &interactivity::ScrollBehaviorPlugin,
-    &interactivity::TouchActionPlugin,
-    &interactivity::UserSelectPlugin,
-    &interactivity::WillChangePlugin,
-    &interactivity::ScrollSnapAlignPlugin,
-    &interactivity::ScrollSnapStopPlugin,
-    &interactivity::ScrollSnapTypePlugin,
-    &interactivity::ScrollPaddingPlugin,
-    &interactivity::ScrollPaddingXPlugin,
-    &interactivity::ScrollPaddingYPlugin,
-    &interactivity::ScrollPaddingLeftPlugin,
-    &interactivity::ScrollPaddingRightPlugin,
-    &interactivity::ScrollPaddingTopPlugin,
-    &interactivity::ScrollPaddingBottomPlugin,
-    &interactivity::ScrollMarginPlugin,
-    &interactivity::ScrollMarginXPlugin,
-    &interactivity::ScrollMarginYPlugin,
-    &interactivity::ScrollMarginLeftPlugin,
-    &interactivity::ScrollMarginRightPlugin,
-    &interactivity::ScrollMarginTopPlugin,
-    &interactivity::ScrollMarginBottomPlugin,
+    &background::OriginPlugin,
     &svg::FillPlugin,
     &svg::StrokeColorPlugin,
     &svg::StrokeWidthPlugin,
-    &table::BorderCollapsePlugin,
-    &table::TableLayoutPlugin,
-    &transform::OriginPlugin,
-    &transform::TranslateXPlugin,
-    &transform::TranslateYPlugin,
-    &transform::RotatePlugin,
-    &transform::ScalePlugin,
-    &transform::ScaleXPlugin,
-    &transform::ScaleYPlugin,
-    &transform::SkewXPlugin,
-    &transform::SkewYPlugin,
-    &filter::FilterPlugin,
+    &layout::ObjectFitPlugin,
+    &layout::ObjectPositionPlugin,
+    &spacing::PaddingPlugin,
+    &spacing::PaddingXPlugin,
+    &spacing::PaddingYPlugin,
+    &spacing::PaddingTopPlugin,
+    &spacing::PaddingRightPlugin,
+    &spacing::PaddingBottomPlugin,
+    &spacing::PaddingLeftPlugin,
+    &typography::TextAlignmentPlugin,
+    &typography::TextIndentPlugin,
+    &typography::VerticalAlignPlugin,
+    &typography::FontFamilyPlugin,
+    &typography::FontSizePlugin,
+    &typography::FontWeightPlugin,
+    &typography::TextTransformPlugin,
+    &typography::ItalicPlugin,
+    &typography::FontVariantNumericPlugin,
+    &typography::LeadingPlugin,
+    &typography::TrackingPlugin,
+    &typography::ColorPlugin,
+    &typography::OpacityPlugin,
+    &typography::TextDecorationPlugin,
+    &typography::TextDecorationColorPlugin,
+    &typography::TextDecorationStylePlugin,
+    &typography::TextDecorationThicknessPlugin,
+    &typography::TextDecorationUnderlineOffsetPlugin,
+    &typography::FontSmoothingPlugin,
+    &interactivity::CaretColorPlugin,
+    &interactivity::AccentColorPlugin,
+    &effect::OpacityPlugin,
+    &effect::BackgroundBlendModePlugin,
+    &effect::MixBlendModePlugin,
+    &effect::BoxShadowPlugin,
+    &effect::BoxShadowColorPlugin,
+    &border::OutlineStylePlugin,
+    &border::OutlineWidthPlugin,
+    &border::OutlineOffsetPlugin,
+    &border::OutlineColorPlugin,
+    &border::RingWidthPlugin,
+    &border::RingColorPlugin,
+    &border::RingOpacityPlugin,
+    &border::RingOffsetWidthPlugin,
+    &border::RingOffsetColorPlugin,
     &filter::BlurPlugin,
     &filter::BrightnessPlugin,
     &filter::ContrastPlugin,
@@ -192,7 +217,7 @@ static BUILTIN_PLUGINS: [&'static (dyn Plugin + Send + Sync); 206] = [
     &filter::InvertPlugin,
     &filter::SaturatePlugin,
     &filter::SepiaPlugin,
-    &filter::BackdropFilterPlugin,
+    &filter::FilterPlugin,
     &filter::BackdropBlurPlugin,
     &filter::BackdropBrightnessPlugin,
     &filter::BackdropContrastPlugin,
@@ -202,32 +227,31 @@ static BUILTIN_PLUGINS: [&'static (dyn Plugin + Send + Sync); 206] = [
     &filter::BackdropOpacityPlugin,
     &filter::BackdropSaturatePlugin,
     &filter::BackdropSepiaPlugin,
-    &effect::MixBlendModePlugin,
-    &effect::OpacityPlugin,
-    &effect::BackgroundBlendModePlugin,
-    &effect::BoxShadowPlugin,
-    &effect::BoxShadowColorPlugin,
-    // It is better to include the following plugins at the end because they match the "" namespace
-    &layout::DisplayPlugin,
-    &layout::PositionPlugin,
-    &layout::VisibilityPlugin,
-    &typography::TextTransformPlugin,
-    &typography::ItalicPlugin,
-    &typography::TextDecorationPlugin,
-    &typography::FontVariantNumericPlugin,
-    &typography::FontSmoothingPlugin,
-    &typography::TextOverflowPlugin,
-    &accessibility::ScreenReaderPlugin,
+    &filter::BackdropFilterPlugin,
+    &transition::PropertyPlugin,
+    &transition::DelayPlugin,
+    &transition::DurationPlugin,
+    &transition::EasePlugin,
+    &interactivity::WillChangePlugin,
+    &typography::ContentPlugin,
 ];
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Modifier<'a> {
-    Basic { is_negative: bool, value: &'a str },
-    Arbitrary { value: &'a str, hint: &'a str },
+    Basic {
+        is_negative: bool,
+        value: &'a str,
+    },
+    Arbitrary {
+        prefix: &'a str,
+        hint: &'a str,
+        value: &'a str,
+    },
 }
 
 #[derive(Clone, Debug)]
 pub struct Selector<'a> {
+    pub(crate) order: usize,
     pub(crate) full: &'a str,
     pub(crate) modifier: Modifier<'a>,
     pub(crate) variants: &'a str,
@@ -266,28 +290,33 @@ impl<'a> Selector<'a> {
         }
 
         // Find the right plugin for handling this selector
-        let find_fn = |plugin: &&'static (dyn Plugin + Send + Sync)| {
+        let find_fn = |(i, plugin): (usize, &&'static (dyn Plugin + Send + Sync))| {
             // Find the modifier
             if let Some(modifier_part) = content.strip_prefix(&plugin.namespace()) {
                 let modifier_part = modifier_part.strip_prefix('-').unwrap_or(modifier_part);
 
-                let modifier = if let Some((_, mut after)) = modifier_part.split_once('[') {
+                let modifier = if let Some((mut prefix, mut after)) = modifier_part.split_once('[')
+                {
+                    prefix = prefix.strip_suffix('-').unwrap_or(prefix);
                     after = after.strip_suffix(']')?;
 
                     if let Some((maybe_hint, rest)) = after.split_once(':') {
                         if VALID_PLUGIN_HINT.contains(&maybe_hint) {
                             Modifier::Arbitrary {
+                                prefix,
                                 hint: maybe_hint,
                                 value: rest,
                             }
                         } else {
                             Modifier::Arbitrary {
+                                prefix,
                                 hint: "",
                                 value: after,
                             }
                         }
                     } else {
                         Modifier::Arbitrary {
+                            prefix,
                             hint: "",
                             value: after,
                         }
@@ -300,7 +329,7 @@ impl<'a> Selector<'a> {
                 };
 
                 if plugin.can_handle(config, &modifier) {
-                    Some((*plugin, modifier))
+                    Some((i, *plugin, modifier))
                 } else {
                     None
                 }
@@ -310,18 +339,22 @@ impl<'a> Selector<'a> {
         };
 
         #[cfg(not(feature = "rayon"))]
-        let result = BUILTIN_PLUGINS.iter().find_map(find_fn);
+        let result = BUILTIN_PLUGINS.iter().enumerate().find_map(find_fn);
 
         #[cfg(feature = "rayon")]
-        let result = BUILTIN_PLUGINS.par_iter().find_map_first(find_fn);
+        let result = BUILTIN_PLUGINS
+            .par_iter()
+            .enumerate()
+            .find_map_first(find_fn);
 
-        if let Some(result) = result {
+        if let Some((order, plugin, modifier)) = result {
             Some(Self {
+                order,
                 full,
                 variants,
-                modifier: result.1,
+                modifier,
                 is_important,
-                plugin: result.0,
+                plugin,
             })
         } else {
             None
@@ -344,7 +377,13 @@ impl<'a> PartialOrd for Selector<'a> {
         } else if !self.variants.is_empty() && other.variants.is_empty() {
             Ordering::Greater
         } else {
-            self.full.cmp(other.full)
+            let order = self.order.cmp(&other.order);
+
+            if order == Ordering::Equal {
+                self.full.cmp(other.full)
+            } else {
+                order
+            }
         })
     }
 }
@@ -356,7 +395,13 @@ impl<'a> Ord for Selector<'a> {
         } else if !self.variants.is_empty() && other.variants.is_empty() {
             Ordering::Greater
         } else {
-            self.full.cmp(other.full)
+            let order = self.order.cmp(&other.order);
+
+            if order == Ordering::Equal {
+                self.full.cmp(other.full)
+            } else {
+                order
+            }
         }
     }
 }

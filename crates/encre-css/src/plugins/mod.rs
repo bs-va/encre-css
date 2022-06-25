@@ -33,7 +33,24 @@ pub trait Plugin: fmt::Debug {
     /// Custom CSS written before the CSS rule
     ///
     /// NOTE: The CSS must end with two newlines
-    fn css_before_rule(&self, _modifier: &Modifier, _buffer: &mut String) -> fmt::Result {
+    fn css_before_rule(
+        &self,
+        _config: &Config,
+        _modifier: &Modifier,
+        _buffer: &mut String,
+    ) -> fmt::Result {
+        Ok(())
+    }
+
+    /// Custom CSS written after the CSS rule
+    ///
+    /// NOTE: The CSS must start with two newlines
+    fn css_after_rule(
+        &self,
+        _config: &Config,
+        _modifier: &Modifier,
+        _buffer: &mut String,
+    ) -> fmt::Result {
         Ok(())
     }
 

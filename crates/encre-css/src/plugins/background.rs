@@ -18,7 +18,7 @@ impl Plugin for ColorPlugin {
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
-            Modifier::Arbitrary { hint, value } => {
+            Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "color" || (hint.is_empty() && is_matching_color(value))
             }
         }
@@ -484,6 +484,38 @@ impl Plugin for RepeatPlugin {
 }
 
 #[derive(Debug)]
+pub struct OriginPlugin;
+
+impl Plugin for OriginPlugin {
+    fn namespace(&self) -> &str {
+        "bg-origin"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["border", "padding", "content"].contains(value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "background-origin: {value}-box;")?,
+            Modifier::Arbitrary { .. } => unreachable!(),
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Debug)]
 pub struct SizePlugin;
 
 impl Plugin for SizePlugin {
@@ -494,7 +526,7 @@ impl Plugin for SizePlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => ["contain", "cover", "auto"].contains(value),
-            Modifier::Arbitrary { hint, value } => {
+            Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "length"
                     || (hint.is_empty()
                         && value.split(',').all(|v| {

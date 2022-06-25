@@ -59,7 +59,14 @@ impl Plugin for MarginPlugin {
     }
 
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        margin_padding_can_handle(modifier)
+        match modifier {
+            Modifier::Basic { is_negative, value } => {
+                *value == "auto" || length::get_basic(value, *is_negative).is_some()
+            }
+            Modifier::Arbitrary { prefix, value, .. } => {
+                prefix.is_empty() && is_matching_length(value)
+            }
+        }
     }
 
     fn handle(
@@ -232,7 +239,14 @@ impl Plugin for PaddingPlugin {
     }
 
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        margin_padding_can_handle(modifier)
+        match modifier {
+            Modifier::Basic { is_negative, value } => {
+                *value == "auto" || length::get_basic(value, *is_negative).is_some()
+            }
+            Modifier::Arbitrary { prefix, value, .. } => {
+                prefix.is_empty() && is_matching_length(value)
+            }
+        }
     }
 
     fn handle(

@@ -249,7 +249,12 @@ impl Plugin for AnimatePlugin {
         "animate"
     }
 
-    fn css_before_rule(&self, modifier: &Modifier, buffer: &mut String) -> fmt::Result {
+    fn css_before_rule(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        buffer: &mut String,
+    ) -> fmt::Result {
         match modifier {
             Modifier::Basic { value, .. } => {
                 match *value {

@@ -67,7 +67,10 @@ impl<'a> EncreGenerator<'a> {
     ///
     /// This function automatically handles duplicated selectors and sorting.
     pub fn add_selectors<T: IntoIterator<Item = &'a str>>(&mut self, val: T) {
-        self.scanned_selectors.extend(val.into_iter().filter_map(|v| Selector::new(v, &self.config)));
+        self.scanned_selectors.extend(
+            val.into_iter()
+                .filter_map(|v| Selector::new(v, &self.config)),
+        );
     }
 
     /// Scan the contents of a file and store all the selectors found.
@@ -120,7 +123,7 @@ impl<'a> EncreGenerator<'a> {
 
             selector
                 .plugin
-                .css_before_rule(&selector.modifier, &mut buffer)?;
+                .css_before_rule(&self.config, &selector.modifier, &mut buffer)?;
 
             let mut indentation = 0;
 
@@ -215,6 +218,10 @@ impl<'a> EncreGenerator<'a> {
             }
 
             write!(buffer, "}}")?;
+
+            selector
+                .plugin
+                .css_after_rule(&self.config, &selector.modifier, &mut buffer)?;
 
             Ok::<(), Error>(())
         })?;

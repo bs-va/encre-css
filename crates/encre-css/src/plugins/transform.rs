@@ -8,6 +8,43 @@ use std::fmt::{self, Write};
 pub const CSS_TRANSFORM: &str = "transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));";
 
 #[derive(Debug)]
+pub struct TransformPlugin;
+
+impl Plugin for TransformPlugin {
+    fn namespace(&self) -> &str {
+        "transform"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["", "gpu", "cpu", "none"].contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match *value {
+                "" | "cpu" => writeln!(buffer, "{}", CSS_TRANSFORM)?,
+                "gpu" => writeln!(buffer, "transform: translate3d(var(--tw-translate-x), var(--tw-translate-y), 0) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));")?,
+                "none" => writeln!(buffer, "transform: none;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { .. } => unreachable!(),
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Debug)]
 pub struct OriginPlugin;
 
 impl Plugin for OriginPlugin {

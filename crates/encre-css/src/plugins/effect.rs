@@ -244,7 +244,7 @@ impl Plugin for BoxShadowColorPlugin {
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
-            Modifier::Arbitrary { hint, value } => {
+            Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "color" || (hint.is_empty() && is_matching_color(value))
             }
         }

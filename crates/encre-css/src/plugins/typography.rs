@@ -1,5 +1,5 @@
 use super::{to_css_value, Plugin};
-use crate::utils::{color, indent, value_matchers::*};
+use crate::utils::{color, indent, length, value_matchers::*};
 use crate::{config::Config, selector::Modifier};
 
 use std::{
@@ -20,7 +20,7 @@ impl Plugin for ColorPlugin {
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
-            Modifier::Arbitrary { hint, value } => {
+            Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "color" || (hint.is_empty() && is_matching_color(value))
             }
         }
@@ -168,7 +168,7 @@ impl Plugin for FontSizePlugin {
                 "9xl",
             ]
             .contains(&&**value),
-            Modifier::Arbitrary { hint, value } => {
+            Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "length"
                     || (hint.is_empty()
                         && (is_matching_length(value)
@@ -508,7 +508,7 @@ pub struct ItalicPlugin;
 impl Plugin for ItalicPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
-            Modifier::Basic { value, .. } => ["italic", "no-italic"].contains(&&**value),
+            Modifier::Basic { value, .. } => ["italic", "not-italic"].contains(&&**value),
             Modifier::Arbitrary { .. } => false,
         }
     }
@@ -524,7 +524,7 @@ impl Plugin for ItalicPlugin {
         match modifier {
             Modifier::Basic { value, .. } => match *value {
                 "italic" => writeln!(buffer, "font-style: italic;")?,
-                "no-italic" => writeln!(buffer, "font-style: normal;")?,
+                "not-italic" => writeln!(buffer, "font-style: normal;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -580,7 +580,7 @@ impl Plugin for TextDecorationColorPlugin {
     fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
-            Modifier::Arbitrary { hint, value } => {
+            Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "color" || (hint.is_empty() && is_matching_color(value))
             }
         }
@@ -651,7 +651,7 @@ impl Plugin for TextDecorationThicknessPlugin {
             Modifier::Basic { value, .. } => {
                 ["auto", "from-font"].contains(&&**value) || value.parse::<usize>().is_ok()
             }
-            Modifier::Arbitrary { hint, value } => {
+            Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "length"
                     || (hint.is_empty()
                         && (["auto", "from-font"].contains(&&**value)
@@ -690,9 +690,9 @@ impl Plugin for TextDecorationThicknessPlugin {
 }
 
 #[derive(Debug)]
-pub struct TextDecorationOffsetPlugin;
+pub struct TextDecorationUnderlineOffsetPlugin;
 
-impl Plugin for TextDecorationOffsetPlugin {
+impl Plugin for TextDecorationUnderlineOffsetPlugin {
     fn namespace(&self) -> &str {
         "underline-offset"
     }
@@ -700,9 +700,7 @@ impl Plugin for TextDecorationOffsetPlugin {
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok() || *value == "auto",
-            Modifier::Arbitrary { value, .. } => {
-                *value == "auto" || is_matching_length(value) || is_matching_percentage(value)
-            }
+            Modifier::Arbitrary { value, .. } => *value == "auto" || is_matching_length(value),
         }
     }
 
@@ -935,6 +933,48 @@ impl Plugin for ListStylePositionPlugin {
         match modifier {
             Modifier::Basic { value, .. } => writeln!(buffer, "list-style-position: {value};")?,
             Modifier::Arbitrary { .. } => unreachable!(),
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Debug)]
+pub struct TextIndentPlugin;
+
+impl Plugin for TextIndentPlugin {
+    fn namespace(&self) -> &str {
+        "indent"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { is_negative, value } => {
+                length::get_basic(value, *is_negative).is_some()
+            }
+            Modifier::Arbitrary { value, .. } => is_matching_length(value),
+        }
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { is_negative, value } => {
+                writeln!(
+                    buffer,
+                    "text-indent: {};",
+                    length::get_basic(value, *is_negative).unwrap(),
+                )?;
+            }
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(buffer, "text-indent: {};", to_css_value(value))?;
+            }
         }
 
         Ok(())

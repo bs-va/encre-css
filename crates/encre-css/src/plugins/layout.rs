@@ -1,8 +1,55 @@
 use super::{to_css_value, Plugin};
-use crate::utils::{indent, length, value_matchers::*};
-use crate::{config::Config, selector::Modifier};
+use crate::{
+    config::{Config, BUILTIN_SCREENS},
+    selector::Modifier,
+    utils::{indent, length, value_matchers::*},
+};
 
-use std::fmt::{self, Write};
+use std::{
+    borrow::Cow,
+    fmt::{self, Write},
+};
+
+#[derive(Debug)]
+pub struct AspectRatioPlugin;
+
+impl Plugin for AspectRatioPlugin {
+    fn namespace(&self) -> &'static str {
+        "aspect"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => ["auto", "square", "video"].contains(&&**value),
+            Modifier::Arbitrary { value, .. } => is_matching_all(value),
+        }
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => match *value {
+                "auto" => writeln!(buffer, "aspect-ratio: auto;")?,
+                "square" => writeln!(buffer, "aspect-ratio: 1 / 1;")?,
+                "video" => writeln!(buffer, "aspect-ratio: 16 / 9;")?,
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { value, .. } => writeln!(
+                buffer,
+                "aspect-ratio: {};",
+                to_css_value(&value.replace('/', " / "))
+            )?,
+        }
+
+        Ok(())
+    }
+}
 
 #[derive(Debug)]
 pub struct PositionPlugin;
@@ -222,7 +269,17 @@ impl Plugin for InsetPlugin {
     }
 
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        position_can_handle(modifier)
+        match modifier {
+            Modifier::Basic { is_negative, value } => {
+                length::get_extended(value, *is_negative).is_some()
+            }
+            Modifier::Arbitrary { prefix, value, .. } => {
+                prefix.is_empty()
+                    && (is_matching_length(value)
+                        || is_matching_percentage(value)
+                        || *value == "auto")
+            }
+        }
     }
 
     fn handle(
@@ -420,10 +477,184 @@ impl Plugin for ContainerPlugin {
         "container"
     }
 
+    fn css_after_rule(
+        &self,
+        config: &Config,
+        modifier: &Modifier,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        if let Modifier::Basic { value, .. } = modifier {
+            if value.is_empty() {
+                // Deduplicate screens
+                if config.theme.screens.is_empty() {
+                    for (_, screen) in BUILTIN_SCREENS.iter() {
+                        write!(
+                            buffer,
+                            "\n\n@media (min-width: {screen}) {{
+  .container {{
+    max-width: {screen};
+  }}
+}}"
+                        )?;
+                    }
+                } else {
+                    let mut dedup = config
+                        .theme
+                        .screens
+                        .iter()
+                        .map(|(a, b)| (a.clone(), b.clone()))
+                        .chain(
+                            BUILTIN_SCREENS
+                                .iter()
+                                .map(|(a, b)| (Cow::from(*a), Cow::from(*b))),
+                        )
+                        .collect::<Vec<(Cow<str>, Cow<str>)>>();
+                    dedup.sort_by_key(|v| v.0.clone());
+                    dedup.dedup_by_key(|v| v.0.clone());
+
+                    for (_, screen) in dedup.iter() {
+                        write!(
+                            buffer,
+                            "\n\n@media (min-width: {screen}) {{
+  .container {{
+    max-width: {screen};
+  }}
+}}"
+                        )?;
+                    }
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                value.is_empty()
+                    || config.theme.screens.contains_key(&Cow::from(*value))
+                    || BUILTIN_SCREENS.iter().any(|s| &s.0 == value)
+            }
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
+        &self,
+        config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => {
+                if value.is_empty() {
+                    writeln!(buffer, "width: 100%;")?;
+                } else if let Some(screen) = config.theme.screens.get(&Cow::from(*value)) {
+                    writeln!(buffer, "max-width: {screen};")?;
+                } else {
+                    writeln!(
+                        buffer,
+                        "max-width: {};",
+                        BUILTIN_SCREENS.iter().find(|s| &s.0 == value).unwrap().1
+                    )?;
+                }
+            }
+            Modifier::Arbitrary { .. } => unreachable!(),
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Debug)]
+pub struct ColumnsPlugin;
+
+impl Plugin for ColumnsPlugin {
+    fn namespace(&self) -> &'static str {
+        "columns"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "columns: {value};")?,
+            Modifier::Arbitrary { .. } => unreachable!(),
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Debug)]
+pub struct BreakBeforePlugin;
+
+impl Plugin for BreakBeforePlugin {
+    fn namespace(&self) -> &'static str {
+        "break-before"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => [
+                "auto",
+                "avoid",
+                "all",
+                "avoid-page",
+                "page",
+                "left",
+                "right",
+                "column",
+            ]
+            .contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "break-before: {value};")?,
+            Modifier::Arbitrary { .. } => unreachable!(),
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Debug)]
+pub struct BreakInsidePlugin;
+
+impl Plugin for BreakInsidePlugin {
+    fn namespace(&self) -> &'static str {
+        "break-inside"
+    }
+
     fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
         match modifier {
             Modifier::Basic { value, .. } => {
-                ["sm", "md", "lg", "xl", "2xl", "none"].contains(&&**value)
+                ["auto", "avoid", "avoid-page", "avoid-column"].contains(&&**value)
             }
             Modifier::Arbitrary { .. } => false,
         }
@@ -438,15 +669,49 @@ impl Plugin for ContainerPlugin {
     ) -> fmt::Result {
         indent(indentation, buffer)?;
         match modifier {
-            Modifier::Basic { value, .. } => match *value {
-                "none" => writeln!(buffer, "width: 100%;")?,
-                "sm" => writeln!(buffer, "max-width: 640px;")?,
-                "md" => writeln!(buffer, "max-width: 768px;")?,
-                "lg" => writeln!(buffer, "max-width: 1024px;")?,
-                "xl" => writeln!(buffer, "max-width: 1280px;")?,
-                "2xl" => writeln!(buffer, "max-width: 1536px;")?,
-                _ => unreachable!(),
-            },
+            Modifier::Basic { value, .. } => writeln!(buffer, "break-inside: {value};")?,
+            Modifier::Arbitrary { .. } => unreachable!(),
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Debug)]
+pub struct BreakAfterPlugin;
+
+impl Plugin for BreakAfterPlugin {
+    fn namespace(&self) -> &'static str {
+        "break-after"
+    }
+
+    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
+        match modifier {
+            Modifier::Basic { value, .. } => [
+                "auto",
+                "avoid",
+                "all",
+                "avoid-page",
+                "page",
+                "left",
+                "right",
+                "column",
+            ]
+            .contains(&&**value),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
+
+    fn handle(
+        &self,
+        _config: &Config,
+        modifier: &Modifier,
+        indentation: usize,
+        buffer: &mut String,
+    ) -> fmt::Result {
+        indent(indentation, buffer)?;
+        match modifier {
+            Modifier::Basic { value, .. } => writeln!(buffer, "break-after: {value};")?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
