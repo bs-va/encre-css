@@ -56,11 +56,18 @@ impl<'a> EncreGenerator<'a> {
         }
     }
 
-    /// Add a new selector which will have its CSS generated.
+    /// Add a single selector which will have its CSS generated.
     ///
     /// This function automatically handles duplicated selectors and sorting.
     pub fn add_selector(&mut self, val: &'a str) {
         Selector::new(val, &self.config).map(|s| self.scanned_selectors.insert(s));
+    }
+
+    /// Add several selectors which will have their CSS generated.
+    ///
+    /// This function automatically handles duplicated selectors and sorting.
+    pub fn add_selectors<T: IntoIterator<Item = &'a str>>(&mut self, val: T) {
+        self.scanned_selectors.extend(val.into_iter().filter_map(|v| Selector::new(v, &self.config)));
     }
 
     /// Scan the contents of a file and store all the selectors found.
