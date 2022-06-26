@@ -7,6 +7,7 @@ use crate::{
 
 use std::{
     borrow::Cow,
+    cmp::Ordering,
     fmt::{self, Write},
 };
 
@@ -485,7 +486,6 @@ impl Plugin for ContainerPlugin {
     ) -> fmt::Result {
         if let Modifier::Basic { value, .. } = modifier {
             if value.is_empty() {
-                // Deduplicate screens
                 if config.theme.screens.is_empty() {
                     for (_, screen) in BUILTIN_SCREENS.iter() {
                         write!(
@@ -498,7 +498,7 @@ impl Plugin for ContainerPlugin {
                         )?;
                     }
                 } else {
-                    let mut dedup = config
+                    let mut screens = config
                         .theme
                         .screens
                         .iter()
@@ -509,10 +509,39 @@ impl Plugin for ContainerPlugin {
                                 .map(|(a, b)| (Cow::from(*a), Cow::from(*b))),
                         )
                         .collect::<Vec<(Cow<str>, Cow<str>)>>();
-                    dedup.sort_by_key(|v| v.0.clone());
-                    dedup.dedup_by_key(|v| v.0.clone());
 
-                    for (_, screen) in dedup.iter() {
+                    // Deduplicate screens
+                    screens.sort_by(|a, b| a.0.cmp(&b.0));
+                    screens.dedup_by(|a, b| a.0.eq(&b.0));
+
+                    // Emulate Tailwind sorting (based on the JS `parseInt` function)
+                    screens.sort_by(|a, b| {
+                        let a =
+                            if let Some(first_char_a) = a.1.chars().position(char::is_alphabetic) {
+                                a.1[..first_char_a].parse::<usize>().ok()
+                            } else {
+                                a.1.parse::<usize>().ok()
+                            };
+
+                        let b =
+                            if let Some(first_char_b) = b.1.chars().position(char::is_alphabetic) {
+                                b.1[..first_char_b].parse::<usize>().ok()
+                            } else {
+                                b.1.parse::<usize>().ok()
+                            };
+
+                        if let Some(a) = a {
+                            if let Some(b) = b {
+                                a.cmp(&b)
+                            } else {
+                                Ordering::Less
+                            }
+                        } else {
+                            Ordering::Greater
+                        }
+                    });
+
+                    for (_, screen) in screens.iter() {
                         write!(
                             buffer,
                             "\n\n@media (min-width: {screen}) {{

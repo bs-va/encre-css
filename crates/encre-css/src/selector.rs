@@ -383,7 +383,9 @@ impl<'a> Ord for Selector<'a> {
         } else if !self.variants.is_empty() && other.variants.is_empty() {
             Ordering::Greater
         } else {
-            self.order.cmp(&other.order).then_with(|| self.full.cmp(other.full))
+            self.order
+                .cmp(&other.order)
+                .then_with(|| self.full.cmp(other.full))
         }
     }
 }
