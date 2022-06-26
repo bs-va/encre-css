@@ -372,19 +372,7 @@ impl<'a> Eq for Selector<'a> {}
 
 impl<'a> PartialOrd for Selector<'a> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(if self.variants.is_empty() && !other.variants.is_empty() {
-            Ordering::Less
-        } else if !self.variants.is_empty() && other.variants.is_empty() {
-            Ordering::Greater
-        } else {
-            let order = self.order.cmp(&other.order);
-
-            if order == Ordering::Equal {
-                self.full.cmp(other.full)
-            } else {
-                order
-            }
-        })
+        Some(self.cmp(other))
     }
 }
 
@@ -395,13 +383,7 @@ impl<'a> Ord for Selector<'a> {
         } else if !self.variants.is_empty() && other.variants.is_empty() {
             Ordering::Greater
         } else {
-            let order = self.order.cmp(&other.order);
-
-            if order == Ordering::Equal {
-                self.full.cmp(other.full)
-            } else {
-                order
-            }
+            self.order.cmp(&other.order).then_with(|| self.full.cmp(other.full))
         }
     }
 }

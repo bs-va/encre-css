@@ -1,11 +1,11 @@
 use std::collections::BTreeSet;
 
 pub struct Extractor {
-    extract_fn: Box<dyn Fn(&str) -> BTreeSet<&str>>,
+    extract_fn: Box<dyn Fn(&str) -> BTreeSet<&str> + Send + Sync>,
 }
 
 impl Extractor {
-    pub fn from_fn<T: 'static + Fn(&str) -> BTreeSet<&str>>(extract_fn: T) -> Self {
+    pub fn from_fn<T: 'static + Fn(&str) -> BTreeSet<&str> + Send + Sync>(extract_fn: T) -> Self {
         Self {
             extract_fn: Box::new(extract_fn),
         }
