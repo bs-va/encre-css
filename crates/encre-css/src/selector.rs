@@ -1,4 +1,4 @@
-use crate::{config::Config, plugins::*, variant::VARIANT_SEPARATOR};
+use crate::{config::Config, context::ContextCanHandle, plugins::*, variant::VARIANT_SEPARATOR};
 
 use std::cmp::Ordering;
 
@@ -328,7 +328,12 @@ impl<'a> Selector<'a> {
                     }
                 };
 
-                if plugin.can_handle(config, &modifier) {
+                let context = ContextCanHandle {
+                    config,
+                    modifier: &modifier,
+                };
+
+                if plugin.can_handle(context) {
                     Some((i, *plugin, modifier))
                 } else {
                     None

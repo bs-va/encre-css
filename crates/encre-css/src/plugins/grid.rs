@@ -1,6 +1,5 @@
 use super::{to_css_value, Plugin};
-use crate::utils::{indent, length, value_matchers::*};
-use crate::{config::Config, selector::Modifier};
+use crate::{context::{ContextCanHandle, ContextHandle}, utils::{indent, length, value_matchers::*}, selector::Modifier};
 
 use std::fmt::{self, Write};
 
@@ -12,36 +11,30 @@ impl Plugin for TemplateColumnsPlugin {
         "grid-cols"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok() || *value == "none",
             Modifier::Arbitrary { value, .. } => is_matching_all(value), // TODO: Better matching
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 if *value == "none" {
-                    return writeln!(buffer, "grid-template-columns: none;");
+                    return writeln!(context.buffer, "grid-template-columns: none;");
                 }
 
                 // NOTE: Not-compatible with TailwindCSS, support all values
                 writeln!(
-                    buffer,
+                    context.buffer,
                     "grid-template-columns: repeat({}, minmax(0, 1fr));",
                     value.parse::<usize>().unwrap(),
                 )?;
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "grid-template-columns: {};", to_css_value(value))?
+                writeln!(context.buffer, "grid-template-columns: {};", to_css_value(value))?
             }
         }
 
@@ -57,36 +50,30 @@ impl Plugin for TemplateRowsPlugin {
         "grid-rows"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok() || *value == "none",
             Modifier::Arbitrary { value, .. } => is_matching_all(value), // TODO: Better matching
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 if *value == "none" {
-                    return writeln!(buffer, "grid-template-rows: none;");
+                    return writeln!(context.buffer, "grid-template-rows: none;");
                 }
 
                 // NOTE: Not-compatible with TailwindCSS, support all values
                 writeln!(
-                    buffer,
+                    context.buffer,
                     "grid-template-rows: repeat({}, minmax(0, 1fr));",
                     value.parse::<usize>().unwrap(),
                 )?;
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "grid-template-rows: {};", to_css_value(value))?
+                writeln!(context.buffer, "grid-template-rows: {};", to_css_value(value))?
             }
         }
 
@@ -102,8 +89,8 @@ impl Plugin for StartEndSpanColumnPlugin {
         "col"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 *value == "auto"
                     || value
@@ -123,45 +110,39 @@ impl Plugin for StartEndSpanColumnPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 if *value == "auto" {
-                    return writeln!(buffer, "grid-column: auto;");
+                    return writeln!(context.buffer, "grid-column: auto;");
                 }
 
                 if let Some(value) = value.strip_prefix("span-") {
                     if value == "full" {
-                        return writeln!(buffer, "grid-column: 1 / -1;");
+                        return writeln!(context.buffer, "grid-column: 1 / -1;");
                     }
 
                     // NOTE: Not-compatible with TailwindCSS, support all values
-                    writeln!(buffer, "grid-column: span {value} / span {value};")?;
+                    writeln!(context.buffer, "grid-column: span {value} / span {value};")?;
                 } else if let Some(value) = value.strip_prefix("start-") {
                     if value == "auto" {
-                        return writeln!(buffer, "grid-column-start: auto;");
+                        return writeln!(context.buffer, "grid-column-start: auto;");
                     }
 
                     // NOTE: Not-compatible with TailwindCSS, support all values
-                    writeln!(buffer, "grid-column-start: {value};")?;
+                    writeln!(context.buffer, "grid-column-start: {value};")?;
                 } else if let Some(value) = value.strip_prefix("end-") {
                     if value == "auto" {
-                        return writeln!(buffer, "grid-column-end: auto;");
+                        return writeln!(context.buffer, "grid-column-end: auto;");
                     }
 
                     // NOTE: Not-compatible with TailwindCSS, support all values
-                    writeln!(buffer, "grid-column-end: {value};")?;
+                    writeln!(context.buffer, "grid-column-end: {value};")?;
                 }
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "grid-column: {};", to_css_value(value))?
+                writeln!(context.buffer, "grid-column: {};", to_css_value(value))?
             }
         }
 
@@ -177,8 +158,8 @@ impl Plugin for StartEndSpanRowPlugin {
         "row"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 *value == "auto"
                     || value
@@ -198,45 +179,39 @@ impl Plugin for StartEndSpanRowPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 if *value == "auto" {
-                    return writeln!(buffer, "grid-row: auto;");
+                    return writeln!(context.buffer, "grid-row: auto;");
                 }
 
                 if let Some(value) = value.strip_prefix("span-") {
                     if value == "full" {
-                        return writeln!(buffer, "grid-row: 1 / -1;");
+                        return writeln!(context.buffer, "grid-row: 1 / -1;");
                     }
 
                     // NOTE: Not-compatible with TailwindCSS, support all values
-                    writeln!(buffer, "grid-row: span {value} / span {value};")?;
+                    writeln!(context.buffer, "grid-row: span {value} / span {value};")?;
                 } else if let Some(value) = value.strip_prefix("start-") {
                     if value == "auto" {
-                        return writeln!(buffer, "grid-row-start: auto;");
+                        return writeln!(context.buffer, "grid-row-start: auto;");
                     }
 
                     // NOTE: Not-compatible with TailwindCSS, support all values
-                    writeln!(buffer, "grid-row-start: {value};")?;
+                    writeln!(context.buffer, "grid-row-start: {value};")?;
                 } else if let Some(value) = value.strip_prefix("end-") {
                     if value == "auto" {
-                        return writeln!(buffer, "grid-row-end: auto;");
+                        return writeln!(context.buffer, "grid-row-end: auto;");
                     }
 
                     // NOTE: Not-compatible with TailwindCSS, support all values
-                    writeln!(buffer, "grid-row-end: {value};")?;
+                    writeln!(context.buffer, "grid-row-end: {value};")?;
                 }
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "grid-row: {};", to_css_value(value))?
+                writeln!(context.buffer, "grid-row: {};", to_css_value(value))?
             }
         }
 
@@ -252,8 +227,8 @@ impl Plugin for AutoFlowPlugin {
         "grid-flow"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["row", "col", "row-dense", "col-dense"].contains(&&**value)
             }
@@ -261,20 +236,14 @@ impl Plugin for AutoFlowPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "row" => writeln!(buffer, "grid-auto-flow: row;")?,
-                "col" => writeln!(buffer, "grid-auto-flow: column;")?,
-                "row-dense" => writeln!(buffer, "grid-auto-flow: row dense;")?,
-                "col-dense" => writeln!(buffer, "grid-auto-flow: column dense;")?,
+                "row" => writeln!(context.buffer, "grid-auto-flow: row;")?,
+                "col" => writeln!(context.buffer, "grid-auto-flow: column;")?,
+                "row-dense" => writeln!(context.buffer, "grid-auto-flow: row dense;")?,
+                "col-dense" => writeln!(context.buffer, "grid-auto-flow: column dense;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -292,31 +261,25 @@ impl Plugin for AutoColumnsPlugin {
         "auto-cols"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["auto", "min", "max", "fr"].contains(&&**value),
             Modifier::Arbitrary { value, .. } => is_matching_all(value), // TODO: Better matching
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "auto" => writeln!(buffer, "grid-auto-columns: auto;")?,
-                "min" => writeln!(buffer, "grid-auto-columns: min-content;")?,
-                "max" => writeln!(buffer, "grid-auto-columns: max-content;")?,
-                "fr" => writeln!(buffer, "grid-auto-columns: minmax(0, 1fr);")?,
+                "auto" => writeln!(context.buffer, "grid-auto-columns: auto;")?,
+                "min" => writeln!(context.buffer, "grid-auto-columns: min-content;")?,
+                "max" => writeln!(context.buffer, "grid-auto-columns: max-content;")?,
+                "fr" => writeln!(context.buffer, "grid-auto-columns: minmax(0, 1fr);")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "grid-auto-columns: {};", to_css_value(value))?
+                writeln!(context.buffer, "grid-auto-columns: {};", to_css_value(value))?
             }
         }
 
@@ -332,31 +295,25 @@ impl Plugin for AutoRowsPlugin {
         "auto-rows"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["auto", "min", "max", "fr"].contains(&&**value),
             Modifier::Arbitrary { value, .. } => is_matching_all(value), // TODO: Better matching
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "auto" => writeln!(buffer, "grid-auto-rows: auto;")?,
-                "min" => writeln!(buffer, "grid-auto-rows: min-content;")?,
-                "max" => writeln!(buffer, "grid-auto-rows: max-content;")?,
-                "fr" => writeln!(buffer, "grid-auto-rows: minmax(0, 1fr);")?,
+                "auto" => writeln!(context.buffer, "grid-auto-rows: auto;")?,
+                "min" => writeln!(context.buffer, "grid-auto-rows: min-content;")?,
+                "max" => writeln!(context.buffer, "grid-auto-rows: max-content;")?,
+                "fr" => writeln!(context.buffer, "grid-auto-rows: minmax(0, 1fr);")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "grid-auto-rows: {};", to_css_value(value))?
+                writeln!(context.buffer, "grid-auto-rows: {};", to_css_value(value))?
             }
         }
 
@@ -372,8 +329,8 @@ impl Plugin for GapPlugin {
         "gap"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { is_negative, value } => {
                 length::get_basic(value, *is_negative).is_some()
             }
@@ -383,21 +340,15 @@ impl Plugin for GapPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { is_negative, value } => writeln!(
-                buffer,
+                context.buffer,
                 "gap: {};",
                 length::get_basic(value, *is_negative).unwrap()
             )?,
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "gap: {};", to_css_value(value))?,
+            Modifier::Arbitrary { value, .. } => writeln!(context.buffer, "gap: {};", to_css_value(value))?,
         }
 
         Ok(())
@@ -412,8 +363,8 @@ impl Plugin for GapXPlugin {
         "gap-x"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { is_negative, value } => {
                 length::get_basic(value, *is_negative).is_some()
             }
@@ -421,22 +372,16 @@ impl Plugin for GapXPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { is_negative, value } => writeln!(
-                buffer,
+                context.buffer,
                 "column-gap: {};",
                 length::get_basic(value, *is_negative).unwrap()
             )?,
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "column-gap: {};", to_css_value(value))?
+                writeln!(context.buffer, "column-gap: {};", to_css_value(value))?
             }
         }
 
@@ -452,8 +397,8 @@ impl Plugin for GapYPlugin {
         "gap-y"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { is_negative, value } => {
                 length::get_basic(value, *is_negative).is_some()
             }
@@ -461,22 +406,16 @@ impl Plugin for GapYPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { is_negative, value } => writeln!(
-                buffer,
+                context.buffer,
                 "row-gap: {};",
                 length::get_basic(value, *is_negative).unwrap()
             )?,
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "row-gap: {};", to_css_value(value))?
+                writeln!(context.buffer, "row-gap: {};", to_css_value(value))?
             }
         }
 

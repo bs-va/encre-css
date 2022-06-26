@@ -1,5 +1,5 @@
 use super::Plugin;
-use crate::{config::Config, selector::Modifier, utils::indent};
+use crate::{context::{ContextCanHandle, ContextHandle}, selector::Modifier, utils::indent};
 
 use std::fmt::{self, Write};
 
@@ -11,8 +11,8 @@ impl Plugin for AlignContentPlugin {
         "content"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["start", "center", "end", "between", "around", "evenly"].contains(value)
             }
@@ -20,22 +20,16 @@ impl Plugin for AlignContentPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "start" => writeln!(buffer, "align-content: flex-start;")?,
-                "center" => writeln!(buffer, "align-content: center;")?,
-                "end" => writeln!(buffer, "align-content: flex-end;")?,
-                "between" => writeln!(buffer, "align-content: space-between;")?,
-                "around" => writeln!(buffer, "align-content: space-around;")?,
-                "evenly" => writeln!(buffer, "align-content: space-evenly;")?,
+                "start" => writeln!(context.buffer, "align-content: flex-start;")?,
+                "center" => writeln!(context.buffer, "align-content: center;")?,
+                "end" => writeln!(context.buffer, "align-content: flex-end;")?,
+                "between" => writeln!(context.buffer, "align-content: space-between;")?,
+                "around" => writeln!(context.buffer, "align-content: space-around;")?,
+                "evenly" => writeln!(context.buffer, "align-content: space-evenly;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -53,8 +47,8 @@ impl Plugin for AlignItemsPlugin {
         "items"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["stretch", "start", "center", "end", "baseline"].contains(value)
             }
@@ -62,21 +56,15 @@ impl Plugin for AlignItemsPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "stretch" => writeln!(buffer, "align-items: stretch;")?,
-                "start" => writeln!(buffer, "align-items: flex-start;")?,
-                "center" => writeln!(buffer, "align-items: center;")?,
-                "end" => writeln!(buffer, "align-items: flex-end;")?,
-                "baseline" => writeln!(buffer, "align-items: baseline;")?,
+                "stretch" => writeln!(context.buffer, "align-items: stretch;")?,
+                "start" => writeln!(context.buffer, "align-items: flex-start;")?,
+                "center" => writeln!(context.buffer, "align-items: center;")?,
+                "end" => writeln!(context.buffer, "align-items: flex-end;")?,
+                "baseline" => writeln!(context.buffer, "align-items: baseline;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -94,8 +82,8 @@ impl Plugin for AlignSelfPlugin {
         "self"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["auto", "start", "center", "end", "stretch"].contains(value)
             }
@@ -103,21 +91,15 @@ impl Plugin for AlignSelfPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "auto" => writeln!(buffer, "align-self: auto;")?,
-                "start" => writeln!(buffer, "align-self: flex-start;")?,
-                "center" => writeln!(buffer, "align-self: center;")?,
-                "end" => writeln!(buffer, "align-self: flex-end;")?,
-                "stretch" => writeln!(buffer, "align-self: stretch;")?,
+                "auto" => writeln!(context.buffer, "align-self: auto;")?,
+                "start" => writeln!(context.buffer, "align-self: flex-start;")?,
+                "center" => writeln!(context.buffer, "align-self: center;")?,
+                "end" => writeln!(context.buffer, "align-self: flex-end;")?,
+                "stretch" => writeln!(context.buffer, "align-self: stretch;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -135,8 +117,8 @@ impl Plugin for JustifyContentPlugin {
         "justify"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["start", "center", "end", "between", "around", "evenly"].contains(value)
             }
@@ -144,22 +126,16 @@ impl Plugin for JustifyContentPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "start" => writeln!(buffer, "justify-content: flex-start;")?,
-                "center" => writeln!(buffer, "justify-content: center;")?,
-                "end" => writeln!(buffer, "justify-content: flex-end;")?,
-                "between" => writeln!(buffer, "justify-content: space-between;")?,
-                "around" => writeln!(buffer, "justify-content: space-around;")?,
-                "evenly" => writeln!(buffer, "justify-content: space-evenly;")?,
+                "start" => writeln!(context.buffer, "justify-content: flex-start;")?,
+                "center" => writeln!(context.buffer, "justify-content: center;")?,
+                "end" => writeln!(context.buffer, "justify-content: flex-end;")?,
+                "between" => writeln!(context.buffer, "justify-content: space-between;")?,
+                "around" => writeln!(context.buffer, "justify-content: space-around;")?,
+                "evenly" => writeln!(context.buffer, "justify-content: space-evenly;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -177,8 +153,8 @@ impl Plugin for JustifyItemsPlugin {
         "justify-items"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["stretch", "start", "center", "end", "auto"].contains(value)
             }
@@ -186,21 +162,15 @@ impl Plugin for JustifyItemsPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "stretch" => writeln!(buffer, "justify-items: stretch;")?,
-                "start" => writeln!(buffer, "justify-items: start;")?,
-                "center" => writeln!(buffer, "justify-items: center;")?,
-                "end" => writeln!(buffer, "justify-items: end;")?,
-                "auto" => writeln!(buffer, "justify-items: auto;")?,
+                "stretch" => writeln!(context.buffer, "justify-items: stretch;")?,
+                "start" => writeln!(context.buffer, "justify-items: start;")?,
+                "center" => writeln!(context.buffer, "justify-items: center;")?,
+                "end" => writeln!(context.buffer, "justify-items: end;")?,
+                "auto" => writeln!(context.buffer, "justify-items: auto;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -218,8 +188,8 @@ impl Plugin for JustifySelfPlugin {
         "justify-self"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["stretch", "start", "center", "end", "auto"].contains(value)
             }
@@ -227,21 +197,15 @@ impl Plugin for JustifySelfPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "stretch" => writeln!(buffer, "justify-self: stretch;")?,
-                "start" => writeln!(buffer, "justify-self: start;")?,
-                "center" => writeln!(buffer, "justify-self: center;")?,
-                "end" => writeln!(buffer, "justify-self: end;")?,
-                "auto" => writeln!(buffer, "justify-self: auto;")?,
+                "stretch" => writeln!(context.buffer, "justify-self: stretch;")?,
+                "start" => writeln!(context.buffer, "justify-self: start;")?,
+                "center" => writeln!(context.buffer, "justify-self: center;")?,
+                "end" => writeln!(context.buffer, "justify-self: end;")?,
+                "auto" => writeln!(context.buffer, "justify-self: auto;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -259,8 +223,8 @@ impl Plugin for PlaceContentPlugin {
         "place-content"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["start", "center", "end", "between", "around", "evenly"].contains(value)
             }
@@ -268,22 +232,16 @@ impl Plugin for PlaceContentPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "start" => writeln!(buffer, "place-content: start;")?,
-                "center" => writeln!(buffer, "place-content: center;")?,
-                "end" => writeln!(buffer, "place-content: end;")?,
-                "between" => writeln!(buffer, "place-content: space-between;")?,
-                "around" => writeln!(buffer, "place-content: space-around;")?,
-                "evenly" => writeln!(buffer, "place-content: space-evenly;")?,
+                "start" => writeln!(context.buffer, "place-content: start;")?,
+                "center" => writeln!(context.buffer, "place-content: center;")?,
+                "end" => writeln!(context.buffer, "place-content: end;")?,
+                "between" => writeln!(context.buffer, "place-content: space-between;")?,
+                "around" => writeln!(context.buffer, "place-content: space-around;")?,
+                "evenly" => writeln!(context.buffer, "place-content: space-evenly;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -301,27 +259,21 @@ impl Plugin for PlaceItemsPlugin {
         "place-items"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["stretch", "start", "center", "end"].contains(value),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "stretch" => writeln!(buffer, "place-items: stretch;")?,
-                "start" => writeln!(buffer, "place-items: start;")?,
-                "center" => writeln!(buffer, "place-items: center;")?,
-                "end" => writeln!(buffer, "place-items: end;")?,
+                "stretch" => writeln!(context.buffer, "place-items: stretch;")?,
+                "start" => writeln!(context.buffer, "place-items: start;")?,
+                "center" => writeln!(context.buffer, "place-items: center;")?,
+                "end" => writeln!(context.buffer, "place-items: end;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -339,8 +291,8 @@ impl Plugin for PlaceSelfPlugin {
         "place-self"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["auto", "start", "center", "end", "stretch"].contains(value)
             }
@@ -348,21 +300,15 @@ impl Plugin for PlaceSelfPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "auto" => writeln!(buffer, "place-self: auto;")?,
-                "start" => writeln!(buffer, "place-self: start;")?,
-                "center" => writeln!(buffer, "place-self: center;")?,
-                "end" => writeln!(buffer, "place-self: end;")?,
-                "stretch" => writeln!(buffer, "place-self: stretch;")?,
+                "auto" => writeln!(context.buffer, "place-self: auto;")?,
+                "start" => writeln!(context.buffer, "place-self: start;")?,
+                "center" => writeln!(context.buffer, "place-self: center;")?,
+                "end" => writeln!(context.buffer, "place-self: end;")?,
+                "stretch" => writeln!(context.buffer, "place-self: stretch;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),

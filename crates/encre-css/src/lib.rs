@@ -20,6 +20,7 @@
 //! - `rayon`: enables [rayon](https://docs.rs/rayon/latest/rayon) parallel iterators
 
 pub mod config;
+pub mod context;
 pub mod error;
 pub mod extractor;
 pub mod generator;

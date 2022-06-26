@@ -1,6 +1,6 @@
 use super::{to_css_value, Plugin};
 use crate::{
-    config::Config,
+    context::{ContextCanHandle, ContextHandle},
     selector::Modifier,
     utils::{format_negative, indent, value_matchers::*},
 };
@@ -19,25 +19,19 @@ impl Plugin for FilterPlugin {
         "filter"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["", "none"].contains(&&**value),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "" => writeln!(buffer, "{}", CSS_FILTER)?,
-                "none" => writeln!(buffer, "filter: none;")?,
+                "" => writeln!(context.buffer, "{}", CSS_FILTER)?,
+                "none" => writeln!(context.buffer, "filter: none;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -55,8 +49,8 @@ impl Plugin for BlurPlugin {
         "blur"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["", "sm", "md", "lg", "xl", "2xl", "3xl", "none"].contains(&&**value)
             }
@@ -64,33 +58,27 @@ impl Plugin for BlurPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "" => writeln!(buffer, "--en-blur: blur(8px);")?,
-                "sm" => writeln!(buffer, "--en-blur: blur(4px);")?,
-                "md" => writeln!(buffer, "--en-blur: blur(12px);")?,
-                "lg" => writeln!(buffer, "--en-blur: blur(16px);")?,
-                "xl" => writeln!(buffer, "--en-blur: blur(24px);")?,
-                "2xl" => writeln!(buffer, "--en-blur: blur(40px);")?,
-                "3xl" => writeln!(buffer, "--en-blur: blur(64px);")?,
-                "none" => writeln!(buffer, "--en-blur: blur(0);")?,
+                "" => writeln!(context.buffer, "--en-blur: blur(8px);")?,
+                "sm" => writeln!(context.buffer, "--en-blur: blur(4px);")?,
+                "md" => writeln!(context.buffer, "--en-blur: blur(12px);")?,
+                "lg" => writeln!(context.buffer, "--en-blur: blur(16px);")?,
+                "xl" => writeln!(context.buffer, "--en-blur: blur(24px);")?,
+                "2xl" => writeln!(context.buffer, "--en-blur: blur(40px);")?,
+                "3xl" => writeln!(context.buffer, "--en-blur: blur(64px);")?,
+                "none" => writeln!(context.buffer, "--en-blur: blur(0);")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "--en-blur: blur({});", to_css_value(value))?
+                writeln!(context.buffer, "--en-blur: blur({});", to_css_value(value))?
             }
         }
 
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_FILTER)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_FILTER)?;
 
         Ok(())
     }
@@ -104,33 +92,27 @@ impl Plugin for BrightnessPlugin {
         "brightness"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
         // NOTE: Not-compatible with TailwindCSS, support all values
-        match modifier {
+        match context.modifier {
             Modifier::Basic { value, .. } => writeln!(
-                buffer,
+                context.buffer,
                 "--en-brightness: brightness({});",
                 value.parse::<usize>().unwrap() as f32 / 100.
             )?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_FILTER)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_FILTER)?;
 
         Ok(())
     }
@@ -144,33 +126,27 @@ impl Plugin for ContrastPlugin {
         "contrast"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
         // NOTE: Not-compatible with TailwindCSS, support all values
-        match modifier {
+        match context.modifier {
             Modifier::Basic { value, .. } => writeln!(
-                buffer,
+                context.buffer,
                 "--en-contrast: contrast({});",
                 value.parse::<usize>().unwrap() as f32 / 100.
             )?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_FILTER)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_FILTER)?;
 
         Ok(())
     }
@@ -184,8 +160,8 @@ impl Plugin for DropShadowPlugin {
         "drop-shadow"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["", "sm", "md", "lg", "xl", "2xl", "none"].contains(&&**value)
             }
@@ -193,30 +169,24 @@ impl Plugin for DropShadowPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "" => writeln!(buffer, "--en-drop-shadow: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));")?,
-                "sm" => writeln!(buffer, "--en-drop-shadow: drop-shadow(0 1px 1px rgb(0 0 0 / 0.05));")?,
-                "md" => writeln!(buffer, "--en-drop-shadow: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));")?,
-                "lg" => writeln!(buffer, "--en-drop-shadow: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));")?,
-                "xl" => writeln!(buffer, "--en-drop-shadow: drop-shadow(0 20px 13px rgb(0 0 0 / 0.03)) drop-shadow(0 8px 5px rgb(0 0 0 / 0.08));")?,
-                "2xl" => writeln!(buffer, "--en-drop-shadow: drop-shadow(0 25px 25px rgb(0 0 0 / 0.15));")?,
-                "none" => writeln!(buffer, "--en-drop-shadow: drop-shadow(0 0 #0000);")?,
+                "" => writeln!(context.buffer, "--en-drop-shadow: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));")?,
+                "sm" => writeln!(context.buffer, "--en-drop-shadow: drop-shadow(0 1px 1px rgb(0 0 0 / 0.05));")?,
+                "md" => writeln!(context.buffer, "--en-drop-shadow: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));")?,
+                "lg" => writeln!(context.buffer, "--en-drop-shadow: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));")?,
+                "xl" => writeln!(context.buffer, "--en-drop-shadow: drop-shadow(0 20px 13px rgb(0 0 0 / 0.03)) drop-shadow(0 8px 5px rgb(0 0 0 / 0.08));")?,
+                "2xl" => writeln!(context.buffer, "--en-drop-shadow: drop-shadow(0 25px 25px rgb(0 0 0 / 0.15));")?,
+                "none" => writeln!(context.buffer, "--en-drop-shadow: drop-shadow(0 0 #0000);")?,
                 _ => unreachable!(),
             }
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "--en-drop-shadow: drop-shadow({});", to_css_value(value))?,
+            Modifier::Arbitrary { value, .. } => writeln!(context.buffer, "--en-drop-shadow: drop-shadow({});", to_css_value(value))?,
         }
 
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_FILTER)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_FILTER)?;
 
         Ok(())
     }
@@ -230,8 +200,8 @@ impl Plugin for GrayscalePlugin {
         "grayscale"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["", "0"].contains(&&**value),
             Modifier::Arbitrary { value, .. } => {
                 is_matching_float(value) || is_matching_percentage(value)
@@ -239,29 +209,23 @@ impl Plugin for GrayscalePlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "" => writeln!(buffer, "--en-grayscale: grayscale(100%);")?,
-                "0" => writeln!(buffer, "--en-grayscale: grayscale(0);")?,
+                "" => writeln!(context.buffer, "--en-grayscale: grayscale(100%);")?,
+                "0" => writeln!(context.buffer, "--en-grayscale: grayscale(0);")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => writeln!(
-                buffer,
+                context.buffer,
                 "--en-grayscale: grayscale({});",
                 to_css_value(value)
             )?,
         }
 
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_FILTER)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_FILTER)?;
 
         Ok(())
     }
@@ -275,37 +239,31 @@ impl Plugin for HueRotatePlugin {
         "hue-rotate"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
             Modifier::Arbitrary { value, .. } => is_matching_angle(value),
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { is_negative, value } => writeln!(
-                buffer,
+                context.buffer,
                 "--en-hue-rotate: hue-rotate({}{}deg);",
                 format_negative(is_negative),
                 value
             )?,
             Modifier::Arbitrary { value, .. } => writeln!(
-                buffer,
+                context.buffer,
                 "--en-hue-rotate: hue-rotate({});",
                 to_css_value(value)
             )?,
         }
 
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_FILTER)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_FILTER)?;
 
         Ok(())
     }
@@ -319,8 +277,8 @@ impl Plugin for InvertPlugin {
         "invert"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["", "0"].contains(&&**value),
             Modifier::Arbitrary { value, .. } => {
                 is_matching_float(value) || is_matching_percentage(value)
@@ -328,27 +286,21 @@ impl Plugin for InvertPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "" => writeln!(buffer, "--en-invert: invert(100%);")?,
-                "0" => writeln!(buffer, "--en-invert: invert(0);")?,
+                "" => writeln!(context.buffer, "--en-invert: invert(100%);")?,
+                "0" => writeln!(context.buffer, "--en-invert: invert(0);")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "--en-invert: invert({});", to_css_value(value))?
+                writeln!(context.buffer, "--en-invert: invert({});", to_css_value(value))?
             }
         }
 
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_FILTER)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_FILTER)?;
 
         Ok(())
     }
@@ -362,33 +314,27 @@ impl Plugin for SaturatePlugin {
         "saturate"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
         // NOTE: Not-compatible with TailwindCSS, support all values
-        match modifier {
+        match context.modifier {
             Modifier::Basic { value, .. } => writeln!(
-                buffer,
+                context.buffer,
                 "--en-saturate: saturate({});",
                 value.parse::<usize>().unwrap() as f32 / 100.
             )?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_FILTER)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_FILTER)?;
 
         Ok(())
     }
@@ -402,8 +348,8 @@ impl Plugin for SepiaPlugin {
         "sepia"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["", "0"].contains(&&**value),
             Modifier::Arbitrary { value, .. } => {
                 is_matching_float(value) || is_matching_percentage(value)
@@ -411,27 +357,21 @@ impl Plugin for SepiaPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "" => writeln!(buffer, "--en-sepia: sepia(100%);")?,
-                "0" => writeln!(buffer, "--en-sepia: sepia(0);")?,
+                "" => writeln!(context.buffer, "--en-sepia: sepia(100%);")?,
+                "0" => writeln!(context.buffer, "--en-sepia: sepia(0);")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "--en-sepia: sepia({});", to_css_value(value))?
+                writeln!(context.buffer, "--en-sepia: sepia({});", to_css_value(value))?
             }
         }
 
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_FILTER)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_FILTER)?;
 
         Ok(())
     }
@@ -447,32 +387,26 @@ impl Plugin for BackdropFilterPlugin {
         "backdrop-filter"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["", "none"].contains(&&**value),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
                 "" => {
-                    writeln!(buffer, "{}", CSS_BACKDROP_FILTER_1)?;
-                    indent(indentation, buffer)?;
-                    writeln!(buffer, "{}", CSS_BACKDROP_FILTER_2)?;
+                    writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_1)?;
+                    indent(context.indentation, context.buffer)?;
+                    writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_2)?;
                 }
                 "none" => {
-                    writeln!(buffer, "-webkit-backdrop-filter: none;")?;
-                    indent(indentation, buffer)?;
-                    writeln!(buffer, "backdrop-filter: none;")?;
+                    writeln!(context.buffer, "-webkit-backdrop-filter: none;")?;
+                    indent(context.indentation, context.buffer)?;
+                    writeln!(context.buffer, "backdrop-filter: none;")?;
                 }
                 _ => unreachable!(),
             },
@@ -491,8 +425,8 @@ impl Plugin for BackdropBlurPlugin {
         "backdrop-blur"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["", "sm", "md", "lg", "xl", "2xl", "3xl", "none"].contains(&&**value)
             }
@@ -500,35 +434,29 @@ impl Plugin for BackdropBlurPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "" => writeln!(buffer, "--en-backdrop-blur: blur(8px);")?,
-                "sm" => writeln!(buffer, "--en-backdrop-blur: blur(4px);")?,
-                "md" => writeln!(buffer, "--en-backdrop-blur: blur(12px);")?,
-                "lg" => writeln!(buffer, "--en-backdrop-blur: blur(16px);")?,
-                "xl" => writeln!(buffer, "--en-backdrop-blur: blur(24px);")?,
-                "2xl" => writeln!(buffer, "--en-backdrop-blur: blur(40px);")?,
-                "3xl" => writeln!(buffer, "--en-backdrop-blur: blur(64px);")?,
-                "none" => writeln!(buffer, "--en-backdrop-blur: blur(0);")?,
+                "" => writeln!(context.buffer, "--en-backdrop-blur: blur(8px);")?,
+                "sm" => writeln!(context.buffer, "--en-backdrop-blur: blur(4px);")?,
+                "md" => writeln!(context.buffer, "--en-backdrop-blur: blur(12px);")?,
+                "lg" => writeln!(context.buffer, "--en-backdrop-blur: blur(16px);")?,
+                "xl" => writeln!(context.buffer, "--en-backdrop-blur: blur(24px);")?,
+                "2xl" => writeln!(context.buffer, "--en-backdrop-blur: blur(40px);")?,
+                "3xl" => writeln!(context.buffer, "--en-backdrop-blur: blur(64px);")?,
+                "none" => writeln!(context.buffer, "--en-backdrop-blur: blur(0);")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "--en-backdrop-blur: blur({});", to_css_value(value))?
+                writeln!(context.buffer, "--en-backdrop-blur: blur({});", to_css_value(value))?
             }
         }
 
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_BACKDROP_FILTER_1)?;
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_BACKDROP_FILTER_2)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_1)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_2)?;
 
         Ok(())
     }
@@ -542,35 +470,29 @@ impl Plugin for BackdropBrightnessPlugin {
         "backdrop-brightness"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
         // NOTE: Not-compatible with TailwindCSS, support all values
-        match modifier {
+        match context.modifier {
             Modifier::Basic { value, .. } => writeln!(
-                buffer,
+                context.buffer,
                 "--en-backdrop-brightness: brightness({});",
                 value.parse::<usize>().unwrap() as f32 / 100.
             )?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_BACKDROP_FILTER_1)?;
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_BACKDROP_FILTER_2)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_1)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_2)?;
 
         Ok(())
     }
@@ -584,35 +506,29 @@ impl Plugin for BackdropContrastPlugin {
         "backdrop-contrast"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
         // NOTE: Not-compatible with TailwindCSS, support all values
-        match modifier {
+        match context.modifier {
             Modifier::Basic { value, .. } => writeln!(
-                buffer,
+                context.buffer,
                 "--en-backdrop-contrast: contrast({});",
                 value.parse::<usize>().unwrap() as f32 / 100.
             )?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_BACKDROP_FILTER_1)?;
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_BACKDROP_FILTER_2)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_1)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_2)?;
 
         Ok(())
     }
@@ -626,8 +542,8 @@ impl Plugin for BackdropGrayscalePlugin {
         "backdrop-grayscale"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["", "0"].contains(&&**value),
             Modifier::Arbitrary { value, .. } => {
                 is_matching_float(value) || is_matching_percentage(value)
@@ -635,31 +551,25 @@ impl Plugin for BackdropGrayscalePlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "" => writeln!(buffer, "--en-backdrop-grayscale: grayscale(100%);")?,
-                "0" => writeln!(buffer, "--en-backdrop-grayscale: grayscale(0);")?,
+                "" => writeln!(context.buffer, "--en-backdrop-grayscale: grayscale(100%);")?,
+                "0" => writeln!(context.buffer, "--en-backdrop-grayscale: grayscale(0);")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => writeln!(
-                buffer,
+                context.buffer,
                 "--en-backdrop-grayscale: grayscale({});",
                 to_css_value(value)
             )?,
         }
 
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_BACKDROP_FILTER_1)?;
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_BACKDROP_FILTER_2)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_1)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_2)?;
 
         Ok(())
     }
@@ -673,39 +583,33 @@ impl Plugin for BackdropHueRotatePlugin {
         "backdrop-hue-rotate"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
             Modifier::Arbitrary { value, .. } => is_matching_angle(value),
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { is_negative, value } => writeln!(
-                buffer,
+                context.buffer,
                 "--en-backdrop-hue-rotate: hue-rotate({}{}deg);",
                 format_negative(is_negative),
                 value
             )?,
             Modifier::Arbitrary { value, .. } => writeln!(
-                buffer,
+                context.buffer,
                 "--en-backdrop-hue-rotate: hue-rotate({});",
                 to_css_value(value)
             )?,
         }
 
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_BACKDROP_FILTER_1)?;
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_BACKDROP_FILTER_2)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_1)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_2)?;
 
         Ok(())
     }
@@ -719,8 +623,8 @@ impl Plugin for BackdropInvertPlugin {
         "backdrop-invert"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["", "0"].contains(&&**value),
             Modifier::Arbitrary { value, .. } => {
                 is_matching_float(value) || is_matching_percentage(value)
@@ -728,31 +632,25 @@ impl Plugin for BackdropInvertPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "" => writeln!(buffer, "--en-backdrop-invert: invert(100%);")?,
-                "0" => writeln!(buffer, "--en-backdrop-invert: invert(0);")?,
+                "" => writeln!(context.buffer, "--en-backdrop-invert: invert(100%);")?,
+                "0" => writeln!(context.buffer, "--en-backdrop-invert: invert(0);")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => writeln!(
-                buffer,
+                context.buffer,
                 "--en-backdrop-invert: invert({});",
                 to_css_value(value)
             )?,
         }
 
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_BACKDROP_FILTER_1)?;
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_BACKDROP_FILTER_2)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_1)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_2)?;
 
         Ok(())
     }
@@ -766,25 +664,19 @@ impl Plugin for BackdropOpacityPlugin {
         "backdrop-opacity"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        indent(indentation, buffer)?;
-        match modifier {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => writeln!(
-                buffer,
+                context.buffer,
                 "--en-backdrop-opacity: {};",
                 value.parse::<usize>().unwrap() as f32 / 100.
             )?,
@@ -803,35 +695,29 @@ impl Plugin for BackdropSaturatePlugin {
         "backdrop-saturate"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
         // NOTE: Not-compatible with TailwindCSS, support all values
-        match modifier {
+        match context.modifier {
             Modifier::Basic { value, .. } => writeln!(
-                buffer,
+                context.buffer,
                 "--en-backdrop-saturate: saturate({});",
                 value.parse::<usize>().unwrap() as f32 / 100.
             )?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_BACKDROP_FILTER_1)?;
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_BACKDROP_FILTER_2)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_1)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_2)?;
 
         Ok(())
     }
@@ -845,8 +731,8 @@ impl Plugin for BackdropSepiaPlugin {
         "backdrop-sepia"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["", "0"].contains(&&**value),
             Modifier::Arbitrary { value, .. } => {
                 is_matching_float(value) || is_matching_percentage(value)
@@ -854,31 +740,25 @@ impl Plugin for BackdropSepiaPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "" => writeln!(buffer, "--en-backdrop-sepia: sepia(100%);")?,
-                "0" => writeln!(buffer, "--en-backdrop-sepia: sepia(0);")?,
+                "" => writeln!(context.buffer, "--en-backdrop-sepia: sepia(100%);")?,
+                "0" => writeln!(context.buffer, "--en-backdrop-sepia: sepia(0);")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => writeln!(
-                buffer,
+                context.buffer,
                 "--en-backdrop-sepia: sepia({});",
                 to_css_value(value)
             )?,
         }
 
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_BACKDROP_FILTER_1)?;
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_BACKDROP_FILTER_2)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_1)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_2)?;
 
         Ok(())
     }

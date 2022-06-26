@@ -1,6 +1,5 @@
 use super::{to_css_value, Plugin};
-use crate::utils::{color, indent, length, value_matchers::*};
-use crate::{config::Config, selector::Modifier};
+use crate::{context::{ContextCanHandle, ContextHandle}, utils::{color, indent, length, value_matchers::*}, selector::Modifier};
 
 use std::fmt::{self, Write};
 
@@ -12,27 +11,21 @@ impl Plugin for AccentColorPlugin {
         "accent"
     }
 
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
-            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(context.config, value),
             Modifier::Arbitrary { value, .. } => is_matching_color(value),
         }
     }
 
-    fn handle(
-        &self,
-        config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        let value = match modifier {
-            Modifier::Basic { value, .. } => color::get(config, value, None).unwrap(),
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        let value = match context.modifier {
+            Modifier::Basic { value, .. } => color::get(context.config, value, None).unwrap(),
             Modifier::Arbitrary { value, .. } => to_css_value(*value),
         };
 
-        writeln!(buffer, "accent-color: {value};")
+        writeln!(context.buffer, "accent-color: {value};")
     }
 }
 
@@ -44,28 +37,22 @@ impl Plugin for AppearancePlugin {
         "appearance"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => *value == "none",
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { .. } => {
-                writeln!(buffer, "-webkit-appearance: none;")?;
-                indent(indentation, buffer)?;
-                writeln!(buffer, "-moz-appearance: none;")?;
-                indent(indentation, buffer)?;
-                writeln!(buffer, "appearance: none;")?;
+                writeln!(context.buffer, "-webkit-appearance: none;")?;
+                indent(context.indentation, context.buffer)?;
+                writeln!(context.buffer, "-moz-appearance: none;")?;
+                indent(context.indentation, context.buffer)?;
+                writeln!(context.buffer, "appearance: none;")?;
             }
             Modifier::Arbitrary { .. } => unreachable!(),
         }
@@ -82,8 +69,8 @@ impl Plugin for CursorPlugin {
         "cursor"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => [
                 "auto",
                 "default",
@@ -127,18 +114,12 @@ impl Plugin for CursorPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => writeln!(buffer, "cursor: {value};")?,
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
+            Modifier::Basic { value, .. } => writeln!(context.buffer, "cursor: {value};")?,
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "cursor: {};", to_css_value(value))?
+                writeln!(context.buffer, "cursor: {};", to_css_value(value))?
             }
         }
 
@@ -154,27 +135,21 @@ impl Plugin for CaretColorPlugin {
         "caret"
     }
 
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
-            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(context.config, value),
             Modifier::Arbitrary { value, .. } => is_matching_color(value),
         }
     }
 
-    fn handle(
-        &self,
-        config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        let value = match modifier {
-            Modifier::Basic { value, .. } => color::get(config, value, None).unwrap(),
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        let value = match context.modifier {
+            Modifier::Basic { value, .. } => color::get(context.config, value, None).unwrap(),
             Modifier::Arbitrary { value, .. } => to_css_value(*value),
         };
 
-        writeln!(buffer, "caret-color: {value};")
+        writeln!(context.buffer, "caret-color: {value};")
     }
 }
 
@@ -186,23 +161,17 @@ impl Plugin for PointerEventsPlugin {
         "pointer-events"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["auto", "none"].contains(&&**value),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => writeln!(buffer, "pointer-events: {value};")?,
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
+            Modifier::Basic { value, .. } => writeln!(context.buffer, "pointer-events: {value};")?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
@@ -218,27 +187,21 @@ impl Plugin for ResizePlugin {
         "resize"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["", "x", "y", "none"].contains(&&**value),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "" => writeln!(buffer, "resize: both;")?,
-                "none" => writeln!(buffer, "resize: none;")?,
-                "x" => writeln!(buffer, "resize: horizontal;")?,
-                "y" => writeln!(buffer, "resize: vertical;")?,
+                "" => writeln!(context.buffer, "resize: both;")?,
+                "none" => writeln!(context.buffer, "resize: none;")?,
+                "x" => writeln!(context.buffer, "resize: horizontal;")?,
+                "y" => writeln!(context.buffer, "resize: vertical;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -256,23 +219,17 @@ impl Plugin for ScrollBehaviorPlugin {
         "scroll"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["auto", "smooth"].contains(&&**value),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => writeln!(buffer, "scroll-behavior: {value};")?,
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
+            Modifier::Basic { value, .. } => writeln!(context.buffer, "scroll-behavior: {value};")?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
@@ -282,8 +239,8 @@ impl Plugin for ScrollBehaviorPlugin {
 
 // Scroll margin
 
-fn scroll_margin_padding_can_handle(modifier: &Modifier) -> bool {
-    match modifier {
+fn scroll_margin_padding_can_handle(context: ContextCanHandle) -> bool {
+    match context.modifier {
         Modifier::Basic { is_negative, value } => {
             length::get_basic(value, *is_negative).is_some() || *value == "auto"
         }
@@ -293,16 +250,14 @@ fn scroll_margin_padding_can_handle(modifier: &Modifier) -> bool {
 
 pub fn scroll_margin_padding_handle(
     css_properties: &[&str],
-    modifier: &Modifier,
-    indentation: usize,
-    buffer: &mut String,
+    context: ContextHandle,
 ) -> fmt::Result {
-    match modifier {
+    match context.modifier {
         Modifier::Basic { is_negative, value } => {
             for css_prop in css_properties {
-                indent(indentation, buffer)?;
+                indent(context.indentation, context.buffer)?;
                 writeln!(
-                    buffer,
+                    context.buffer,
                     "{}: {};",
                     css_prop,
                     length::get_basic(value, *is_negative).unwrap(),
@@ -312,8 +267,8 @@ pub fn scroll_margin_padding_handle(
         Modifier::Arbitrary { value, .. } => {
             let value = to_css_value(value);
             for css_prop in css_properties {
-                indent(indentation, buffer)?;
-                writeln!(buffer, "{}: {};", css_prop, value)?;
+                indent(context.indentation, context.buffer)?;
+                writeln!(context.buffer, "{}: {};", css_prop, value)?;
             }
         }
     }
@@ -329,18 +284,12 @@ impl Plugin for ScrollMarginPlugin {
         "scroll-m"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        scroll_margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scroll_margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        scroll_margin_padding_handle(&["scroll-margin"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-margin"], context)
     }
 }
 
@@ -352,23 +301,12 @@ impl Plugin for ScrollMarginXPlugin {
         "scroll-mx"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        scroll_margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scroll_margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        scroll_margin_padding_handle(
-            &["scroll-margin-left", "scroll-margin-right"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-margin-left", "scroll-margin-right"], context)
     }
 }
 
@@ -380,23 +318,12 @@ impl Plugin for ScrollMarginYPlugin {
         "scroll-my"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        scroll_margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scroll_margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        scroll_margin_padding_handle(
-            &["scroll-margin-top", "scroll-margin-bottom"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-margin-top", "scroll-margin-bottom"], context)
     }
 }
 
@@ -408,18 +335,12 @@ impl Plugin for ScrollMarginLeftPlugin {
         "scroll-ml"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        scroll_margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scroll_margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        scroll_margin_padding_handle(&["scroll-margin-left"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-margin-left"], context)
     }
 }
 
@@ -431,18 +352,12 @@ impl Plugin for ScrollMarginRightPlugin {
         "scroll-mr"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        scroll_margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scroll_margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        scroll_margin_padding_handle(&["scroll-margin-right"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-margin-right"], context)
     }
 }
 
@@ -454,18 +369,12 @@ impl Plugin for ScrollMarginTopPlugin {
         "scroll-mt"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        scroll_margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scroll_margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        scroll_margin_padding_handle(&["scroll-margin-top"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-margin-top"], context)
     }
 }
 
@@ -477,18 +386,12 @@ impl Plugin for ScrollMarginBottomPlugin {
         "scroll-mb"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        scroll_margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scroll_margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        scroll_margin_padding_handle(&["scroll-margin-bottom"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-margin-bottom"], context)
     }
 }
 
@@ -502,18 +405,12 @@ impl Plugin for ScrollPaddingPlugin {
         "scroll-p"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        scroll_margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scroll_margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        scroll_margin_padding_handle(&["scroll-padding"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-padding"], context)
     }
 }
 
@@ -525,23 +422,12 @@ impl Plugin for ScrollPaddingXPlugin {
         "scroll-px"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        scroll_margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scroll_margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        scroll_margin_padding_handle(
-            &["scroll-padding-left", "scroll-padding-right"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-padding-left", "scroll-padding-right"], context)
     }
 }
 
@@ -553,23 +439,12 @@ impl Plugin for ScrollPaddingYPlugin {
         "scroll-py"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        scroll_margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scroll_margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        scroll_margin_padding_handle(
-            &["scroll-padding-top", "scroll-padding-bottom"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-padding-top", "scroll-padding-bottom"], context)
     }
 }
 
@@ -581,18 +456,12 @@ impl Plugin for ScrollPaddingLeftPlugin {
         "scroll-pl"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        scroll_margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scroll_margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        scroll_margin_padding_handle(&["scroll-padding-left"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-padding-left"], context)
     }
 }
 
@@ -604,18 +473,12 @@ impl Plugin for ScrollPaddingRightPlugin {
         "scroll-pr"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        scroll_margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scroll_margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        scroll_margin_padding_handle(&["scroll-padding-right"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-padding-right"], context)
     }
 }
 
@@ -627,18 +490,12 @@ impl Plugin for ScrollPaddingTopPlugin {
         "scroll-pt"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        scroll_margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scroll_margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        scroll_margin_padding_handle(&["scroll-padding-top"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-padding-top"], context)
     }
 }
 
@@ -650,18 +507,12 @@ impl Plugin for ScrollPaddingBottomPlugin {
         "scroll-pb"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        scroll_margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scroll_margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        scroll_margin_padding_handle(&["scroll-padding-bottom"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        scroll_margin_padding_handle(&["scroll-padding-bottom"], context)
     }
 }
 
@@ -673,8 +524,8 @@ impl Plugin for ScrollSnapAlignPlugin {
         "snap"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["start", "end", "center", "align-none"].contains(&&**value)
             }
@@ -682,20 +533,14 @@ impl Plugin for ScrollSnapAlignPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "start" => writeln!(buffer, "scroll-snap-align: start;")?,
-                "end" => writeln!(buffer, "scroll-snap-align: end;")?,
-                "center" => writeln!(buffer, "scroll-snap-align: center;")?,
-                "align-none" => writeln!(buffer, "scroll-snap-align: none;")?,
+                "start" => writeln!(context.buffer, "scroll-snap-align: start;")?,
+                "end" => writeln!(context.buffer, "scroll-snap-align: end;")?,
+                "center" => writeln!(context.buffer, "scroll-snap-align: center;")?,
+                "align-none" => writeln!(context.buffer, "scroll-snap-align: none;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -713,25 +558,19 @@ impl Plugin for ScrollSnapStopPlugin {
         "snap"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["normal", "always"].contains(&&**value),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "normal" => writeln!(buffer, "scroll-snap-stop: normal;")?,
-                "always" => writeln!(buffer, "scroll-snap-stop: always;")?,
+                "normal" => writeln!(context.buffer, "scroll-snap-stop: normal;")?,
+                "always" => writeln!(context.buffer, "scroll-snap-stop: always;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -749,8 +588,8 @@ impl Plugin for ScrollSnapTypePlugin {
         "snap"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["x", "y", "both", "mandatory", "proximity", "none"].contains(&&**value)
             }
@@ -758,56 +597,50 @@ impl Plugin for ScrollSnapTypePlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
                 "none" => {
-                    writeln!(buffer, "-ms-scroll-snap-type: none;")?;
-                    indent(indentation, buffer)?;
-                    writeln!(buffer, "scroll-snap-type: none;")?;
+                    writeln!(context.buffer, "-ms-scroll-snap-type: none;")?;
+                    indent(context.indentation, context.buffer)?;
+                    writeln!(context.buffer, "scroll-snap-type: none;")?;
                 }
                 "x" => {
                     writeln!(
-                        buffer,
+                        context.buffer,
                         "-ms-scroll-snap-type: x var(--en-scroll-snap-strictness);"
                     )?;
-                    indent(indentation, buffer)?;
+                    indent(context.indentation, context.buffer)?;
                     writeln!(
-                        buffer,
+                        context.buffer,
                         "scroll-snap-type: x var(--en-scroll-snap-strictness);"
                     )?;
                 }
                 "y" => {
                     writeln!(
-                        buffer,
+                        context.buffer,
                         "-ms-scroll-snap-type: y var(--en-scroll-snap-strictness);"
                     )?;
-                    indent(indentation, buffer)?;
+                    indent(context.indentation, context.buffer)?;
                     writeln!(
-                        buffer,
+                        context.buffer,
                         "scroll-snap-type: y var(--en-scroll-snap-strictness);"
                     )?;
                 }
                 "both" => {
                     writeln!(
-                        buffer,
+                        context.buffer,
                         "-ms-scroll-snap-type: both var(--en-scroll-snap-strictness);"
                     )?;
-                    indent(indentation, buffer)?;
+                    indent(context.indentation, context.buffer)?;
                     writeln!(
-                        buffer,
+                        context.buffer,
                         "scroll-snap-type: both var(--en-scroll-snap-strictness);"
                     )?;
                 }
-                "mandatory" => writeln!(buffer, "--en-scroll-snap-strictness: mandatory;")?,
-                "proximity" => writeln!(buffer, "--en-scroll-snap-strictness: proximity;")?,
+                "mandatory" => writeln!(context.buffer, "--en-scroll-snap-strictness: mandatory;")?,
+                "proximity" => writeln!(context.buffer, "--en-scroll-snap-strictness: proximity;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -825,8 +658,8 @@ impl Plugin for TouchActionPlugin {
         "touch"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => [
                 "auto",
                 "pan-x",
@@ -844,16 +677,10 @@ impl Plugin for TouchActionPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => writeln!(buffer, "touch-action: {value};")?,
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
+            Modifier::Basic { value, .. } => writeln!(context.buffer, "touch-action: {value};")?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
@@ -869,23 +696,17 @@ impl Plugin for UserSelectPlugin {
         "select"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["text", "all", "auto", "none"].contains(&&**value),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => writeln!(buffer, "user-select: {value};")?,
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
+            Modifier::Basic { value, .. } => writeln!(context.buffer, "user-select: {value};")?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
@@ -901,8 +722,8 @@ impl Plugin for WillChangePlugin {
         "will-change"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["auto", "scroll", "contents", "transform"].contains(&&**value)
             }
@@ -910,23 +731,17 @@ impl Plugin for WillChangePlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "auto" => writeln!(buffer, "will-change: auto;")?,
-                "scroll" => writeln!(buffer, "will-change: scroll-position;")?,
-                "contents" => writeln!(buffer, "will-change: contents;")?,
-                "transform" => writeln!(buffer, "will-change: transfrom;")?,
+                "auto" => writeln!(context.buffer, "will-change: auto;")?,
+                "scroll" => writeln!(context.buffer, "will-change: scroll-position;")?,
+                "contents" => writeln!(context.buffer, "will-change: contents;")?,
+                "transform" => writeln!(context.buffer, "will-change: transfrom;")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "will-change: {value};")?,
+            Modifier::Arbitrary { value, .. } => writeln!(context.buffer, "will-change: {value};")?,
         }
 
         Ok(())

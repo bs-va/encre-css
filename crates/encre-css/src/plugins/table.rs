@@ -1,6 +1,6 @@
 use super::{to_css_value, Plugin};
 use crate::{
-    config::Config,
+    context::{ContextCanHandle, ContextHandle},
     selector::Modifier,
     utils::{indent, length, value_matchers::*},
 };
@@ -15,25 +15,19 @@ impl Plugin for BorderCollapsePlugin {
         "border"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["collapse", "separate"].contains(&&**value),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "collapse" => writeln!(buffer, "border-collapse: collapse;")?,
-                "separate" => writeln!(buffer, "border-collapse: separate;")?,
+                "collapse" => writeln!(context.buffer, "border-collapse: collapse;")?,
+                "separate" => writeln!(context.buffer, "border-collapse: separate;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -43,8 +37,8 @@ impl Plugin for BorderCollapsePlugin {
     }
 }
 
-pub fn border_spacing_can_handle(modifier: &Modifier) -> bool {
-    match modifier {
+pub fn border_spacing_can_handle(context: ContextCanHandle) -> bool {
+    match context.modifier {
         Modifier::Basic { is_negative, value } => {
             length::get_extended(value, *is_negative).is_some()
         }
@@ -54,16 +48,14 @@ pub fn border_spacing_can_handle(modifier: &Modifier) -> bool {
 
 pub fn border_spacing_handle(
     css_props: &[&str],
-    modifier: &Modifier,
-    indentation: usize,
-    buffer: &mut String,
+    context: ContextHandle,
 ) -> fmt::Result {
-    match modifier {
+    match context.modifier {
         Modifier::Basic { is_negative, value } => {
             for css_prop in css_props {
-                indent(indentation, buffer)?;
+                indent(context.indentation, context.buffer)?;
                 writeln!(
-                    buffer,
+                    context.buffer,
                     "{}: {};",
                     css_prop,
                     length::get_extended(value, *is_negative).unwrap()
@@ -72,15 +64,15 @@ pub fn border_spacing_handle(
         }
         Modifier::Arbitrary { value, .. } => {
             for css_prop in css_props {
-                indent(indentation, buffer)?;
-                writeln!(buffer, "{}: {};", css_prop, to_css_value(value))?
+                indent(context.indentation, context.buffer)?;
+                writeln!(context.buffer, "{}: {};", css_prop, to_css_value(value))?
             }
         }
     }
 
-    indent(indentation, buffer)?;
+    indent(context.indentation, context.buffer)?;
     writeln!(
-        buffer,
+        context.buffer,
         "border-spacing: var(--en-border-spacing-x) var(--en-border-spacing-y);"
     )?;
     Ok(())
@@ -94,23 +86,12 @@ impl Plugin for BorderSpacingPlugin {
         "border-spacing"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        border_spacing_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        border_spacing_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        border_spacing_handle(
-            &["--en-border-spacing-x", "--en-border-spacing-y"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        border_spacing_handle(&["--en-border-spacing-x", "--en-border-spacing-y"], context)
     }
 }
 
@@ -122,18 +103,12 @@ impl Plugin for BorderSpacingXPlugin {
         "border-spacing-x"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        border_spacing_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        border_spacing_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        border_spacing_handle(&["--en-border-spacing-x"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        border_spacing_handle(&["--en-border-spacing-x"], context)
     }
 }
 
@@ -145,18 +120,12 @@ impl Plugin for BorderSpacingYPlugin {
         "border-spacing-y"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        border_spacing_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        border_spacing_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        border_spacing_handle(&["--en-border-spacing-y"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        border_spacing_handle(&["--en-border-spacing-y"], context)
     }
 }
 
@@ -168,25 +137,19 @@ impl Plugin for TableLayoutPlugin {
         "table"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["auto", "fixed"].contains(&&**value),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "auto" => writeln!(buffer, "table-layout: auto;")?,
-                "fixed" => writeln!(buffer, "table-layout: fixed;")?,
+                "auto" => writeln!(context.buffer, "table-layout: auto;")?,
+                "fixed" => writeln!(context.buffer, "table-layout: fixed;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),

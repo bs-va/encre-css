@@ -1,6 +1,7 @@
 use super::{to_css_value, Plugin};
 use crate::{
-    config::{Config, BUILTIN_SCREENS},
+    context::{ContextCanHandle, ContextHandle},
+    config::BUILTIN_SCREENS,
     selector::Modifier,
     utils::{indent, length, value_matchers::*},
 };
@@ -19,30 +20,24 @@ impl Plugin for AspectRatioPlugin {
         "aspect"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["auto", "square", "video"].contains(&&**value),
             Modifier::Arbitrary { value, .. } => is_matching_all(value),
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "auto" => writeln!(buffer, "aspect-ratio: auto;")?,
-                "square" => writeln!(buffer, "aspect-ratio: 1 / 1;")?,
-                "video" => writeln!(buffer, "aspect-ratio: 16 / 9;")?,
+                "auto" => writeln!(context.buffer, "aspect-ratio: auto;")?,
+                "square" => writeln!(context.buffer, "aspect-ratio: 1 / 1;")?,
+                "video" => writeln!(context.buffer, "aspect-ratio: 16 / 9;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => writeln!(
-                buffer,
+                context.buffer,
                 "aspect-ratio: {};",
                 to_css_value(&value.replace('/', " / "))
             )?,
@@ -56,8 +51,8 @@ impl Plugin for AspectRatioPlugin {
 pub struct PositionPlugin;
 
 impl Plugin for PositionPlugin {
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["static", "fixed", "absolute", "relative", "sticky"].contains(&&**value)
             }
@@ -65,16 +60,10 @@ impl Plugin for PositionPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => writeln!(buffer, "position: {value};")?,
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
+            Modifier::Basic { value, .. } => writeln!(context.buffer, "position: {value};")?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
@@ -86,8 +75,8 @@ impl Plugin for PositionPlugin {
 pub struct DisplayPlugin;
 
 impl Plugin for DisplayPlugin {
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => [
                 "hidden",
                 "contents",
@@ -116,37 +105,31 @@ impl Plugin for DisplayPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "hidden" => writeln!(buffer, "display: none;")?,
-                "contents" => writeln!(buffer, "display: contents;")?,
-                "list-item" => writeln!(buffer, "display: list-item;")?,
-                "block" => writeln!(buffer, "display: block;")?,
-                "inline-block" => writeln!(buffer, "display: inline-block;")?,
-                "flex" => writeln!(buffer, "display: flex;")?,
-                "inline-flex" => writeln!(buffer, "display: inline-flex;")?,
-                "inline" => writeln!(buffer, "display: inline;")?,
-                "table" => writeln!(buffer, "display: table;")?,
-                "inline-table" => writeln!(buffer, "display: inline-table;")?,
-                "table-cell" => writeln!(buffer, "display: table-cell;")?,
-                "table-caption" => writeln!(buffer, "display: table-caption;")?,
-                "table-column" => writeln!(buffer, "display: table-column;")?,
-                "table-column-group" => writeln!(buffer, "display: table-column-group;")?,
-                "table-footer-group" => writeln!(buffer, "display: table-footer-group;")?,
-                "table-header-group" => writeln!(buffer, "display: table-header-group;")?,
-                "table-row-group" => writeln!(buffer, "display: table-row-group;")?,
-                "table-row" => writeln!(buffer, "display: table-row;")?,
-                "flow-root" => writeln!(buffer, "display: flow-root;")?,
-                "grid" => writeln!(buffer, "display: grid;")?,
-                "inline-grid" => writeln!(buffer, "display: inline-grid;")?,
+                "hidden" => writeln!(context.buffer, "display: none;")?,
+                "contents" => writeln!(context.buffer, "display: contents;")?,
+                "list-item" => writeln!(context.buffer, "display: list-item;")?,
+                "block" => writeln!(context.buffer, "display: block;")?,
+                "inline-block" => writeln!(context.buffer, "display: inline-block;")?,
+                "flex" => writeln!(context.buffer, "display: flex;")?,
+                "inline-flex" => writeln!(context.buffer, "display: inline-flex;")?,
+                "inline" => writeln!(context.buffer, "display: inline;")?,
+                "table" => writeln!(context.buffer, "display: table;")?,
+                "inline-table" => writeln!(context.buffer, "display: inline-table;")?,
+                "table-cell" => writeln!(context.buffer, "display: table-cell;")?,
+                "table-caption" => writeln!(context.buffer, "display: table-caption;")?,
+                "table-column" => writeln!(context.buffer, "display: table-column;")?,
+                "table-column-group" => writeln!(context.buffer, "display: table-column-group;")?,
+                "table-footer-group" => writeln!(context.buffer, "display: table-footer-group;")?,
+                "table-header-group" => writeln!(context.buffer, "display: table-header-group;")?,
+                "table-row-group" => writeln!(context.buffer, "display: table-row-group;")?,
+                "table-row" => writeln!(context.buffer, "display: table-row;")?,
+                "flow-root" => writeln!(context.buffer, "display: flow-root;")?,
+                "grid" => writeln!(context.buffer, "display: grid;")?,
+                "inline-grid" => writeln!(context.buffer, "display: inline-grid;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -160,25 +143,19 @@ impl Plugin for DisplayPlugin {
 pub struct VisibilityPlugin;
 
 impl Plugin for VisibilityPlugin {
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["visible", "invisible"].contains(&&**value),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "visible" => writeln!(buffer, "visibility: visible;")?,
-                "invisible" => writeln!(buffer, "visibility: hidden;")?,
+                "visible" => writeln!(context.buffer, "visibility: visible;")?,
+                "invisible" => writeln!(context.buffer, "visibility: hidden;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -192,25 +169,19 @@ impl Plugin for VisibilityPlugin {
 pub struct IsolationPlugin;
 
 impl Plugin for IsolationPlugin {
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["isolate", "isolation-auto"].contains(&&**value),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "isolate" => writeln!(buffer, "isolation: isolate;")?,
-                "isolation-auto" => writeln!(buffer, "isolation: auto;")?,
+                "isolate" => writeln!(context.buffer, "isolation: isolate;")?,
+                "isolation-auto" => writeln!(context.buffer, "isolation: auto;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -220,8 +191,8 @@ impl Plugin for IsolationPlugin {
     }
 }
 
-pub fn position_can_handle(modifier: &Modifier) -> bool {
-    match modifier {
+pub fn position_can_handle(context: ContextCanHandle) -> bool {
+    match context.modifier {
         Modifier::Basic { is_negative, value } => {
             length::get_extended(value, *is_negative).is_some()
         }
@@ -233,16 +204,14 @@ pub fn position_can_handle(modifier: &Modifier) -> bool {
 
 pub fn position_handle(
     css_properties: &[&str],
-    modifier: &Modifier,
-    indentation: usize,
-    buffer: &mut String,
+    context: ContextHandle,
 ) -> fmt::Result {
-    match modifier {
+    match context.modifier {
         Modifier::Basic { is_negative, value } => {
             for css_prop in css_properties {
-                indent(indentation, buffer)?;
+                indent(context.indentation, context.buffer)?;
                 writeln!(
-                    buffer,
+                    context.buffer,
                     "{}: {};",
                     css_prop,
                     length::get_extended(value, *is_negative).unwrap(),
@@ -252,8 +221,8 @@ pub fn position_handle(
         Modifier::Arbitrary { value, .. } => {
             let value = to_css_value(value);
             for css_prop in css_properties {
-                indent(indentation, buffer)?;
-                writeln!(buffer, "{}: {};", css_prop, value)?;
+                indent(context.indentation, context.buffer)?;
+                writeln!(context.buffer, "{}: {};", css_prop, value)?;
             }
         }
     }
@@ -269,8 +238,8 @@ impl Plugin for InsetPlugin {
         "inset"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { is_negative, value } => {
                 length::get_extended(value, *is_negative).is_some()
             }
@@ -283,19 +252,8 @@ impl Plugin for InsetPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        position_handle(
-            &["top", "bottom", "left", "right"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        position_handle(&["top", "bottom", "left", "right"], context)
     }
 }
 
@@ -307,18 +265,12 @@ impl Plugin for InsetXPlugin {
         "inset-x"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        position_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        position_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        position_handle(&["left", "right"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        position_handle(&["left", "right"], context)
     }
 }
 
@@ -330,18 +282,12 @@ impl Plugin for InsetYPlugin {
         "inset-y"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        position_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        position_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        position_handle(&["top", "bottom"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        position_handle(&["top", "bottom"], context)
     }
 }
 
@@ -353,18 +299,12 @@ impl Plugin for TopPlugin {
         "top"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        position_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        position_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        position_handle(&["top"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        position_handle(&["top"], context)
     }
 }
 
@@ -376,18 +316,12 @@ impl Plugin for BottomPlugin {
         "bottom"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        position_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        position_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        position_handle(&["bottom"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        position_handle(&["bottom"], context)
     }
 }
 
@@ -399,18 +333,12 @@ impl Plugin for LeftPlugin {
         "left"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        position_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        position_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        position_handle(&["left"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        position_handle(&["left"], context)
     }
 }
 
@@ -422,18 +350,12 @@ impl Plugin for RightPlugin {
         "right"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        position_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        position_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        position_handle(&["right"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        position_handle(&["right"], context)
     }
 }
 
@@ -445,24 +367,18 @@ impl Plugin for ZIndexPlugin {
         "z"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok() || *value == "auto",
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => writeln!(buffer, "z-index: {value};")?,
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
+            Modifier::Basic { value, .. } => writeln!(context.buffer, "z-index: {value};")?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
@@ -480,16 +396,14 @@ impl Plugin for ContainerPlugin {
 
     fn css_after_rule(
         &self,
-        config: &Config,
-        modifier: &Modifier,
-        buffer: &mut String,
+        context: ContextHandle,
     ) -> fmt::Result {
-        if let Modifier::Basic { value, .. } = modifier {
+        if let Modifier::Basic { value, .. } = context.modifier {
             if value.is_empty() {
-                if config.theme.screens.is_empty() {
+                if context.config.theme.screens.is_empty() {
                     for (_, screen) in BUILTIN_SCREENS.iter() {
                         write!(
-                            buffer,
+                            context.buffer,
                             "\n\n@media (min-width: {screen}) {{
   .container {{
     max-width: {screen};
@@ -498,7 +412,7 @@ impl Plugin for ContainerPlugin {
                         )?;
                     }
                 } else {
-                    let mut screens = config
+                    let mut screens = context.config
                         .theme
                         .screens
                         .iter()
@@ -543,7 +457,7 @@ impl Plugin for ContainerPlugin {
 
                     for (_, screen) in screens.iter() {
                         write!(
-                            buffer,
+                            context.buffer,
                             "\n\n@media (min-width: {screen}) {{
   .container {{
     max-width: {screen};
@@ -558,34 +472,28 @@ impl Plugin for ContainerPlugin {
         Ok(())
     }
 
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 value.is_empty()
-                    || config.theme.screens.contains_key(&Cow::from(*value))
+                    || context.config.theme.screens.contains_key(&Cow::from(*value))
                     || BUILTIN_SCREENS.iter().any(|s| &s.0 == value)
             }
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 if value.is_empty() {
-                    writeln!(buffer, "width: 100%;")?;
-                } else if let Some(screen) = config.theme.screens.get(&Cow::from(*value)) {
-                    writeln!(buffer, "max-width: {screen};")?;
+                    writeln!(context.buffer, "width: 100%;")?;
+                } else if let Some(screen) = context.config.theme.screens.get(&Cow::from(*value)) {
+                    writeln!(context.buffer, "max-width: {screen};")?;
                 } else {
                     writeln!(
-                        buffer,
+                        context.buffer,
                         "max-width: {};",
                         BUILTIN_SCREENS.iter().find(|s| &s.0 == value).unwrap().1
                     )?;
@@ -606,23 +514,17 @@ impl Plugin for ColumnsPlugin {
         "columns"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => writeln!(buffer, "columns: {value};")?,
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
+            Modifier::Basic { value, .. } => writeln!(context.buffer, "columns: {value};")?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
@@ -638,8 +540,8 @@ impl Plugin for BreakBeforePlugin {
         "break-before"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => [
                 "auto",
                 "avoid",
@@ -655,16 +557,10 @@ impl Plugin for BreakBeforePlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => writeln!(buffer, "break-before: {value};")?,
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
+            Modifier::Basic { value, .. } => writeln!(context.buffer, "break-before: {value};")?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
@@ -680,8 +576,8 @@ impl Plugin for BreakInsidePlugin {
         "break-inside"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["auto", "avoid", "avoid-page", "avoid-column"].contains(&&**value)
             }
@@ -689,16 +585,10 @@ impl Plugin for BreakInsidePlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => writeln!(buffer, "break-inside: {value};")?,
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
+            Modifier::Basic { value, .. } => writeln!(context.buffer, "break-inside: {value};")?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
@@ -714,8 +604,8 @@ impl Plugin for BreakAfterPlugin {
         "break-after"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => [
                 "auto",
                 "avoid",
@@ -731,16 +621,10 @@ impl Plugin for BreakAfterPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => writeln!(buffer, "break-after: {value};")?,
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
+            Modifier::Basic { value, .. } => writeln!(context.buffer, "break-after: {value};")?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
@@ -756,23 +640,17 @@ impl Plugin for BoxDecorationBreakPlugin {
         "decoration"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["slice", "clone"].contains(&&**value),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => writeln!(buffer, "box-decoration-break: {value};")?,
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
+            Modifier::Basic { value, .. } => writeln!(context.buffer, "box-decoration-break: {value};")?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
@@ -788,23 +666,17 @@ impl Plugin for BoxSizingPlugin {
         "box"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["border", "content"].contains(&&**value),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => writeln!(buffer, "box-sizing: {value}-box;")?,
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
+            Modifier::Basic { value, .. } => writeln!(context.buffer, "box-sizing: {value}-box;")?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
@@ -820,23 +692,17 @@ impl Plugin for FloatPlugin {
         "float"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["left", "right", "none"].contains(&&**value),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => writeln!(buffer, "float: {value};")?,
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
+            Modifier::Basic { value, .. } => writeln!(context.buffer, "float: {value};")?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
@@ -852,23 +718,17 @@ impl Plugin for ClearPlugin {
         "clear"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["left", "right", "both", "none"].contains(&&**value),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => writeln!(buffer, "clear: {value};")?,
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
+            Modifier::Basic { value, .. } => writeln!(context.buffer, "clear: {value};")?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
@@ -884,8 +744,8 @@ impl Plugin for ObjectFitPlugin {
         "object"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["contain", "cover", "fill", "scale-down", "none"].contains(&&**value)
             }
@@ -893,16 +753,10 @@ impl Plugin for ObjectFitPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => writeln!(buffer, "object-fit: {value};")?,
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
+            Modifier::Basic { value, .. } => writeln!(context.buffer, "object-fit: {value};")?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
@@ -918,8 +772,8 @@ impl Plugin for ObjectPositionPlugin {
         "object"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => [
                 "bottom",
                 "center",
@@ -936,29 +790,23 @@ impl Plugin for ObjectPositionPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "bottom" => writeln!(buffer, "object-position: bottom;")?,
-                "center" => writeln!(buffer, "object-position: center;")?,
-                "left" => writeln!(buffer, "object-position: left;")?,
-                "left-bottom" => writeln!(buffer, "object-position: left bottom;")?,
-                "left-top" => writeln!(buffer, "object-position: left top;")?,
-                "right" => writeln!(buffer, "object-position: right;")?,
-                "right-bottom" => writeln!(buffer, "object-position: right bottom;")?,
-                "right-top" => writeln!(buffer, "object-position: right top;")?,
-                "top" => writeln!(buffer, "object-position: top;")?,
+                "bottom" => writeln!(context.buffer, "object-position: bottom;")?,
+                "center" => writeln!(context.buffer, "object-position: center;")?,
+                "left" => writeln!(context.buffer, "object-position: left;")?,
+                "left-bottom" => writeln!(context.buffer, "object-position: left bottom;")?,
+                "left-top" => writeln!(context.buffer, "object-position: left top;")?,
+                "right" => writeln!(context.buffer, "object-position: right;")?,
+                "right-bottom" => writeln!(context.buffer, "object-position: right bottom;")?,
+                "right-top" => writeln!(context.buffer, "object-position: right top;")?,
+                "top" => writeln!(context.buffer, "object-position: top;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "object-position: {};", to_css_value(value))?
+                writeln!(context.buffer, "object-position: {};", to_css_value(value))?
             }
         }
 
@@ -974,8 +822,8 @@ impl Plugin for OverflowPlugin {
         "overflow"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => [
                 "auto",
                 "x-auto",
@@ -995,28 +843,22 @@ impl Plugin for OverflowPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "auto" => writeln!(buffer, "overflow: auto;")?,
-                "x-auto" => writeln!(buffer, "overflow-x: auto;")?,
-                "y-auto" => writeln!(buffer, "overflow-y: auto;")?,
-                "hidden" => writeln!(buffer, "overflow: hidden;")?,
-                "x-hidden" => writeln!(buffer, "overflow-x: hidden;")?,
-                "y-hidden" => writeln!(buffer, "overflow-y: hidden;")?,
-                "visible" => writeln!(buffer, "overflow: visible;")?,
-                "x-visible" => writeln!(buffer, "overflow-x: visible;")?,
-                "y-visible" => writeln!(buffer, "overflow-y: visible;")?,
-                "scroll" => writeln!(buffer, "overflow: scroll;")?,
-                "x-scroll" => writeln!(buffer, "overflow-x: scroll;")?,
-                "y-scroll" => writeln!(buffer, "overflow-y: scroll;")?,
+                "auto" => writeln!(context.buffer, "overflow: auto;")?,
+                "x-auto" => writeln!(context.buffer, "overflow-x: auto;")?,
+                "y-auto" => writeln!(context.buffer, "overflow-y: auto;")?,
+                "hidden" => writeln!(context.buffer, "overflow: hidden;")?,
+                "x-hidden" => writeln!(context.buffer, "overflow-x: hidden;")?,
+                "y-hidden" => writeln!(context.buffer, "overflow-y: hidden;")?,
+                "visible" => writeln!(context.buffer, "overflow: visible;")?,
+                "x-visible" => writeln!(context.buffer, "overflow-x: visible;")?,
+                "y-visible" => writeln!(context.buffer, "overflow-y: visible;")?,
+                "scroll" => writeln!(context.buffer, "overflow: scroll;")?,
+                "x-scroll" => writeln!(context.buffer, "overflow-x: scroll;")?,
+                "y-scroll" => writeln!(context.buffer, "overflow-y: scroll;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -1034,8 +876,8 @@ impl Plugin for OverscrollPlugin {
         "overscroll"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => [
                 "auto",
                 "x-auto",
@@ -1052,25 +894,19 @@ impl Plugin for OverscrollPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "auto" => writeln!(buffer, "overscroll-behavior: auto;")?,
-                "x-auto" => writeln!(buffer, "overscroll-behavior-x: auto;")?,
-                "y-auto" => writeln!(buffer, "overscroll-behavior-y: auto;")?,
-                "contain" => writeln!(buffer, "overscroll-behavior: contain;")?,
-                "x-contain" => writeln!(buffer, "overscroll-behavior-x: contain;")?,
-                "y-contain" => writeln!(buffer, "overscroll-behavior-y: contain;")?,
-                "none" => writeln!(buffer, "overscroll-behavior: none;")?,
-                "x-none" => writeln!(buffer, "overscroll-behavior-x: none;")?,
-                "y-none" => writeln!(buffer, "overscroll-behavior-y: none;")?,
+                "auto" => writeln!(context.buffer, "overscroll-behavior: auto;")?,
+                "x-auto" => writeln!(context.buffer, "overscroll-behavior-x: auto;")?,
+                "y-auto" => writeln!(context.buffer, "overscroll-behavior-y: auto;")?,
+                "contain" => writeln!(context.buffer, "overscroll-behavior: contain;")?,
+                "x-contain" => writeln!(context.buffer, "overscroll-behavior-x: contain;")?,
+                "y-contain" => writeln!(context.buffer, "overscroll-behavior-y: contain;")?,
+                "none" => writeln!(context.buffer, "overscroll-behavior: none;")?,
+                "x-none" => writeln!(context.buffer, "overscroll-behavior-x: none;")?,
+                "y-none" => writeln!(context.buffer, "overscroll-behavior-y: none;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),

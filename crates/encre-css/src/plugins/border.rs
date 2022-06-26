@@ -1,45 +1,38 @@
 use super::{to_css_value, Plugin};
-use crate::utils::{color, indent, value_matchers::*};
-use crate::{config::Config, selector::Modifier};
+use crate::{context::{ContextCanHandle, ContextHandle}, utils::{color, indent, value_matchers::*}, selector::Modifier};
 
 use std::fmt::{self, Write};
 
 const CSS_RING_OFFSET_SHADOW: &str = "--en-ring-offset-shadow: var(--en-ring-inset) 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color);";
 
-pub fn color_can_handle(config: &Config, modifier: &Modifier) -> bool {
-    match modifier {
-        Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+pub fn color_can_handle(context: ContextCanHandle) -> bool {
+    match context.modifier {
+        Modifier::Basic { value, .. } => color::is_matching_basic_color(context.config, value),
         Modifier::Arbitrary { hint, value, .. } => {
             *hint == "color" || (hint.is_empty() && is_matching_color(value))
         }
     }
 }
 
-pub fn color_handle(
-    config: &Config,
-    css_props: &[&str],
-    modifier: &Modifier,
-    indentation: usize,
-    buffer: &mut String,
-) -> fmt::Result {
-    indent(indentation, buffer)?;
-    match modifier {
+pub fn color_handle(css_props: &[&str], context: ContextHandle) -> fmt::Result {
+    indent(context.indentation, context.buffer)?;
+    match context.modifier {
         Modifier::Basic { value, .. } => {
-            let color = color::get(config, value, Some("--en-border-opacity")).unwrap();
+            let color = color::get(context.config, value, Some("--en-border-opacity")).unwrap();
             if color.contains("--en-border-opacity") {
-                writeln!(buffer, "--en-border-opacity: 1;")?;
-                indent(indentation, buffer)?;
+                writeln!(context.buffer, "--en-border-opacity: 1;")?;
+                indent(context.indentation, context.buffer)?;
             }
 
             for css_prop in css_props {
-                writeln!(buffer, "{css_prop}: {color};")?;
+                writeln!(context.buffer, "{css_prop}: {color};")?;
             }
         }
         Modifier::Arbitrary { value, .. } => {
             let value = to_css_value(value);
 
             for css_prop in css_props {
-                writeln!(buffer, "{css_prop}: {value};")?
+                writeln!(context.buffer, "{css_prop}: {value};")?
             }
         }
     }
@@ -55,9 +48,9 @@ impl Plugin for ColorPlugin {
         "border"
     }
 
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
-            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(context.config, value),
             Modifier::Arbitrary {
                 prefix,
                 hint,
@@ -70,14 +63,8 @@ impl Plugin for ColorPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        color_handle(config, &["border-color"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        color_handle(&["border-color"], context)
     }
 }
 
@@ -89,24 +76,12 @@ impl Plugin for ColorXPlugin {
         "border-x"
     }
 
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
-        color_can_handle(config, modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        color_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        color_handle(
-            config,
-            &["border-left-color", "border-right-color"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        color_handle(&["border-left-color", "border-right-color"], context)
     }
 }
 
@@ -118,24 +93,12 @@ impl Plugin for ColorYPlugin {
         "border-y"
     }
 
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
-        color_can_handle(config, modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        color_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        color_handle(
-            config,
-            &["border-top-color", "border-bottom-color"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        color_handle(&["border-top-color", "border-bottom-color"], context)
     }
 }
 
@@ -147,24 +110,12 @@ impl Plugin for ColorLeftPlugin {
         "border-l"
     }
 
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
-        color_can_handle(config, modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        color_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        color_handle(
-            config,
-            &["border-left-color"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        color_handle(&["border-left-color"], context)
     }
 }
 
@@ -176,24 +127,12 @@ impl Plugin for ColorRightPlugin {
         "border-r"
     }
 
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
-        color_can_handle(config, modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        color_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        color_handle(
-            config,
-            &["border-right-color"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        color_handle(&["border-right-color"], context)
     }
 }
 
@@ -205,18 +144,12 @@ impl Plugin for ColorTopPlugin {
         "border-t"
     }
 
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
-        color_can_handle(config, modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        color_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        color_handle(config, &["border-top-color"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        color_handle(&["border-top-color"], context)
     }
 }
 
@@ -228,29 +161,17 @@ impl Plugin for ColorBottomPlugin {
         "border-b"
     }
 
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
-        color_can_handle(config, modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        color_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        color_handle(
-            config,
-            &["border-bottom-color"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        color_handle(&["border-bottom-color"], context)
     }
 }
 
-pub fn radius_can_handle(modifier: &Modifier) -> bool {
-    match modifier {
+pub fn radius_can_handle(context: ContextCanHandle) -> bool {
+    match context.modifier {
         Modifier::Basic { value, .. } => {
             value.is_empty()
                 || ["sm", "md", "lg", "xl", "2xl", "3xl", "full", "none"].contains(&&**value)
@@ -261,18 +182,13 @@ pub fn radius_can_handle(modifier: &Modifier) -> bool {
     }
 }
 
-pub fn radius_handle(
-    css_properties: &[&str],
-    modifier: &Modifier,
-    indentation: usize,
-    buffer: &mut String,
-) -> fmt::Result {
-    match modifier {
+pub fn radius_handle(css_properties: &[&str], context: ContextHandle) -> fmt::Result {
+    match context.modifier {
         Modifier::Basic { value, .. } => {
             for css_prop in css_properties {
-                indent(indentation, buffer)?;
+                indent(context.indentation, context.buffer)?;
                 writeln!(
-                    buffer,
+                    context.buffer,
                     "{}: {};",
                     css_prop,
                     match *value {
@@ -292,8 +208,8 @@ pub fn radius_handle(
         }
         Modifier::Arbitrary { value, .. } => {
             for css_prop in css_properties {
-                indent(indentation, buffer)?;
-                writeln!(buffer, "{}: {};", css_prop, to_css_value(value))?;
+                indent(context.indentation, context.buffer)?;
+                writeln!(context.buffer, "{}: {};", css_prop, to_css_value(value))?;
             }
         }
     }
@@ -309,8 +225,8 @@ impl Plugin for RadiusPlugin {
         "rounded"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 value.is_empty()
                     || ["sm", "md", "lg", "xl", "2xl", "3xl", "full", "none"].contains(&&**value)
@@ -324,14 +240,8 @@ impl Plugin for RadiusPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        radius_handle(&["border-radius"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        radius_handle(&["border-radius"], context)
     }
 }
 
@@ -343,18 +253,12 @@ impl Plugin for RadiusTopRightPlugin {
         "rounded-tr"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        radius_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        radius_handle(&["border-top-right-radius"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        radius_handle(&["border-top-right-radius"], context)
     }
 }
 
@@ -366,18 +270,12 @@ impl Plugin for RadiusTopLeftPlugin {
         "rounded-tl"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        radius_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        radius_handle(&["border-top-left-radius"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        radius_handle(&["border-top-left-radius"], context)
     }
 }
 
@@ -389,23 +287,12 @@ impl Plugin for RadiusBottomRightPlugin {
         "rounded-br"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        radius_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        radius_handle(
-            &["border-bottom-right-radius"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        radius_handle(&["border-bottom-right-radius"], context)
     }
 }
 
@@ -417,23 +304,12 @@ impl Plugin for RadiusBottomLeftPlugin {
         "rounded-bl"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        radius_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        radius_handle(
-            &["border-bottom-left-radius"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        radius_handle(&["border-bottom-left-radius"], context)
     }
 }
 
@@ -445,23 +321,12 @@ impl Plugin for RadiusTopPlugin {
         "rounded-t"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        radius_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        radius_handle(
-            &["border-top-left-radius", "border-top-right-radius"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        radius_handle(&["border-top-left-radius", "border-top-right-radius"], context)
     }
 }
 
@@ -473,23 +338,12 @@ impl Plugin for RadiusBottomPlugin {
         "rounded-b"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        radius_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        radius_handle(
-            &["border-bottom-left-radius", "border-bottom-right-radius"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        radius_handle(&["border-bottom-left-radius", "border-bottom-right-radius"], context)
     }
 }
 
@@ -501,23 +355,12 @@ impl Plugin for RadiusLeftPlugin {
         "rounded-l"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        radius_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        radius_handle(
-            &["border-top-left-radius", "border-bottom-left-radius"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        radius_handle(&["border-top-left-radius", "border-bottom-left-radius"], context)
     }
 }
 
@@ -529,23 +372,12 @@ impl Plugin for RadiusRightPlugin {
         "rounded-r"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        radius_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        radius_handle(
-            &["border-top-right-radius", "border-bottom-right-radius"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        radius_handle(&["border-top-right-radius", "border-bottom-right-radius"], context)
     }
 }
 
@@ -557,8 +389,8 @@ impl Plugin for StylePlugin {
         "border"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["solid", "dashed", "dotted", "double", "hidden", "none"].contains(value)
             }
@@ -566,16 +398,10 @@ impl Plugin for StylePlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => writeln!(buffer, "border-style: {};", value)?,
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
+            Modifier::Basic { value, .. } => writeln!(context.buffer, "border-style: {};", value)?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
@@ -583,8 +409,8 @@ impl Plugin for StylePlugin {
     }
 }
 
-pub fn width_can_handle(modifier: &Modifier) -> bool {
-    match modifier {
+pub fn width_can_handle(context: ContextCanHandle) -> bool {
+    match context.modifier {
         Modifier::Basic { value, .. } => value.is_empty() || value.parse::<usize>().is_ok(),
         Modifier::Arbitrary { hint, value, .. } => {
             *hint == "length"
@@ -593,19 +419,14 @@ pub fn width_can_handle(modifier: &Modifier) -> bool {
     }
 }
 
-pub fn width_handle(
-    css_properties: &[&str],
-    modifier: &Modifier,
-    indentation: usize,
-    buffer: &mut String,
-) -> fmt::Result {
+pub fn width_handle(css_properties: &[&str], context: ContextHandle) -> fmt::Result {
     // NOTE: Not-compatible with TailwindCSS, support all values
-    match modifier {
+    match context.modifier {
         Modifier::Basic { value, .. } => {
             for css_prop in css_properties {
-                indent(indentation, buffer)?;
+                indent(context.indentation, context.buffer)?;
                 writeln!(
-                    buffer,
+                    context.buffer,
                     "{}: {}px;",
                     css_prop,
                     if value.is_empty() { "1" } else { value }
@@ -615,8 +436,8 @@ pub fn width_handle(
         Modifier::Arbitrary { value, .. } => {
             let value = to_css_value(value);
             for css_prop in css_properties {
-                indent(indentation, buffer)?;
-                writeln!(buffer, "{}: {};", css_prop, value)?;
+                indent(context.indentation, context.buffer)?;
+                writeln!(context.buffer, "{}: {};", css_prop, value)?;
             }
         }
     }
@@ -632,8 +453,8 @@ impl Plugin for WidthPlugin {
         "border"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.is_empty() || value.parse::<usize>().is_ok(),
             Modifier::Arbitrary {
                 prefix,
@@ -649,15 +470,9 @@ impl Plugin for WidthPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        width_handle(&["border-width"], modifier, indentation, buffer)
+        width_handle(&["border-width"], context)
     }
 }
 
@@ -669,18 +484,12 @@ impl Plugin for WidthTopPlugin {
         "border-t"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        width_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        width_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        width_handle(&["border-top-width"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        width_handle(&["border-top-width"], context)
     }
 }
 
@@ -692,18 +501,12 @@ impl Plugin for WidthBottomPlugin {
         "border-b"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        width_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        width_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        width_handle(&["border-bottom-width"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        width_handle(&["border-bottom-width"], context)
     }
 }
 
@@ -715,18 +518,12 @@ impl Plugin for WidthLeftPlugin {
         "border-l"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        width_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        width_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        width_handle(&["border-left-width"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        width_handle(&["border-left-width"], context)
     }
 }
 
@@ -738,18 +535,12 @@ impl Plugin for WidthRightPlugin {
         "border-r"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        width_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        width_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        width_handle(&["border-right-width"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        width_handle(&["border-right-width"], context)
     }
 }
 
@@ -761,23 +552,12 @@ impl Plugin for WidthXPlugin {
         "border-x"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        width_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        width_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        width_handle(
-            &["border-left-width", "border-right-width"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        width_handle(&["border-left-width", "border-right-width"], context)
     }
 }
 
@@ -789,23 +569,12 @@ impl Plugin for WidthYPlugin {
         "border-y"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        width_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        width_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        width_handle(
-            &["border-top-width", "border-bottom-width"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        width_handle(&["border-top-width", "border-bottom-width"], context)
     }
 }
 
@@ -817,25 +586,19 @@ impl Plugin for OpacityPlugin {
         "border-opacity"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        indent(indentation, buffer)?;
-        match modifier {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => writeln!(
-                buffer,
+                context.buffer,
                 "--en-border-opacity: {};",
                 value.parse::<usize>().unwrap() as f32 / 100.
             )?,
@@ -854,35 +617,29 @@ impl Plugin for DivideColorPlugin {
         "divide"
     }
 
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
-            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(context.config, value),
             Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "color" || (hint.is_empty() && is_matching_color(value))
             }
         }
     }
 
-    fn handle(
-        &self,
-        config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => {
-                let color = color::get(config, value, Some("--en-divide-opacity")).unwrap();
+                let color = color::get(context.config, value, Some("--en-divide-opacity")).unwrap();
                 if color.contains("--en-divide-opacity") {
-                    writeln!(buffer, "--en-divide-opacity: 1;")?;
-                    indent(indentation, buffer)?;
+                    writeln!(context.buffer, "--en-divide-opacity: 1;")?;
+                    indent(context.indentation, context.buffer)?;
                 }
 
-                writeln!(buffer, "border-color: {color};")?;
+                writeln!(context.buffer, "border-color: {color};")?;
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "border-color: {};", to_css_value(value))?
+                writeln!(context.buffer, "border-color: {};", to_css_value(value))?
             }
         }
 
@@ -890,8 +647,8 @@ impl Plugin for DivideColorPlugin {
     }
 }
 
-pub fn divide_width_can_handle(modifier: &Modifier) -> bool {
-    match modifier {
+pub fn divide_width_can_handle(context: ContextCanHandle) -> bool {
+    match context.modifier {
         Modifier::Basic { value, .. } => {
             value.is_empty() || *value == "reverse" || value.parse::<usize>().is_ok()
         }
@@ -910,65 +667,59 @@ impl Plugin for DivideWidthXPlugin {
         "divide-x"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        divide_width_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        divide_width_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        indent(indentation, buffer)?;
-        match modifier {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 if *value == "reverse" {
-                    return writeln!(buffer, "--en-divide-x-reverse: 1;");
+                    return writeln!(context.buffer, "--en-divide-x-reverse: 1;");
                 }
 
-                writeln!(buffer, "--en-divide-x-reverse: 0;")?;
-                indent(indentation, buffer)?;
+                writeln!(context.buffer, "--en-divide-x-reverse: 0;")?;
+                indent(context.indentation, context.buffer)?;
 
                 // TODO: class with `> :not([hidden]) ~ :not([hidden])`
                 if is_matching_line_width(value) {
-                    writeln!(buffer, "border-left-width: {value};")?;
-                    indent(indentation, buffer)?;
-                    writeln!(buffer, "border-right-width: {value};")?;
+                    writeln!(context.buffer, "border-left-width: {value};")?;
+                    indent(context.indentation, context.buffer)?;
+                    writeln!(context.buffer, "border-right-width: {value};")?;
                 } else {
                     writeln!(
-                        buffer,
+                        context.buffer,
                         "border-left-width: calc({}px * calc(1 - var(--en-divide-x-reverse)));",
                         if value.is_empty() { "1" } else { value }
                     )?;
-                    indent(indentation, buffer)?;
+                    indent(context.indentation, context.buffer)?;
                     writeln!(
-                        buffer,
+                        context.buffer,
                         "border-right-width: calc({}px * var(--en-divide-x-reverse));",
                         if value.is_empty() { "1" } else { value }
                     )?;
                 }
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "--en-divide-x-reverse: 0;")?;
-                indent(indentation, buffer)?;
+                writeln!(context.buffer, "--en-divide-x-reverse: 0;")?;
+                indent(context.indentation, context.buffer)?;
 
                 if is_matching_line_width(value) {
                     let value = to_css_value(value);
-                    writeln!(buffer, "border-left-width: {value};")?;
-                    indent(indentation, buffer)?;
-                    writeln!(buffer, "border-right-width: {value};")?;
+                    writeln!(context.buffer, "border-left-width: {value};")?;
+                    indent(context.indentation, context.buffer)?;
+                    writeln!(context.buffer, "border-right-width: {value};")?;
                 } else {
                     let value = to_css_value(value);
                     writeln!(
-                        buffer,
+                        context.buffer,
                         "border-left-width: calc({value} * calc(1 - var(--en-divide-x-reverse)));"
                     )?;
-                    indent(indentation, buffer)?;
+                    indent(context.indentation, context.buffer)?;
                     writeln!(
-                        buffer,
+                        context.buffer,
                         "border-right-width: calc({value} * var(--en-divide-x-reverse));"
                     )?;
                 }
@@ -987,65 +738,59 @@ impl Plugin for DivideWidthYPlugin {
         "divide-y"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        divide_width_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        divide_width_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        indent(indentation, buffer)?;
-        match modifier {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 if *value == "reverse" {
-                    return writeln!(buffer, "--en-divide-y-reverse: 1;");
+                    return writeln!(context.buffer, "--en-divide-y-reverse: 1;");
                 }
 
-                writeln!(buffer, "--en-divide-y-reverse: 0;")?;
-                indent(indentation, buffer)?;
+                writeln!(context.buffer, "--en-divide-y-reverse: 0;")?;
+                indent(context.indentation, context.buffer)?;
 
                 // TODO: class with `> :not([hidden]) ~ :not([hidden])`
                 if is_matching_line_width(value) {
-                    writeln!(buffer, "border-top-width: {value};")?;
-                    indent(indentation, buffer)?;
-                    writeln!(buffer, "border-bottom-width: {value};")?;
+                    writeln!(context.buffer, "border-top-width: {value};")?;
+                    indent(context.indentation, context.buffer)?;
+                    writeln!(context.buffer, "border-bottom-width: {value};")?;
                 } else {
                     writeln!(
-                        buffer,
+                        context.buffer,
                         "border-top-width: calc({} * calc(1 - var(--en-divide-y-reverse)));",
                         if value.is_empty() { "1px" } else { value }
                     )?;
-                    indent(indentation, buffer)?;
+                    indent(context.indentation, context.buffer)?;
                     writeln!(
-                        buffer,
+                        context.buffer,
                         "border-bottom-width: calc({} * var(--en-divide-y-reverse));",
                         if value.is_empty() { "1px" } else { value }
                     )?;
                 }
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "--en-divide-y-reverse: 0;")?;
-                indent(indentation, buffer)?;
+                writeln!(context.buffer, "--en-divide-y-reverse: 0;")?;
+                indent(context.indentation, context.buffer)?;
 
                 if is_matching_line_width(value) {
                     let value = to_css_value(value);
-                    writeln!(buffer, "border-top-width: {value};")?;
-                    indent(indentation, buffer)?;
-                    writeln!(buffer, "border-bottom-width: {value};")?;
+                    writeln!(context.buffer, "border-top-width: {value};")?;
+                    indent(context.indentation, context.buffer)?;
+                    writeln!(context.buffer, "border-bottom-width: {value};")?;
                 } else {
                     let value = to_css_value(value);
                     writeln!(
-                        buffer,
+                        context.buffer,
                         "border-top-width: calc({value} * calc(1 - var(--en-divide-y-reverse)));"
                     )?;
-                    indent(indentation, buffer)?;
+                    indent(context.indentation, context.buffer)?;
                     writeln!(
-                        buffer,
+                        context.buffer,
                         "border-bottom-width: calc({value} * var(--en-divide-y-reverse));"
                     )?;
                 }
@@ -1064,8 +809,8 @@ impl Plugin for DivideStylePlugin {
         "divide"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["solid", "dashed", "dotted", "double", "none"].contains(value)
             }
@@ -1073,21 +818,15 @@ impl Plugin for DivideStylePlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "solid" => writeln!(buffer, "border-style: solid;")?,
-                "dashed" => writeln!(buffer, "border-style: dashed;")?,
-                "dotted" => writeln!(buffer, "border-style: dotted;")?,
-                "double" => writeln!(buffer, "border-style: double;")?,
-                "none" => writeln!(buffer, "border-style: none;")?,
+                "solid" => writeln!(context.buffer, "border-style: solid;")?,
+                "dashed" => writeln!(context.buffer, "border-style: dashed;")?,
+                "dotted" => writeln!(context.buffer, "border-style: dotted;")?,
+                "double" => writeln!(context.buffer, "border-style: double;")?,
+                "none" => writeln!(context.buffer, "border-style: none;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -1105,25 +844,19 @@ impl Plugin for DivideOpacityPlugin {
         "divide-opacity"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        indent(indentation, buffer)?;
-        match modifier {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => writeln!(
-                buffer,
+                context.buffer,
                 "--en-divide-opacity: {};",
                 value.parse::<usize>().unwrap() as f32 / 100.
             )?,
@@ -1142,35 +875,29 @@ impl Plugin for RingColorPlugin {
         "ring"
     }
 
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
-            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(context.config, value),
             Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "color" || (hint.is_empty() && is_matching_color(value))
             }
         }
     }
 
-    fn handle(
-        &self,
-        config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => {
-                let color = color::get(config, value, Some("--en-ring-opacity")).unwrap();
+                let color = color::get(context.config, value, Some("--en-ring-opacity")).unwrap();
                 if color.contains("--en-ring-opacity") {
-                    writeln!(buffer, "--en-ring-opacity: 1;")?;
-                    indent(indentation, buffer)?;
+                    writeln!(context.buffer, "--en-ring-opacity: 1;")?;
+                    indent(context.indentation, context.buffer)?;
                 }
 
-                writeln!(buffer, "--ring-color: {color};")?;
+                writeln!(context.buffer, "--ring-color: {color};")?;
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "--ring-color: {};", to_css_value(value))?
+                writeln!(context.buffer, "--ring-color: {};", to_css_value(value))?
             }
         }
 
@@ -1186,8 +913,8 @@ impl Plugin for RingWidthPlugin {
         "ring"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 value.is_empty() || *value == "inset" || value.parse::<usize>().is_ok()
             }
@@ -1197,28 +924,22 @@ impl Plugin for RingWidthPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        indent(indentation, buffer)?;
-        match modifier {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 if *value == "inset" {
-                    return writeln!(buffer, "--en-ring-inset: inset;");
+                    return writeln!(context.buffer, "--en-ring-inset: inset;");
                 }
 
-                writeln!(buffer, "--en-ring-shadow: var(--en-ring-inset) 0 0 0 calc({}px + var(--en-ring-offset-width)) var(--en-ring-color);", if value.is_empty() { "3px" } else { value })?;
+                writeln!(context.buffer, "--en-ring-shadow: var(--en-ring-inset) 0 0 0 calc({}px + var(--en-ring-offset-width)) var(--en-ring-color);", if value.is_empty() { "3px" } else { value })?;
             }
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "--en-ring-shadow: var(--en-ring-inset) 0 0 0 calc({} + var(--en-ring-offset-width)) var(--en-ring-color);", to_css_value(value))?,
+            Modifier::Arbitrary { value, .. } => writeln!(context.buffer, "--en-ring-shadow: var(--en-ring-inset) 0 0 0 calc({} + var(--en-ring-offset-width)) var(--en-ring-color);", to_css_value(value))?,
         }
 
-        indent(indentation, buffer)?;
-        writeln!(buffer, "box-shadow: var(--en-ring-offset-shadow), var(--en-ring-shadow), var(--en-shadow, 0 0 #0000);")?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "box-shadow: var(--en-ring-offset-shadow), var(--en-ring-shadow), var(--en-shadow, 0 0 #0000);")?;
 
         Ok(())
     }
@@ -1232,25 +953,19 @@ impl Plugin for RingOpacityPlugin {
         "ring-opacity"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        indent(indentation, buffer)?;
-        match modifier {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => writeln!(
-                buffer,
+                context.buffer,
                 "--en-ring-opacity: {};",
                 value.parse::<usize>().unwrap() as f32 / 100.
             )?,
@@ -1269,32 +984,26 @@ impl Plugin for RingOffsetColorPlugin {
         "ring-offset"
     }
 
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
-            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(context.config, value),
             Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "color" || (hint.is_empty() && is_matching_color(value))
             }
         }
     }
 
-    fn handle(
-        &self,
-        config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_RING_OFFSET_SHADOW)?;
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_RING_OFFSET_SHADOW)?;
 
-        indent(indentation, buffer)?;
-        let value = match modifier {
-            Modifier::Basic { value, .. } => color::get(config, value, None).unwrap(),
+        indent(context.indentation, context.buffer)?;
+        let value = match context.modifier {
+            Modifier::Basic { value, .. } => color::get(context.config, value, None).unwrap(),
             Modifier::Arbitrary { value, .. } => to_css_value(*value),
         };
 
-        writeln!(buffer, "--en-ring-offset-color: {value};")
+        writeln!(context.buffer, "--en-ring-offset-color: {value};")
     }
 }
 
@@ -1306,8 +1015,8 @@ impl Plugin for RingOffsetWidthPlugin {
         "ring-offset"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
             Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "length" || (hint.is_empty() && is_matching_length(value))
@@ -1315,22 +1024,16 @@ impl Plugin for RingOffsetWidthPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_RING_OFFSET_SHADOW)?;
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_RING_OFFSET_SHADOW)?;
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => {
-                writeln!(buffer, "--en-ring-offset-width: {value}px;")?
+                writeln!(context.buffer, "--en-ring-offset-width: {value}px;")?
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "--en-ring-offset-width: {};", to_css_value(value))?
+                writeln!(context.buffer, "--en-ring-offset-width: {};", to_css_value(value))?
             }
         }
 
@@ -1345,29 +1048,23 @@ impl Plugin for OutlineColorPlugin {
     fn namespace(&self) -> &str {
         "outline"
     }
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
-            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(context.config, value),
             Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "color" || (hint.is_empty() && is_matching_color(value))
             }
         }
     }
 
-    fn handle(
-        &self,
-        config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        let value = match modifier {
-            Modifier::Basic { value, .. } => color::get(config, value, None).unwrap(),
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        let value = match context.modifier {
+            Modifier::Basic { value, .. } => color::get(context.config, value, None).unwrap(),
             Modifier::Arbitrary { value, .. } => to_css_value(*value),
         };
 
-        writeln!(buffer, "outline-color: {value};")
+        writeln!(context.buffer, "outline-color: {value};")
     }
 }
 
@@ -1379,8 +1076,8 @@ impl Plugin for OutlineWidthPlugin {
         "outline"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
             Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "length" || (hint.is_empty() && is_matching_length(value))
@@ -1388,19 +1085,13 @@ impl Plugin for OutlineWidthPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => writeln!(buffer, "outline-width: {value}px;")?,
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
+            Modifier::Basic { value, .. } => writeln!(context.buffer, "outline-width: {value}px;")?,
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "outline-width: {};", to_css_value(value))?
+                writeln!(context.buffer, "outline-width: {};", to_css_value(value))?
             }
         }
 
@@ -1416,8 +1107,8 @@ impl Plugin for OutlineStylePlugin {
         "outline"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["", "dashed", "dotted", "double", "hidden", "none"].contains(&&**value)
             }
@@ -1425,26 +1116,20 @@ impl Plugin for OutlineStylePlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "" => writeln!(buffer, "outline-style: solid;")?,
+                "" => writeln!(context.buffer, "outline-style: solid;")?,
                 "none" => {
-                    writeln!(buffer, "outline: 2px solid transparent;")?;
-                    indent(indentation, buffer)?;
-                    writeln!(buffer, "outline-offset: 2px;")?;
+                    writeln!(context.buffer, "outline: 2px solid transparent;")?;
+                    indent(context.indentation, context.buffer)?;
+                    writeln!(context.buffer, "outline-offset: 2px;")?;
                 }
-                "dashed" => writeln!(buffer, "outline-style: dashed;")?,
-                "dotted" => writeln!(buffer, "outline-style: dotted;")?,
-                "double" => writeln!(buffer, "outline-style: double;")?,
-                "hidden" => writeln!(buffer, "outline-style: hidden;")?,
+                "dashed" => writeln!(context.buffer, "outline-style: dashed;")?,
+                "dotted" => writeln!(context.buffer, "outline-style: dotted;")?,
+                "double" => writeln!(context.buffer, "outline-style: double;")?,
+                "hidden" => writeln!(context.buffer, "outline-style: hidden;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -1462,26 +1147,20 @@ impl Plugin for OutlineOffsetPlugin {
         "outline-offset"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
             Modifier::Arbitrary { value, .. } => is_matching_length(value),
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => writeln!(buffer, "outline-offset: {value}px;")?,
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
+            Modifier::Basic { value, .. } => writeln!(context.buffer, "outline-offset: {value}px;")?,
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "outline-offset: {};", to_css_value(value))?
+                writeln!(context.buffer, "outline-offset: {};", to_css_value(value))?
             }
         }
 

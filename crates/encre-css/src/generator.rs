@@ -1,5 +1,6 @@
 use crate::{
     config::Config,
+    context::ContextHandle,
     error::{Error, Result},
     plugins::transition,
     preflight::ENCRE_PREFLIGHT_CSS,
@@ -124,11 +125,18 @@ impl<'a> EncreGenerator<'a> {
         self.scanned_selectors.iter().try_for_each(|selector| {
             write!(buffer, "\n\n")?;
 
-            selector
-                .plugin
-                .css_before_rule(&self.config, &selector.modifier, &mut buffer)?;
-
             let mut indentation = 0;
+
+            {
+                let context = ContextHandle {
+                    config: &self.config,
+                    modifier: &selector.modifier,
+                    indentation,
+                    buffer: &mut buffer,
+                };
+
+                selector.plugin.css_before_rule(context)?;
+            }
 
             // Before rule
             if !selector.variants.is_empty() {
@@ -207,12 +215,16 @@ impl<'a> EncreGenerator<'a> {
             // Rule content
 
             // TODO: Support the important prefix
-            selector.plugin.handle(
-                &self.config,
-                &selector.modifier,
-                indentation + 1,
-                &mut buffer,
-            )?;
+            {
+                let context = ContextHandle {
+                    config: &self.config,
+                    modifier: &selector.modifier,
+                    indentation: indentation + 1,
+                    buffer: &mut buffer,
+                };
+
+                selector.plugin.handle(context)?;
+            }
 
             // After rule
             for i in (1..indentation + 1).rev() {
@@ -222,9 +234,16 @@ impl<'a> EncreGenerator<'a> {
 
             write!(buffer, "}}")?;
 
-            selector
-                .plugin
-                .css_after_rule(&self.config, &selector.modifier, &mut buffer)?;
+            {
+                let context = ContextHandle {
+                    config: &self.config,
+                    modifier: &selector.modifier,
+                    indentation: indentation + 1,
+                    buffer: &mut buffer,
+                };
+
+                selector.plugin.css_after_rule(context)?;
+            }
 
             Ok::<(), Error>(())
         })?;

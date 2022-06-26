@@ -1,12 +1,11 @@
 use super::{to_css_value, Plugin};
-use crate::utils::{indent, length, value_matchers::*};
-use crate::{config::Config, selector::Modifier};
+use crate::{context::{ContextCanHandle, ContextHandle}, utils::{indent, length, value_matchers::*}, selector::Modifier};
 
 use std::borrow::Cow;
 use std::fmt::{self, Write};
 
-pub fn margin_padding_can_handle(modifier: &Modifier) -> bool {
-    match modifier {
+pub fn margin_padding_can_handle(context: ContextCanHandle) -> bool {
+    match context.modifier {
         Modifier::Basic { is_negative, value } => {
             *value == "auto" || length::get_basic(value, *is_negative).is_some()
         }
@@ -16,16 +15,14 @@ pub fn margin_padding_can_handle(modifier: &Modifier) -> bool {
 
 pub fn margin_padding_handle(
     css_properties: &[&str],
-    modifier: &Modifier,
-    indentation: usize,
-    buffer: &mut String,
+    context: ContextHandle,
 ) -> fmt::Result {
-    match modifier {
+    match context.modifier {
         Modifier::Basic { is_negative, value } => {
             for css_prop in css_properties {
-                indent(indentation, buffer)?;
+                indent(context.indentation, context.buffer)?;
                 writeln!(
-                    buffer,
+                    context.buffer,
                     "{}: {};",
                     css_prop,
                     if *value == "auto" {
@@ -39,8 +36,8 @@ pub fn margin_padding_handle(
         Modifier::Arbitrary { value, .. } => {
             let value = to_css_value(value);
             for css_prop in css_properties {
-                indent(indentation, buffer)?;
-                writeln!(buffer, "{}: {};", css_prop, value)?;
+                indent(context.indentation, context.buffer)?;
+                writeln!(context.buffer, "{}: {};", css_prop, value)?;
             }
         }
     }
@@ -58,8 +55,8 @@ impl Plugin for MarginPlugin {
         "m"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { is_negative, value } => {
                 *value == "auto" || length::get_basic(value, *is_negative).is_some()
             }
@@ -69,14 +66,8 @@ impl Plugin for MarginPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        margin_padding_handle(&["margin"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        margin_padding_handle(&["margin"], context)
     }
 }
 
@@ -88,23 +79,12 @@ impl Plugin for MarginXPlugin {
         "mx"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        margin_padding_handle(
-            &["margin-left", "margin-right"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        margin_padding_handle(&["margin-left", "margin-right"], context)
     }
 }
 
@@ -116,23 +96,12 @@ impl Plugin for MarginYPlugin {
         "my"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        margin_padding_handle(
-            &["margin-top", "margin-bottom"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        margin_padding_handle(&["margin-top", "margin-bottom"], context)
     }
 }
 
@@ -144,18 +113,12 @@ impl Plugin for MarginTopPlugin {
         "mt"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        margin_padding_handle(&["margin-top"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        margin_padding_handle(&["margin-top"], context)
     }
 }
 
@@ -167,18 +130,12 @@ impl Plugin for MarginBottomPlugin {
         "mb"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        margin_padding_handle(&["margin-bottom"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        margin_padding_handle(&["margin-bottom"], context)
     }
 }
 
@@ -190,18 +147,12 @@ impl Plugin for MarginLeftPlugin {
         "ml"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        margin_padding_handle(&["margin-left"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        margin_padding_handle(&["margin-left"], context)
     }
 }
 
@@ -213,18 +164,12 @@ impl Plugin for MarginRightPlugin {
         "mr"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        margin_padding_handle(&["margin-right"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        margin_padding_handle(&["margin-right"], context)
     }
 }
 
@@ -238,8 +183,8 @@ impl Plugin for PaddingPlugin {
         "p"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { is_negative, value } => {
                 *value == "auto" || length::get_basic(value, *is_negative).is_some()
             }
@@ -249,14 +194,8 @@ impl Plugin for PaddingPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        margin_padding_handle(&["padding"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        margin_padding_handle(&["padding"], context)
     }
 }
 
@@ -268,23 +207,12 @@ impl Plugin for PaddingXPlugin {
         "px"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        margin_padding_handle(
-            &["padding-left", "padding-right"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        margin_padding_handle(&["padding-left", "padding-right"], context)
     }
 }
 
@@ -296,23 +224,12 @@ impl Plugin for PaddingYPlugin {
         "py"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        margin_padding_handle(
-            &["padding-top", "padding-bottom"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        margin_padding_handle(&["padding-top", "padding-bottom"], context)
     }
 }
 
@@ -324,18 +241,12 @@ impl Plugin for PaddingTopPlugin {
         "pt"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        margin_padding_handle(&["padding-top"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        margin_padding_handle(&["padding-top"], context)
     }
 }
 
@@ -347,18 +258,12 @@ impl Plugin for PaddingBottomPlugin {
         "pb"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        margin_padding_handle(&["padding-bottom"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        margin_padding_handle(&["padding-bottom"], context)
     }
 }
 
@@ -370,18 +275,12 @@ impl Plugin for PaddingLeftPlugin {
         "pl"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        margin_padding_handle(&["padding-left"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        margin_padding_handle(&["padding-left"], context)
     }
 }
 
@@ -393,18 +292,12 @@ impl Plugin for PaddingRightPlugin {
         "pr"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        margin_padding_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        margin_padding_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        margin_padding_handle(&["padding-right"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        margin_padding_handle(&["padding-right"], context)
     }
 }
 
@@ -418,8 +311,8 @@ impl Plugin for SpaceXPlugin {
         "space-x"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { is_negative, value } => {
                 *value == "reverse" || length::get_basic(value, *is_negative).is_some()
             }
@@ -427,45 +320,39 @@ impl Plugin for SpaceXPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
         // TODO: class with `> :not([hidden]) ~ :not([hidden])`
-        indent(indentation, buffer)?;
-        match modifier {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { is_negative, value } => {
                 if *value == "reverse" {
-                    return writeln!(buffer, "--en-space-x-reverse: 1;");
+                    return writeln!(context.buffer, "--en-space-x-reverse: 1;");
                 }
 
                 let length = length::get_basic(value, *is_negative).unwrap();
-                writeln!(buffer, "--en-space-x-reverse: 0;")?;
-                indent(indentation, buffer)?;
+                writeln!(context.buffer, "--en-space-x-reverse: 0;")?;
+                indent(context.indentation, context.buffer)?;
                 writeln!(
-                    buffer,
+                    context.buffer,
                     "margin-left: calc({length} * calc(1 - var(--en-space-x-reverse)));"
                 )?;
-                indent(indentation, buffer)?;
+                indent(context.indentation, context.buffer)?;
                 writeln!(
-                    buffer,
+                    context.buffer,
                     "margin-right: calc({length} * var(--en-space-x-reverse));"
                 )?;
             }
             Modifier::Arbitrary { value, .. } => {
                 let value = to_css_value(value);
-                writeln!(buffer, "--en-space-x-reverse: 0;")?;
-                indent(indentation, buffer)?;
+                writeln!(context.buffer, "--en-space-x-reverse: 0;")?;
+                indent(context.indentation, context.buffer)?;
                 writeln!(
-                    buffer,
+                    context.buffer,
                     "margin-left: calc({value} * calc(1 - var(--en-space-x-reverse)));"
                 )?;
-                indent(indentation, buffer)?;
+                indent(context.indentation, context.buffer)?;
                 writeln!(
-                    buffer,
+                    context.buffer,
                     "margin-right: calc({value} * var(--en-space-x-reverse));"
                 )?;
             }
@@ -483,8 +370,8 @@ impl Plugin for SpaceYPlugin {
         "space-y"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { is_negative, value } => {
                 *value == "reverse" || length::get_basic(value, *is_negative).is_some()
             }
@@ -492,45 +379,39 @@ impl Plugin for SpaceYPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
         // TODO: class with `> :not([hidden]) ~ :not([hidden])`
-        indent(indentation, buffer)?;
-        match modifier {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { is_negative, value } => {
                 if *value == "reverse" {
-                    return writeln!(buffer, "--en-space-y-reverse: 1;");
+                    return writeln!(context.buffer, "--en-space-y-reverse: 1;");
                 }
 
                 let length = length::get_basic(value, *is_negative).unwrap();
-                writeln!(buffer, "--en-space-y-reverse: 0;")?;
-                indent(indentation, buffer)?;
+                writeln!(context.buffer, "--en-space-y-reverse: 0;")?;
+                indent(context.indentation, context.buffer)?;
                 writeln!(
-                    buffer,
+                    context.buffer,
                     "margin-top: calc({length} * calc(1 - var(--en-space-y-reverse)));"
                 )?;
-                indent(indentation, buffer)?;
+                indent(context.indentation, context.buffer)?;
                 writeln!(
-                    buffer,
+                    context.buffer,
                     "margin-bottom: calc({length} * var(--en-space-y-reverse));"
                 )?;
             }
             Modifier::Arbitrary { value, .. } => {
                 let value = to_css_value(value);
-                writeln!(buffer, "--en-space-y-reverse: 0;")?;
-                indent(indentation, buffer)?;
+                writeln!(context.buffer, "--en-space-y-reverse: 0;")?;
+                indent(context.indentation, context.buffer)?;
                 writeln!(
-                    buffer,
+                    context.buffer,
                     "margin-top: calc({value} * calc(1 - var(--en-space-y-reverse)));"
                 )?;
-                indent(indentation, buffer)?;
+                indent(context.indentation, context.buffer)?;
                 writeln!(
-                    buffer,
+                    context.buffer,
                     "margin-bottom: calc({value} * var(--en-space-y-reverse));"
                 )?;
             }

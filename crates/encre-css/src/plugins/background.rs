@@ -1,6 +1,5 @@
 use super::{to_css_value, Plugin};
-use crate::utils::{color, indent, value_matchers::*};
-use crate::{config::Config, selector::Modifier};
+use crate::{context::{ContextCanHandle, ContextHandle}, utils::{color, indent, value_matchers::*}, selector::Modifier};
 
 use std::{
     borrow::Cow,
@@ -15,35 +14,29 @@ impl Plugin for ColorPlugin {
         "bg"
     }
 
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
-            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(context.config, value),
             Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "color" || (hint.is_empty() && is_matching_color(value))
             }
         }
     }
 
-    fn handle(
-        &self,
-        config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => {
-                let color = color::get(config, value, Some("--en-bg-opacity")).unwrap();
+                let color = color::get(context.config, value, Some("--en-bg-opacity")).unwrap();
                 if color.contains("--en-bg-opacity") {
-                    writeln!(buffer, "--en-bg-opacity: 1;")?;
-                    indent(indentation, buffer)?;
+                    writeln!(context.buffer, "--en-bg-opacity: 1;")?;
+                    indent(context.indentation, context.buffer)?;
                 }
 
-                writeln!(buffer, "background-color: {color};")?;
+                writeln!(context.buffer, "background-color: {color};")?;
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "background-color: {};", to_css_value(value))?;
+                writeln!(context.buffer, "background-color: {};", to_css_value(value))?;
             }
         }
 
@@ -59,26 +52,20 @@ impl Plugin for AttachmentPlugin {
         "bg"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["fixed", "local", "scroll"].contains(value),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "fixed" => writeln!(buffer, "background-attachment: fixed;")?,
-                "local" => writeln!(buffer, "background-attachment: local;")?,
-                "scroll" => writeln!(buffer, "background-attachment: scroll;")?,
+                "fixed" => writeln!(context.buffer, "background-attachment: fixed;")?,
+                "local" => writeln!(context.buffer, "background-attachment: local;")?,
+                "scroll" => writeln!(context.buffer, "background-attachment: scroll;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -96,8 +83,8 @@ impl Plugin for ClipPlugin {
         "bg-clip"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["border", "padding", "content", "text"].contains(value)
             }
@@ -105,20 +92,14 @@ impl Plugin for ClipPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "border" => writeln!(buffer, "background-clip: border-box;")?,
-                "padding" => writeln!(buffer, "background-clip: padding-box;")?,
-                "content" => writeln!(buffer, "background-clip: content-box;")?,
-                "text" => writeln!(buffer, "background-clip: text;")?,
+                "border" => writeln!(context.buffer, "background-clip: border-box;")?,
+                "padding" => writeln!(context.buffer, "background-clip: padding-box;")?,
+                "content" => writeln!(context.buffer, "background-clip: content-box;")?,
+                "text" => writeln!(context.buffer, "background-clip: text;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -136,25 +117,19 @@ impl Plugin for OpacityPlugin {
         "bg-opacity"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
         // NOTE: Not-compatible with TailwindCSS, support all values
-        indent(indentation, buffer)?;
-        match modifier {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => writeln!(
-                buffer,
+                context.buffer,
                 "--en-bg-opacity: {};",
                 value.parse::<usize>().unwrap() as f32 / 100.
             )?,
@@ -173,8 +148,8 @@ impl Plugin for ImagePlugin {
         "bg"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => [
                 "none",
                 "gradient-to-t",
@@ -191,53 +166,47 @@ impl Plugin for ImagePlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "none" => writeln!(buffer, "background-image: none;")?,
+                "none" => writeln!(context.buffer, "background-image: none;")?,
                 "gradient-to-t" => writeln!(
-                    buffer,
+                    context.buffer,
                     "background-image: linear-gradient(to top, var(--en-gradient-stops));"
                 )?,
                 "gradient-to-tr" => writeln!(
-                    buffer,
+                    context.buffer,
                     "background-image: linear-gradient(to top right, var(--en-gradient-stops));"
                 )?,
                 "gradient-to-r" => writeln!(
-                    buffer,
+                    context.buffer,
                     "background-image: linear-gradient(to right, var(--en-gradient-stops));"
                 )?,
                 "gradient-to-br" => writeln!(
-                    buffer,
+                    context.buffer,
                     "background-image: linear-gradient(to bottom right, var(--en-gradient-stops));"
                 )?,
                 "gradient-to-b" => writeln!(
-                    buffer,
+                    context.buffer,
                     "background-image: linear-gradient(to bottom, var(--en-gradient-stops));"
                 )?,
                 "gradient-to-bl" => writeln!(
-                    buffer,
+                    context.buffer,
                     "background-image: linear-gradient(to bottom left, var(--en-gradient-stops));"
                 )?,
                 "gradient-to-l" => writeln!(
-                    buffer,
+                    context.buffer,
                     "background-image: linear-gradient(to left, var(--en-gradient-stops));"
                 )?,
                 "gradient-to-tl" => writeln!(
-                    buffer,
+                    context.buffer,
                     "background-image: linear-gradient(to top left, var(--en-gradient-stops));"
                 )?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "background-image: {};", to_css_value(value))?
+                writeln!(context.buffer, "background-image: {};", to_css_value(value))?
             }
         }
 
@@ -253,22 +222,16 @@ impl Plugin for GradientFromPlugin {
         "from"
     }
 
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
-            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(context.config, value),
             Modifier::Arbitrary { value, .. } => is_matching_color(value),
         }
     }
 
-    fn handle(
-        &self,
-        config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        let value = match modifier {
-            Modifier::Basic { value, .. } => color::get(config, value, None).unwrap(),
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        let value = match context.modifier {
+            Modifier::Basic { value, .. } => color::get(context.config, value, None).unwrap(),
             Modifier::Arbitrary { value, .. } => to_css_value(*value),
         };
 
@@ -281,11 +244,11 @@ impl Plugin for GradientFromPlugin {
             Cow::from(default)
         };
 
-        indent(indentation, buffer)?;
-        writeln!(buffer, "--en-gradient-from: {value};")?;
-        indent(indentation, buffer)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "--en-gradient-from: {value};")?;
+        indent(context.indentation, context.buffer)?;
         writeln!(
-            buffer,
+            context.buffer,
             "--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to, {default_to});"
         )?;
 
@@ -301,22 +264,16 @@ impl Plugin for GradientViaPlugin {
         "via"
     }
 
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
-            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(context.config, value),
             Modifier::Arbitrary { value, .. } => is_matching_color(value),
         }
     }
 
-    fn handle(
-        &self,
-        config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        let value = match modifier {
-            Modifier::Basic { value, .. } => color::get(config, value, None).unwrap(),
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        let value = match context.modifier {
+            Modifier::Basic { value, .. } => color::get(context.config, value, None).unwrap(),
             Modifier::Arbitrary { value, .. } => to_css_value(*value),
         };
 
@@ -329,9 +286,9 @@ impl Plugin for GradientViaPlugin {
             Cow::from(default)
         };
 
-        indent(indentation, buffer)?;
+        indent(context.indentation, context.buffer)?;
         writeln!(
-            buffer,
+            context.buffer,
             "--en-gradient-stops: var(--en-gradient-from), {}, var(--en-gradient-to, {});",
             value, default_to
         )?;
@@ -348,27 +305,21 @@ impl Plugin for GradientToPlugin {
         "to"
     }
 
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
-            Modifier::Basic { value, .. } => color::is_matching_basic_color(config, value),
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
+            Modifier::Basic { value, .. } => color::is_matching_basic_color(context.config, value),
             Modifier::Arbitrary { value, .. } => is_matching_color(value),
         }
     }
 
-    fn handle(
-        &self,
-        config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        let value = match modifier {
-            Modifier::Basic { value, .. } => color::get(config, value, None).unwrap(),
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        let value = match context.modifier {
+            Modifier::Basic { value, .. } => color::get(context.config, value, None).unwrap(),
             Modifier::Arbitrary { value, .. } => to_css_value(*value),
         };
 
-        indent(indentation, buffer)?;
-        writeln!(buffer, "--en-gradient-to: {value};")?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "--en-gradient-to: {value};")?;
 
         Ok(())
     }
@@ -382,8 +333,8 @@ impl Plugin for PositionPlugin {
         "bg"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => [
                 "bottom",
                 "center",
@@ -405,29 +356,23 @@ impl Plugin for PositionPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "bottom" => writeln!(buffer, "background-position: bottom;")?,
-                "center" => writeln!(buffer, "background-position: center;")?,
-                "left" => writeln!(buffer, "background-position: left;")?,
-                "left-bottom" => writeln!(buffer, "background-position: left-bottom;")?,
-                "left-top" => writeln!(buffer, "background-position: left-top;")?,
-                "right" => writeln!(buffer, "background-position: right;")?,
-                "right-bottom" => writeln!(buffer, "background-position: right-bottom;")?,
-                "right-top" => writeln!(buffer, "background-position: right-top;")?,
-                "top" => writeln!(buffer, "background-position: top;")?,
+                "bottom" => writeln!(context.buffer, "background-position: bottom;")?,
+                "center" => writeln!(context.buffer, "background-position: center;")?,
+                "left" => writeln!(context.buffer, "background-position: left;")?,
+                "left-bottom" => writeln!(context.buffer, "background-position: left-bottom;")?,
+                "left-top" => writeln!(context.buffer, "background-position: left-top;")?,
+                "right" => writeln!(context.buffer, "background-position: right;")?,
+                "right-bottom" => writeln!(context.buffer, "background-position: right-bottom;")?,
+                "right-top" => writeln!(context.buffer, "background-position: right-top;")?,
+                "top" => writeln!(context.buffer, "background-position: top;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "background-position: {};", to_css_value(value))?
+                writeln!(context.buffer, "background-position: {};", to_css_value(value))?
             }
         }
 
@@ -443,8 +388,8 @@ impl Plugin for RepeatPlugin {
         "bg"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => [
                 "repeat",
                 "no-repeat",
@@ -458,22 +403,16 @@ impl Plugin for RepeatPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "repeat" => writeln!(buffer, "background-repeat: repeat;")?,
-                "no-repeat" => writeln!(buffer, "background-repeat: no-repeat;")?,
-                "repeat-x" => writeln!(buffer, "background-repeat: repeat-x;")?,
-                "repeat-y" => writeln!(buffer, "background-repeat: repeat-y;")?,
-                "repeat-round" => writeln!(buffer, "background-repeat: round;")?,
-                "repeat-space" => writeln!(buffer, "background-repeat: space;")?,
+                "repeat" => writeln!(context.buffer, "background-repeat: repeat;")?,
+                "no-repeat" => writeln!(context.buffer, "background-repeat: no-repeat;")?,
+                "repeat-x" => writeln!(context.buffer, "background-repeat: repeat-x;")?,
+                "repeat-y" => writeln!(context.buffer, "background-repeat: repeat-y;")?,
+                "repeat-round" => writeln!(context.buffer, "background-repeat: round;")?,
+                "repeat-space" => writeln!(context.buffer, "background-repeat: space;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -491,23 +430,17 @@ impl Plugin for OriginPlugin {
         "bg-origin"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["border", "padding", "content"].contains(value),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
-            Modifier::Basic { value, .. } => writeln!(buffer, "background-origin: {value}-box;")?,
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
+            Modifier::Basic { value, .. } => writeln!(context.buffer, "background-origin: {value}-box;")?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
@@ -523,8 +456,8 @@ impl Plugin for SizePlugin {
         "bg"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["contain", "cover", "auto"].contains(value),
             Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "length"
@@ -540,23 +473,17 @@ impl Plugin for SizePlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "auto" => writeln!(buffer, "background-size: auto;")?,
-                "cover" => writeln!(buffer, "background-size: cover;")?,
-                "contain" => writeln!(buffer, "background-size: contain;")?,
+                "auto" => writeln!(context.buffer, "background-size: auto;")?,
+                "cover" => writeln!(context.buffer, "background-size: cover;")?,
+                "contain" => writeln!(context.buffer, "background-size: contain;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "background-size: {};", to_css_value(value))?
+                writeln!(context.buffer, "background-size: {};", to_css_value(value))?
             }
         }
 

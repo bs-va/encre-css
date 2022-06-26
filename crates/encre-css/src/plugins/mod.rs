@@ -1,4 +1,4 @@
-use crate::{config::Config, selector::Modifier};
+use crate::context::{ContextCanHandle, ContextHandle};
 
 use std::{borrow::Cow, fmt};
 
@@ -33,40 +33,24 @@ pub trait Plugin: fmt::Debug {
     /// Custom CSS written before the CSS rule
     ///
     /// NOTE: The CSS must end with two newlines
-    fn css_before_rule(
-        &self,
-        _config: &Config,
-        _modifier: &Modifier,
-        _buffer: &mut String,
-    ) -> fmt::Result {
+    fn css_before_rule(&self, _context: ContextHandle) -> fmt::Result {
         Ok(())
     }
 
     /// Custom CSS written after the CSS rule
     ///
     /// NOTE: The CSS must start with two newlines
-    fn css_after_rule(
-        &self,
-        _config: &Config,
-        _modifier: &Modifier,
-        _buffer: &mut String,
-    ) -> fmt::Result {
+    fn css_after_rule(&self, _context: ContextHandle) -> fmt::Result {
         Ok(())
     }
 
     /// Returns whether the plugin can handle a specific modifier
-    fn can_handle(&self, config: &Config, modifier: &Modifier) -> bool;
+    fn can_handle(&self, _context: ContextCanHandle) -> bool;
 
     /// Get the CSS code from a modifier
     ///
     /// The CSS should end with a newline
-    fn handle(
-        &self,
-        config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result;
+    fn handle(&self, _context: ContextHandle) -> fmt::Result;
 }
 
 /// Convert an arbitrary value into a CSS value

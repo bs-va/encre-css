@@ -1,6 +1,5 @@
 use super::{to_css_value, Plugin};
-use crate::utils::{indent, value_matchers::*};
-use crate::{config::Config, selector::Modifier};
+use crate::{context::{ContextCanHandle, ContextHandle}, utils::{indent, value_matchers::*}, selector::Modifier};
 
 use std::fmt::{self, Write};
 
@@ -12,30 +11,24 @@ impl Plugin for OrderPlugin {
         "order"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["first", "last", "none"].contains(&&**value),
             Modifier::Arbitrary { value, .. } => is_matching_number(value),
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "first" => return writeln!(buffer, "order: -9999;"),
-                "last" => return writeln!(buffer, "order: 9999;"),
-                "none" => return writeln!(buffer, "order: 0;"),
+                "first" => return writeln!(context.buffer, "order: -9999;"),
+                "last" => return writeln!(context.buffer, "order: 9999;"),
+                "none" => return writeln!(context.buffer, "order: 0;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "order: {};", to_css_value(value))?
+                writeln!(context.buffer, "order: {};", to_css_value(value))?
             }
         }
 
@@ -51,8 +44,8 @@ impl Plugin for DirectionPlugin {
         "flex"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => {
                 ["row", "row-reverse", "col", "col-reverse"].contains(&&**value)
             }
@@ -60,20 +53,14 @@ impl Plugin for DirectionPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "row" => writeln!(buffer, "flex-direction: row;")?,
-                "row-reverse" => writeln!(buffer, "flex-direction: row-reverse;")?,
-                "col" => writeln!(buffer, "flex-direction: column;")?,
-                "col-reverse" => writeln!(buffer, "flex-direction: column-reverse;")?,
+                "row" => writeln!(context.buffer, "flex-direction: row;")?,
+                "row-reverse" => writeln!(context.buffer, "flex-direction: row-reverse;")?,
+                "col" => writeln!(context.buffer, "flex-direction: column;")?,
+                "col-reverse" => writeln!(context.buffer, "flex-direction: column-reverse;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -91,26 +78,20 @@ impl Plugin for WrapPlugin {
         "flex"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["nowrap", "wrap", "wrap-reverse"].contains(&&**value),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "nowrap" => writeln!(buffer, "flex-wrap: nowrap;")?,
-                "wrap" => writeln!(buffer, "flex-wrap: wrap;")?,
-                "wrap-reverse" => writeln!(buffer, "flex-wrap: wrap-reverse;")?,
+                "nowrap" => writeln!(context.buffer, "flex-wrap: nowrap;")?,
+                "wrap" => writeln!(context.buffer, "flex-wrap: wrap;")?,
+                "wrap-reverse" => writeln!(context.buffer, "flex-wrap: wrap-reverse;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -128,8 +109,8 @@ impl Plugin for GrowShrinkBasisPlugin {
         "flex"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => [
                 "1", "auto", "initial", "grow", "grow-0", "shrink", "shrink-0", "none",
             ]
@@ -168,28 +149,22 @@ impl Plugin for GrowShrinkBasisPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "1" => writeln!(buffer, "flex: 1 1 0%;")?,
-                "auto" => writeln!(buffer, "flex: 1 1 auto;")?,
-                "initial" => writeln!(buffer, "flex: 0 1 auto;")?,
-                "none" => writeln!(buffer, "flex: none;")?,
-                "grow" => writeln!(buffer, "flex-grow: 1;")?,
-                "grow-0" => writeln!(buffer, "flex-grow: 0;")?,
-                "shrink" => writeln!(buffer, "flex-shrink: 1;")?,
-                "shrink-0" => writeln!(buffer, "flex-shrink: 0;")?,
+                "1" => writeln!(context.buffer, "flex: 1 1 0%;")?,
+                "auto" => writeln!(context.buffer, "flex: 1 1 auto;")?,
+                "initial" => writeln!(context.buffer, "flex: 0 1 auto;")?,
+                "none" => writeln!(context.buffer, "flex: none;")?,
+                "grow" => writeln!(context.buffer, "flex-grow: 1;")?,
+                "grow-0" => writeln!(context.buffer, "flex-grow: 0;")?,
+                "shrink" => writeln!(context.buffer, "flex-shrink: 1;")?,
+                "shrink-0" => writeln!(context.buffer, "flex-shrink: 0;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "flex: {};", to_css_value(value))?
+                writeln!(context.buffer, "flex: {};", to_css_value(value))?
             }
         }
 

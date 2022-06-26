@@ -1,6 +1,5 @@
 use super::{to_css_value, Plugin};
-use crate::utils::{format_negative, indent, length, value_matchers::*};
-use crate::{config::Config, selector::Modifier};
+use crate::{context::{ContextCanHandle, ContextHandle}, utils::{format_negative, indent, length, value_matchers::*}, selector::Modifier};
 
 use std::fmt::{self, Write};
 
@@ -15,26 +14,20 @@ impl Plugin for TransformPlugin {
         "transform"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => ["", "gpu", "cpu", "none"].contains(&&**value),
             Modifier::Arbitrary { .. } => false,
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { value, .. } => match *value {
-                "" | "cpu" => writeln!(buffer, "{}", CSS_TRANSFORM)?,
-                "gpu" => writeln!(buffer, "transform: translate3d(var(--tw-translate-x), var(--tw-translate-y), 0) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));")?,
-                "none" => writeln!(buffer, "transform: none;")?,
+                "" | "cpu" => writeln!(context.buffer, "{}", CSS_TRANSFORM)?,
+                "gpu" => writeln!(context.buffer, "transform: translate3d(var(--tw-translate-x), var(--tw-translate-y), 0) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));")?,
+                "none" => writeln!(context.buffer, "transform: none;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -52,8 +45,8 @@ impl Plugin for OriginPlugin {
         "origin"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => [
                 "center",
                 "top",
@@ -70,17 +63,11 @@ impl Plugin for OriginPlugin {
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        match context.modifier {
             Modifier::Basic { value, .. } | Modifier::Arbitrary { value, .. } => {
-                indent(indentation, buffer)?;
-                writeln!(buffer, "transform-origin: {};", to_css_value(value))?;
+                indent(context.indentation, context.buffer)?;
+                writeln!(context.buffer, "transform-origin: {};", to_css_value(value))?;
             }
         }
 
@@ -88,8 +75,8 @@ impl Plugin for OriginPlugin {
     }
 }
 
-pub fn translate_can_handle(modifier: &Modifier) -> bool {
-    match modifier {
+pub fn translate_can_handle(context: ContextCanHandle) -> bool {
+    match context.modifier {
         Modifier::Basic { is_negative, value } => {
             length::get_extended(value, *is_negative).is_some()
         }
@@ -99,25 +86,23 @@ pub fn translate_can_handle(modifier: &Modifier) -> bool {
 
 pub fn translate_handle(
     css_prop: &str,
-    modifier: &Modifier,
-    indentation: usize,
-    buffer: &mut String,
+    context: ContextHandle,
 ) -> fmt::Result {
-    indent(indentation, buffer)?;
-    match modifier {
+    indent(context.indentation, context.buffer)?;
+    match context.modifier {
         Modifier::Basic { is_negative, value } => writeln!(
-            buffer,
+            context.buffer,
             "{}: {};",
             css_prop,
             length::get_extended(value, *is_negative).unwrap()
         )?,
         Modifier::Arbitrary { value, .. } => {
-            writeln!(buffer, "{}: {};", css_prop, to_css_value(value))?
+            writeln!(context.buffer, "{}: {};", css_prop, to_css_value(value))?
         }
     }
 
-    indent(indentation, buffer)?;
-    writeln!(buffer, "{}", CSS_TRANSFORM)?;
+    indent(context.indentation, context.buffer)?;
+    writeln!(context.buffer, "{}", CSS_TRANSFORM)?;
     Ok(())
 }
 
@@ -129,18 +114,12 @@ impl Plugin for TranslateXPlugin {
         "translate-x"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        translate_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        translate_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        translate_handle("--en-translate-x", modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        translate_handle("--en-translate-x", context)
     }
 }
 
@@ -152,18 +131,12 @@ impl Plugin for TranslateYPlugin {
         "translate-y"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        translate_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        translate_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        translate_handle("--en-translate-y", modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        translate_handle("--en-translate-y", context)
     }
 }
 
@@ -175,41 +148,35 @@ impl Plugin for RotatePlugin {
         "rotate"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        match modifier {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
             Modifier::Arbitrary { value, .. } => is_matching_angle(value),
         }
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        indent(indentation, buffer)?;
-        match modifier {
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        indent(context.indentation, context.buffer)?;
+        match context.modifier {
             Modifier::Basic { is_negative, value } => writeln!(
-                buffer,
+                context.buffer,
                 "--en-rotate: {}{}deg;",
                 format_negative(is_negative),
                 value.parse::<usize>().unwrap(),
             )?,
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "--en-rotate: {};", to_css_value(value))?
+                writeln!(context.buffer, "--en-rotate: {};", to_css_value(value))?
             }
         }
 
-        indent(indentation, buffer)?;
-        writeln!(buffer, "{}", CSS_TRANSFORM)?;
+        indent(context.indentation, context.buffer)?;
+        writeln!(context.buffer, "{}", CSS_TRANSFORM)?;
         Ok(())
     }
 }
 
-pub fn scale_can_handle(modifier: &Modifier) -> bool {
-    match modifier {
+pub fn scale_can_handle(context: ContextCanHandle) -> bool {
+    match context.modifier {
         Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
         Modifier::Arbitrary { .. } => false,
     }
@@ -217,17 +184,15 @@ pub fn scale_can_handle(modifier: &Modifier) -> bool {
 
 pub fn scale_handle(
     css_properties: &[&str],
-    modifier: &Modifier,
-    indentation: usize,
-    buffer: &mut String,
+    context: ContextHandle,
 ) -> fmt::Result {
     // NOTE: Not-compatible with TailwindCSS, support all values
-    match modifier {
+    match context.modifier {
         Modifier::Basic { is_negative, value } => {
             for css_prop in css_properties {
-                indent(indentation, buffer)?;
+                indent(context.indentation, context.buffer)?;
                 writeln!(
-                    buffer,
+                    context.buffer,
                     "{}: {}{};",
                     css_prop,
                     format_negative(is_negative),
@@ -238,8 +203,8 @@ pub fn scale_handle(
         Modifier::Arbitrary { .. } => unreachable!(),
     }
 
-    indent(indentation, buffer)?;
-    writeln!(buffer, "{}", CSS_TRANSFORM)?;
+    indent(context.indentation, context.buffer)?;
+    writeln!(context.buffer, "{}", CSS_TRANSFORM)?;
     Ok(())
 }
 
@@ -251,23 +216,12 @@ impl Plugin for ScalePlugin {
         "scale"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        scale_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scale_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        scale_handle(
-            &["--en-scale-x", "--en-scale-y"],
-            modifier,
-            indentation,
-            buffer,
-        )
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        scale_handle(&["--en-scale-x", "--en-scale-y"], context)
     }
 }
 
@@ -279,18 +233,12 @@ impl Plugin for ScaleXPlugin {
         "scale-x"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        scale_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scale_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        scale_handle(&["--en-scale-x"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        scale_handle(&["--en-scale-x"], context)
     }
 }
 
@@ -302,23 +250,17 @@ impl Plugin for ScaleYPlugin {
         "scale-y"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        scale_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scale_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        scale_handle(&["--en-scale-y"], modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        scale_handle(&["--en-scale-y"], context)
     }
 }
 
-pub fn skew_can_handle(modifier: &Modifier) -> bool {
-    match modifier {
+pub fn skew_can_handle(context: ContextCanHandle) -> bool {
+    match context.modifier {
         Modifier::Basic { value, .. } => value.parse::<usize>().is_ok(),
         Modifier::Arbitrary { value, .. } => is_matching_angle(value),
     }
@@ -326,26 +268,24 @@ pub fn skew_can_handle(modifier: &Modifier) -> bool {
 
 pub fn skew_handle(
     css_prop: &str,
-    modifier: &Modifier,
-    indentation: usize,
-    buffer: &mut String,
+    context: ContextHandle,
 ) -> fmt::Result {
     // NOTE: Not-compatible with TailwindCSS, support all values
-    indent(indentation, buffer)?;
-    match modifier {
+    indent(context.indentation, context.buffer)?;
+    match context.modifier {
         Modifier::Basic { is_negative, value } => writeln!(
-            buffer,
+            context.buffer,
             "{}: {}{value}deg;",
             css_prop,
             format_negative(is_negative),
         )?,
         Modifier::Arbitrary { value, .. } => {
-            writeln!(buffer, "{}: {};", css_prop, to_css_value(value))?
+            writeln!(context.buffer, "{}: {};", css_prop, to_css_value(value))?
         }
     }
 
-    indent(indentation, buffer)?;
-    writeln!(buffer, "{}", CSS_TRANSFORM)?;
+    indent(context.indentation, context.buffer)?;
+    writeln!(context.buffer, "{}", CSS_TRANSFORM)?;
     Ok(())
 }
 
@@ -357,18 +297,12 @@ impl Plugin for SkewXPlugin {
         "skew-x"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        skew_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        skew_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        skew_handle("--en-skew-x", modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        skew_handle("--en-skew-x", context)
     }
 }
 
@@ -380,17 +314,11 @@ impl Plugin for SkewYPlugin {
         "skew-y"
     }
 
-    fn can_handle(&self, _config: &Config, modifier: &Modifier) -> bool {
-        skew_can_handle(modifier)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        skew_can_handle(context)
     }
 
-    fn handle(
-        &self,
-        _config: &Config,
-        modifier: &Modifier,
-        indentation: usize,
-        buffer: &mut String,
-    ) -> fmt::Result {
-        skew_handle("--en-skew-y", modifier, indentation, buffer)
+    fn handle(&self, context: ContextHandle) -> fmt::Result {
+        skew_handle("--en-skew-y", context)
     }
 }
