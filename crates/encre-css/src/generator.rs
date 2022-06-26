@@ -58,14 +58,24 @@ impl<'a> EncreGenerator<'a> {
 
     /// Add a single selector which will have its CSS generated.
     ///
+    /// You need to use this function if you already have scanned a selector, otherwise use
+    /// [scan].
+    ///
     /// This function automatically handles duplicated selectors and sorting.
+    ///
+    /// [scan]: EncreGenerator::scan
     pub fn add_selector(&mut self, val: &'a str) {
         Selector::new(val, &self.config).map(|s| self.scanned_selectors.insert(s));
     }
 
     /// Add several selectors which will have their CSS generated.
     ///
+    /// You need to use this function if you already have scanned a list of selectors, otherwise use
+    /// [scan].
+    ///
     /// This function automatically handles duplicated selectors and sorting.
+    ///
+    /// [scan]: EncreGenerator::scan
     pub fn add_selectors<T: IntoIterator<Item = &'a str>>(&mut self, val: T) {
         self.scanned_selectors.extend(
             val.into_iter()
@@ -75,30 +85,23 @@ impl<'a> EncreGenerator<'a> {
 
     /// Scan the contents of a file and store all the selectors found.
     ///
+    /// You can customize the extractor using the configuration field [Config::extractor], by
+    /// default, it splits the value by spaces, double quotes, single quotes and backticks.
+    ///
     /// This function automatically handles duplicated selectors and sorting.
     pub fn scan(&mut self, content: &'a str) {
-        self.scanned_selectors.extend(
-            content
-                .split(|ch| ch == ' ' || ch == '"' || ch == '\'' || ch == '`' || ch == '\n')
-                .filter_map(|val| {
-                    // The shortest selector is `m-1`
-                    if val.len() >= 3 {
-                        Selector::new(val, &self.config)
-                    } else {
-                        None
-                    }
-                })
-                .collect::<BTreeSet<Selector>>(),
-        );
+        self.add_selectors(self.config.extractor.extract(content));
     }
 
     /// Generate the CSS styles needed based on the scanned selectors.
     ///
     /// Don't forget to scan selectors before, using:
-    /// - [add_selector] to add individual selectors to the scanned list;
-    /// - [scan] to scan a string (e.g. the content of a file);
+    /// - [add_selector] to add a single selector to the scanned list;
+    /// - [add_selectors] to add a list of selectors to the scanned list;
+    /// - [scan] to scan a string (e.g. the contents of a file).
     ///
     /// [add_selector]: EncreGenerator::add_selector
+    /// [add_selectors]: EncreGenerator::add_selectors
     /// [scan]: EncreGenerator::scan
     pub fn generate(&self) -> Result<String> {
         // Make sure that animations are not defined

@@ -21,6 +21,7 @@
 
 pub mod config;
 pub mod error;
+pub mod extractor;
 pub mod generator;
 pub mod plugins;
 pub mod preflight;
@@ -35,8 +36,7 @@ pub use generator::EncreGenerator;
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::config::DarkModeConfig;
-    use crate::selector::Selector;
+    use crate::{config::DarkModeConfig, selector::Selector};
 
     use pretty_assertions::assert_eq;
     use std::{

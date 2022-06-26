@@ -1,7 +1,10 @@
-use crate::error::{Error, Result};
+use crate::{
+    error::{Error, Result},
+    extractor::Extractor,
+};
 
 use serde::Deserialize;
-use std::{borrow::Cow, collections::BTreeMap, fs, path::Path};
+use std::{borrow::Cow, collections::BTreeMap, fmt, fs, path::Path};
 
 pub const BUILTIN_COLORS: &[(&str, [u8; 3])] = &[
     ("slate-50", [248, 250, 252]),
@@ -259,10 +262,13 @@ pub struct ThemeConfig {
     pub colors: BTreeMap<Cow<'static, str>, Cow<'static, str>>,
 }
 
-#[derive(Default, PartialEq, Debug, Deserialize)]
+#[derive(Default, Deserialize)]
 pub struct Config {
     #[serde(default)]
     pub theme: ThemeConfig,
+
+    #[serde(skip)]
+    pub extractor: Extractor,
     // custom_variants: Vec<VariantConfig>,
     // custom_plugins: Vec<PluginConfig>,
 
@@ -274,5 +280,19 @@ impl Config {
         Ok(toml::from_str(&fs::read_to_string(&path).map_err(
             |e| Error::ConfigFileNotFound(path.as_ref().to_path_buf(), e),
         )?)?)
+    }
+}
+
+impl PartialEq for Config {
+    fn eq(&self, other: &Self) -> bool {
+        self.theme.eq(&other.theme)
+    }
+}
+
+impl fmt::Debug for Config {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.debug_struct("Config")
+            .field("theme", &self.theme)
+            .finish()
     }
 }
