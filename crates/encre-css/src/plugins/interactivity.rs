@@ -1,5 +1,9 @@
 use super::{to_css_value, Plugin};
-use crate::{context::{ContextCanHandle, ContextHandle}, utils::{color, indent, length, value_matchers::*}, selector::Modifier};
+use crate::{
+    context::{ContextCanHandle, ContextHandle},
+    selector::Modifier,
+    utils::{color, indent, length, value_matchers::*},
+};
 
 use std::fmt::{self, Write};
 

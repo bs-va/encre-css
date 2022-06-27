@@ -1,5 +1,9 @@
 use super::{to_css_value, Plugin};
-use crate::{context::{ContextCanHandle, ContextHandle}, utils::{indent, length, value_matchers::*}, selector::Modifier};
+use crate::{
+    context::{ContextCanHandle, ContextHandle},
+    selector::Modifier,
+    utils::{indent, length, value_matchers::*},
+};
 
 use std::fmt::{self, Write};
 
@@ -33,9 +37,11 @@ impl Plugin for TemplateColumnsPlugin {
                     value.parse::<usize>().unwrap(),
                 )?;
             }
-            Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "grid-template-columns: {};", to_css_value(value))?
-            }
+            Modifier::Arbitrary { value, .. } => writeln!(
+                context.buffer,
+                "grid-template-columns: {};",
+                to_css_value(value)
+            )?,
         }
 
         Ok(())
@@ -72,9 +78,11 @@ impl Plugin for TemplateRowsPlugin {
                     value.parse::<usize>().unwrap(),
                 )?;
             }
-            Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "grid-template-rows: {};", to_css_value(value))?
-            }
+            Modifier::Arbitrary { value, .. } => writeln!(
+                context.buffer,
+                "grid-template-rows: {};",
+                to_css_value(value)
+            )?,
         }
 
         Ok(())
@@ -278,9 +286,11 @@ impl Plugin for AutoColumnsPlugin {
                 "fr" => writeln!(context.buffer, "grid-auto-columns: minmax(0, 1fr);")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "grid-auto-columns: {};", to_css_value(value))?
-            }
+            Modifier::Arbitrary { value, .. } => writeln!(
+                context.buffer,
+                "grid-auto-columns: {};",
+                to_css_value(value)
+            )?,
         }
 
         Ok(())
@@ -348,7 +358,9 @@ impl Plugin for GapPlugin {
                 "gap: {};",
                 length::get_basic(value, *is_negative).unwrap()
             )?,
-            Modifier::Arbitrary { value, .. } => writeln!(context.buffer, "gap: {};", to_css_value(value))?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(context.buffer, "gap: {};", to_css_value(value))?
+            }
         }
 
         Ok(())

@@ -437,6 +437,111 @@ mod tests {
     }
 
     #[test]
+    fn gen_selector_css_for_container_test() {
+        let mut generator = EncreGenerator::from_config(Config::default());
+        generator.add_selector("container");
+
+        assert_eq!(
+            generator.generate().unwrap(),
+            format!(
+                r#"{}
+
+.container {{
+  width: 100%;
+}}
+
+@media (min-width: 640px) {{
+  .container {{
+    max-width: 640px;
+  }}
+}}
+
+@media (min-width: 768px) {{
+  .container {{
+    max-width: 768px;
+  }}
+}}
+
+@media (min-width: 1024px) {{
+  .container {{
+    max-width: 1024px;
+  }}
+}}
+
+@media (min-width: 1280px) {{
+  .container {{
+    max-width: 1280px;
+  }}
+}}
+
+@media (min-width: 1536px) {{
+  .container {{
+    max-width: 1536px;
+  }}
+}}"#,
+                preflight::ENCRE_PREFLIGHT_CSS,
+            )
+        );
+
+        let mut generator = EncreGenerator::from_config(Config::default());
+        generator.add_selector("md:container");
+        generator.add_selector("md:mx-auto");
+
+        assert_eq!(
+            generator.generate().unwrap(),
+            format!(
+                r#"{}
+
+@media (min-width: 768px) {{
+  .md\:container {{
+    width: 100%;
+  }}
+}}
+
+@media (min-width: 768px) {{
+  @media (min-width: 640px) {{
+    .md\:container {{
+      max-width: 640px;
+    }}
+  }}
+
+  @media (min-width: 768px) {{
+    .md\:container {{
+      max-width: 768px;
+    }}
+  }}
+
+  @media (min-width: 1024px) {{
+    .md\:container {{
+      max-width: 1024px;
+    }}
+  }}
+
+  @media (min-width: 1280px) {{
+    .md\:container {{
+      max-width: 1280px;
+    }}
+  }}
+
+  @media (min-width: 1536px) {{
+    .md\:container {{
+      max-width: 1536px;
+    }}
+  }}
+}}
+
+@media (min-width: 768px) {{
+  .md\:mx-auto {{
+    margin-left: auto;
+    margin-right: auto;
+  }}
+}}"#,
+                preflight::ENCRE_PREFLIGHT_CSS,
+            )
+        );
+    }
+
+    #[test]
     fn gen_selector_css_with_dark_variant_test() {
         let mut generator = EncreGenerator::from_config(Config::default());
         generator.add_selector("dark:mt-px");

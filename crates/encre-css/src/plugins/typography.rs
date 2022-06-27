@@ -1,5 +1,9 @@
 use super::{to_css_value, Plugin};
-use crate::{context::{ContextCanHandle, ContextHandle}, utils::{color, indent, length, value_matchers::*}, selector::Modifier};
+use crate::{
+    context::{ContextCanHandle, ContextHandle},
+    selector::Modifier,
+    utils::{color, indent, length, value_matchers::*},
+};
 
 use std::{
     borrow::Cow,
@@ -552,7 +556,9 @@ impl Plugin for TextDecorationStylePlugin {
     fn handle(&self, context: ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
         match context.modifier {
-            Modifier::Basic { value, .. } => writeln!(context.buffer, "text-decoration-style: {value};")?,
+            Modifier::Basic { value, .. } => {
+                writeln!(context.buffer, "text-decoration-style: {value};")?
+            }
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
@@ -630,9 +636,11 @@ impl Plugin for TextDecorationUnderlineOffsetPlugin {
                 // NOTE: Not-compatible with TailwindCSS, support all values
                 writeln!(context.buffer, "text-underline-offset: {value}px;")?;
             }
-            Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "text-underline-offset: {};", to_css_value(value))?
-            }
+            Modifier::Arbitrary { value, .. } => writeln!(
+                context.buffer,
+                "text-underline-offset: {};",
+                to_css_value(value)
+            )?,
         }
 
         Ok(())
@@ -810,7 +818,9 @@ impl Plugin for ListStylePositionPlugin {
     fn handle(&self, context: ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
         match context.modifier {
-            Modifier::Basic { value, .. } => writeln!(context.buffer, "list-style-position: {value};")?,
+            Modifier::Basic { value, .. } => {
+                writeln!(context.buffer, "list-style-position: {value};")?
+            }
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 

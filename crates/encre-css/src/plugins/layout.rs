@@ -1,9 +1,10 @@
 use super::{to_css_value, Plugin};
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
     config::BUILTIN_SCREENS,
+    context::{ContextAfterRule, ContextCanHandle, ContextHandle},
     selector::Modifier,
     utils::{indent, length, value_matchers::*},
+    variant::{VARIANT_SEPARATOR, BUILTIN_VARIANTS, Variant},
 };
 
 use std::{
@@ -202,10 +203,7 @@ pub fn position_can_handle(context: ContextCanHandle) -> bool {
     }
 }
 
-pub fn position_handle(
-    css_properties: &[&str],
-    context: ContextHandle,
-) -> fmt::Result {
+pub fn position_handle(css_properties: &[&str], context: ContextHandle) -> fmt::Result {
     match context.modifier {
         Modifier::Basic { is_negative, value } => {
             for css_prop in css_properties {
@@ -394,112 +392,166 @@ impl Plugin for ContainerPlugin {
         "container"
     }
 
-    fn css_after_rule(
-        &self,
-        context: ContextHandle,
-    ) -> fmt::Result {
-        if let Modifier::Basic { value, .. } = context.modifier {
-            if value.is_empty() {
-                if context.config.theme.screens.is_empty() {
-                    for (_, screen) in BUILTIN_SCREENS.iter() {
-                        write!(
-                            context.buffer,
-                            "\n\n@media (min-width: {screen}) {{
-  .container {{
-    max-width: {screen};
-  }}
-}}"
-                        )?;
-                    }
-                } else {
-                    let mut screens = context.config
-                        .theme
-                        .screens
-                        .iter()
-                        .map(|(a, b)| (a.clone(), b.clone()))
-                        .chain(
-                            BUILTIN_SCREENS
-                                .iter()
-                                .map(|(a, b)| (Cow::from(*a), Cow::from(*b))),
-                        )
-                        .collect::<Vec<(Cow<str>, Cow<str>)>>();
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
+            Modifier::Basic { value, .. } => value.is_empty(),
+            Modifier::Arbitrary { .. } => false,
+        }
+    }
 
-                    // Deduplicate screens
-                    screens.sort_by(|a, b| a.0.cmp(&b.0));
-                    screens.dedup_by(|a, b| a.0.eq(&b.0));
+    fn css_after_rule(&self, context: ContextAfterRule) -> fmt::Result {
+        if let Modifier::Basic { .. } = context.selector.modifier {
+            let get_variant = |variant| {
+                BUILTIN_VARIANTS
+                    .iter()
+                    .find_map(|v| if v.0 == variant { Some(&v.1) } else { None })
+                    .or_else(|| context.custom_variants.get(&variant))
+            };
 
-                    // Emulate Tailwind sorting (based on the JS `parseInt` function)
-                    screens.sort_by(|a, b| {
-                        let a =
-                            if let Some(first_char_a) = a.1.chars().position(char::is_alphabetic) {
-                                a.1[..first_char_a].parse::<usize>().ok()
-                            } else {
-                                a.1.parse::<usize>().ok()
-                            };
+            let mut indentation = 0;
+            let mut first_child = false;
 
-                        let b =
-                            if let Some(first_char_b) = b.1.chars().position(char::is_alphabetic) {
-                                b.1[..first_char_b].parse::<usize>().ok()
-                            } else {
-                                b.1.parse::<usize>().ok()
-                            };
-
-                        if let Some(a) = a {
-                            if let Some(b) = b {
-                                a.cmp(&b)
-                            } else {
-                                Ordering::Less
+            // Support variants before rule
+            if !context.selector.variants.is_empty() {
+                context.selector
+                    .variants
+                    .split(VARIANT_SEPARATOR)
+                    .try_for_each(|variant| {
+                        if let Some(Variant::BeforeRule(variant)) = get_variant(Cow::from(variant))
+                        {
+                            if !first_child {
+                                write!(context.buffer, "\n\n")?;
                             }
-                        } else {
-                            Ordering::Greater
-                        }
-                    });
 
-                    for (_, screen) in screens.iter() {
-                        write!(
-                            context.buffer,
-                            "\n\n@media (min-width: {screen}) {{
-  .container {{
-    max-width: {screen};
-  }}
-}}"
-                        )?;
+                            indent(indentation, context.buffer)?;
+                            writeln!(context.buffer, "{} {{", variant)?;
+                            indentation += 1;
+                            first_child = true;
+                        }
+
+                        Ok::<(), fmt::Error>(())
+                    })?;
+            }
+
+            if context.config.theme.screens.is_empty() {
+                for (_, screen) in BUILTIN_SCREENS.iter() {
+                    if !first_child {
+                        write!(context.buffer, "\n\n")?;
+                    } else {
+                        first_child = false;
                     }
+
+                    indent(indentation, context.buffer)?;
+                    writeln!(context.buffer, "@media (min-width: {screen}) {{")?;
+
+                    indentation += 1;
+                    indent(indentation, context.buffer)?;
+                    write!(context.buffer, ".")?;
+                    context.selector.write_css_class(context.buffer)?;
+                    writeln!(context.buffer, " {{")?;
+
+                    indentation += 1;
+                    indent(indentation, context.buffer)?;
+                    writeln!(context.buffer, "max-width: {screen};")?;
+
+                    indentation -= 1;
+                    indent(indentation, context.buffer)?;
+                    writeln!(context.buffer, "}}")?;
+
+                    indentation -= 1;
+                    indent(indentation, context.buffer)?;
+                    write!(context.buffer, "}}")?;
                 }
+            } else {
+                let mut screens = context
+                    .config
+                    .theme
+                    .screens
+                    .iter()
+                    .map(|(a, b)| (a.clone(), b.clone()))
+                    .chain(
+                        BUILTIN_SCREENS
+                            .iter()
+                            .map(|(a, b)| (Cow::from(*a), Cow::from(*b))),
+                    )
+                    .collect::<Vec<(Cow<str>, Cow<str>)>>();
+
+                // Deduplicate screens
+                screens.sort_by(|a, b| a.0.cmp(&b.0));
+                screens.dedup_by(|a, b| a.0.eq(&b.0));
+
+                // Emulate Tailwind sorting (based on the JS `parseInt` function)
+                screens.sort_by(|a, b| {
+                    let a =
+                        if let Some(first_char_a) = a.1.chars().position(char::is_alphabetic) {
+                            a.1[..first_char_a].parse::<usize>().ok()
+                        } else {
+                            a.1.parse::<usize>().ok()
+                        };
+
+                    let b =
+                        if let Some(first_char_b) = b.1.chars().position(char::is_alphabetic) {
+                            b.1[..first_char_b].parse::<usize>().ok()
+                        } else {
+                            b.1.parse::<usize>().ok()
+                        };
+
+                    if let Some(a) = a {
+                        if let Some(b) = b {
+                            a.cmp(&b)
+                        } else {
+                            Ordering::Less
+                        }
+                    } else {
+                        Ordering::Greater
+                    }
+                });
+
+                for (_, screen) in screens.iter() {
+                    if !first_child {
+                        write!(context.buffer, "\n\n")?;
+                    } else {
+                        first_child = false;
+                    }
+
+                    indent(indentation, context.buffer)?;
+                    writeln!(context.buffer, "@media (min-width: {screen}) {{")?;
+
+                    indentation += 1;
+                    indent(indentation, context.buffer)?;
+                    write!(context.buffer, ".")?;
+                    context.selector.write_css_class(context.buffer)?;
+                    writeln!(context.buffer, " {{")?;
+
+                    indentation += 1;
+                    indent(indentation, context.buffer)?;
+                    writeln!(context.buffer, "max-width: {screen};")?;
+
+                    indentation -= 1;
+                    indent(indentation, context.buffer)?;
+                    writeln!(context.buffer, "}}")?;
+
+                    indentation -= 1;
+                    indent(indentation, context.buffer)?;
+                    write!(context.buffer, "}}")?;
+                }
+            }
+
+            // After rule
+            for i in (1..indentation + 1).rev() {
+                writeln!(context.buffer)?;
+                indent(i - 1, context.buffer)?;
+                write!(context.buffer, "}}")?;
             }
         }
 
         Ok(())
     }
 
-    fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Basic { value, .. } => {
-                value.is_empty()
-                    || context.config.theme.screens.contains_key(&Cow::from(*value))
-                    || BUILTIN_SCREENS.iter().any(|s| &s.0 == value)
-            }
-            Modifier::Arbitrary { .. } => false,
-        }
-    }
-
     fn handle(&self, context: ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
-        match context.modifier {
-            Modifier::Basic { value, .. } => {
-                if value.is_empty() {
-                    writeln!(context.buffer, "width: 100%;")?;
-                } else if let Some(screen) = context.config.theme.screens.get(&Cow::from(*value)) {
-                    writeln!(context.buffer, "max-width: {screen};")?;
-                } else {
-                    writeln!(
-                        context.buffer,
-                        "max-width: {};",
-                        BUILTIN_SCREENS.iter().find(|s| &s.0 == value).unwrap().1
-                    )?;
-                }
-            }
-            Modifier::Arbitrary { .. } => unreachable!(),
+        if let Modifier::Basic { .. } = context.modifier {
+            writeln!(context.buffer, "width: 100%;")?;
         }
 
         Ok(())
@@ -650,7 +702,9 @@ impl Plugin for BoxDecorationBreakPlugin {
     fn handle(&self, context: ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
         match context.modifier {
-            Modifier::Basic { value, .. } => writeln!(context.buffer, "box-decoration-break: {value};")?,
+            Modifier::Basic { value, .. } => {
+                writeln!(context.buffer, "box-decoration-break: {value};")?
+            }
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 

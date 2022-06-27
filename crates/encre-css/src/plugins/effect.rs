@@ -1,5 +1,9 @@
 use super::{to_css_value, Plugin};
-use crate::{context::{ContextCanHandle, ContextHandle}, utils::{color, indent, shadow, value_matchers::*}, selector::Modifier};
+use crate::{
+    context::{ContextCanHandle, ContextHandle},
+    selector::Modifier,
+    utils::{color, indent, shadow, value_matchers::*},
+};
 
 use std::fmt::{self, Write};
 
@@ -156,7 +160,10 @@ impl Plugin for BoxShadowPlugin {
                     writeln!(context.buffer, "--en-shadow-colored: 0 1px 3px 0 var(--en-shadow-color), 0 1px 2px -1px var(--en-shadow-color);")?;
                 }
                 "sm" => {
-                    writeln!(context.buffer, "--en-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);")?;
+                    writeln!(
+                        context.buffer,
+                        "--en-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);"
+                    )?;
                     indent(context.indentation, context.buffer)?;
                     writeln!(
                         context.buffer,
@@ -179,7 +186,10 @@ impl Plugin for BoxShadowPlugin {
                     writeln!(context.buffer, "--en-shadow-colored: 0 20px 25px -5px var(--en-shadow-color), 0 8px 10px -6px var(--en-shadow-color);")?;
                 }
                 "2xl" => {
-                    writeln!(context.buffer, "--en-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);")?;
+                    writeln!(
+                        context.buffer,
+                        "--en-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);"
+                    )?;
                     indent(context.indentation, context.buffer)?;
                     writeln!(
                         context.buffer,
@@ -187,7 +197,10 @@ impl Plugin for BoxShadowPlugin {
                     )?;
                 }
                 "inner" => {
-                    writeln!(context.buffer, "--en-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);")?;
+                    writeln!(
+                        context.buffer,
+                        "--en-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);"
+                    )?;
                     indent(context.indentation, context.buffer)?;
                     writeln!(
                         context.buffer,

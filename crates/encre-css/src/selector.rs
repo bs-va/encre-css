@@ -1,6 +1,6 @@
 use crate::{config::Config, context::ContextCanHandle, plugins::*, variant::VARIANT_SEPARATOR};
 
-use std::cmp::Ordering;
+use std::{fmt::{self, Write}, cmp::Ordering};
 
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
@@ -364,6 +364,25 @@ impl<'a> Selector<'a> {
         } else {
             None
         }
+    }
+
+    pub fn write_css_class(&self, buffer: &mut String) -> fmt::Result {
+        self.full.chars().enumerate().try_for_each(|(i, ch)| {
+            if i == 0 {
+                if ch.is_numeric() {
+                    // CSS classes must not start with a number, we need to escape it
+                    write!(buffer, "\\3")?;
+                }
+
+                write!(buffer, "{}", ch)?;
+            } else if !ch.is_alphanumeric() && ch != '-' && ch != '_' {
+                write!(buffer, "\\{}", ch)?;
+            } else {
+                write!(buffer, "{}", ch)?;
+            }
+
+            Ok::<(), fmt::Error>(())
+        })
     }
 }
 

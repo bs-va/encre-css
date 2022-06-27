@@ -1,5 +1,9 @@
 use super::{to_css_value, Plugin};
-use crate::{context::{ContextCanHandle, ContextHandle}, utils::{format_negative, indent, length, value_matchers::*}, selector::Modifier};
+use crate::{
+    context::{ContextCanHandle, ContextHandle},
+    selector::Modifier,
+    utils::{format_negative, indent, length, value_matchers::*},
+};
 
 use std::fmt::{self, Write};
 
@@ -84,10 +88,7 @@ pub fn translate_can_handle(context: ContextCanHandle) -> bool {
     }
 }
 
-pub fn translate_handle(
-    css_prop: &str,
-    context: ContextHandle,
-) -> fmt::Result {
+pub fn translate_handle(css_prop: &str, context: ContextHandle) -> fmt::Result {
     indent(context.indentation, context.buffer)?;
     match context.modifier {
         Modifier::Basic { is_negative, value } => writeln!(
@@ -182,10 +183,7 @@ pub fn scale_can_handle(context: ContextCanHandle) -> bool {
     }
 }
 
-pub fn scale_handle(
-    css_properties: &[&str],
-    context: ContextHandle,
-) -> fmt::Result {
+pub fn scale_handle(css_properties: &[&str], context: ContextHandle) -> fmt::Result {
     // NOTE: Not-compatible with TailwindCSS, support all values
     match context.modifier {
         Modifier::Basic { is_negative, value } => {
@@ -266,10 +264,7 @@ pub fn skew_can_handle(context: ContextCanHandle) -> bool {
     }
 }
 
-pub fn skew_handle(
-    css_prop: &str,
-    context: ContextHandle,
-) -> fmt::Result {
+pub fn skew_handle(css_prop: &str, context: ContextHandle) -> fmt::Result {
     // NOTE: Not-compatible with TailwindCSS, support all values
     indent(context.indentation, context.buffer)?;
     match context.modifier {

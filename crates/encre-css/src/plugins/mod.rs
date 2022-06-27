@@ -1,4 +1,4 @@
-use crate::context::{ContextCanHandle, ContextHandle};
+use crate::context::{ContextAfterRule, ContextBeforeRule, ContextCanHandle, ContextHandle};
 
 use std::{borrow::Cow, fmt};
 
@@ -30,22 +30,22 @@ pub trait Plugin: fmt::Debug {
         ""
     }
 
+    /// Returns whether the plugin can handle a specific modifier
+    fn can_handle(&self, _context: ContextCanHandle) -> bool;
+
     /// Custom CSS written before the CSS rule
     ///
     /// NOTE: The CSS must end with two newlines
-    fn css_before_rule(&self, _context: ContextHandle) -> fmt::Result {
+    fn css_before_rule(&self, _context: ContextBeforeRule) -> fmt::Result {
         Ok(())
     }
 
     /// Custom CSS written after the CSS rule
     ///
     /// NOTE: The CSS must start with two newlines
-    fn css_after_rule(&self, _context: ContextHandle) -> fmt::Result {
+    fn css_after_rule(&self, _context: ContextAfterRule) -> fmt::Result {
         Ok(())
     }
-
-    /// Returns whether the plugin can handle a specific modifier
-    fn can_handle(&self, _context: ContextCanHandle) -> bool;
 
     /// Get the CSS code from a modifier
     ///

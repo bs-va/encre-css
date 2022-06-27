@@ -1,5 +1,9 @@
 use super::{to_css_value, Plugin};
-use crate::{context::{ContextCanHandle, ContextHandle}, utils::{indent, length, value_matchers::*}, selector::Modifier};
+use crate::{
+    context::{ContextCanHandle, ContextHandle},
+    selector::Modifier,
+    utils::{indent, length, value_matchers::*},
+};
 
 use std::borrow::Cow;
 use std::fmt::{self, Write};
@@ -13,10 +17,7 @@ pub fn margin_padding_can_handle(context: ContextCanHandle) -> bool {
     }
 }
 
-pub fn margin_padding_handle(
-    css_properties: &[&str],
-    context: ContextHandle,
-) -> fmt::Result {
+pub fn margin_padding_handle(css_properties: &[&str], context: ContextHandle) -> fmt::Result {
     match context.modifier {
         Modifier::Basic { is_negative, value } => {
             for css_prop in css_properties {

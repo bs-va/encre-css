@@ -1,5 +1,9 @@
 use super::Plugin;
-use crate::{context::{ContextCanHandle, ContextHandle}, selector::Modifier, utils::indent};
+use crate::{
+    context::{ContextCanHandle, ContextHandle},
+    selector::Modifier,
+    utils::indent,
+};
 
 use std::fmt::{self, Write};
 

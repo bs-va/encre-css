@@ -1,5 +1,9 @@
 use super::{to_css_value, Plugin};
-use crate::{context::{ContextCanHandle, ContextHandle}, utils::{color, indent, value_matchers::*}, selector::Modifier};
+use crate::{
+    context::{ContextCanHandle, ContextHandle},
+    selector::Modifier,
+    utils::{color, indent, value_matchers::*},
+};
 
 use std::{
     borrow::Cow,
@@ -371,9 +375,11 @@ impl Plugin for PositionPlugin {
                 "top" => writeln!(context.buffer, "background-position: top;")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "background-position: {};", to_css_value(value))?
-            }
+            Modifier::Arbitrary { value, .. } => writeln!(
+                context.buffer,
+                "background-position: {};",
+                to_css_value(value)
+            )?,
         }
 
         Ok(())
@@ -440,7 +446,9 @@ impl Plugin for OriginPlugin {
     fn handle(&self, context: ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
         match context.modifier {
-            Modifier::Basic { value, .. } => writeln!(context.buffer, "background-origin: {value}-box;")?,
+            Modifier::Basic { value, .. } => {
+                writeln!(context.buffer, "background-origin: {value}-box;")?
+            }
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 

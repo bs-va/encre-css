@@ -46,10 +46,7 @@ pub fn border_spacing_can_handle(context: ContextCanHandle) -> bool {
     }
 }
 
-pub fn border_spacing_handle(
-    css_props: &[&str],
-    context: ContextHandle,
-) -> fmt::Result {
+pub fn border_spacing_handle(css_props: &[&str], context: ContextHandle) -> fmt::Result {
     match context.modifier {
         Modifier::Basic { is_negative, value } => {
             for css_prop in css_props {

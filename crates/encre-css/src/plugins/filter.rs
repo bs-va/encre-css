@@ -294,9 +294,11 @@ impl Plugin for InvertPlugin {
                 "0" => writeln!(context.buffer, "--en-invert: invert(0);")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "--en-invert: invert({});", to_css_value(value))?
-            }
+            Modifier::Arbitrary { value, .. } => writeln!(
+                context.buffer,
+                "--en-invert: invert({});",
+                to_css_value(value)
+            )?,
         }
 
         indent(context.indentation, context.buffer)?;
@@ -365,9 +367,11 @@ impl Plugin for SepiaPlugin {
                 "0" => writeln!(context.buffer, "--en-sepia: sepia(0);")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "--en-sepia: sepia({});", to_css_value(value))?
-            }
+            Modifier::Arbitrary { value, .. } => writeln!(
+                context.buffer,
+                "--en-sepia: sepia({});",
+                to_css_value(value)
+            )?,
         }
 
         indent(context.indentation, context.buffer)?;
@@ -448,9 +452,11 @@ impl Plugin for BackdropBlurPlugin {
                 "none" => writeln!(context.buffer, "--en-backdrop-blur: blur(0);")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "--en-backdrop-blur: blur({});", to_css_value(value))?
-            }
+            Modifier::Arbitrary { value, .. } => writeln!(
+                context.buffer,
+                "--en-backdrop-blur: blur({});",
+                to_css_value(value)
+            )?,
         }
 
         indent(context.indentation, context.buffer)?;

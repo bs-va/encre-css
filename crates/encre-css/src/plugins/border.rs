@@ -1,5 +1,9 @@
 use super::{to_css_value, Plugin};
-use crate::{context::{ContextCanHandle, ContextHandle}, utils::{color, indent, value_matchers::*}, selector::Modifier};
+use crate::{
+    context::{ContextCanHandle, ContextHandle},
+    selector::Modifier,
+    utils::{color, indent, value_matchers::*},
+};
 
 use std::fmt::{self, Write};
 
@@ -326,7 +330,10 @@ impl Plugin for RadiusTopPlugin {
     }
 
     fn handle(&self, context: ContextHandle) -> fmt::Result {
-        radius_handle(&["border-top-left-radius", "border-top-right-radius"], context)
+        radius_handle(
+            &["border-top-left-radius", "border-top-right-radius"],
+            context,
+        )
     }
 }
 
@@ -343,7 +350,10 @@ impl Plugin for RadiusBottomPlugin {
     }
 
     fn handle(&self, context: ContextHandle) -> fmt::Result {
-        radius_handle(&["border-bottom-left-radius", "border-bottom-right-radius"], context)
+        radius_handle(
+            &["border-bottom-left-radius", "border-bottom-right-radius"],
+            context,
+        )
     }
 }
 
@@ -360,7 +370,10 @@ impl Plugin for RadiusLeftPlugin {
     }
 
     fn handle(&self, context: ContextHandle) -> fmt::Result {
-        radius_handle(&["border-top-left-radius", "border-bottom-left-radius"], context)
+        radius_handle(
+            &["border-top-left-radius", "border-bottom-left-radius"],
+            context,
+        )
     }
 }
 
@@ -377,7 +390,10 @@ impl Plugin for RadiusRightPlugin {
     }
 
     fn handle(&self, context: ContextHandle) -> fmt::Result {
-        radius_handle(&["border-top-right-radius", "border-bottom-right-radius"], context)
+        radius_handle(
+            &["border-top-right-radius", "border-bottom-right-radius"],
+            context,
+        )
     }
 }
 
@@ -1032,9 +1048,11 @@ impl Plugin for RingOffsetWidthPlugin {
             Modifier::Basic { value, .. } => {
                 writeln!(context.buffer, "--en-ring-offset-width: {value}px;")?
             }
-            Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "--en-ring-offset-width: {};", to_css_value(value))?
-            }
+            Modifier::Arbitrary { value, .. } => writeln!(
+                context.buffer,
+                "--en-ring-offset-width: {};",
+                to_css_value(value)
+            )?,
         }
 
         Ok(())
@@ -1158,7 +1176,9 @@ impl Plugin for OutlineOffsetPlugin {
         // NOTE: Not-compatible with TailwindCSS, support all values
         indent(context.indentation, context.buffer)?;
         match context.modifier {
-            Modifier::Basic { value, .. } => writeln!(context.buffer, "outline-offset: {value}px;")?,
+            Modifier::Basic { value, .. } => {
+                writeln!(context.buffer, "outline-offset: {value}px;")?
+            }
             Modifier::Arbitrary { value, .. } => {
                 writeln!(context.buffer, "outline-offset: {};", to_css_value(value))?
             }

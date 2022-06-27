@@ -1,6 +1,6 @@
 use super::{to_css_value, Plugin};
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
+    context::{ContextCanHandle, ContextBeforeRule, ContextHandle},
     selector::Modifier,
     utils::{indent, value_matchers::*},
 };
@@ -236,10 +236,10 @@ impl Plugin for AnimatePlugin {
         "animate"
     }
 
-    fn css_before_rule(&self, context: ContextHandle) -> fmt::Result {
-        match context.modifier {
+    fn css_before_rule(&self, context: ContextBeforeRule) -> fmt::Result {
+        match context.selector.modifier {
             Modifier::Basic { value, .. } => {
-                match *value {
+                match value {
                     "spin" => {
                         if !ANIMATIONS_ALREADY_DEFINED[0].swap(true, Ordering::Relaxed) {
                             writeln!(

@@ -1,6 +1,6 @@
 use crate::{
     config::Config,
-    context::ContextHandle,
+    context::{ContextAfterRule, ContextBeforeRule, ContextHandle},
     error::{Error, Result},
     plugins::transition,
     preflight::ENCRE_PREFLIGHT_CSS,
@@ -128,10 +128,9 @@ impl<'a> EncreGenerator<'a> {
             let mut indentation = 0;
 
             {
-                let context = ContextHandle {
+                let context = ContextBeforeRule {
                     config: &self.config,
-                    modifier: &selector.modifier,
-                    indentation,
+                    selector,
                     buffer: &mut buffer,
                 };
 
@@ -175,23 +174,7 @@ impl<'a> EncreGenerator<'a> {
 
             // Class
             write!(buffer, ".")?;
-
-            selector.full.chars().enumerate().try_for_each(|(i, ch)| {
-                if i == 0 {
-                    if ch.is_numeric() {
-                        // CSS classes must not start with a number, we need to escape it
-                        write!(buffer, "\\3")?;
-                    }
-
-                    write!(buffer, "{}", ch)?;
-                } else if !ch.is_alphanumeric() && ch != '-' && ch != '_' {
-                    write!(buffer, "\\{}", ch)?;
-                } else {
-                    write!(buffer, "{}", ch)?;
-                }
-
-                Ok::<(), Error>(())
-            })?;
+            selector.write_css_class(&mut buffer)?;
 
             // After class
             if !selector.variants.is_empty() {
@@ -235,11 +218,11 @@ impl<'a> EncreGenerator<'a> {
             write!(buffer, "}}")?;
 
             {
-                let context = ContextHandle {
+                let context = ContextAfterRule {
                     config: &self.config,
-                    modifier: &selector.modifier,
-                    indentation: indentation + 1,
+                    selector,
                     buffer: &mut buffer,
+                    custom_variants: &custom_variants,
                 };
 
                 selector.plugin.css_after_rule(context)?;
