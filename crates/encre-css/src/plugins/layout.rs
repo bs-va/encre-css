@@ -4,7 +4,7 @@ use crate::{
     context::{ContextAfterRule, ContextCanHandle, ContextHandle},
     selector::Modifier,
     utils::{indent, length, value_matchers::*},
-    variant::{VARIANT_SEPARATOR, BUILTIN_VARIANTS, Variant},
+    variant::{Variant, BUILTIN_VARIANTS, VARIANT_SEPARATOR},
 };
 
 use std::{
@@ -413,12 +413,12 @@ impl Plugin for ContainerPlugin {
 
             // Support variants before rule
             if !context.selector.variants.is_empty() {
-                context.selector
+                context
+                    .selector
                     .variants
                     .split(VARIANT_SEPARATOR)
                     .try_for_each(|variant| {
-                        if let Some(Variant::BeforeRule(variant)) = get_variant(Cow::from(variant))
-                        {
+                        if let Some(Variant::AtRule(variant)) = get_variant(Cow::from(variant)) {
                             if !first_child {
                                 write!(context.buffer, "\n\n")?;
                             }
@@ -446,8 +446,11 @@ impl Plugin for ContainerPlugin {
 
                     indentation += 1;
                     indent(indentation, context.buffer)?;
-                    write!(context.buffer, ".")?;
-                    context.selector.write_css_class(context.buffer)?;
+                    write!(
+                        context.buffer,
+                        "{}",
+                        context.selector.get_css_class(context.custom_variants)
+                    )?;
                     writeln!(context.buffer, " {{")?;
 
                     indentation += 1;
@@ -482,19 +485,17 @@ impl Plugin for ContainerPlugin {
 
                 // Emulate Tailwind sorting (based on the JS `parseInt` function)
                 screens.sort_by(|a, b| {
-                    let a =
-                        if let Some(first_char_a) = a.1.chars().position(char::is_alphabetic) {
-                            a.1[..first_char_a].parse::<usize>().ok()
-                        } else {
-                            a.1.parse::<usize>().ok()
-                        };
+                    let a = if let Some(first_char_a) = a.1.chars().position(char::is_alphabetic) {
+                        a.1[..first_char_a].parse::<usize>().ok()
+                    } else {
+                        a.1.parse::<usize>().ok()
+                    };
 
-                    let b =
-                        if let Some(first_char_b) = b.1.chars().position(char::is_alphabetic) {
-                            b.1[..first_char_b].parse::<usize>().ok()
-                        } else {
-                            b.1.parse::<usize>().ok()
-                        };
+                    let b = if let Some(first_char_b) = b.1.chars().position(char::is_alphabetic) {
+                        b.1[..first_char_b].parse::<usize>().ok()
+                    } else {
+                        b.1.parse::<usize>().ok()
+                    };
 
                     if let Some(a) = a {
                         if let Some(b) = b {
@@ -519,8 +520,11 @@ impl Plugin for ContainerPlugin {
 
                     indentation += 1;
                     indent(indentation, context.buffer)?;
-                    write!(context.buffer, ".")?;
-                    context.selector.write_css_class(context.buffer)?;
+                    write!(
+                        context.buffer,
+                        "{}",
+                        context.selector.get_css_class(context.custom_variants)
+                    )?;
                     writeln!(context.buffer, " {{")?;
 
                     indentation += 1;

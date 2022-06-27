@@ -143,8 +143,7 @@ impl<'a> EncreGenerator<'a> {
                     .variants
                     .split(VARIANT_SEPARATOR)
                     .try_for_each(|variant| {
-                        if let Some(Variant::BeforeRule(variant)) = get_variant(Cow::from(variant))
-                        {
+                        if let Some(Variant::AtRule(variant)) = get_variant(Cow::from(variant)) {
                             indent(indentation, &mut buffer)?;
                             writeln!(buffer, "{} {{", variant)?;
                             indentation += 1;
@@ -154,46 +153,9 @@ impl<'a> EncreGenerator<'a> {
                     })?;
             }
 
-            // Before class
+            // Write the class
             indent(indentation, &mut buffer)?;
-            if !selector.variants.is_empty() {
-                // Variants are reversed to be compatible with TailwindCSS
-                selector
-                    .variants
-                    .split(VARIANT_SEPARATOR)
-                    .rev()
-                    .try_for_each(|variant| {
-                        if let Some(Variant::BeforeClass(variant)) = get_variant(Cow::from(variant))
-                        {
-                            write!(buffer, "{}", variant)?;
-                        }
-
-                        Ok::<(), Error>(())
-                    })?;
-            }
-
-            // Class
-            write!(buffer, ".")?;
-            selector.write_css_class(&mut buffer)?;
-
-            // After class
-            if !selector.variants.is_empty() {
-                // Variants are reversed to be compatible with TailwindCSS
-                selector
-                    .variants
-                    .split(VARIANT_SEPARATOR)
-                    .rev()
-                    .try_for_each(|variant| {
-                        if let Some(Variant::AfterClass(variant)) = get_variant(Cow::from(variant))
-                        {
-                            write!(buffer, "{}", variant)?;
-                        }
-
-                        Ok::<(), Error>(())
-                    })?;
-            }
-
-            writeln!(buffer, " {{")?;
+            writeln!(buffer, "{} {{", selector.get_css_class(&custom_variants))?;
 
             // Rule content
 

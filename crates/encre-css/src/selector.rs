@@ -1,6 +1,11 @@
-use crate::{config::Config, context::ContextCanHandle, plugins::*, variant::VARIANT_SEPARATOR};
+use crate::{
+    config::Config,
+    context::ContextCanHandle,
+    plugins::*,
+    variant::{Variant, BUILTIN_VARIANTS, VARIANT_SEPARATOR},
+};
 
-use std::{fmt::{self, Write}, cmp::Ordering};
+use std::{borrow::Cow, cmp::Ordering, collections::BTreeMap};
 
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
@@ -366,23 +371,46 @@ impl<'a> Selector<'a> {
         }
     }
 
-    pub fn write_css_class(&self, buffer: &mut String) -> fmt::Result {
-        self.full.chars().enumerate().try_for_each(|(i, ch)| {
-            if i == 0 {
-                if ch.is_numeric() {
-                    // CSS classes must not start with a number, we need to escape it
-                    write!(buffer, "\\3")?;
-                }
+    pub fn get_css_class(&self, custom_variants: &BTreeMap<Cow<str>, Variant>) -> String {
+        let mut base_class = ".".to_string()
+            + &self
+                .full
+                .chars()
+                .enumerate()
+                .map(|(i, ch)| {
+                    if i == 0 {
+                        if ch.is_numeric() {
+                            // CSS classes must not start with a number, we need to escape it
+                            "\\3".to_string() + &ch.to_string()
+                        } else {
+                            ch.to_string()
+                        }
+                    } else if !ch.is_alphanumeric() && ch != '-' && ch != '_' {
+                        format!("\\{}", ch)
+                    } else {
+                        ch.to_string()
+                    }
+                })
+                .collect::<String>();
 
-                write!(buffer, "{}", ch)?;
-            } else if !ch.is_alphanumeric() && ch != '-' && ch != '_' {
-                write!(buffer, "\\{}", ch)?;
-            } else {
-                write!(buffer, "{}", ch)?;
-            }
+        if !self.variants.is_empty() {
+            self.variants
+                .split(VARIANT_SEPARATOR)
+                .rev()
+                .for_each(|variant| {
+                    if let Some(variant) = BUILTIN_VARIANTS
+                        .iter()
+                        .find_map(|v| if v.0 == variant { Some(&v.1) } else { None })
+                        .or_else(|| custom_variants.get(&Cow::from(variant)))
+                    {
+                        if let Variant::WrapClass(template) = variant {
+                            base_class = template.replace('&', &base_class);
+                        }
+                    }
+                });
+        }
 
-            Ok::<(), fmt::Error>(())
-        })
+        base_class
     }
 }
 

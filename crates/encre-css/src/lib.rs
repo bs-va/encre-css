@@ -254,13 +254,13 @@ mod tests {
   background-color: rgb(219 39 119 / var(--en-bg-opacity));
 }}
 
-.marker\:selection\:hover\:bg-green-200:hover::selection::marker {{
+.marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection *::marker, .marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection::marker {{
   --en-bg-opacity: 1;
   background-color: rgb(187 247 208 / var(--en-bg-opacity));
 }}
 
 @media (min-width: 768px) {{
-  .md\:focus\:selection\:bg-blue-100::selection:focus {{
+  .md\:focus\:selection\:bg-blue-100 *::selection, .md\:focus\:selection\:bg-blue-100::selection:focus {{
     --en-bg-opacity: 1;
     background-color: rgb(219 234 254 / var(--en-bg-opacity));
   }}
