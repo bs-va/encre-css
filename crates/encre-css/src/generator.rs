@@ -1,12 +1,13 @@
+//! Define the main [`EncreGenerator`] structure used to scan content and to generate CSS styles.
 use crate::{
-    config::Config,
+    config::{Config, BUILTIN_VARIANTS},
     context::{ContextAfterRule, ContextBeforeRule, ContextHandle},
     error::{Error, Result},
-    plugins::transition,
+    plugins::transition::animation,
     preflight::ENCRE_PREFLIGHT_CSS,
-    selector::Selector,
+    selector::{Selector, VARIANT_SEPARATOR},
     utils::indent,
-    variant::{init_variants, Variant, BUILTIN_VARIANTS, VARIANT_SEPARATOR},
+    variant::{init_variants, Variant},
 };
 
 use std::{
@@ -17,14 +18,13 @@ use std::{
     sync::{atomic::Ordering, Arc},
 };
 
-/// Main structure used to generate CSS from selectors
+/// Main structure used to generate CSS from selectors.
 ///
-/// It is common to build this structure each time the CSS needs to be generated for the file
-/// contents (due to lifetimes, the file contents must live as long as the [`EncreGenerator`]
-/// structure and if you call several times the [`EncreGenerator::generate`] function, you will
-/// need to clear the buffer and the scanned selectors will be in an undefined state). In this
-/// case, [`EncreGenerator::from_config`] can take an [`Arc<Config>`] to avoid cloning the
-/// configuration.
+/// Please note that the scanned content **must live as long as the [`EncreGenerator`] structure**,
+/// but because it is pretty cheap to make one (it just stores scanned atomic classes), it is
+/// recommended to make a new one (or clone it) each time you call [`EncreGenerator::generate`] and
+/// to pass an `Arc<Config>` to it (to avoid cloning the configuration).
+#[derive(Debug, Clone)]
 pub struct EncreGenerator<'a> {
     config: Arc<Config>,
     pub(crate) scanned_selectors: BTreeSet<Selector<'a>>,
@@ -86,7 +86,7 @@ impl<'a> EncreGenerator<'a> {
 
     /// Scan the contents of a file and store all the selectors found.
     ///
-    /// You can customize the extractor using the configuration field [Config::extractor], by
+    /// You can customize the extractor using the configuration field [`Config::extractor`], by
     /// default, it splits the value by spaces, double quotes, single quotes and backticks.
     ///
     /// This function automatically handles duplicated selectors and sorting.
@@ -97,16 +97,20 @@ impl<'a> EncreGenerator<'a> {
     /// Generate the CSS styles needed based on the scanned selectors.
     ///
     /// Don't forget to scan selectors before, using:
-    /// - [add_selector] to add a single selector to the scanned list;
-    /// - [add_selectors] to add a list of selectors to the scanned list;
-    /// - [scan] to scan a string (e.g. the contents of a file).
+    /// - [`add_selector`] to add a single selector to the scanned list;
+    /// - [`add_selectors`] to add a list of selectors to the scanned list;
+    /// - [`scan`] to scan a string (e.g. the contents of a file).
     ///
-    /// [add_selector]: EncreGenerator::add_selector
-    /// [add_selectors]: EncreGenerator::add_selectors
-    /// [scan]: EncreGenerator::scan
+    /// # Errors
+    ///
+    /// Returns [`Error::Format`] if writing to the buffer failed.
+    ///
+    /// [`add_selector`]: EncreGenerator::add_selector
+    /// [`add_selectors`]: EncreGenerator::add_selectors
+    /// [`scan`]: EncreGenerator::scan
     pub fn generate(&self) -> Result<String> {
         // Make sure that animations are not defined
-        transition::ANIMATIONS_ALREADY_DEFINED
+        animation::ANIMATIONS_ALREADY_DEFINED
             .iter()
             .for_each(|animation| animation.store(false, Ordering::Relaxed));
 
@@ -172,7 +176,7 @@ impl<'a> EncreGenerator<'a> {
             }
 
             // After rule
-            for i in (1..indentation + 1).rev() {
+            for i in (1..=indentation).rev() {
                 indent(i, &mut buffer)?;
                 writeln!(buffer, "}}")?;
             }

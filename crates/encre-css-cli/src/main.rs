@@ -1,3 +1,41 @@
+#![doc(html_logo_url = "http://gitlab.com/encre-css/encre-css/raw/main/.assets/logo.svg")]
+#![forbid(unsafe_code)]
+#![warn(
+    trivial_casts,
+    trivial_numeric_casts,
+    unstable_features,
+    unused_import_braces,
+    unused_qualifications,
+    rustdoc::private_doc_tests,
+    rustdoc::broken_intra_doc_links,
+    rustdoc::private_intra_doc_links,
+    clippy::unnecessary_wraps,
+    clippy::too_many_lines,
+    clippy::string_to_string,
+    clippy::explicit_iter_loop,
+    clippy::unnecessary_cast,
+    clippy::missing_errors_doc,
+    clippy::pedantic,
+    clippy::clone_on_ref_ptr,
+    clippy::non_ascii_literal,
+    clippy::dbg_macro,
+    clippy::map_err_ignore,
+    clippy::use_debug,
+    clippy::pattern_type_mismatch,
+    clippy::map_err_ignore,
+    clippy::use_self,
+    clippy::useless_let_if_seq,
+    clippy::verbose_file_reads,
+    clippy::unwrap_used,
+    clippy::expect_used,
+    clippy::indexing_slicing,
+    clippy::unwrap_in_result,
+    clippy::panic,
+    clippy::unreachable,
+    clippy::unimplemented,
+    clippy::todo,
+)]
+
 use clap::{Parser, Subcommand};
 use color_eyre::Report;
 use std::{env, path::PathBuf};
@@ -63,7 +101,7 @@ fn main() -> Result<(), Report> {
             input: extra_input,
             output,
             watch,
-        } => build(config, extra_input, output, watch),
+        } => build(&config, extra_input, output, watch),
     }
 
     Ok(())

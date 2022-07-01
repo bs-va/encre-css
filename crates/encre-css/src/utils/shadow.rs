@@ -1,12 +1,13 @@
-use super::value_matchers::*;
+//! Shadow parsing utility functions.
+use super::value_matchers::{is_matching_length, is_matching_color, is_matching_var};
 
 use std::fmt;
 
-pub const SHADOW_KEYWORDS: [&str; 5] = ["none", "inherit", "initial", "revert", "unset"];
+const SHADOW_KEYWORDS: [&str; 5] = ["none", "inherit", "initial", "revert", "unset"];
 
 #[derive(Debug, PartialEq)]
-pub enum Shadow<'a> {
-    Raw([Option<&'a str>; 6]),
+enum Shadow<'a> {
+    Raw([&'a str; 6]),
     Keyword(&'a str),
     Variable(&'a str),
     Shorthand1 {
@@ -33,20 +34,18 @@ pub enum Shadow<'a> {
 }
 
 impl<'a> Shadow<'a> {
-    pub fn new_raw() -> Self {
-        Self::Raw([None; 6])
+    fn new_raw() -> Self {
+        Self::Raw([""; 6])
     }
 
-    /// Parse a real {`Shadow`] from a [`Shadow::Raw`] variant
-    pub fn parse(&self) -> Option<Self> {
+    /// Parse a real [`Shadow`] from a [`Shadow::Raw`] variant.
+    fn parse(&self) -> Option<Self> {
         if let Shadow::Raw(shadow) = self {
             // Handle inset shadows
-            let (is_inset, shadow) = if let Some(shadow_first_part) = shadow[0] {
-                if shadow_first_part == "inset" {
-                    (true, &shadow[1..])
-                } else {
-                    (false, &shadow[..])
-                }
+            let (is_inset, shadow) = if shadow[0].is_empty() {
+                (false, &shadow[..])
+            } else if shadow[0] == "inset" {
+                (true, &shadow[1..])
             } else {
                 (false, &shadow[..])
             };
@@ -58,63 +57,63 @@ impl<'a> Shadow<'a> {
                 return None;
             }
 
-            let len = shadow.iter().position(|p| p.is_none()).unwrap_or(6);
+            let len = shadow.iter().position(|p| p.is_empty()).unwrap_or(6);
             if len == 1 {
                 // Keyword value
-                if SHADOW_KEYWORDS.contains(&shadow[0].unwrap()) {
-                    Some(Shadow::Keyword(shadow[0].unwrap()))
-                } else if is_matching_var(shadow[0].unwrap()) {
-                    Some(Shadow::Variable(shadow[0].unwrap()))
+                if SHADOW_KEYWORDS.contains(&shadow[0]) {
+                    Some(Shadow::Keyword(shadow[0]))
+                } else if is_matching_var(shadow[0]) {
+                    Some(Shadow::Variable(shadow[0]))
                 } else {
                     None
                 }
             } else if len == 3 {
                 // Shorthand 1: offset-x | offset-y | color
-                if is_matching_length(shadow[0].unwrap())
-                    && is_matching_length(shadow[1].unwrap())
-                    && is_matching_color(shadow[2].unwrap())
+                if is_matching_length(shadow[0])
+                    && is_matching_length(shadow[1])
+                    && is_matching_color(shadow[2])
                 {
                     Some(Shadow::Shorthand1 {
                         is_inset,
-                        offset_x: shadow[0].unwrap(),
-                        offset_y: shadow[1].unwrap(),
-                        color: shadow[2].unwrap(),
+                        offset_x: shadow[0],
+                        offset_y: shadow[1],
+                        color: shadow[2],
                     })
                 } else {
                     None
                 }
             } else if len == 4 {
                 // Shorthand 2: offset-x | offset-y | blur-radius | color
-                if is_matching_length(shadow[0].unwrap())
-                    && is_matching_length(shadow[1].unwrap())
-                    && is_matching_length(shadow[2].unwrap())
-                    && is_matching_color(shadow[3].unwrap())
+                if is_matching_length(shadow[0])
+                    && is_matching_length(shadow[1])
+                    && is_matching_length(shadow[2])
+                    && is_matching_color(shadow[3])
                 {
                     Some(Shadow::Shorthand2 {
                         is_inset,
-                        offset_x: shadow[0].unwrap(),
-                        offset_y: shadow[1].unwrap(),
-                        blur_radius: shadow[2].unwrap(),
-                        color: shadow[3].unwrap(),
+                        offset_x: shadow[0],
+                        offset_y: shadow[1],
+                        blur_radius: shadow[2],
+                        color: shadow[3],
                     })
                 } else {
                     None
                 }
             } else if len == 5 {
                 // Full: offset-x | offset-y | blur-radius | spread-radius | color
-                if is_matching_length(shadow[0].unwrap())
-                    && is_matching_length(shadow[1].unwrap())
-                    && is_matching_length(shadow[2].unwrap())
-                    && is_matching_length(shadow[3].unwrap())
-                    && is_matching_color(shadow[4].unwrap())
+                if is_matching_length(shadow[0])
+                    && is_matching_length(shadow[1])
+                    && is_matching_length(shadow[2])
+                    && is_matching_length(shadow[3])
+                    && is_matching_color(shadow[4])
                 {
                     Some(Shadow::Full {
                         is_inset,
-                        offset_x: shadow[0].unwrap(),
-                        offset_y: shadow[1].unwrap(),
-                        blur_radius: shadow[2].unwrap(),
-                        spread_radius: shadow[3].unwrap(),
-                        color: shadow[4].unwrap(),
+                        offset_x: shadow[0],
+                        offset_y: shadow[1],
+                        blur_radius: shadow[2],
+                        spread_radius: shadow[3],
+                        color: shadow[4],
                     })
                 } else {
                     None
@@ -131,7 +130,7 @@ impl<'a> Shadow<'a> {
 impl<'a> fmt::Display for Shadow<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Shadow::Raw(_) => panic!("Trying to print a `Shadow::Raw` variant"),
+            Shadow::Raw(s) => write!(f, "{}", s.join(" ")),
             Shadow::Keyword(keyword) => write!(f, "{keyword}"),
             Shadow::Variable(variable) => write!(f, "{variable}"),
             Shadow::Shorthand1 {
@@ -171,18 +170,112 @@ impl<'a> fmt::Display for Shadow<'a> {
     }
 }
 
+/// A list of shadows, used in the [`box-shadow`](https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow) CSS property.
 #[derive(Debug, PartialEq)]
 pub struct ShadowList<'a>(Vec<Shadow<'a>>);
 
 impl<'a> ShadowList<'a> {
+    /// Parse an arbitrary string into a [`ShadowList`].
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use encre_css::utils::shadow::ShadowList;
+    /// assert_eq!(ShadowList::parse("10px 20px 30px 40px rgb(12 12 12)").unwrap().to_string(), "10px 20px 30px 40px rgb(12 12 12)".to_string());
+    /// assert_eq!(ShadowList::parse("1px 2px 3px 4px"), None);
+    /// ```
+    pub fn parse(value: &'a str) -> Option<Self> {
+        let mut parenthesis_level = 0;
+        let mut last_index = 0;
+        let mut shadows = vec![Shadow::new_raw()];
+
+        for (ch_index, ch) in value.chars().enumerate() {
+            match ch {
+                '(' => {
+                    parenthesis_level += 1;
+                }
+                ')' => {
+                    parenthesis_level -= 1;
+                }
+                ' ' if parenthesis_level == 0 => {
+                    let shadow = if let Shadow::Raw(shadow) = shadows.last_mut()? {
+                        shadow
+                    } else {
+                        // Shadow already parsed but a space was encountered
+                        return None;
+                    };
+
+                    if !value[last_index..ch_index].is_empty() {
+                        // Find the index of the first free part
+                        let index = shadow.iter().position(|p| p.is_empty()).unwrap_or(5);
+
+                        // Insert the part
+                        shadow[index] = &value[last_index..ch_index];
+                    }
+
+                    // Update the index (and ignore the space)
+                    last_index = ch_index + 1;
+                }
+                ',' if parenthesis_level == 0 => {
+                    // Add the last part (not suffixed by `_`)
+                    let shadow = if let Shadow::Raw(shadow) = shadows.last_mut()? {
+                        shadow
+                    } else {
+                        // Shadow already parsed but a space was encountered
+                        return None;
+                    };
+
+                    // Find the index of the first free part
+                    let index = shadow.iter().position(|p| p.is_empty()).unwrap_or(5);
+
+                    // Insert the part
+                    shadow[index] = &value[last_index..ch_index];
+
+                    // Ignore the shadow if it is empty
+                    if !shadow.iter().all(|p| p.is_empty()) {
+                        // Parse the shadow
+                        let parsed_shadow = shadows.last()?.parse()?;
+                        *shadows.last_mut()? = parsed_shadow;
+
+                        // Start the next shadow
+                        shadows.push(Shadow::new_raw());
+                    }
+
+                    // Update the index (and ignore the comma)
+                    last_index = ch_index + 1;
+                }
+                _ => (),
+            }
+        }
+
+        // Add the last part (not suffixed by `,`)
+        if last_index != value.len() - 1 {
+            // Find the index of the first free part
+            let shadow = if let Shadow::Raw(shadow) = shadows.last_mut()? {
+                shadow
+            } else {
+                return None;
+            };
+            let index = shadow.iter().position(|p| p.is_empty()).unwrap_or(5);
+
+            // Insert the part
+            shadow[index] = &value[last_index..value.len()];
+
+            // Parse the shadow
+            let parsed_shadow = shadows.last()?.parse()?;
+            *shadows.last_mut()? = parsed_shadow;
+        }
+
+        Some(Self(shadows))
+    }
+
+    /// Replace the color of all shadows with the color given as the first argument.
     pub fn replace_all_colors(&mut self, new_color: &'a str) {
         self.0.iter_mut().for_each(|shadow| match shadow {
-            Shadow::Raw(_) => (),
-            Shadow::Keyword(_) => (),
-            Shadow::Variable(_) => (),
             Shadow::Shorthand1 { ref mut color, .. }
             | Shadow::Shorthand2 { ref mut color, .. }
             | Shadow::Full { ref mut color, .. } => *color = new_color,
+            _ => (),
         });
     }
 }
@@ -190,103 +283,11 @@ impl<'a> ShadowList<'a> {
 impl<'a> fmt::Display for ShadowList<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for (i, v) in self.0.iter().enumerate() {
-            write!(f, "{}{}", v, if i != self.0.len() - 1 { "," } else { "" })?;
+            write!(f, "{}{}", v, if i == self.0.len() - 1 { "" } else { "," })?;
         }
 
         Ok(())
     }
-}
-
-impl<'a> From<Vec<Shadow<'a>>> for ShadowList<'a> {
-    fn from(v: Vec<Shadow<'a>>) -> Self {
-        Self(v)
-    }
-}
-
-// https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow
-pub fn parse_shadow(value: &str) -> Option<ShadowList> {
-    let mut parenthesis_level = 0;
-    let mut last_index = 0;
-    let mut shadows = vec![Shadow::new_raw()];
-
-    for (ch_index, ch) in value.chars().enumerate() {
-        match ch {
-            '(' => {
-                parenthesis_level += 1;
-            }
-            ')' => {
-                parenthesis_level -= 1;
-            }
-            ' ' if parenthesis_level == 0 => {
-                let shadow = if let Shadow::Raw(shadow) = shadows.last_mut().unwrap() {
-                    shadow
-                } else {
-                    // Shadow already parsed but a space was encountered
-                    return None;
-                };
-
-                if !value[last_index..ch_index].is_empty() {
-                    // Find the index of the first free part
-                    let index = shadow.iter().position(|p| p.is_none()).unwrap_or(5);
-
-                    // Insert the part
-                    shadow[index] = Some(&value[last_index..ch_index]);
-                }
-
-                // Update the index (and ignore the space)
-                last_index = ch_index + 1;
-            }
-            ',' if parenthesis_level == 0 => {
-                // Add the last part (not suffixed by `_`)
-                let shadow = if let Shadow::Raw(shadow) = shadows.last_mut().unwrap() {
-                    shadow
-                } else {
-                    // Shadow already parsed but a space was encountered
-                    return None;
-                };
-
-                // Find the index of the first free part
-                let index = shadow.iter().position(|p| p.is_none()).unwrap_or(5);
-
-                // Insert the part
-                shadow[index] = Some(&value[last_index..ch_index]);
-
-                // Ignore the shadow if it is empty
-                if !shadow.iter().all(Option::is_none) {
-                    // Parse the shadow
-                    let parsed_shadow = shadows.last().unwrap().parse()?;
-                    *shadows.last_mut().unwrap() = parsed_shadow;
-
-                    // Start the next shadow
-                    shadows.push(Shadow::new_raw());
-                }
-
-                // Update the index (and ignore the comma)
-                last_index = ch_index + 1;
-            }
-            _ => (),
-        }
-    }
-
-    // Add the last part (not suffixed by `,`)
-    if last_index != value.len() - 1 {
-        // Find the index of the first free part
-        let shadow = if let Shadow::Raw(shadow) = shadows.last_mut().unwrap() {
-            shadow
-        } else {
-            return None;
-        };
-        let index = shadow.iter().position(|p| p.is_none()).unwrap_or(5);
-
-        // Insert the part
-        shadow[index] = Some(&value[last_index..value.len()]);
-
-        // Parse the shadow
-        let parsed_shadow = shadows.last().unwrap().parse()?;
-        *shadows.last_mut().unwrap() = parsed_shadow;
-    }
-
-    Some(ShadowList::from(shadows))
 }
 
 #[cfg(test)]
@@ -296,7 +297,7 @@ mod tests {
     #[test]
     fn parse_shadow_test() {
         let shadow = "20px 35px 60px -15px rgba(0,0,0,0.3),0 72px rgba(0,2,42,0.2),inset 23px 42em 42px rgba(255,0,0,1)";
-        let result = parse_shadow(shadow).unwrap();
+        let result = ShadowList::parse(shadow).unwrap();
         assert_eq!(
             result,
             ShadowList(vec![
@@ -325,7 +326,7 @@ mod tests {
         );
 
         assert_eq!(
-            parse_shadow("var(--a, 0 0 1px rgb(0, 0, 0)),1px 2px 3rem rgb(0, 0, 0)").unwrap(),
+            ShadowList::parse("var(--a, 0 0 1px rgb(0, 0, 0)),1px 2px 3rem rgb(0, 0, 0)").unwrap(),
             ShadowList(vec![
                 Shadow::Variable("var(--a, 0 0 1px rgb(0, 0, 0))"),
                 Shadow::Shorthand2 {
@@ -339,7 +340,7 @@ mod tests {
         );
 
         assert_eq!(
-            parse_shadow("none").unwrap(),
+            ShadowList::parse("none").unwrap(),
             ShadowList(vec![Shadow::Keyword("none")])
         );
     }
@@ -347,7 +348,7 @@ mod tests {
     #[test]
     fn format_shadow() {
         let shadow = "20px 35px 60px -15px rgba(0,0,0,0.3),0 72px rgba(0,2,42,0.2),inset 23px 42em rgba(255,0,0,1)";
-        let result = parse_shadow(shadow).unwrap();
+        let result = ShadowList::parse(shadow).unwrap();
         assert_eq!(&result.to_string(), shadow);
     }
 }

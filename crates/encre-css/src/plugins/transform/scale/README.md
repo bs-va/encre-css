@@ -1,0 +1,22 @@
+Utilities for scaling elements with transform.
+
+<table style="display: table;">
+  <thead>
+    <tr>
+      <th style="text-align: center;">Class</th>
+      <th style="text-align: center;">Properties</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>scale-<i>&lt;integer&gt;</i></td><td>transform: scale(<i>&lt;integer / 100&gt;</i>);</td></tr>
+    <tr><td>scale-x-<i>&lt;integer&gt;</i></td><td>transform: scaleX(<i>&lt;integer / 100&gt;</i>);</td></tr>
+    <tr><td>scale-y-<i>&lt;integer&gt;</i></td><td>transform: scaleY(<i>&lt;integer / 100&gt;</i>);</td></tr>
+  </tbody>
+</table>
+
+### Tailwind compatibility
+
+Scale values don't follow Tailwind's philosophy of restraining possible values and all
+numbers are supported. They are however perfectly compatible with Tailwind's values.
+
+[Tailwind reference](https://tailwindcss.com/docs/scale)

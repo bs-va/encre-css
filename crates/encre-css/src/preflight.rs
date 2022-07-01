@@ -1,5 +1,9 @@
+//! Define the default set of base CSS styles used to make websites consistent across browsers.
+//!
+//! Based on [Tailwind's default preflight](https://tailwindcss.com/docs/preflight).
+
 // TODO: Make the lines marked as `CAN BE EDITED` editable with a config file
-pub const ENCRE_PREFLIGHT_CSS: &str = r#"/*
+pub(crate) const ENCRE_PREFLIGHT_CSS: &str = r#"/*
 1. Prevent padding and border from affecting element width.
 2. Allow adding a border to an element by just adding a border-width.
 */

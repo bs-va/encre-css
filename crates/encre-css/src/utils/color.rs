@@ -1,3 +1,4 @@
+//! Define some color manipulation functions.
 use crate::{
     config::{Config, BUILTIN_COLORS},
     error::{Error, Result},
@@ -5,35 +6,60 @@ use crate::{
 
 use std::borrow::Cow;
 
-pub fn hex_to_rgb(hex: &str) -> Result<[u8; 3]> {
+/// Convert an hexadecimal color to an RGB one.
+///
+/// # Example
+///
+/// ```rust
+/// use encre_css::utils::color::hex_to_rgb;
+/// assert_eq!(hex_to_rgb("#333").unwrap(), [51, 51, 51]);
+/// assert_eq!(hex_to_rgb("#f1f1f1").unwrap(), [241, 241, 241]);
+/// ```
+///
+/// # Errors
+///
+/// Returns [`Error::HexToRgbConversion`] when the hexadecimal color is incorrect.
+pub fn hex_to_rgb(mut hex: &str) -> Result<[u8; 3]> {
     // Remove the useless `#` from the start of the color
-    let hex = if let Some(hex) = hex.strip_prefix('#') {
-        hex
+    hex = hex.strip_prefix('#').unwrap_or(hex);
+
+    if hex.len() == 3 {
+        // Support the hexadecimal shorthand
+        let r = u8::from_str_radix(&hex[0..1], 16)
+            .map_err(|e| Error::HexToRgbConversion(hex.to_string(), e.to_string()))?;
+        let g = u8::from_str_radix(&hex[1..2], 16)
+            .map_err(|e| Error::HexToRgbConversion(hex.to_string(), e.to_string()))?;
+        let b = u8::from_str_radix(&hex[2..3], 16)
+            .map_err(|e| Error::HexToRgbConversion(hex.to_string(), e.to_string()))?;
+
+        Ok([r + r * 16, g + g * 16, b + b * 16])
+    } else if hex.len() == 6 {
+        let hex = hex.to_lowercase();
+
+        let r = u8::from_str_radix(&hex[0..2], 16)
+            .map_err(|e| Error::HexToRgbConversion(hex.clone(), e.to_string()))?;
+        let g = u8::from_str_radix(&hex[2..4], 16)
+            .map_err(|e| Error::HexToRgbConversion(hex.clone(), e.to_string()))?;
+        let b = u8::from_str_radix(&hex[4..6], 16)
+            .map_err(|e| Error::HexToRgbConversion(hex, e.to_string()))?;
+
+        Ok([r, g, b])
     } else {
-        hex
-    };
-
-    // Support the hexadecimal shorthand
-    let hex = if hex.len() == 3 {
-        hex.chars()
-            .map(|ch| ch.to_string().repeat(2).to_lowercase())
-            .collect::<String>()
-    } else {
-        hex.to_lowercase()
-    };
-
-    // TODO: Handle errors
-    let r = u8::from_str_radix(&hex[0..2], 16)
-        .map_err(|e| Error::HexToRgbConversion(hex[0..2].to_string(), e))?;
-    let g = u8::from_str_radix(&hex[2..4], 16)
-        .map_err(|e| Error::HexToRgbConversion(hex[2..4].to_string(), e))?;
-    let b = u8::from_str_radix(&hex[4..6], 16)
-        .map_err(|e| Error::HexToRgbConversion(hex[4..6].to_string(), e))?;
-
-    Ok([r, g, b])
+        Err(Error::HexToRgbConversion(
+            hex.to_string(),
+            format!(
+                "bad number of digits (expected 3 or 6, found {})",
+                hex.len()
+            ),
+        ))
+    }
 }
 
-pub fn is_matching_basic_color(config: &Config, mut modifier: &str) -> bool {
+/// Returns whether the modifier is matching a builtin color. The builtin colors are:
+///
+/// - `current`, `inherit`, `transparent`, `black`, `white`;
+/// - Any key contained in the [`BUILTIN_COLORS`] list.
+pub fn is_matching_builtin_color(config: &Config, mut modifier: &str) -> bool {
     if ["current", "inherit", "transparent", "black", "white"].contains(&modifier) {
         return true;
     }
@@ -43,11 +69,16 @@ pub fn is_matching_basic_color(config: &Config, mut modifier: &str) -> bool {
         modifier = new_modifier;
     }
 
-    BUILTIN_COLORS.iter().any(|color| color.0 == modifier)
-        || config.theme.colors.contains_key(modifier)
+    BUILTIN_COLORS.iter().any(|color| color.0 == modifier) || config.theme.colors.contains(modifier)
 }
 
-/// Get a color from a modifier
+/// Get a color from a modifier.
+///
+/// The third argument is used to set the opacity type used:
+///
+/// - [`Option::None`] will not use opacity (except if the opacity syntax is used, for example in `bg-red-500/25`);
+/// - [`Option::Some`] contains a variable which will be added as the opacity of the color, used to
+/// dynamically change the opacity.
 pub fn get<'a>(
     config: &Config,
     modifier: &'a str,
@@ -62,6 +93,7 @@ pub fn get<'a>(
             return Some(Cow::from("inherit"));
         } else if let Some((new_modifier, opacity_suffix)) = modifier.split_once('/') {
             if let Ok(opacity_number) = opacity_suffix.parse::<usize>() {
+                #[allow(clippy::cast_precision_loss)]
                 (Some(opacity_number as f32 / 100.), new_modifier)
             } else {
                 (None, modifier)

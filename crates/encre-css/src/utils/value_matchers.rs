@@ -1,33 +1,24 @@
-pub const LENGTH_UNITS: [&str; 16] = [
+//! Define some utility functions used to detect the [CSS type](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Types) of a CSS value.
+use super::shadow::ShadowList;
+
+const LENGTH_UNITS: [&str; 16] = [
     "cm", "mm", "Q", "in", "pc", "pt", "px", "em", "ex", "ch", "rem", "lh", "vw", "vh", "vmin",
     "vmax",
 ];
-pub const LINE_WIDTHS: [&str; 3] = ["thin", "medium", "thick"];
-pub const ANGLES: [&str; 4] = ["deg", "grad", "rad", "turn"];
-pub const GRADIENT_TYPES: [&str; 5] = [
+const LINE_WIDTHS: [&str; 3] = ["thin", "medium", "thick"];
+const LINE_STYLES: [&str; 10] = [
+    "solid", "dashed", "dotted", "double", "groove", "ridge", "inset", "outset", "hidden", "none",
+];
+const ANGLES: [&str; 4] = ["deg", "grad", "rad", "turn"];
+const GRADIENT_TYPES: [&str; 5] = [
     "linear-gradient",
     "radial-gradient",
     "repeating-linear-gradient",
     "repeating-radial-gradient",
     "conic-gradient",
 ];
-pub const VALID_POSITIONS: [&str; 5] = ["center", "top", "right", "bottom", "left"];
-pub const GENERIC_NAMES: [&str; 13] = [
-    "serif",
-    "sans-serif",
-    "monospace",
-    "cursive",
-    "fantasy",
-    "system-ui",
-    "ui-serif",
-    "ui-sans-serif",
-    "ui-monospace",
-    "ui-rounded",
-    "math",
-    "emoji",
-    "fangsong",
-];
-pub const ABSOLUTE_SIZES: [&str; 8] = [
+const VALID_POSITIONS: [&str; 5] = ["center", "top", "right", "bottom", "left"];
+const ABSOLUTE_SIZES: [&str; 8] = [
     "xx-small",
     "x-small",
     "small",
@@ -37,8 +28,10 @@ pub const ABSOLUTE_SIZES: [&str; 8] = [
     "x-large",
     "xxx-large",
 ];
-pub const RELATIVE_SIZES: [&str; 2] = ["larger", "smaller"];
-pub const NAMED_COLORS: [&str; 148] = [
+const RELATIVE_SIZES: [&str; 2] = ["larger", "smaller"];
+const NAMED_COLORS: [&str; 150] = [
+    "transparent",
+    "currentColor",
     "antiquewhite",
     "aliceblue",
     "aqua",
@@ -189,116 +182,285 @@ pub const NAMED_COLORS: [&str; 148] = [
     "yellowgreen",
 ];
 
-// TODO: Support:
-// - global values like inherit, initial, revert, revert-layer, unset
-// - intrinsic sizing keywords: fill, max-content, min-content, fit-content
+fn is_matching_base(value: &str) -> bool {
+    is_matching_var(value)
+        || [
+            "inherit",
+            "initial",
+            "revert",
+            "revert-layer",
+            "unset",
+            "fill",
+            "max-content",
+            "min-content",
+            "fit-content",
+        ]
+        .contains(&value)
+}
 
+/// Match all CSS types.
 pub fn is_matching_all(_value: &str) -> bool {
     true
 }
 
+/// Returns whether the CSS value is an [`url()`](https://developer.mozilla.org/en-US/docs/Web/CSS/url).
+///
+/// # Example
+///
+/// ```rust
+/// use encre_css::utils::value_matchers::is_matching_url;
+/// assert!(is_matching_url("url('/hello/world.png')"));
+/// ```
 pub fn is_matching_url(value: &str) -> bool {
     value.starts_with("url(")
 }
 
+/// Returns whether the CSS value is a [`var()`](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties).
+///
+/// # Example
+///
+/// ```rust
+/// use encre_css::utils::value_matchers::is_matching_var;
+/// assert!(is_matching_var("var(--bg-blue)"));
+/// ```
 pub fn is_matching_var(value: &str) -> bool {
     value.starts_with("var(")
 }
 
-pub fn is_matching_computational_css_function(value: &str) -> bool {
-    value.starts_with("min")
-        || value.starts_with("max")
-        || value.starts_with("clamp")
-        || value.starts_with("calc")
-}
-
-pub fn is_matching_color(value: &str) -> bool {
-    (value.starts_with('#') && (value.len() == 4 || value.len() == 7))
-        || value.starts_with("rgb")
-        || value.starts_with("rgba")
-        || value.starts_with("hsl")
-        || value.starts_with("hsla")
-        || NAMED_COLORS.iter().any(|c| &value == c)
-        || is_matching_var(value)
-}
-
-pub fn is_matching_length(value: &str) -> bool {
-    value.split('_').all(|v| {
-        v == "0" || LENGTH_UNITS.iter().any(|u| v.ends_with(u)) || is_matching_percentage(v)
-    }) || is_matching_var(value)
-}
-
-pub fn is_matching_number(value: &str) -> bool {
-    value.parse::<usize>().is_ok() || is_matching_computational_css_function(value)
-}
-
-pub fn is_matching_float(value: &str) -> bool {
-    value.parse::<f32>().is_ok() || is_matching_computational_css_function(value)
-}
-
-pub fn is_matching_percentage(value: &str) -> bool {
-    value.ends_with('%') || is_matching_computational_css_function(value)
-}
-
-pub fn is_matching_time(value: &str) -> bool {
-    value.ends_with('s') || value.ends_with("ms")
-}
-
+/// Returns whether the CSS value is a [`shadow`](https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow#values).
+///
+/// # Example
+///
+/// ```rust
+/// use encre_css::utils::value_matchers::is_matching_shadow;
+/// assert!(is_matching_shadow("1px_2rem_10px_10px_rgb(12,12,12)"));
+/// ```
 pub fn is_matching_shadow(value: &str) -> bool {
-    super::shadow::parse_shadow(&value.replace('_', " ")).is_some()
+    ShadowList::parse(&value.replace('_', " ")).is_some()
 }
 
-pub fn is_matching_gradient(value: &str) -> bool {
-    GRADIENT_TYPES.iter().any(|t| value.starts_with(t))
-}
-
-pub fn is_matching_position(value: &str) -> bool {
-    VALID_POSITIONS.contains(&value) || is_matching_length(value) || is_matching_percentage(value)
-}
-
-pub fn is_matching_line_width(value: &str) -> bool {
-    LINE_WIDTHS.contains(&value)
-}
-
-pub fn is_matching_angle(value: &str) -> bool {
-    ANGLES.iter().any(|a| value.ends_with(a))
-}
-
-pub fn is_matching_generic_name(value: &str) -> bool {
-    GENERIC_NAMES.contains(&value)
-}
-
+/// Returns whether the CSS value is an [`absolute size`](https://developer.mozilla.org/en-US/docs/Web/CSS/font-size#values).
+///
+/// # Example
+///
+/// ```rust
+/// use encre_css::utils::value_matchers::is_matching_absolute_size;
+/// assert!(is_matching_absolute_size("xx-small"));
+/// ```
 pub fn is_matching_absolute_size(value: &str) -> bool {
     ABSOLUTE_SIZES.contains(&value)
 }
 
+/// Returns whether the CSS value is a [`relative size`](https://developer.mozilla.org/en-US/docs/Web/CSS/font-size#values).
+///
+/// # Example
+///
+/// ```rust
+/// use encre_css::utils::value_matchers::is_matching_relative_size;
+/// assert!(is_matching_relative_size("larger"));
+/// ```
 pub fn is_matching_relative_size(value: &str) -> bool {
     RELATIVE_SIZES.contains(&value)
 }
 
+/// Returns whether the CSS value is a [`line width`](https://developer.mozilla.org/en-US/docs/Web/CSS/border-width#values).
+///
+/// # Example
+///
+/// ```rust
+/// use encre_css::utils::value_matchers::is_matching_line_width;
+/// assert!(is_matching_line_width("thin"));
+/// ```
+pub fn is_matching_line_width(value: &str) -> bool {
+    LINE_WIDTHS.contains(&value)
+}
+
+/// Returns whether the CSS value is a [`line style`](https://developer.mozilla.org/en-US/docs/Web/CSS/border-style#values).
+///
+/// # Example
+///
+/// ```rust
+/// use encre_css::utils::value_matchers::is_matching_line_style;
+/// assert!(is_matching_line_style("solid"));
+/// ```
+pub fn is_matching_line_style(value: &str) -> bool {
+    LINE_STYLES.contains(&value)
+}
+
+/// Returns whether the CSS value is a computational CSS function like:
+///
+/// - [`min()`](https://developer.mozilla.org/en-US/docs/Web/CSS/min)
+/// - [`max()`](https://developer.mozilla.org/en-US/docs/Web/CSS/max)
+/// - [`clamp()`](https://developer.mozilla.org/en-US/docs/Web/CSS/clamp)
+/// - [`calc()`](https://developer.mozilla.org/en-US/docs/Web/CSS/calc)
+///
+/// # Example
+///
+/// ```rust
+/// use encre_css::utils::value_matchers::is_matching_computational_css_function;
+/// assert!(is_matching_computational_css_function("min(12px,10%)"));
+/// ```
+pub fn is_matching_computational_css_function(value: &str) -> bool {
+    value.starts_with("min(")
+        || value.starts_with("max(")
+        || value.starts_with("clamp(")
+        || value.starts_with("calc(")
+}
+
+/// Returns whether the CSS value has the [`<color>`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value) type.
+///
+/// # Example
+///
+/// ```rust
+/// use encre_css::utils::value_matchers::is_matching_color;
+/// assert!(is_matching_color("blue"));
+/// assert!(is_matching_color("#333"));
+/// ```
+pub fn is_matching_color(value: &str) -> bool {
+    (value.starts_with('#') && (value.len() == 4 || value.len() == 7))
+        || ["rgb(", "rgba(", "hsl(", "hsla(", "hwb(", "lch(", "lab("]
+            .iter()
+            .any(|e| value.starts_with(e))
+        || NAMED_COLORS.iter().any(|c| &value == c)
+        || is_matching_base(value)
+}
+
+/// Returns whether the CSS value has the [`<length>`](https://developer.mozilla.org/en-US/docs/Web/CSS/length) type.
+///
+/// # Example
+///
+/// ```rust
+/// use encre_css::utils::value_matchers::is_matching_length;
+/// assert!(is_matching_length("300px"));
+/// ```
+pub fn is_matching_length(value: &str) -> bool {
+    value.split('_').all(|v| {
+        v == "0"
+            || LENGTH_UNITS.iter().any(|u| v.ends_with(u))
+            || is_matching_computational_css_function(value)
+    }) || is_matching_base(value)
+}
+
+/// Returns whether the CSS value has the [`<integer>`](https://developer.mozilla.org/en-US/docs/Web/CSS/integer) type.
+///
+/// # Example
+///
+/// ```rust
+/// use encre_css::utils::value_matchers::is_matching_integer;
+/// assert!(is_matching_integer("12"));
+/// assert!(!is_matching_integer("42.12"));
+/// ```
+pub fn is_matching_integer(value: &str) -> bool {
+    value.parse::<isize>().is_ok()
+        || is_matching_computational_css_function(value)
+        || is_matching_base(value)
+}
+
+/// Returns whether the CSS value has the [`<number>`](https://developer.mozilla.org/en-US/docs/Web/CSS/number) type.
+///
+/// # Example
+///
+/// ```rust
+/// use encre_css::utils::value_matchers::is_matching_number;
+/// assert!(is_matching_number("42.12"));
+/// ```
+pub fn is_matching_number(value: &str) -> bool {
+    value.parse::<f32>().is_ok()
+        || is_matching_computational_css_function(value)
+        || is_matching_base(value)
+}
+
+/// Returns whether the CSS value has the [`<percentage>`](https://developer.mozilla.org/en-US/docs/Web/CSS/percentage) type.
+///
+/// # Example
+///
+/// ```rust
+/// use encre_css::utils::value_matchers::is_matching_percentage;
+/// assert!(is_matching_percentage("10%"));
+/// ```
+pub fn is_matching_percentage(value: &str) -> bool {
+    value.ends_with('%') || is_matching_computational_css_function(value) || is_matching_base(value)
+}
+
+/// Returns whether the CSS value has the [`<time>`](https://developer.mozilla.org/en-US/docs/Web/CSS/time) type.
+///
+/// # Example
+///
+/// ```rust
+/// use encre_css::utils::value_matchers::is_matching_time;
+/// assert!(is_matching_time("0.5s"));
+/// assert!(is_matching_time("10ms"));
+/// ```
+pub fn is_matching_time(value: &str) -> bool {
+    value.ends_with('s')
+        || value.ends_with("ms")
+        || is_matching_computational_css_function(value)
+        || is_matching_base(value)
+}
+
+/// Returns whether the CSS value has the [`<gradient>`](https://developer.mozilla.org/en-US/docs/Web/CSS/gradient) type.
+///
+/// # Example
+///
+/// ```rust
+/// use encre_css::utils::value_matchers::is_matching_gradient;
+/// assert!(is_matching_gradient("linear-gradient(45deg, blue, red);"));
+/// ```
+pub fn is_matching_gradient(value: &str) -> bool {
+    GRADIENT_TYPES.iter().any(|t| value.starts_with(t)) || is_matching_base(value)
+}
+
+/// Returns whether the CSS value has the [`<position>`](https://developer.mozilla.org/en-US/docs/Web/CSS/position_value) type.
+///
+/// # Example
+///
+/// ```rust
+/// use encre_css::utils::value_matchers::is_matching_position;
+/// assert!(is_matching_position("right"));
+/// assert!(is_matching_position("12px"));
+/// assert!(is_matching_position("42%"));
+/// ```
+pub fn is_matching_position(value: &str) -> bool {
+    value
+        .split('_')
+        .all(|v| VALID_POSITIONS.contains(&v) || is_matching_length(v) || is_matching_percentage(v))
+        || is_matching_base(value)
+}
+
+/// Returns whether the CSS value has the [`<angle>`](https://developer.mozilla.org/en-US/docs/Web/CSS/angle) type.
+///
+/// # Example
+///
+/// ```rust
+/// use encre_css::utils::value_matchers::is_matching_angle;
+/// assert!(is_matching_angle("0.2turn"));
+/// ```
+pub fn is_matching_angle(value: &str) -> bool {
+    ANGLES.iter().any(|a| value.ends_with(a))
+        || is_matching_computational_css_function(value)
+        || is_matching_base(value)
+}
+
+/// Returns whether the CSS value has the [`<image>`](https://developer.mozilla.org/en-US/docs/Web/CSS/image) type.
+///
+/// # Example
+///
+/// ```rust
+/// use encre_css::utils::value_matchers::is_matching_image;
+/// assert!(is_matching_image("linear-gradient(to_right,red,orange,yellow,green,blue,indigo,violet)"));
+/// ```
 pub fn is_matching_image(value: &str) -> bool {
-    value.split(',').all(|v| {
-        is_matching_url(v)
-            || is_matching_gradient(v)
-            || ["element(", "image(", "cross-fade(", "image-set("]
-                .iter()
-                .any(|e| v.starts_with(e))
-    })
+    is_matching_url(value)
+        || is_matching_gradient(value)
+        || ["element(", "image(", "cross-fade(", "image-set("]
+            .iter()
+            .any(|e| value.starts_with(e))
+        || is_matching_base(value)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn is_matching_url_test() {
-        assert!(is_matching_url("url('/hello/world.png')"));
-    }
-
-    #[test]
-    fn is_matching_var_test() {
-        assert!(is_matching_var("var(--bg-blue)"));
-    }
 
     #[test]
     fn is_matching_color_test() {
@@ -322,32 +484,10 @@ mod tests {
     #[test]
     fn is_matching_length_test() {
         assert!(is_matching_length("300px"));
-        assert!(is_matching_length("50%"));
+        assert!(!is_matching_length("50%"));
         assert!(is_matching_length("30vw"));
         assert!(is_matching_length("min(10%,10px)"));
         assert!(is_matching_length("0"));
-    }
-
-    #[test]
-    fn is_matching_number_test() {
-        assert!(is_matching_number("12"));
-        assert!(!is_matching_number("42.12"));
-    }
-
-    #[test]
-    fn is_matching_float_test() {
-        assert!(is_matching_float("42.12"));
-    }
-
-    #[test]
-    fn is_matching_percentage_test() {
-        assert!(is_matching_percentage("10%"));
-    }
-
-    #[test]
-    fn is_matching_time_test() {
-        assert!(is_matching_time("0.5s"));
-        assert!(is_matching_time("10ms"));
     }
 
     #[test]
@@ -357,43 +497,5 @@ mod tests {
         assert!(is_matching_shadow(
             "var(--a,_0_0_1px_rgb(0,_0,_0)),_0_0_1px_rgb(0,_0,_0)"
         ));
-    }
-
-    #[test]
-    fn is_matching_gradient_test() {
-        assert!(is_matching_gradient("linear-gradient(45deg, blue, red);"));
-    }
-
-    #[test]
-    fn is_matching_position_test() {
-        assert!(is_matching_position("right"));
-        assert!(is_matching_position("12px"));
-        assert!(is_matching_position("42%"));
-    }
-
-    #[test]
-    fn is_matching_line_width_test() {
-        assert!(is_matching_line_width("thin"));
-    }
-
-    #[test]
-    fn is_matching_angle_test() {
-        assert!(is_matching_angle("0.2turn"));
-    }
-
-    #[test]
-    fn is_matching_generic_name_test() {
-        assert!(is_matching_generic_name("sans-serif"));
-        assert!(is_matching_generic_name("fantasy"));
-    }
-
-    #[test]
-    fn is_matching_absolute_size_test() {
-        assert!(is_matching_absolute_size("xx-small"));
-    }
-
-    #[test]
-    fn is_matching_relative_size_test() {
-        assert!(is_matching_relative_size("larger"));
     }
 }

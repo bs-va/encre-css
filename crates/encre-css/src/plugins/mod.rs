@@ -1,9 +1,9 @@
+//! Define the [`Plugin`] trait used to generate styles from classes.
 use crate::context::{ContextAfterRule, ContextBeforeRule, ContextCanHandle, ContextHandle};
 
 use std::{borrow::Cow, fmt};
 
 pub mod accessibility;
-pub mod alignment;
 pub mod background;
 pub mod border;
 pub mod effect;
@@ -22,42 +22,65 @@ pub mod typography;
 
 const WILL_BE_REPLACED_BY_UNDERSCORE: &str = "WILL-BE-REPLACED-BY-UNDERSCORE";
 
+/// A plugin is a structure capable of generating CSS styles from a modifier (contained in a
+/// context structure).
 pub trait Plugin: fmt::Debug {
-    /// Returns the namespace containing the plugin
+    /// Returns the namespace containing the plugin.
     ///
-    /// By default, the plugin does not belong to a namespace
+    /// By default, the plugin does not belong to a namespace.
     fn namespace(&self) -> &str {
         ""
     }
 
-    /// Returns whether the plugin can handle a specific modifier
+    /// Returns whether the plugin can handle a specific modifier.
     fn can_handle(&self, _context: ContextCanHandle) -> bool;
 
-    /// Custom CSS written before the CSS rule
+    /// Custom CSS written before the CSS rule.
     ///
-    /// NOTE: The CSS must end with two newlines
+    /// Note: the CSS must end with two newlines.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Format`] if writing to the buffer failed.
+    ///
+    /// [`Error::Format`]: crate::Error::Format
     fn css_before_rule(&self, _context: ContextBeforeRule) -> fmt::Result {
         Ok(())
     }
 
-    /// Custom CSS written after the CSS rule
+    /// Custom CSS written after the CSS rule.
     ///
-    /// NOTE: The CSS must start with two newlines
+    /// Note: the CSS must start with two newlines.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Format`] if writing to the buffer failed.
+    ///
+    /// [`Error::Format`]: crate::Error::Format
     fn css_after_rule(&self, _context: ContextAfterRule) -> fmt::Result {
         Ok(())
     }
 
-    /// Get the CSS code from a modifier
+    /// Get the CSS code from a modifier.
     ///
-    /// The CSS should end with a newline
+    /// The [`Plugin::can_handle`] method **must be** called before to know if it can handle
+    /// the modifier, otherwise this function **will panic**.
+    ///
+    /// Note: the CSS should end with a newline.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Format`] if writing to the buffer failed.
+    ///
+    /// [`Error::Format`]: crate::Error::Format
     fn handle(&self, _context: ContextHandle) -> fmt::Result;
 }
 
-/// Convert an arbitrary value into a CSS value
+/// Convert an arbitrary value into a CSS value.
 ///
-///  -  `_` (underscores) are converted to ` ` (spaces) (not in `url`s or if prefixed by a backslash)
-///  - Spaces are added around operators in the `calc` CSS function
-pub fn to_css_value(value: &str) -> Cow<str> {
+///  -  `_` (underscores) are converted to ` ` (spaces) (not in `url`s or if prefixed by a backslash);
+///  - Spaces are added around operators in the `calc` CSS function.
+pub(crate) fn to_css_value(value: &str) -> Cow<str> {
     let mut value = Cow::from(value);
 
     // Don't replace `_` if it is a URL
@@ -98,7 +121,7 @@ pub fn to_css_value(value: &str) -> Cow<str> {
                 })
                 .collect::<Vec<Cow<str>>>()
                 .join(" "),
-        )
+        );
     }
 
     value

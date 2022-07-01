@@ -1,0 +1,23 @@
+Utilities for controlling the order of flex and grid items.
+
+<table style="display: table;">
+  <thead>
+    <tr>
+      <th style="text-align: center;">Class</th>
+      <th style="text-align: center;">Properties</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>order-<i>&lt;signed integer&gt;</i></td><td>order: <i>&lt;signed integer&gt;</i>;</td></tr>
+    <tr><td>order-first</td><td>order: -9999;</td></tr>
+    <tr><td>order-last</td><td>order: 9999;</td></tr>
+    <tr><td>order-none</td><td>order: 0;</td></tr>
+  </tbody>
+</table>
+
+### Tailwind compatibility
+
+Order values don't follow Tailwind's philosophy of restraining possible values and all numbers
+are supported. They are however perfectly compatible with Tailwind's values.
+
+[Tailwind reference](https://tailwindcss.com/docs/order)

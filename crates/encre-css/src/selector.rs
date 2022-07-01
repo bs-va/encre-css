@@ -1,8 +1,35 @@
+//! Define the [`Selector`] structure used to parse scanned classes.
+//!
+//! ### Some vocabulary
+//!
+//! <p style="font-family: sans-serif;"><b><span class="macro">hover</span>:<span class="macro">xl</span>:<span class="struct">bg</span>-<span class="method">red-500</span></b></p>
+//!
+//! 1. The <a href="../variant/index.html" style="text-decoration: underline; text-underline-offset: 2px;">
+//!    <span class="macro"><b>variants</b></span></a>
+//!    (used to add pseudo-selectors, pseudo-elements, pseudo classes, media queries), in this case
+//!    the class will be applied only on a screen larger than 1280px (see [`BUILTIN_SCREENS`]) and
+//!    if hovered;
+//! 2. The <span class="struct"><b>namespace</b></span> (basically the name of the plugin), in this case `bg` for changing the background;
+//! 3. The <a href="enum.Modifier.html" style="text-decoration: underline; text-underline-offset: 2px;"><span class="method"><b>modifier</b></span></a> (used to clarify the CSS needed to be generated), in this case the
+//!       background color will become `rgb(239 68 68)` (see [`BUILTIN_COLORS`]).
+//!
+//! <p style="font-family: sans-serif;"><b><span class="struct">bg</span>-[<span class="trait">rgb(12_12_12)</span>]</b></p>
+//!
+//! 4. The <a href="enum.Modifier.html#variant.Arbitrary" style="text-decoration: underline; text-underline-offset: 2px;"><span class="trait"><b>arbitrary value</b></span></a>
+//!    (used to specify a value not included in your design system), in this case the background
+//!    color will become `rgb(12 12 12)` (spaces need to be replaced with underscores in arbitrary
+//!    values).
+//!
+//! As you can see, by default variants are separated by `:`, modifiers by `-` and arbitrary values
+//! are surrounded by `[]`.
+//!
+//! [`BUILTIN_SCREENS`]: crate::config::BUILTIN_SCREENS
+//! [`BUILTIN_COLORS`]: crate::config::BUILTIN_COLORS
 use crate::{
-    config::Config,
+    config::{Config, BUILTIN_PLUGINS, BUILTIN_VARIANTS},
     context::ContextCanHandle,
-    plugins::*,
-    variant::{Variant, BUILTIN_VARIANTS, VARIANT_SEPARATOR},
+    plugins::Plugin,
+    variant::Variant,
 };
 
 use std::{borrow::Cow, cmp::Ordering, collections::BTreeMap};
@@ -10,250 +37,81 @@ use std::{borrow::Cow, cmp::Ordering, collections::BTreeMap};
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
-pub const VALID_PLUGIN_HINT: [&str; 4] = ["color", "length", "angle", "list"];
-
-/// The list of builtin plugins
-///
-/// Sorted following https://github.com/avencera/rustywind/blob/master/src/defaults.rs
-static BUILTIN_PLUGINS: [&'static (dyn Plugin + Send + Sync); 223] = [
-    &layout::ContainerPlugin,
-    &accessibility::ScreenReaderPlugin,
-    &interactivity::PointerEventsPlugin,
-    &layout::VisibilityPlugin,
-    &layout::PositionPlugin,
-    &layout::InsetPlugin,
-    &layout::InsetXPlugin,
-    &layout::InsetYPlugin,
-    &layout::TopPlugin,
-    &layout::RightPlugin,
-    &layout::BottomPlugin,
-    &layout::LeftPlugin,
-    &layout::IsolationPlugin,
-    &layout::ZIndexPlugin,
-    &flexbox::OrderPlugin,
-    &grid::StartEndSpanColumnPlugin,
-    &grid::StartEndSpanRowPlugin,
-    &layout::FloatPlugin,
-    &layout::ClearPlugin,
-    &spacing::MarginPlugin,
-    &spacing::MarginXPlugin,
-    &spacing::MarginYPlugin,
-    &spacing::MarginTopPlugin,
-    &spacing::MarginRightPlugin,
-    &spacing::MarginBottomPlugin,
-    &spacing::MarginLeftPlugin,
-    &layout::BoxSizingPlugin,
-    &layout::DisplayPlugin,
-    &layout::AspectRatioPlugin,
-    &sizing::HeightPlugin,
-    &sizing::MaxHeightPlugin,
-    &sizing::MinHeightPlugin,
-    &sizing::WidthPlugin,
-    &sizing::MinWidthPlugin,
-    &sizing::MaxWidthPlugin,
-    &flexbox::GrowShrinkBasisPlugin,
-    &table::TableLayoutPlugin,
-    &table::BorderCollapsePlugin,
-    &table::BorderSpacingPlugin,
-    &table::BorderSpacingXPlugin,
-    &table::BorderSpacingYPlugin,
-    &transform::OriginPlugin,
-    &transform::TranslateXPlugin,
-    &transform::TranslateYPlugin,
-    &transform::RotatePlugin,
-    &transform::SkewXPlugin,
-    &transform::SkewYPlugin,
-    &transform::ScalePlugin,
-    &transform::ScaleXPlugin,
-    &transform::ScaleYPlugin,
-    &transform::TransformPlugin,
-    &transition::AnimatePlugin,
-    &interactivity::CursorPlugin,
-    &interactivity::TouchActionPlugin,
-    &interactivity::UserSelectPlugin,
-    &interactivity::ResizePlugin,
-    &interactivity::ScrollSnapTypePlugin,
-    &interactivity::ScrollSnapAlignPlugin,
-    &interactivity::ScrollSnapStopPlugin,
-    &interactivity::ScrollMarginPlugin,
-    &interactivity::ScrollMarginXPlugin,
-    &interactivity::ScrollMarginYPlugin,
-    &interactivity::ScrollMarginTopPlugin,
-    &interactivity::ScrollMarginRightPlugin,
-    &interactivity::ScrollMarginBottomPlugin,
-    &interactivity::ScrollMarginLeftPlugin,
-    &interactivity::ScrollPaddingPlugin,
-    &interactivity::ScrollPaddingXPlugin,
-    &interactivity::ScrollPaddingYPlugin,
-    &interactivity::ScrollPaddingTopPlugin,
-    &interactivity::ScrollPaddingRightPlugin,
-    &interactivity::ScrollPaddingBottomPlugin,
-    &interactivity::ScrollPaddingLeftPlugin,
-    &typography::ListStylePositionPlugin,
-    &typography::ListStyleTypePlugin,
-    &interactivity::AppearancePlugin,
-    &layout::ColumnsPlugin,
-    &layout::BreakBeforePlugin,
-    &layout::BreakInsidePlugin,
-    &layout::BreakAfterPlugin,
-    &grid::AutoColumnsPlugin,
-    &grid::AutoFlowPlugin,
-    &grid::AutoRowsPlugin,
-    &grid::TemplateColumnsPlugin,
-    &grid::TemplateRowsPlugin,
-    &flexbox::DirectionPlugin,
-    &flexbox::WrapPlugin,
-    &alignment::PlaceContentPlugin,
-    &alignment::PlaceItemsPlugin,
-    &alignment::AlignContentPlugin,
-    &alignment::AlignItemsPlugin,
-    &alignment::JustifyContentPlugin,
-    &alignment::JustifyItemsPlugin,
-    &grid::GapPlugin,
-    &grid::GapXPlugin,
-    &grid::GapYPlugin,
-    &spacing::SpaceYPlugin,
-    &spacing::SpaceXPlugin,
-    &border::DivideWidthXPlugin,
-    &border::DivideWidthYPlugin,
-    &border::DivideStylePlugin,
-    &border::DivideColorPlugin,
-    &border::DivideOpacityPlugin,
-    &alignment::PlaceSelfPlugin,
-    &alignment::AlignSelfPlugin,
-    &alignment::JustifySelfPlugin,
-    &layout::OverflowPlugin,
-    &layout::OverscrollPlugin,
-    &interactivity::ScrollBehaviorPlugin,
-    &typography::TextOverflowPlugin,
-    &typography::WhitespacePlugin,
-    &typography::WordBreakPlugin,
-    &border::RadiusPlugin,
-    &border::RadiusTopPlugin,
-    &border::RadiusRightPlugin,
-    &border::RadiusBottomPlugin,
-    &border::RadiusLeftPlugin,
-    &border::RadiusTopLeftPlugin,
-    &border::RadiusTopRightPlugin,
-    &border::RadiusBottomRightPlugin,
-    &border::RadiusBottomLeftPlugin,
-    &border::WidthPlugin,
-    &border::WidthXPlugin,
-    &border::WidthYPlugin,
-    &border::WidthTopPlugin,
-    &border::WidthRightPlugin,
-    &border::WidthBottomPlugin,
-    &border::WidthLeftPlugin,
-    &border::StylePlugin,
-    &border::ColorPlugin,
-    &border::ColorXPlugin,
-    &border::ColorYPlugin,
-    &border::ColorTopPlugin,
-    &border::ColorRightPlugin,
-    &border::ColorBottomPlugin,
-    &border::ColorLeftPlugin,
-    &border::OpacityPlugin,
-    &background::ColorPlugin,
-    &background::OpacityPlugin,
-    &background::ImagePlugin,
-    &background::GradientFromPlugin,
-    &background::GradientViaPlugin,
-    &background::GradientToPlugin,
-    &layout::BoxDecorationBreakPlugin,
-    &background::SizePlugin,
-    &background::AttachmentPlugin,
-    &background::ClipPlugin,
-    &background::PositionPlugin,
-    &background::RepeatPlugin,
-    &background::OriginPlugin,
-    &svg::FillPlugin,
-    &svg::StrokeColorPlugin,
-    &svg::StrokeWidthPlugin,
-    &layout::ObjectFitPlugin,
-    &layout::ObjectPositionPlugin,
-    &spacing::PaddingPlugin,
-    &spacing::PaddingXPlugin,
-    &spacing::PaddingYPlugin,
-    &spacing::PaddingTopPlugin,
-    &spacing::PaddingRightPlugin,
-    &spacing::PaddingBottomPlugin,
-    &spacing::PaddingLeftPlugin,
-    &typography::TextAlignmentPlugin,
-    &typography::TextIndentPlugin,
-    &typography::VerticalAlignPlugin,
-    &typography::FontFamilyPlugin,
-    &typography::FontSizePlugin,
-    &typography::FontWeightPlugin,
-    &typography::TextTransformPlugin,
-    &typography::ItalicPlugin,
-    &typography::FontVariantNumericPlugin,
-    &typography::LeadingPlugin,
-    &typography::TrackingPlugin,
-    &typography::ColorPlugin,
-    &typography::OpacityPlugin,
-    &typography::TextDecorationPlugin,
-    &typography::TextDecorationColorPlugin,
-    &typography::TextDecorationStylePlugin,
-    &typography::TextDecorationThicknessPlugin,
-    &typography::TextDecorationUnderlineOffsetPlugin,
-    &typography::FontSmoothingPlugin,
-    &interactivity::CaretColorPlugin,
-    &interactivity::AccentColorPlugin,
-    &effect::OpacityPlugin,
-    &effect::BackgroundBlendModePlugin,
-    &effect::MixBlendModePlugin,
-    &effect::BoxShadowPlugin,
-    &effect::BoxShadowColorPlugin,
-    &border::OutlineStylePlugin,
-    &border::OutlineWidthPlugin,
-    &border::OutlineOffsetPlugin,
-    &border::OutlineColorPlugin,
-    &border::RingWidthPlugin,
-    &border::RingColorPlugin,
-    &border::RingOpacityPlugin,
-    &border::RingOffsetWidthPlugin,
-    &border::RingOffsetColorPlugin,
-    &filter::BlurPlugin,
-    &filter::BrightnessPlugin,
-    &filter::ContrastPlugin,
-    &filter::DropShadowPlugin,
-    &filter::GrayscalePlugin,
-    &filter::HueRotatePlugin,
-    &filter::InvertPlugin,
-    &filter::SaturatePlugin,
-    &filter::SepiaPlugin,
-    &filter::FilterPlugin,
-    &filter::BackdropBlurPlugin,
-    &filter::BackdropBrightnessPlugin,
-    &filter::BackdropContrastPlugin,
-    &filter::BackdropGrayscalePlugin,
-    &filter::BackdropHueRotatePlugin,
-    &filter::BackdropInvertPlugin,
-    &filter::BackdropOpacityPlugin,
-    &filter::BackdropSaturatePlugin,
-    &filter::BackdropSepiaPlugin,
-    &filter::BackdropFilterPlugin,
-    &transition::PropertyPlugin,
-    &transition::DelayPlugin,
-    &transition::DurationPlugin,
-    &transition::EasePlugin,
-    &interactivity::WillChangePlugin,
-    &typography::ContentPlugin,
+const VALID_PLUGIN_HINT: [&str; 13] = [
+    "color",
+    "length",
+    "line-width",
+    "image",
+    "url",
+    "position",
+    "percentage",
+    "number",
+    "generic-name",
+    "family-name",
+    "absolute-size",
+    "relative-size",
+    "shadow",
 ];
 
+pub(crate) const VARIANT_SEPARATOR: char = ':';
+const MODIFIER_SEPARATOR: char = '-';
+const ARBITRARY_SEPARATOR_START: char = '[';
+const ARBITRARY_SEPARATOR_END: char = ']';
+const HINT_SEPARATOR: char = ':';
+
+/// The modifier is the rest of the selector after the namespace, it is used to clarify the
+/// CSS needed to be generated.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Modifier<'a> {
-    Basic {
+    /// A builtin static modifier (e.g. `bg-red-500`).
+    Builtin {
+        /// Whether the value is negative (e.g. `-translate-2` is negative).
         is_negative: bool,
+
+        /// The inner value of the modifier.
         value: &'a str,
     },
+
+    /// A dynamic modifier capable of automatically generating a rule from a CSS value
+    /// (e.g. `bg-[rgb(12_12_12)]`).
+    ///
+    /// Sometimes the value is ambiguous, for example `bg-[var(--foo)]` can be handled by either
+    /// the [`background color`](crate::plugins::background::background_color) or the
+    /// [`background size`](crate::plugins::background::background_size) utility. In this case,
+    /// you need to provide a [CSS type](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Types)
+    /// hint (see the list of hints below) before the arbitrary value. For example
+    /// `bg-[length:var(--foo)]` will generate `background-size: var(--foo);` (using the
+    /// [`background size`] utility).
+    ///
+    /// List of all type hints:
+    /// - `color`
+    /// - `length`
+    /// - `line-width`
+    /// - `image`
+    /// - `url`
+    /// - `position`
+    /// - `percentage`
+    /// - `number`
+    /// - `generic-name`
+    /// - `family-name`
+    /// - `absolute-size`
+    /// - `relative-size`
+    /// - `shadow`
     Arbitrary {
+        /// The rest of the modifier without the arbitrary value (e.g. `bg` in `bg-[rgb(12_12_12)]`)
         prefix: &'a str,
+
+        /// The type hint needed for ambiguous values
         hint: &'a str,
+
+        /// The inner value of the modifier
         value: &'a str,
     },
 }
 
+/// A selector is a full class, containing the variants, the namespace and the modifier.
+///
+/// See [`crate::selector`] for more informations.
 #[derive(Clone, Debug)]
 pub struct Selector<'a> {
     pub(crate) order: usize,
@@ -265,47 +123,54 @@ pub struct Selector<'a> {
 }
 
 impl<'a> Selector<'a> {
-    pub fn new(full: &'a str, config: &Config) -> Option<Self> {
+    pub(crate) fn new(full: &'a str, config: &Config) -> Option<Self> {
         // We need to ignore all characters in arbitrary values (wrapped in `[]`) and we know that
         // nothing interesting is placed after them, so we can just split by `[` and take the first
         // value
         let variants = {
-            let before_arbitrary = full.split('[').next().unwrap();
-            &before_arbitrary[..before_arbitrary.rfind(VARIANT_SEPARATOR).unwrap_or(0)]
+            let before_arbitrary = full.split('[').next()?;
+            &before_arbitrary.get(..before_arbitrary.rfind(VARIANT_SEPARATOR).unwrap_or(0))?
         };
 
-        // The selector without variants is the remaining part of the list of variants
-        let mut content = if variants.is_empty() {
+        // The rest of the selector is the namespace and the modifier
+        let mut rest = if variants.is_empty() {
             full
         } else {
-            full.strip_prefix(variants)?.strip_prefix(':')?
+            full.strip_prefix(variants)?
+                .strip_prefix(VARIANT_SEPARATOR)?
         };
 
-        // Strip the important flag before the negative one
-        let mut is_important = false;
-        if content.starts_with('!') {
-            content = &content[1..];
-            is_important = true;
-        }
+        // Strip the important flag (must be before the negative one)
+        let is_important = if rest.starts_with('!') {
+            rest = &rest[1..];
+            true
+        } else {
+            false
+        };
 
-        let mut is_negative = false;
-        if content.starts_with('-') {
-            content = &content[1..];
-            is_negative = true;
-        }
+        // Strip the negative flag
+        let is_negative = if rest.starts_with('-') {
+            rest = &rest[1..];
+            true
+        } else {
+            false
+        };
 
         // Find the right plugin for handling this selector
         let find_fn = |(i, plugin): (usize, &&'static (dyn Plugin + Send + Sync))| {
             // Find the modifier
-            if let Some(modifier_part) = content.strip_prefix(&plugin.namespace()) {
-                let modifier_part = modifier_part.strip_prefix('-').unwrap_or(modifier_part);
+            if let Some(modifier_part) = rest.strip_prefix(&plugin.namespace()) {
+                let modifier_part = modifier_part
+                    .strip_prefix(MODIFIER_SEPARATOR)
+                    .unwrap_or(modifier_part);
 
-                let modifier = if let Some((mut prefix, mut after)) = modifier_part.split_once('[')
+                let modifier = if let Some((mut prefix, mut after)) =
+                    modifier_part.split_once(ARBITRARY_SEPARATOR_START)
                 {
-                    prefix = prefix.strip_suffix('-').unwrap_or(prefix);
-                    after = after.strip_suffix(']')?;
+                    prefix = prefix.strip_suffix(MODIFIER_SEPARATOR).unwrap_or(prefix);
+                    after = after.strip_suffix(ARBITRARY_SEPARATOR_END)?;
 
-                    if let Some((maybe_hint, rest)) = after.split_once(':') {
+                    if let Some((maybe_hint, rest)) = after.split_once(HINT_SEPARATOR) {
                         if VALID_PLUGIN_HINT.contains(&maybe_hint) {
                             Modifier::Arbitrary {
                                 prefix,
@@ -327,7 +192,7 @@ impl<'a> Selector<'a> {
                         }
                     }
                 } else {
-                    Modifier::Basic {
+                    Modifier::Builtin {
                         is_negative,
                         value: modifier_part,
                     }
@@ -361,8 +226,8 @@ impl<'a> Selector<'a> {
             Some(Self {
                 order,
                 full,
-                variants,
                 modifier,
+                variants,
                 is_important,
                 plugin,
             })
@@ -371,7 +236,7 @@ impl<'a> Selector<'a> {
         }
     }
 
-    pub fn get_css_class(&self, custom_variants: &BTreeMap<Cow<str>, Variant>) -> String {
+    pub(crate) fn get_css_class(&self, custom_variants: &BTreeMap<Cow<str>, Variant>) -> String {
         let mut base_class = ".".to_string()
             + &self
                 .full
@@ -398,14 +263,12 @@ impl<'a> Selector<'a> {
                 .split(VARIANT_SEPARATOR)
                 .rev()
                 .for_each(|variant| {
-                    if let Some(variant) = BUILTIN_VARIANTS
+                    if let Some(Variant::WrapClass(template)) = BUILTIN_VARIANTS
                         .iter()
                         .find_map(|v| if v.0 == variant { Some(&v.1) } else { None })
                         .or_else(|| custom_variants.get(&Cow::from(variant)))
                     {
-                        if let Variant::WrapClass(template) = variant {
-                            base_class = template.replace('&', &base_class);
-                        }
+                        base_class = template.replace('&', &base_class);
                     }
                 });
         }

@@ -24,7 +24,7 @@ use rayon::prelude::*;
 struct Config {
     /// Specify which files should be scanned using globs.
     #[serde(default)]
-    input: Vec<std::path::PathBuf>,
+    input: Vec<PathBuf>,
 
     #[serde(flatten)]
     encre_config: EncreConfig,
@@ -283,12 +283,12 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, output: Opti
 }
 
 pub(crate) fn build<T: AsRef<Path>>(
-    config: Option<String>,
+    config: &Option<String>,
     extra_input: Option<T>,
     output: Option<String>,
     need_watch: bool,
 ) {
-    let config_file = if let Some(ref config_file) = config {
+    let config_file = if let Some(ref config_file) = *config {
         config_file
     } else {
         DEFAULT_CONFIG_FILE
