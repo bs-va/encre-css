@@ -113,19 +113,15 @@ encre-css = { git = "https://gitlab.com/encre-css/encre-css.git", tag = "v0.3.0"
 ```
 
 Generating styles takes three steps:
-- First, you need to _configure_ the main [`EncreGenerator`] structure
-either by manually making a [`Config`] structure and calling
-[`EncreGenerator::from_config`] or by reading a [TOML](https://toml.io) file using
-[`EncreGenerator::new`];
+- First, you need to _configure_ the main `EncreGenerator` structure
+either by manually making a `Config` structure and calling
+`EncreGenerator::from_config` or by reading a [TOML](https://toml.io) file using
+`EncreGenerator::new`;
 - Then, you need to _scan content_ to extract and collect all useful atomic classes using
-[`EncreGenerator::scan`] or [`EncreGenerator::add_selector`] to manually add **a
-single** previously scanned selector or [`EncreGenerator::add_selectors`] to manually add
+`EncreGenerator::scan` or `EncreGenerator::add_selector` to manually add **a
+single** previously scanned selector or `EncreGenerator::add_selectors` to manually add
 **several** previously scanned selectors;
-- Finally, you need to _generate the styles_ using [`EncreGenerator::generate`].
-
-Please note that the scanned content **must live as long as the [`EncreGenerator`] structure**,
-but because it is pretty cheap to make one (it just stores scanned atomic classes), it is
-recommended to make a new one each time you call [`EncreGenerator::generate`].
+- Finally, you need to _generate the styles_ using `EncreGenerator::generate`.
 
 ### Example
 
