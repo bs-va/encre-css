@@ -2,20 +2,20 @@
 //!
 //! ### Some vocabulary
 //!
-//! <p style="font-family: sans-serif;"><b><span class="macro">hover</span>:<span class="macro">xl</span>:<span class="struct">bg</span>-<span class="method">red-500</span></b></p>
+//! <p style="font-family: sans-serif; color: black;"><b><span style="padding: 0.1rem 0 0.1rem 0.2rem; background-color: hsl(45, 100%, 85%);">hover:xl</span><span style="padding: 0.1rem 0; background-image: linear-gradient(to right, hsl(45, 100%, 85%), hsl(180, 100%, 85%));">:</span><span style="padding: 0.1rem 0; background-color: hsl(180, 100%, 85%);">bg</span><span style="padding: 0.1rem 0; background-image: linear-gradient(to right, hsl(180, 100%, 85%), hsl(315, 100%, 85%));">-</span><span style="padding: 0.1rem 0.2rem 0.1rem 0; background-color: hsl(315, 100%, 85%);">red-500</span></b></p>
 //!
-//! 1. The <a href="../variant/index.html" style="text-decoration: underline; text-underline-offset: 2px;">
-//!    <span class="macro"><b>variants</b></span></a>
+//! 1. The <a href="../variant/index.html" style="text-decoration: underline; text-underline-offset: 2px; text-decoration-color: black;">
+//!    <span style="background-color: hsl(45, 100%, 85%); color: black; padding: 0 0.2rem;"><b>variants</b></span></a>
 //!    (used to add pseudo-selectors, pseudo-elements, pseudo classes, media queries), in this case
 //!    the class will be applied only on a screen larger than 1280px (see [`BUILTIN_SCREENS`]) and
 //!    if hovered;
-//! 2. The <span class="struct"><b>namespace</b></span> (basically the name of the plugin), in this case `bg` for changing the background;
-//! 3. The <a href="enum.Modifier.html" style="text-decoration: underline; text-underline-offset: 2px;"><span class="method"><b>modifier</b></span></a> (used to clarify the CSS needed to be generated), in this case the
+//! 2. The <span style="background-color: hsl(180, 100%, 85%); color: black; padding: 0 0.2rem;"><b>namespace</b></span> (basically the name of the plugin), in this case `bg` for changing the background;
+//! 3. The <a href="enum.Modifier.html" style="text-decoration: underline; text-underline-offset: 2px; text-decoration-color: black;"><span style="background-color: hsl(315, 100%, 85%); color: black; padding: 0 0.2rem;"><b>modifier</b></span></a> (used to clarify the CSS needed to be generated), in this case the
 //!       background color will become `rgb(239 68 68)` (see [`BUILTIN_COLORS`]).
 //!
-//! <p style="font-family: sans-serif;"><b><span class="struct">bg</span>-[<span class="trait">rgb(12_12_12)</span>]</b></p>
+//! <p style="font-family: sans-serif; color: black;"><b><span style="padding: 0.1rem 0 0.1rem 0.2rem; background-color: hsl(180, 100%, 85%);">bg</span><span style="padding: 0.1rem 0; background-image: linear-gradient(to right, hsl(180, 100%, 85%), hsl(135, 100%, 85%));">-</span><span style="padding: 0.1rem 0.2rem 0.1rem 0; background-color: hsl(135, 100%, 85%);">[rgb(12_12_12)]</span></b></p>
 //!
-//! 4. The <a href="enum.Modifier.html#variant.Arbitrary" style="text-decoration: underline; text-underline-offset: 2px;"><span class="trait"><b>arbitrary value</b></span></a>
+//! 4. The <a href="enum.Modifier.html#variant.Arbitrary" style="text-decoration: underline; text-underline-offset: 2px; text-decoration-color: black;"><span style="background-color: hsl(135, 100%, 85%); color: black; padding: 0 0.2rem;"><b>arbitrary value</b></span></a>
 //!    (used to specify a value not included in your design system), in this case the background
 //!    color will become `rgb(12 12 12)` (spaces need to be replaced with underscores in arbitrary
 //!    values).
