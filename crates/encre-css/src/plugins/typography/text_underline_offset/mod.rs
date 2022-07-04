@@ -1,9 +1,12 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    plugins::{to_css_value, Plugin},
     context::{ContextCanHandle, ContextHandle},
+    plugins::{to_css_value, Plugin},
     selector::Modifier,
-    utils::{indent, value_matchers::{is_matching_length, is_matching_percentage}},
+    utils::{
+        indent,
+        value_matchers::{is_matching_length, is_matching_percentage},
+    },
 };
 
 use std::fmt::{self, Write};
@@ -22,7 +25,10 @@ impl Plugin for PluginDefinition {
             Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "length"
                     || *hint == "percentage"
-                    || (hint.is_empty() && (*value == "auto" || is_matching_length(value) || is_matching_percentage(value)))
+                    || (hint.is_empty()
+                        && (*value == "auto"
+                            || is_matching_length(value)
+                            || is_matching_percentage(value)))
             }
         }
     }

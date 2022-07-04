@@ -1,7 +1,7 @@
 #![doc = include_str!("README.md")]
 use crate::{
+    context::{ContextBeforeRule, ContextCanHandle, ContextHandle},
     plugins::{to_css_value, Plugin},
-    context::{ContextCanHandle, ContextHandle, ContextBeforeRule},
     selector::Modifier,
     utils::{indent, value_matchers::is_matching_all},
 };

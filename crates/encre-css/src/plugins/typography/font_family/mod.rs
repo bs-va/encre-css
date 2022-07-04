@@ -1,12 +1,15 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    plugins::{to_css_value, Plugin},
     context::{ContextCanHandle, ContextHandle},
+    plugins::{to_css_value, Plugin},
     selector::Modifier,
     utils::indent,
 };
 
-use std::{borrow::Cow, fmt::{self, Write}};
+use std::{
+    borrow::Cow,
+    fmt::{self, Write},
+};
 
 #[derive(Debug)]
 pub(crate) struct PluginDefinition;
@@ -22,7 +25,8 @@ impl Plugin for PluginDefinition {
             Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "generic-name"
                     || *hint == "family-name"
-                    || (hint.is_empty() && value.split(',').all(|v| v[..1].parse::<usize>().is_err()))
+                    || (hint.is_empty()
+                        && value.split(',').all(|v| v[..1].parse::<usize>().is_err()))
             }
         }
     }

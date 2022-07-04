@@ -1,8 +1,8 @@
 #![doc = include_str!("README.md")]
 
 use crate::{
-    plugins::Plugin,
     context::{ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
     utils::indent,
 };

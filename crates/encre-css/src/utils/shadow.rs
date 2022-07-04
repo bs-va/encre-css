@@ -1,5 +1,5 @@
 //! Shadow parsing utility functions.
-use super::value_matchers::{is_matching_length, is_matching_color, is_matching_var};
+use super::value_matchers::{is_matching_color, is_matching_length, is_matching_var};
 
 use std::fmt;
 

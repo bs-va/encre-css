@@ -1,7 +1,7 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    plugins::{to_css_value, Plugin},
     context::{ContextCanHandle, ContextHandle},
+    plugins::{to_css_value, Plugin},
     selector::Modifier,
     utils::{indent, spacing, value_matchers::is_matching_length},
 };
@@ -15,10 +15,7 @@ fn scroll_padding_can_handle(context: &mut ContextCanHandle) -> bool {
     }
 }
 
-fn scroll_padding_handle(
-    css_properties: &[&str],
-    context: &mut ContextHandle,
-) -> fmt::Result {
+fn scroll_padding_handle(css_properties: &[&str], context: &mut ContextHandle) -> fmt::Result {
     match context.modifier {
         Modifier::Builtin { is_negative, value } => {
             for css_prop in css_properties {

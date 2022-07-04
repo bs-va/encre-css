@@ -1,12 +1,15 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    plugins::{to_css_value, Plugin},
     context::{ContextCanHandle, ContextHandle},
+    plugins::{to_css_value, Plugin},
     selector::Modifier,
     utils::{indent, spacing, value_matchers::is_matching_length},
 };
 
-use std::{borrow::Cow, fmt::{self, Write}};
+use std::{
+    borrow::Cow,
+    fmt::{self, Write},
+};
 
 #[derive(Debug)]
 pub(crate) struct PluginDefinition;

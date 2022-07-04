@@ -1,7 +1,7 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    plugins::{to_css_value, Plugin},
     context::{ContextCanHandle, ContextHandle},
+    plugins::{to_css_value, Plugin},
     selector::Modifier,
     utils::{indent, value_matchers::is_matching_length},
 };
@@ -23,7 +23,9 @@ impl Plugin for PluginDefinition {
                 *hint == "length"
                     || *hint == "number"
                     || *hint == "percentage"
-                    || (hint.is_empty() && (is_matching_length(value) || ["thin", "medium", "thick"].contains(value)))
+                    || (hint.is_empty()
+                        && (is_matching_length(value)
+                            || ["thin", "medium", "thick"].contains(value)))
             }
         }
     }

@@ -1,7 +1,7 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    plugins::{to_css_value, Plugin},
     context::{ContextCanHandle, ContextHandle},
+    plugins::{to_css_value, Plugin},
     selector::Modifier,
     utils::{indent, value_matchers::is_matching_all},
 };
@@ -35,7 +35,9 @@ impl Plugin for PluginDefinition {
                 "transform" => writeln!(context.buffer, "will-change: transfrom;")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => writeln!(context.buffer, "will-change: {};", to_css_value(value))?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(context.buffer, "will-change: {};", to_css_value(value))?
+            }
         }
 
         Ok(())

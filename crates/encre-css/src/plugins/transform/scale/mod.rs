@@ -1,10 +1,10 @@
 #![doc = include_str!("README.md")]
 use super::CSS_TRANSFORM;
 use crate::{
-    plugins::Plugin,
     context::{ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
-    utils::{indent, format_negative},
+    utils::{format_negative, indent},
 };
 
 use std::fmt::{self, Write};

@@ -1,12 +1,18 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    plugins::{to_css_value, Plugin},
     context::{ContextCanHandle, ContextHandle},
+    plugins::{to_css_value, Plugin},
     selector::Modifier,
-    utils::{indent, spacing, value_matchers::{is_matching_length, is_matching_percentage}},
+    utils::{
+        indent, spacing,
+        value_matchers::{is_matching_length, is_matching_percentage},
+    },
 };
 
-use std::{borrow::Cow, fmt::{self, Write}};
+use std::{
+    borrow::Cow,
+    fmt::{self, Write},
+};
 
 fn placement_can_handle(context: &mut ContextCanHandle) -> bool {
     match context.modifier {

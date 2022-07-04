@@ -1,9 +1,9 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    plugins::{to_css_value, Plugin},
     context::{ContextCanHandle, ContextHandle},
+    plugins::{to_css_value, Plugin},
     selector::Modifier,
-    utils::{indent, value_matchers::is_matching_shadow, shadow::ShadowList},
+    utils::{indent, shadow::ShadowList, value_matchers::is_matching_shadow},
 };
 
 use std::fmt::{self, Write};
