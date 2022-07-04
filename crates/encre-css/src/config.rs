@@ -535,6 +535,10 @@ pub const BUILTIN_VARIANTS: &[(&str, Variant)] = &[
         "placeholder",
         Variant::WrapClass(Cow::Borrowed("&::placeholder")),
     ),
+    (
+        "backdrop",
+        Variant::WrapClass(Cow::Borrowed("&::backdrop")),
+    ),
     ("backdrop", Variant::WrapClass(Cow::Borrowed("&::backdrop"))),
     ("before", Variant::WrapClass(Cow::Borrowed("&::before"))),
     ("after", Variant::WrapClass(Cow::Borrowed("&::after"))),
