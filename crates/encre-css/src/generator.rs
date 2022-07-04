@@ -80,7 +80,7 @@ impl<'a> EncreGenerator<'a> {
     pub fn add_selectors<T: IntoIterator<Item = &'a str>>(&mut self, val: T) {
         self.scanned_selectors.extend(
             val.into_iter()
-                .filter_map(|v| Selector::new(v, &self.config)),
+                .filter_map(|v| Selector::new(v.trim(), &self.config)),
         );
     }
 
