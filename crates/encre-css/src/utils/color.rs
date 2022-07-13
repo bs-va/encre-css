@@ -96,7 +96,7 @@ pub fn get<'a>(
                 #[allow(clippy::cast_precision_loss)]
                 (Some(opacity_number as f32 / 100.), new_modifier)
             } else {
-                (None, modifier)
+                (None, new_modifier)
             }
         } else {
             (None, modifier)

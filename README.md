@@ -100,7 +100,7 @@ system (if you have one):
 
 There is already a lot of utility-first frameworks like [Tailwind
 CSS](https://tailwindcss.com), [Windi CSS](https://windicss.org), [Twind](https://twind.dev)
-and [Uno CSS](https://uno.antfu.me), but `encre` is unique because it is written in Rust and
+and [Uno CSS](https://uno.antfu.me), but `encre-css` is unique because it is written in Rust and
 uses a new architecture, making it **the fastest utility-first framework**.
 
 ## Getting started
