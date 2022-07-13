@@ -1,7 +1,7 @@
 [package]
 name = "encre-css"
-version = "0.4.0"
-description = "A TailwindCSS-compatible CSS generation library written in Rust"
+version = "0.5.0"
+description = "A TailwindCSS-compatible utility-first CSS generation library written in Rust"
 authors = ["nifou <nifou@mailfence.com>"]
 license = "MIT"
 edition = "2021"
@@ -15,7 +15,6 @@ harness = false
 [dependencies]
 toml = "0.5.9"
 serde = { version = "1.0.137", features = ["derive"] }
-rayon = { version = "1.5.2", optional = true }
 thiserror = "1.0.31"
 
 [dev-dependencies]

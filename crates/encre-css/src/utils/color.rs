@@ -12,14 +12,14 @@ use std::borrow::Cow;
 ///
 /// ```rust
 /// use encre_css::utils::color::hex_to_rgb;
-/// assert_eq!(hex_to_rgb("#333").unwrap(), [51, 51, 51]);
-/// assert_eq!(hex_to_rgb("#f1f1f1").unwrap(), [241, 241, 241]);
+/// assert_eq!(hex_to_rgb("#333").unwrap(), (51, 51, 51));
+/// assert_eq!(hex_to_rgb("#f1f1f1").unwrap(), (241, 241, 241));
 /// ```
 ///
 /// # Errors
 ///
 /// Returns [`Error::HexToRgbConversion`] when the hexadecimal color is incorrect.
-pub fn hex_to_rgb(mut hex: &str) -> Result<[u8; 3]> {
+pub fn hex_to_rgb(mut hex: &str) -> Result<(u8, u8, u8)> {
     // Remove the useless `#` from the start of the color
     hex = hex.strip_prefix('#').unwrap_or(hex);
 
@@ -32,7 +32,7 @@ pub fn hex_to_rgb(mut hex: &str) -> Result<[u8; 3]> {
         let b = u8::from_str_radix(&hex[2..3], 16)
             .map_err(|e| Error::HexToRgbConversion(hex.to_string(), e.to_string()))?;
 
-        Ok([r + r * 16, g + g * 16, b + b * 16])
+        Ok((r + r * 16, g + g * 16, b + b * 16))
     } else if hex.len() == 6 {
         let hex = hex.to_lowercase();
 
@@ -43,7 +43,7 @@ pub fn hex_to_rgb(mut hex: &str) -> Result<[u8; 3]> {
         let b = u8::from_str_radix(&hex[4..6], 16)
             .map_err(|e| Error::HexToRgbConversion(hex, e.to_string()))?;
 
-        Ok([r, g, b])
+        Ok((r, g, b))
     } else {
         Err(Error::HexToRgbConversion(
             hex.to_string(),
@@ -108,11 +108,11 @@ pub fn get<'a>(
             opacity_from_syntax = Some(0.0);
         }
 
-        Some([0, 0, 0])
+        Some((0, 0, 0))
     } else if modifier == "black" {
-        Some([0, 0, 0])
+        Some((0, 0, 0))
     } else if modifier == "white" {
-        Some([0xff, 0xff, 0xff])
+        Some((0xff, 0xff, 0xff))
     } else if let Some(hex_color) = config.theme.colors.get(modifier) {
         // Custom theme values override builtin colors
         hex_to_rgb(hex_color).ok()
@@ -127,9 +127,9 @@ pub fn get<'a>(
     rgb_result.map(|rgb_result| {
         Cow::from(format!(
             "rgb({} {} {}{})",
-            rgb_result[0],
-            rgb_result[1],
-            rgb_result[2],
+            rgb_result.0,
+            rgb_result.1,
+            rgb_result.2,
             if let Some(opacity_from_syntax) = opacity_from_syntax {
                 Cow::from(format!(" / {}", opacity_from_syntax))
             } else if let Some(opacity) = opacity {
@@ -147,9 +147,9 @@ mod tests {
 
     #[test]
     fn hex_to_rgb_test() {
-        assert_eq!(hex_to_rgb(&Cow::from("#ff0000")).unwrap(), [255, 0, 0]);
-        assert_eq!(hex_to_rgb(&Cow::from("#FF00FF")).unwrap(), [255, 0, 255]);
-        assert_eq!(hex_to_rgb(&Cow::from("#332")).unwrap(), [51, 51, 34]);
-        assert_eq!(hex_to_rgb(&Cow::from("#FEF")).unwrap(), [255, 238, 255]);
+        assert_eq!(hex_to_rgb(&Cow::from("#ff0000")).unwrap(), (255, 0, 0));
+        assert_eq!(hex_to_rgb(&Cow::from("#FF00FF")).unwrap(), (255, 0, 255));
+        assert_eq!(hex_to_rgb(&Cow::from("#332")).unwrap(), (51, 51, 34));
+        assert_eq!(hex_to_rgb(&Cow::from("#FEF")).unwrap(), (255, 238, 255));
     }
 }

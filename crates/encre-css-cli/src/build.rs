@@ -4,7 +4,11 @@ use encre_css::{
     error::{Error, Result},
     Config as EncreConfig, EncreGenerator,
 };
-use notify::{watcher, DebouncedEvent::*, RecursiveMode, Watcher};
+use notify::{
+    watcher,
+    DebouncedEvent::{Create, Remove, Rename, Write},
+    RecursiveMode, Watcher,
+};
 use serde::Deserialize;
 use std::{
     fs,
@@ -89,7 +93,7 @@ fn scan_path<T: AsRef<Path>>(glob_path: T, buffer: &mut String) {
                         }
                     }
                     Err(e) => {
-                        eprintln!("Failed to open the file {:?}: {:?}", glob_path.as_ref(), e)
+                        eprintln!("Failed to open the file {:?}: {:?}", glob_path.as_ref(), e);
                     }
                 }
             }
@@ -121,7 +125,7 @@ fn build_single<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, outpu
     gen_css(&generator, output);
 }
 
-fn watch<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, output: Option<String>) {
+fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Option<String>) {
     let (tx, rx) = channel();
 
     let mut watcher = watcher(tx, Duration::from_millis(500)).unwrap();
@@ -148,7 +152,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, output: Opti
     {
         let mut generator = EncreGenerator::from_config(Arc::clone(&config));
 
-        if let Some(ref glob_path) = extra_input {
+        if let Some(ref glob_path) = *extra_input {
             scan_path(glob_path, &mut buffer);
         }
 
@@ -195,7 +199,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, output: Opti
                         }
                     });
 
-                    let extra_input_files = if let Some(ref extra_input) = extra_input {
+                    let extra_input_files = if let Some(ref extra_input) = *extra_input {
                         let (prefix, glob) = match Glob::new(
                             extra_input
                                 .as_ref()
@@ -233,14 +237,14 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, output: Opti
                             )
                         }))
                     {
-                        println!("Changes detected. Reloading…");
+                        println!("Changes detected. Reloading\u{2026}");
                         need_reloading = true;
                     } else if result_equal(
                         PathBuf::from(path).canonicalize(),
                         PathBuf::from(DEFAULT_CONFIG_FILE).canonicalize(),
                     ) {
                         // Handle configuration changes
-                        println!("Configuration file changed. Reloading…");
+                        println!("Configuration file changed. Reloading\u{2026}");
 
                         let (new_input, new_config) = {
                             let config = match Config::from_file(config_file) {
@@ -263,7 +267,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, output: Opti
                         let mut generator = EncreGenerator::from_config(Arc::clone(&config));
                         buffer.clear();
 
-                        if let Some(ref glob_path) = extra_input {
+                        if let Some(ref glob_path) = *extra_input {
                             scan_path(glob_path, &mut buffer);
                         }
 
@@ -277,7 +281,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, output: Opti
                     }
                 }
             }
-            Err(e) => println!("watch error: {:?}", e),
+            Err(e) => eprintln!("watch error: {:?}", e),
         }
     }
 }
@@ -295,7 +299,7 @@ pub(crate) fn build<T: AsRef<Path>>(
     };
 
     if need_watch {
-        watch(config_file, extra_input, output);
+        watch(config_file, &extra_input, &output);
     } else {
         build_single(config_file, extra_input, output);
     }

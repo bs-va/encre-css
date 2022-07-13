@@ -22,4 +22,8 @@ values from 0 to 360 are supported. They are however perfectly compatible with T
 Any [`<angle>`](crate::utils::value_matchers::is_matching_angle) property is allowed as arbitrary value.
 For example, `backdrop-hue-rotate-[1.5turn]`.
 
+### Negative values
+
+This plugin supports negative values. For example, `-backdrop-hue-rotate-90` or `hover:-backdrop-hue-rotate-90`.
+
 [Tailwind reference](https://tailwindcss.com/docs/backdrop-hue-rotate)

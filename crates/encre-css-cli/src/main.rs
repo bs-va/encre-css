@@ -25,15 +25,7 @@
     clippy::map_err_ignore,
     clippy::use_self,
     clippy::useless_let_if_seq,
-    clippy::verbose_file_reads,
-    clippy::unwrap_used,
-    clippy::expect_used,
-    clippy::indexing_slicing,
-    clippy::unwrap_in_result,
-    clippy::panic,
-    clippy::unreachable,
-    clippy::unimplemented,
-    clippy::todo,
+    clippy::indexing_slicing
 )]
 
 use clap::{Parser, Subcommand};
@@ -44,7 +36,7 @@ mod build;
 mod playground;
 
 use build::build;
-use playground::launch_playground;
+use playground::launch;
 
 pub const DEFAULT_CONFIG_FILE: &str = "encre.toml";
 
@@ -95,7 +87,7 @@ fn main() -> Result<(), Report> {
     let args = Cli::parse();
 
     match args.command {
-        Commands::Playground { name } => launch_playground(name),
+        Commands::Playground { name } => launch(name),
         Commands::Build {
             config,
             input: extra_input,

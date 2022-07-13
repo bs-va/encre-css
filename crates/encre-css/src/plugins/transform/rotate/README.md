@@ -22,4 +22,8 @@ numbers are supported. They are however perfectly compatible with Tailwind's val
 Any [`<angle>`](crate::utils::value_matchers::is_matching_angle) property is allowed as arbitrary value.
 For example, `rotate-[0.42turn]`.
 
+### Negative values
+
+This plugin supports negative values. For example, `-rotate-90` or `hover:-rotate-90`.
+
 [Tailwind reference](https://tailwindcss.com/docs/rotate)

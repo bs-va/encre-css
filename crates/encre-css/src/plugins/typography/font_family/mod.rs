@@ -1,15 +1,12 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
-    plugins::{to_css_value, Plugin},
+    generator::{ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
     utils::indent,
 };
 
-use std::{
-    borrow::Cow,
-    fmt::{self, Write},
-};
+use std::fmt::{self, Write};
 
 #[derive(Debug)]
 pub(crate) struct PluginDefinition;
@@ -31,7 +28,7 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
         match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
@@ -49,19 +46,9 @@ impl Plugin for PluginDefinition {
                 )?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => writeln!(
-                context.buffer,
-                "font-family: {};",
-                to_css_value(value)
-                    .split(',')
-                    .map(|v| if v.trim().contains(' ') {
-                        Cow::from(format!(r#""{}""#, v))
-                    } else {
-                        Cow::from(v)
-                    })
-                    .collect::<Vec<Cow<str>>>()
-                    .join(","),
-            )?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(context.buffer, "font-family: {value};")?;
+            }
         }
 
         Ok(())

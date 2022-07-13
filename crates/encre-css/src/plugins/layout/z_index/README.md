@@ -18,4 +18,8 @@ Utilities for controlling the stack order of an element.
 Z-Index values don't follow Tailwind's philosophy of restraining possible values and all
 spacing values are supported. They are however perfectly compatible with Tailwind's values.
 
+### Negative values
+
+This plugin supports negative values. For example, `-z-2` or `hover:-z-2`.
+
 [Tailwind reference](https://tailwindcss.com/docs/z-index)

@@ -1,7 +1,7 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
-    plugins::{to_css_value, Plugin},
+    generator::{generate_at_rules, generate_class, ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
     utils::{color, indent, value_matchers::is_matching_color},
 };
@@ -27,23 +27,37 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
-            Modifier::Builtin { value, .. } => {
-                let color = color::get(context.config, value, Some("--en-divide-opacity")).unwrap();
-                if color.contains("--en-divide-opacity") {
-                    writeln!(context.buffer, "--en-divide-opacity: 1;")?;
+    fn needs_wrapping(&self) -> bool {
+        false
+    }
+
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        generate_at_rules(context, |context| {
+            generate_class(
+                context,
+                |context| {
                     indent(context.indentation, context.buffer)?;
-                }
+                    match context.modifier {
+                        Modifier::Builtin { value, .. } => {
+                            let color =
+                                color::get(context.config, value, Some("--en-divide-opacity"))
+                                    .unwrap();
+                            if color.contains("--en-divide-opacity") {
+                                writeln!(context.buffer, "--en-divide-opacity: 1;")?;
+                                indent(context.indentation, context.buffer)?;
+                            }
 
-                writeln!(context.buffer, "border-color: {color};")?;
-            }
-            Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "border-color: {};", to_css_value(value))?;
-            }
-        }
+                            writeln!(context.buffer, "border-color: {color};")?;
+                        }
+                        Modifier::Arbitrary { value, .. } => {
+                            writeln!(context.buffer, "border-color: {value};")?;
+                        }
+                    }
 
-        Ok(())
+                    Ok(())
+                },
+                " > :not([hidden]) ~ :not([hidden])",
+            )
+        })
     }
 }

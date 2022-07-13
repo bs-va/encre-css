@@ -1,7 +1,7 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
-    plugins::{to_css_value, Plugin},
+    generator::{ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
     utils::{indent, value_matchers::is_matching_image},
 };
@@ -35,7 +35,7 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
         match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
@@ -75,7 +75,7 @@ impl Plugin for PluginDefinition {
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "background-image: {};", to_css_value(value))?;
+                writeln!(context.buffer, "background-image: {value};")?;
             }
         }
 

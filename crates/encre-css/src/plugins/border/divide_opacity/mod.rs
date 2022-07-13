@@ -1,6 +1,6 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
+    generator::{generate_at_rules, generate_class, ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
     utils::indent,
@@ -23,18 +23,30 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
-            #[allow(clippy::cast_precision_loss)]
-            Modifier::Builtin { value, .. } => writeln!(
-                context.buffer,
-                "--en-divide-opacity: {};",
-                value.parse::<usize>().unwrap() as f32 / 100.,
-            )?,
-            Modifier::Arbitrary { .. } => unreachable!(),
-        }
+    fn needs_wrapping(&self) -> bool {
+        false
+    }
 
-        Ok(())
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        generate_at_rules(context, |context| {
+            generate_class(
+                context,
+                |context| {
+                    indent(context.indentation, context.buffer)?;
+                    match context.modifier {
+                        #[allow(clippy::cast_precision_loss)]
+                        Modifier::Builtin { value, .. } => writeln!(
+                            context.buffer,
+                            "--en-divide-opacity: {};",
+                            value.parse::<usize>().unwrap() as f32 / 100.,
+                        )?,
+                        Modifier::Arbitrary { .. } => unreachable!(),
+                    }
+
+                    Ok(())
+                },
+                " > :not([hidden]) ~ :not([hidden])",
+            )
+        })
     }
 }

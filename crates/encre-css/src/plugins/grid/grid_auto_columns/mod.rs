@@ -1,7 +1,7 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
-    plugins::{to_css_value, Plugin},
+    generator::{ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
     utils::{indent, value_matchers::is_matching_all},
 };
@@ -23,7 +23,7 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
         match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
@@ -33,11 +33,9 @@ impl Plugin for PluginDefinition {
                 "fr" => writeln!(context.buffer, "grid-auto-columns: minmax(0, 1fr);")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => writeln!(
-                context.buffer,
-                "grid-auto-columns: {};",
-                to_css_value(value)
-            )?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(context.buffer, "grid-auto-columns: {value};")?;
+            }
         }
 
         Ok(())

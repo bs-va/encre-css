@@ -1,7 +1,7 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
-    plugins::{to_css_value, Plugin},
+    generator::{ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
     utils::{indent, spacing, value_matchers::is_matching_length},
 };
@@ -29,10 +29,9 @@ fn scroll_padding_handle(css_properties: &[&str], context: &mut ContextHandle) -
             }
         }
         Modifier::Arbitrary { value, .. } => {
-            let value = to_css_value(value);
             for css_prop in css_properties {
                 indent(context.indentation, context.buffer)?;
-                writeln!(context.buffer, "{}: {};", css_prop, value)?;
+                writeln!(context.buffer, "{css_prop}: {value};")?;
             }
         }
     }
@@ -52,8 +51,8 @@ impl Plugin for PluginDefinition {
         scroll_padding_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        scroll_padding_handle(&["scroll-padding"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        scroll_padding_handle(&["scroll-padding"], context)
     }
 }
 
@@ -69,11 +68,8 @@ impl Plugin for PluginXDefinition {
         scroll_padding_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        scroll_padding_handle(
-            &["scroll-padding-left", "scroll-padding-right"],
-            &mut context,
-        )
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        scroll_padding_handle(&["scroll-padding-left", "scroll-padding-right"], context)
     }
 }
 
@@ -89,11 +85,8 @@ impl Plugin for PluginYDefinition {
         scroll_padding_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        scroll_padding_handle(
-            &["scroll-padding-top", "scroll-padding-bottom"],
-            &mut context,
-        )
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        scroll_padding_handle(&["scroll-padding-top", "scroll-padding-bottom"], context)
     }
 }
 
@@ -109,8 +102,8 @@ impl Plugin for PluginLeftDefinition {
         scroll_padding_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        scroll_padding_handle(&["scroll-padding-left"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        scroll_padding_handle(&["scroll-padding-left"], context)
     }
 }
 
@@ -126,8 +119,8 @@ impl Plugin for PluginRightDefinition {
         scroll_padding_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        scroll_padding_handle(&["scroll-padding-right"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        scroll_padding_handle(&["scroll-padding-right"], context)
     }
 }
 
@@ -143,8 +136,8 @@ impl Plugin for PluginTopDefinition {
         scroll_padding_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        scroll_padding_handle(&["scroll-padding-top"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        scroll_padding_handle(&["scroll-padding-top"], context)
     }
 }
 
@@ -160,7 +153,7 @@ impl Plugin for PluginBottomDefinition {
         scroll_padding_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        scroll_padding_handle(&["scroll-padding-bottom"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        scroll_padding_handle(&["scroll-padding-bottom"], context)
     }
 }

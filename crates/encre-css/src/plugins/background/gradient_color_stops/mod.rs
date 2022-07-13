@@ -1,7 +1,7 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
-    plugins::{to_css_value, Plugin},
+    generator::{ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
     utils::{color, indent, value_matchers::is_matching_color},
 };
@@ -29,10 +29,10 @@ impl Plugin for PluginFromDefinition {
         }
     }
 
-    fn handle(&self, context: ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
         let value = match context.modifier {
             Modifier::Builtin { value, .. } => color::get(context.config, value, None).unwrap(),
-            Modifier::Arbitrary { value, .. } => to_css_value(*value),
+            Modifier::Arbitrary { value, .. } => value.clone(),
         };
 
         let default_to = if value == "inherit" || value == "currentColor" {
@@ -75,10 +75,10 @@ impl Plugin for PluginViaDefinition {
         }
     }
 
-    fn handle(&self, context: ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
         let value = match context.modifier {
             Modifier::Builtin { value, .. } => color::get(context.config, value, None).unwrap(),
-            Modifier::Arbitrary { value, .. } => to_css_value(*value),
+            Modifier::Arbitrary { value, .. } => value.clone(),
         };
 
         let default_to = if value == "inherit" || value == "currentColor" {
@@ -120,15 +120,17 @@ impl Plugin for PluginToDefinition {
         }
     }
 
-    fn handle(&self, context: ContextHandle) -> fmt::Result {
-        let value = match context.modifier {
-            Modifier::Builtin { value, .. } => color::get(context.config, value, None).unwrap(),
-            Modifier::Arbitrary { value, .. } => to_css_value(*value),
-        };
-
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
-        writeln!(context.buffer, "--en-gradient-to: {value};")?;
-
-        Ok(())
+        match context.modifier {
+            Modifier::Builtin { value, .. } => writeln!(
+                context.buffer,
+                "--en-gradient-to: {};",
+                color::get(context.config, value, None).unwrap()
+            ),
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(context.buffer, "--en-gradient-to: {value};")
+            }
+        }
     }
 }

@@ -1,7 +1,7 @@
 #![doc = include_str!("README.md")]
 use super::CSS_TRANSFORM;
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
+    generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
     utils::{format_negative, indent},
@@ -52,8 +52,8 @@ impl Plugin for PluginDefinition {
         scale_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        scale_handle(&["--en-scale-x", "--en-scale-y"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        scale_handle(&["--en-scale-x", "--en-scale-y"], context)
     }
 }
 
@@ -69,8 +69,8 @@ impl Plugin for PluginXDefinition {
         scale_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        scale_handle(&["--en-scale-x"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        scale_handle(&["--en-scale-x"], context)
     }
 }
 
@@ -86,7 +86,7 @@ impl Plugin for PluginYDefinition {
         scale_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        scale_handle(&["--en-scale-y"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        scale_handle(&["--en-scale-y"], context)
     }
 }

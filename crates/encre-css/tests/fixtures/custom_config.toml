@@ -1,3 +1,5 @@
+preflight = "none"
+
 [theme]
 dark_mode = { class = ".dark" }
 screens = { 3xl = "1600px", lg = "2000px" }

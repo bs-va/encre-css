@@ -29,4 +29,8 @@ spacing values are supported. They are however perfectly compatible with Tailwin
 Any [`<length>`](crate::utils::value_matchers::is_matching_length) property is allowed as arbitrary value.
 For example, `space-x-[1rem]`.
 
+### Negative values
+
+This plugin supports negative values. For example, `-space-x-2` or `hover:-space-x-2`.
+
 [Tailwind reference](https://tailwindcss.com/docs/space)

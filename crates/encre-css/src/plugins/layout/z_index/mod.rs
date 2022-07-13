@@ -1,9 +1,9 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
+    generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
+    utils::{format_negative, indent},
 };
 
 use std::fmt::{self, Write};
@@ -23,10 +23,14 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
         match context.modifier {
-            Modifier::Builtin { value, .. } => writeln!(context.buffer, "z-index: {value};")?,
+            Modifier::Builtin { is_negative, value } => writeln!(
+                context.buffer,
+                "z-index: {}{value};",
+                format_negative(is_negative)
+            )?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 

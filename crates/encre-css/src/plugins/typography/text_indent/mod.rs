@@ -1,7 +1,7 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
-    plugins::{to_css_value, Plugin},
+    generator::{ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
     utils::{indent, spacing, value_matchers::is_matching_length},
 };
@@ -23,7 +23,7 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
         match context.modifier {
             Modifier::Builtin { is_negative, value } => {
@@ -34,7 +34,7 @@ impl Plugin for PluginDefinition {
                 )?;
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "text-indent: {};", to_css_value(value))?;
+                writeln!(context.buffer, "text-indent: {value};")?;
             }
         }
 

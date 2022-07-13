@@ -1,8 +1,8 @@
 #![doc = include_str!("README.md")]
 use super::CSS_TRANSFORM;
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
-    plugins::{to_css_value, Plugin},
+    generator::{ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
     utils::{format_negative, indent, value_matchers::is_matching_angle},
 };
@@ -26,7 +26,7 @@ fn skew_handle(css_prop: &str, context: &mut ContextHandle) -> fmt::Result {
             format_negative(is_negative),
         )?,
         Modifier::Arbitrary { value, .. } => {
-            writeln!(context.buffer, "{}: {};", css_prop, to_css_value(value))?;
+            writeln!(context.buffer, "{css_prop}: {value};")?;
         }
     }
 
@@ -47,8 +47,8 @@ impl Plugin for PluginXDefinition {
         skew_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        skew_handle("--en-skew-x", &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        skew_handle("--en-skew-x", context)
     }
 }
 
@@ -64,7 +64,7 @@ impl Plugin for PluginYDefinition {
         skew_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        skew_handle("--en-skew-y", &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        skew_handle("--en-skew-y", context)
     }
 }

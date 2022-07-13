@@ -1,7 +1,7 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
-    plugins::{to_css_value, Plugin},
+    generator::{ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
     utils::{indent, value_matchers::is_matching_line_style},
 };
@@ -23,12 +23,15 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
 
-        let (Modifier::Builtin { value, .. } | Modifier::Arbitrary { value, .. }) =
-            context.modifier;
-        writeln!(context.buffer, "border-style: {};", to_css_value(value))?;
+        match context.modifier {
+            Modifier::Builtin { value, .. } => writeln!(context.buffer, "border-style: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(context.buffer, "border-style: {value};")?;
+            }
+        }
 
         Ok(())
     }

@@ -19,4 +19,8 @@ Utilities for scaling elements with transform.
 Scale values don't follow Tailwind's philosophy of restraining possible values and all
 numbers are supported. They are however perfectly compatible with Tailwind's values.
 
+### Negative values
+
+This plugin supports negative values. For example, `-scale-50` or `hover:-scale-50`.
+
 [Tailwind reference](https://tailwindcss.com/docs/scale)

@@ -1,7 +1,7 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
-    plugins::{to_css_value, Plugin},
+    generator::{ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
     utils::{indent, spacing, value_matchers::is_matching_length},
 };
@@ -25,7 +25,7 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
         match context.modifier {
             Modifier::Builtin { is_negative, value } => writeln!(
@@ -34,7 +34,7 @@ impl Plugin for PluginDefinition {
                 spacing::get(value, *is_negative).unwrap()
             )?,
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "gap: {};", to_css_value(value))?;
+                writeln!(context.buffer, "gap: {value};")?;
             }
         }
 
@@ -57,7 +57,7 @@ impl Plugin for PluginXDefinition {
         }
     }
 
-    fn handle(&self, context: ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
         match context.modifier {
             Modifier::Builtin { is_negative, value } => writeln!(
@@ -66,7 +66,7 @@ impl Plugin for PluginXDefinition {
                 spacing::get(value, *is_negative).unwrap()
             )?,
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "column-gap: {};", to_css_value(value))?;
+                writeln!(context.buffer, "column-gap: {value};")?;
             }
         }
 
@@ -89,7 +89,7 @@ impl Plugin for PluginYDefinition {
         }
     }
 
-    fn handle(&self, context: ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
         match context.modifier {
             Modifier::Builtin { is_negative, value } => writeln!(
@@ -98,7 +98,7 @@ impl Plugin for PluginYDefinition {
                 spacing::get(value, *is_negative).unwrap()
             )?,
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "row-gap: {};", to_css_value(value))?;
+                writeln!(context.buffer, "row-gap: {value};")?;
             }
         }
 

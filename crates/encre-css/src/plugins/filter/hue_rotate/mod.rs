@@ -1,8 +1,8 @@
 #![doc = include_str!("README.md")]
 use super::CSS_FILTER;
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
-    plugins::{to_css_value, Plugin},
+    generator::{ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
     utils::{format_negative, indent, value_matchers::is_matching_angle},
 };
@@ -24,7 +24,7 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
         match context.modifier {
             Modifier::Builtin { is_negative, value } => writeln!(
@@ -33,11 +33,9 @@ impl Plugin for PluginDefinition {
                 format_negative(is_negative),
                 value
             )?,
-            Modifier::Arbitrary { value, .. } => writeln!(
-                context.buffer,
-                "--en-hue-rotate: hue-rotate({});",
-                to_css_value(value)
-            )?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(context.buffer, "--en-hue-rotate: hue-rotate({value});")?;
+            }
         }
 
         indent(context.indentation, context.buffer)?;

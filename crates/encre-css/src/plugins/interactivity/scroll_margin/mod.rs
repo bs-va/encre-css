@@ -1,7 +1,7 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
-    plugins::{to_css_value, Plugin},
+    generator::{ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
     utils::{indent, spacing, value_matchers::is_matching_length},
 };
@@ -29,10 +29,9 @@ fn scroll_margin_handle(css_properties: &[&str], context: &mut ContextHandle) ->
             }
         }
         Modifier::Arbitrary { value, .. } => {
-            let value = to_css_value(value);
             for css_prop in css_properties {
                 indent(context.indentation, context.buffer)?;
-                writeln!(context.buffer, "{}: {};", css_prop, value)?;
+                writeln!(context.buffer, "{css_prop}: {value};")?;
             }
         }
     }
@@ -52,8 +51,8 @@ impl Plugin for PluginDefinition {
         scroll_margin_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        scroll_margin_handle(&["scroll-margin"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        scroll_margin_handle(&["scroll-margin"], context)
     }
 }
 
@@ -69,8 +68,8 @@ impl Plugin for PluginXDefinition {
         scroll_margin_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        scroll_margin_handle(&["scroll-margin-left", "scroll-margin-right"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        scroll_margin_handle(&["scroll-margin-left", "scroll-margin-right"], context)
     }
 }
 
@@ -86,8 +85,8 @@ impl Plugin for PluginYDefinition {
         scroll_margin_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        scroll_margin_handle(&["scroll-margin-top", "scroll-margin-bottom"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        scroll_margin_handle(&["scroll-margin-top", "scroll-margin-bottom"], context)
     }
 }
 
@@ -103,8 +102,8 @@ impl Plugin for PluginLeftDefinition {
         scroll_margin_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        scroll_margin_handle(&["scroll-margin-left"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        scroll_margin_handle(&["scroll-margin-left"], context)
     }
 }
 
@@ -120,8 +119,8 @@ impl Plugin for PluginRightDefinition {
         scroll_margin_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        scroll_margin_handle(&["scroll-margin-right"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        scroll_margin_handle(&["scroll-margin-right"], context)
     }
 }
 
@@ -137,8 +136,8 @@ impl Plugin for PluginTopDefinition {
         scroll_margin_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        scroll_margin_handle(&["scroll-margin-top"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        scroll_margin_handle(&["scroll-margin-top"], context)
     }
 }
 
@@ -154,7 +153,7 @@ impl Plugin for PluginBottomDefinition {
         scroll_margin_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        scroll_margin_handle(&["scroll-margin-bottom"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        scroll_margin_handle(&["scroll-margin-bottom"], context)
     }
 }

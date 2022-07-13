@@ -21,7 +21,7 @@ const DEFAULT_CONFIG_CONTENT: &str = r#"input = ["index.html"]"#;
 /// Launch a new playground environment:
 /// - Create a new directory
 /// - Create the `index.html` and `encre.toml` files in it and fill them with the default content
-pub fn launch_playground(name: Option<String>) {
+pub fn launch(name: Option<String>) {
     let name = name.unwrap_or_else(|| {
         format!(
             "playground-{}",

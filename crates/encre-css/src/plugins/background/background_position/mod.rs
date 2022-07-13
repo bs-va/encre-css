@@ -1,7 +1,7 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
-    plugins::{to_css_value, Plugin},
+    generator::{ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
     utils::{indent, value_matchers::is_matching_position},
 };
@@ -37,7 +37,7 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
         match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
@@ -52,11 +52,9 @@ impl Plugin for PluginDefinition {
                 "top" => writeln!(context.buffer, "background-position: top;")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => writeln!(
-                context.buffer,
-                "background-position: {};",
-                to_css_value(value)
-            )?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(context.buffer, "background-position: {value};")?;
+            }
         }
 
         Ok(())

@@ -1,7 +1,7 @@
 <div align="center">
   <img src=".assets/logo.svg" />
   <h1>encre-css</h1>
-  <p>A TailwindCSS-compatible CSS generation library written in Rust</p>
+  <p>A TailwindCSS-compatible utility-first CSS generation library written in Rust</p>
 
   <a href="https://gitlab.com/encre-css/encre-css/blob/main/LICENSE">
     <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-success" />
@@ -145,10 +145,6 @@ assert!(generator.generate().expect("failed to generate the CSS").contains(r#"
   background-color: rgb(254 202 202 / var(--en-bg-opacity));
 }"#));
 ```
-
-## Cargo features
-
-- `rayon`: enables [rayon](https://docs.rs/rayon/latest/rayon) parallel iterators
 
 ## Command line interface
 

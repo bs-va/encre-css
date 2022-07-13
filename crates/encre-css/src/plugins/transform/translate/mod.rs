@@ -1,10 +1,13 @@
 #![doc = include_str!("README.md")]
 use super::CSS_TRANSFORM;
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
-    plugins::{to_css_value, Plugin},
+    generator::{ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
-    utils::{indent, spacing, value_matchers::is_matching_length},
+    utils::{
+        indent, spacing,
+        value_matchers::{is_matching_length, is_matching_percentage},
+    },
 };
 
 use std::{
@@ -17,7 +20,9 @@ fn translate_can_handle(context: &mut ContextCanHandle) -> bool {
         Modifier::Builtin { value, .. } => {
             spacing::is_matching_builtin_spacing(value) || *value == "auto" || *value == "full"
         }
-        Modifier::Arbitrary { value, .. } => is_matching_length(value),
+        Modifier::Arbitrary { value, .. } => {
+            is_matching_length(value) || is_matching_percentage(value)
+        }
     }
 }
 
@@ -37,7 +42,7 @@ fn translate_handle(css_prop: &str, context: &mut ContextHandle) -> fmt::Result 
             },
         )?,
         Modifier::Arbitrary { value, .. } => {
-            writeln!(context.buffer, "{}: {};", css_prop, to_css_value(value))?;
+            writeln!(context.buffer, "{css_prop}: {value};")?;
         }
     }
 
@@ -58,8 +63,8 @@ impl Plugin for PluginXDefinition {
         translate_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        translate_handle("--en-translate-x", &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        translate_handle("--en-translate-x", context)
     }
 }
 
@@ -75,7 +80,7 @@ impl Plugin for PluginYDefinition {
         translate_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        translate_handle("--en-translate-y", &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        translate_handle("--en-translate-y", context)
     }
 }

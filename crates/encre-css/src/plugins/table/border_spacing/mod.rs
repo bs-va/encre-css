@@ -1,7 +1,7 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
-    plugins::{to_css_value, Plugin},
+    generator::{ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
     utils::{indent, spacing, value_matchers::is_matching_length},
 };
@@ -31,7 +31,7 @@ fn border_spacing_handle(css_props: &[&str], context: &mut ContextHandle) -> fmt
         Modifier::Arbitrary { value, .. } => {
             for css_prop in css_props {
                 indent(context.indentation, context.buffer)?;
-                writeln!(context.buffer, "{}: {};", css_prop, to_css_value(value))?;
+                writeln!(context.buffer, "{css_prop}: {value}")?;
             }
         }
     }
@@ -56,11 +56,8 @@ impl Plugin for PluginDefinition {
         border_spacing_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        border_spacing_handle(
-            &["--en-border-spacing-x", "--en-border-spacing-y"],
-            &mut context,
-        )
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        border_spacing_handle(&["--en-border-spacing-x", "--en-border-spacing-y"], context)
     }
 }
 
@@ -76,8 +73,8 @@ impl Plugin for PluginXDefinition {
         border_spacing_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        border_spacing_handle(&["--en-border-spacing-x"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        border_spacing_handle(&["--en-border-spacing-x"], context)
     }
 }
 
@@ -93,7 +90,7 @@ impl Plugin for PluginYDefinition {
         border_spacing_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        border_spacing_handle(&["--en-border-spacing-y"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        border_spacing_handle(&["--en-border-spacing-y"], context)
     }
 }

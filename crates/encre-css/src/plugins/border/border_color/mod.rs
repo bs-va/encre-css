@@ -1,7 +1,7 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
-    plugins::{to_css_value, Plugin},
+    generator::{ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
     utils::{color, indent, value_matchers::is_matching_color},
 };
@@ -32,8 +32,6 @@ fn color_handle(css_props: &[&str], context: &mut ContextHandle) -> fmt::Result 
             }
         }
         Modifier::Arbitrary { value, .. } => {
-            let value = to_css_value(value);
-
             for css_prop in css_props {
                 writeln!(context.buffer, "{css_prop}: {value};")?;
             }
@@ -68,8 +66,8 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        color_handle(&["border-color"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        color_handle(&["border-color"], context)
     }
 }
 
@@ -85,8 +83,8 @@ impl Plugin for PluginXDefinition {
         color_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        color_handle(&["border-left-color", "border-right-color"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        color_handle(&["border-left-color", "border-right-color"], context)
     }
 }
 
@@ -102,8 +100,8 @@ impl Plugin for PluginYDefinition {
         color_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        color_handle(&["border-top-color", "border-bottom-color"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        color_handle(&["border-top-color", "border-bottom-color"], context)
     }
 }
 
@@ -119,8 +117,8 @@ impl Plugin for PluginLeftDefinition {
         color_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        color_handle(&["border-left-color"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        color_handle(&["border-left-color"], context)
     }
 }
 
@@ -136,8 +134,8 @@ impl Plugin for PluginRightDefinition {
         color_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        color_handle(&["border-right-color"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        color_handle(&["border-right-color"], context)
     }
 }
 
@@ -153,8 +151,8 @@ impl Plugin for PluginTopDefinition {
         color_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        color_handle(&["border-top-color"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        color_handle(&["border-top-color"], context)
     }
 }
 
@@ -170,7 +168,7 @@ impl Plugin for PluginBottomDefinition {
         color_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        color_handle(&["border-bottom-color"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        color_handle(&["border-bottom-color"], context)
     }
 }

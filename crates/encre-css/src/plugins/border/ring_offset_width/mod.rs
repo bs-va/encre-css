@@ -1,7 +1,7 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
-    plugins::{to_css_value, Plugin},
+    generator::{ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
     utils::{indent, value_matchers::is_matching_length},
 };
@@ -25,7 +25,7 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
         writeln!(context.buffer, "--en-ring-offset-shadow: var(--en-ring-inset) 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color);")?;
         indent(context.indentation, context.buffer)?;
@@ -33,11 +33,9 @@ impl Plugin for PluginDefinition {
             Modifier::Builtin { value, .. } => {
                 writeln!(context.buffer, "--en-ring-offset-width: {value}px;")?;
             }
-            Modifier::Arbitrary { value, .. } => writeln!(
-                context.buffer,
-                "--en-ring-offset-width: {};",
-                to_css_value(value)
-            )?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(context.buffer, "--en-ring-offset-width: {value};",)?;
+            }
         }
 
         Ok(())

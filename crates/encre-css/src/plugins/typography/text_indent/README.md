@@ -24,4 +24,8 @@ are supported. They are however perfectly compatible with Tailwind's values.
 Any [`<length>`](crate::utils::value_matchers::is_matching_length) property is allowed as arbitrary value.
 For example, `indent-[1.2rem]`.
 
+### Negative values
+
+This plugin supports negative values. For example, `-indent-2` or `hover:-indent-2`.
+
 [Tailwind reference](https://tailwindcss.com/docs/text-indent)

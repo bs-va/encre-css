@@ -21,6 +21,6 @@ are supported. They are however perfectly compatible with Tailwind's values.
 ### Arbitrary values
 
 Any property is allowed as arbitrary value.
-For example, `grid-cols-[100px 1fr]`.
+For example, `grid-cols-[100px_1fr]`.
 
 [Tailwind reference](https://tailwindcss.com/docs/template-columns)

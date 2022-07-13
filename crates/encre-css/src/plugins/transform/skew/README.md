@@ -23,4 +23,8 @@ numbers from 0 to 360 are supported. They are however perfectly compatible with 
 Any [`<angle>`](crate::utils::value_matchers::is_matching_angle) property is allowed as arbitrary value.
 For example, `skew-x-[-0.312rad]`.
 
+### Negative values
+
+This plugin supports negative values. For example, `-skew-x-2` or `hover:-skew-x-2`.
+
 [Tailwind reference](https://tailwindcss.com/docs/skew)

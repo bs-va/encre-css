@@ -1,7 +1,7 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
-    plugins::{to_css_value, Plugin},
+    generator::{ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
     utils::{
         indent, spacing,
@@ -45,10 +45,9 @@ fn placement_handle(css_properties: &[&str], context: &mut ContextHandle) -> fmt
             }
         }
         Modifier::Arbitrary { value, .. } => {
-            let value = to_css_value(value);
             for css_prop in css_properties {
                 indent(context.indentation, context.buffer)?;
-                writeln!(context.buffer, "{}: {};", css_prop, value)?;
+                writeln!(context.buffer, "{css_prop}: {value};")?;
             }
         }
     }
@@ -78,8 +77,8 @@ impl Plugin for PluginInsetDefinition {
         }
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        placement_handle(&["top", "bottom", "left", "right"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        placement_handle(&["top", "bottom", "left", "right"], context)
     }
 }
 
@@ -95,8 +94,8 @@ impl Plugin for PluginInsetXDefinition {
         placement_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        placement_handle(&["left", "right"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        placement_handle(&["left", "right"], context)
     }
 }
 
@@ -112,8 +111,8 @@ impl Plugin for PluginInsetYDefinition {
         placement_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        placement_handle(&["top", "bottom"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        placement_handle(&["top", "bottom"], context)
     }
 }
 
@@ -129,8 +128,8 @@ impl Plugin for PluginTopDefinition {
         placement_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        placement_handle(&["top"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        placement_handle(&["top"], context)
     }
 }
 
@@ -146,8 +145,8 @@ impl Plugin for PluginBottomDefinition {
         placement_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        placement_handle(&["bottom"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        placement_handle(&["bottom"], context)
     }
 }
 
@@ -163,8 +162,8 @@ impl Plugin for PluginLeftDefinition {
         placement_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        placement_handle(&["left"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        placement_handle(&["left"], context)
     }
 }
 
@@ -180,7 +179,7 @@ impl Plugin for PluginRightDefinition {
         placement_can_handle(&mut context)
     }
 
-    fn handle(&self, mut context: ContextHandle) -> fmt::Result {
-        placement_handle(&["right"], &mut context)
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        placement_handle(&["right"], context)
     }
 }

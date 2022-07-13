@@ -1,6 +1,6 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
+    generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
     utils::indent,
@@ -23,13 +23,13 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
         match context.modifier {
             #[allow(clippy::cast_precision_loss)]
             Modifier::Builtin { value, .. } => match *value {
                 "" => writeln!(context.buffer, "flex-grow: 1;")?,
-                _ => writeln!(context.buffer, "flex-grow: {};", value)?,
+                _ => writeln!(context.buffer, "flex-grow: {value};")?,
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }

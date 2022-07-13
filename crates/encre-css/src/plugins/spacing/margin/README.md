@@ -49,4 +49,8 @@ spacing values are supported. They are however perfectly compatible with Tailwin
 Any [`<length>`](crate::utils::value_matchers::is_matching_length) property is allowed as arbitrary value.
 For example, `mt-[5vw]`.
 
+### Negative values
+
+This plugin supports negative values. For example, `-mt-2` or `hover:-mt-2`.
+
 [Tailwind reference](https://tailwindcss.com/docs/margin)

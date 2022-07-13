@@ -1,7 +1,8 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    context::{ContextBeforeRule, ContextCanHandle, ContextHandle},
-    plugins::{to_css_value, Plugin},
+    generator::generate_wrapper,
+    generator::{ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
     utils::{indent, value_matchers::is_matching_all},
 };
@@ -26,10 +27,25 @@ impl Plugin for PluginDefinition {
         "animate"
     }
 
-    fn css_before_rule(&self, context: ContextBeforeRule) -> fmt::Result {
-        match context.selector.modifier {
+    fn needs_wrapping(&self) -> bool {
+        false
+    }
+
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
             Modifier::Builtin { value, .. } => {
-                match value {
+                ["spin", "ping", "pulse", "bounce", "none"].contains(value)
+            }
+            Modifier::Arbitrary { value, .. } => is_matching_all(value),
+        }
+    }
+
+    #[allow(clippy::too_many_lines)]
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+        match context.modifier {
+            Modifier::Builtin { value, .. } => {
+                let animation = match *value {
+                    "none" => "none",
                     "spin" => {
                         if !ANIMATIONS_ALREADY_DEFINED[0].swap(true, Ordering::Relaxed) {
                             writeln!(
@@ -50,6 +66,8 @@ impl Plugin for PluginDefinition {
 }}\n"
                             )?;
                         }
+
+                        "spin 1s linear infinite"
                     }
                     "ping" => {
                         if !ANIMATIONS_ALREADY_DEFINED[1].swap(true, Ordering::Relaxed) {
@@ -70,6 +88,8 @@ impl Plugin for PluginDefinition {
 }}\n"
                             )?;
                         }
+
+                        "ping 1s cubic-bezier(0, 0, 0.2, 1) infinite"
                     }
                     "pulse" => {
                         if !ANIMATIONS_ALREADY_DEFINED[2].swap(true, Ordering::Relaxed) {
@@ -91,6 +111,8 @@ impl Plugin for PluginDefinition {
 }}\n"
                             )?;
                         }
+
+                        "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite"
                     }
                     "bounce" => {
                         if !ANIMATIONS_ALREADY_DEFINED[3].swap(true, Ordering::Relaxed) {
@@ -124,51 +146,25 @@ impl Plugin for PluginDefinition {
 }}\n"
                             )?;
                         }
+
+                        "bounce 1s infinite"
                     }
                     _ => unreachable!(),
                 };
-            }
-            Modifier::Arbitrary { .. } => (),
-        }
 
-        Ok(())
-    }
-
-    fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => {
-                ["spin", "ping", "pulse", "bounce", "none"].contains(value)
-            }
-            Modifier::Arbitrary { value, .. } => is_matching_all(value),
-        }
-    }
-
-    fn handle(&self, context: ContextHandle) -> fmt::Result {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => {
-                let animation = match *value {
-                    "none" => "none",
-                    "spin" => "spin 1s linear infinite",
-                    "ping" => "ping 1s cubic-bezier(0, 0, 0.2, 1) infinite",
-                    "pulse" => "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-                    "bounce" => "bounce 1s infinite",
-                    _ => unreachable!(),
-                };
-
-                indent(context.indentation, context.buffer)?;
-                writeln!(context.buffer, "-webkit-animation: {animation};")?;
-                indent(context.indentation, context.buffer)?;
-                writeln!(context.buffer, "animation: {animation};")?;
+                generate_wrapper(context, |context| {
+                    indent(context.indentation, context.buffer)?;
+                    writeln!(context.buffer, "-webkit-animation: {animation};")?;
+                    indent(context.indentation, context.buffer)?;
+                    writeln!(context.buffer, "animation: {animation};")
+                })
             }
             Modifier::Arbitrary { value, .. } => {
-                let value = to_css_value(value);
                 indent(context.indentation, context.buffer)?;
                 writeln!(context.buffer, "-webkit-animation: {value};")?;
                 indent(context.indentation, context.buffer)?;
-                writeln!(context.buffer, "animation: {value};")?;
+                writeln!(context.buffer, "animation: {value};")
             }
         }
-
-        Ok(())
     }
 }

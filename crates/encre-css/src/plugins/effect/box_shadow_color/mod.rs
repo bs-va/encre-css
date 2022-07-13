@@ -1,7 +1,7 @@
 #![doc = include_str!("README.md")]
 use crate::{
-    context::{ContextCanHandle, ContextHandle},
-    plugins::{to_css_value, Plugin},
+    generator::{ContextCanHandle, ContextHandle},
+    plugins::Plugin,
     selector::Modifier,
     utils::{color, indent, value_matchers::is_matching_color},
 };
@@ -27,13 +27,18 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
-        let value = match context.modifier {
-            Modifier::Builtin { value, .. } => color::get(context.config, value, None).unwrap(),
-            Modifier::Arbitrary { value, .. } => to_css_value(*value),
-        };
-        writeln!(context.buffer, "--en-shadow-color: {value};")?;
+        match context.modifier {
+            Modifier::Builtin { value, .. } => writeln!(
+                context.buffer,
+                "--en-shadow-color: {};",
+                color::get(context.config, value, None).unwrap()
+            )?,
+            Modifier::Arbitrary { value, .. } => {
+                writeln!(context.buffer, "--en-shadow-color: {value};")?;
+            }
+        }
 
         indent(context.indentation, context.buffer)?;
         writeln!(context.buffer, "--en-shadow: var(--en-shadow-colored);")?;

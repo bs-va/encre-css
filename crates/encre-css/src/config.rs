@@ -1,4 +1,5 @@
-//! Define the [`Config`] structure used to configure an [`EncreGenerator`] using a [Tailwind-like configuration](https://tailwindcss.com/docs/configuration).
+//! Define the [`Config`] structure used to configure an [`EncreGenerator`] using a
+//! [Tailwind-like configuration](https://tailwindcss.com/docs/configuration).
 //!
 //! # Example
 //!
@@ -23,8 +24,7 @@
 //! let mut generator = EncreGenerator::from_config(config);
 //! generator.add_selector("tablet:dark:bg-primary");
 //!
-//! assert!(generator.generate().expect("failed to generate the CSS").contains(r#"
-//! @media (min-width: 640px) {
+//! assert!(generator.generate().expect("failed to generate the CSS").contains(r#"@media (min-width: 640px) {
 //!   .dark .tablet\:dark\:bg-primary {
 //!     --en-bg-opacity: 1;
 //!     background-color: rgb(211 25 140 / var(--en-bg-opacity));
@@ -35,8 +35,9 @@
 //! [`EncreGenerator`]: crate::EncreGenerator
 use crate::{
     error::{Error, Result},
-    extractor::Extractor,
-    variant::Variant,
+    preflight::Preflight,
+    scanner::Scanner,
+    variant::VariantType,
 };
 
 #[allow(clippy::wildcard_imports)]
@@ -280,227 +281,227 @@ use std::{borrow::Cow, collections::BTreeMap, fmt, fs, path::Path};
 /// </table>
 ///
 /// Based on [Tailwind's default color palette](https://tailwindcss.com/docs/customizing-colors).
-pub const BUILTIN_COLORS: &[(&str, [u8; 3])] = &[
-    ("slate-50", [248, 250, 252]),
-    ("slate-100", [241, 245, 249]),
-    ("slate-200", [226, 232, 240]),
-    ("slate-300", [203, 213, 225]),
-    ("slate-400", [148, 163, 184]),
-    ("slate-500", [100, 116, 139]),
-    ("slate-600", [71, 85, 105]),
-    ("slate-700", [51, 65, 85]),
-    ("slate-800", [30, 41, 59]),
-    ("slate-900", [15, 23, 42]),
-    ("gray-50", [249, 250, 251]),
-    ("gray-100", [243, 244, 246]),
-    ("gray-200", [229, 231, 235]),
-    ("gray-300", [209, 213, 219]),
-    ("gray-400", [156, 163, 175]),
-    ("gray-500", [107, 114, 128]),
-    ("gray-600", [75, 85, 99]),
-    ("gray-700", [55, 65, 81]),
-    ("gray-800", [31, 41, 55]),
-    ("gray-900", [17, 24, 39]),
-    ("zinc-50", [250, 250, 250]),
-    ("zinc-100", [244, 244, 245]),
-    ("zinc-200", [228, 228, 231]),
-    ("zinc-300", [212, 212, 216]),
-    ("zinc-400", [161, 161, 170]),
-    ("zinc-500", [113, 113, 122]),
-    ("zinc-600", [82, 82, 91]),
-    ("zinc-700", [63, 63, 70]),
-    ("zinc-800", [39, 39, 42]),
-    ("zinc-900", [24, 24, 27]),
-    ("neutral-50", [250, 250, 250]),
-    ("neutral-100", [245, 245, 245]),
-    ("neutral-200", [229, 229, 229]),
-    ("neutral-300", [212, 212, 212]),
-    ("neutral-400", [163, 163, 163]),
-    ("neutral-500", [115, 115, 115]),
-    ("neutral-600", [82, 82, 82]),
-    ("neutral-700", [64, 64, 64]),
-    ("neutral-800", [38, 38, 38]),
-    ("neutral-900", [23, 23, 23]),
-    ("stone-50", [250, 250, 249]),
-    ("stone-100", [245, 245, 244]),
-    ("stone-200", [231, 229, 228]),
-    ("stone-300", [214, 211, 209]),
-    ("stone-400", [168, 162, 158]),
-    ("stone-500", [120, 113, 108]),
-    ("stone-600", [87, 83, 78]),
-    ("stone-700", [68, 64, 60]),
-    ("stone-800", [41, 37, 36]),
-    ("stone-900", [28, 25, 23]),
-    ("red-50", [254, 242, 242]),
-    ("red-100", [254, 226, 226]),
-    ("red-200", [254, 202, 202]),
-    ("red-300", [252, 165, 165]),
-    ("red-400", [248, 113, 113]),
-    ("red-500", [239, 68, 68]),
-    ("red-600", [220, 38, 38]),
-    ("red-700", [185, 28, 28]),
-    ("red-800", [153, 27, 27]),
-    ("red-900", [127, 29, 29]),
-    ("orange-50", [255, 247, 237]),
-    ("orange-100", [255, 237, 213]),
-    ("orange-200", [254, 215, 170]),
-    ("orange-300", [253, 186, 116]),
-    ("orange-400", [251, 146, 60]),
-    ("orange-500", [249, 115, 22]),
-    ("orange-600", [234, 88, 12]),
-    ("orange-700", [194, 65, 12]),
-    ("orange-800", [154, 52, 18]),
-    ("orange-900", [124, 45, 18]),
-    ("amber-50", [255, 251, 235]),
-    ("amber-100", [254, 243, 199]),
-    ("amber-200", [253, 230, 138]),
-    ("amber-300", [252, 211, 77]),
-    ("amber-400", [251, 191, 36]),
-    ("amber-500", [245, 158, 11]),
-    ("amber-600", [217, 119, 6]),
-    ("amber-700", [180, 83, 9]),
-    ("amber-800", [146, 64, 14]),
-    ("amber-900", [120, 53, 15]),
-    ("yellow-50", [254, 252, 232]),
-    ("yellow-100", [254, 249, 195]),
-    ("yellow-200", [254, 240, 138]),
-    ("yellow-300", [253, 224, 71]),
-    ("yellow-400", [250, 204, 21]),
-    ("yellow-500", [234, 179, 8]),
-    ("yellow-600", [202, 138, 4]),
-    ("yellow-700", [161, 98, 7]),
-    ("yellow-800", [133, 77, 14]),
-    ("yellow-900", [113, 63, 18]),
-    ("lime-50", [247, 254, 231]),
-    ("lime-100", [236, 252, 203]),
-    ("lime-200", [217, 249, 157]),
-    ("lime-300", [190, 242, 100]),
-    ("lime-400", [163, 230, 53]),
-    ("lime-500", [132, 204, 22]),
-    ("lime-600", [101, 163, 13]),
-    ("lime-700", [77, 124, 15]),
-    ("lime-800", [63, 98, 18]),
-    ("lime-900", [54, 83, 20]),
-    ("green-50", [240, 253, 244]),
-    ("green-100", [220, 252, 231]),
-    ("green-200", [187, 247, 208]),
-    ("green-300", [134, 239, 172]),
-    ("green-400", [74, 222, 128]),
-    ("green-500", [34, 197, 94]),
-    ("green-600", [22, 163, 74]),
-    ("green-700", [21, 128, 61]),
-    ("green-800", [22, 101, 52]),
-    ("green-900", [20, 83, 45]),
-    ("emerald-50", [236, 253, 245]),
-    ("emerald-100", [209, 250, 229]),
-    ("emerald-200", [167, 243, 208]),
-    ("emerald-300", [110, 231, 183]),
-    ("emerald-400", [52, 211, 153]),
-    ("emerald-500", [16, 185, 129]),
-    ("emerald-600", [5, 150, 105]),
-    ("emerald-700", [4, 120, 87]),
-    ("emerald-800", [6, 95, 70]),
-    ("emerald-900", [6, 78, 59]),
-    ("teal-50", [240, 253, 250]),
-    ("teal-100", [204, 251, 241]),
-    ("teal-200", [153, 246, 228]),
-    ("teal-300", [94, 234, 212]),
-    ("teal-400", [45, 212, 191]),
-    ("teal-500", [20, 184, 166]),
-    ("teal-600", [13, 148, 136]),
-    ("teal-700", [15, 118, 110]),
-    ("teal-800", [17, 94, 89]),
-    ("teal-900", [19, 78, 74]),
-    ("cyan-50", [236, 254, 255]),
-    ("cyan-100", [207, 250, 254]),
-    ("cyan-200", [165, 243, 252]),
-    ("cyan-300", [103, 232, 249]),
-    ("cyan-400", [34, 211, 238]),
-    ("cyan-500", [6, 182, 212]),
-    ("cyan-600", [8, 145, 178]),
-    ("cyan-700", [14, 116, 144]),
-    ("cyan-800", [21, 94, 117]),
-    ("cyan-900", [22, 78, 99]),
-    ("sky-50", [240, 249, 255]),
-    ("sky-100", [224, 242, 254]),
-    ("sky-200", [186, 230, 253]),
-    ("sky-300", [125, 211, 252]),
-    ("sky-400", [56, 189, 248]),
-    ("sky-500", [14, 165, 233]),
-    ("sky-600", [2, 132, 199]),
-    ("sky-700", [3, 105, 161]),
-    ("sky-800", [7, 89, 133]),
-    ("sky-900", [12, 74, 110]),
-    ("blue-50", [239, 246, 255]),
-    ("blue-100", [219, 234, 254]),
-    ("blue-200", [191, 219, 254]),
-    ("blue-300", [147, 197, 253]),
-    ("blue-400", [96, 165, 250]),
-    ("blue-500", [59, 130, 246]),
-    ("blue-600", [37, 99, 235]),
-    ("blue-700", [29, 78, 216]),
-    ("blue-800", [30, 64, 175]),
-    ("blue-900", [30, 58, 138]),
-    ("indigo-50", [238, 242, 255]),
-    ("indigo-100", [224, 231, 255]),
-    ("indigo-200", [199, 210, 254]),
-    ("indigo-300", [165, 180, 252]),
-    ("indigo-400", [129, 140, 248]),
-    ("indigo-500", [99, 102, 241]),
-    ("indigo-600", [79, 70, 229]),
-    ("indigo-700", [67, 56, 202]),
-    ("indigo-800", [55, 48, 163]),
-    ("indigo-900", [49, 46, 129]),
-    ("violet-50", [245, 243, 255]),
-    ("violet-100", [237, 233, 254]),
-    ("violet-200", [221, 214, 254]),
-    ("violet-300", [196, 181, 253]),
-    ("violet-400", [167, 139, 250]),
-    ("violet-500", [139, 92, 246]),
-    ("violet-600", [124, 58, 237]),
-    ("violet-700", [109, 40, 217]),
-    ("violet-800", [91, 33, 182]),
-    ("violet-900", [76, 29, 149]),
-    ("purple-50", [250, 245, 255]),
-    ("purple-100", [243, 232, 255]),
-    ("purple-200", [233, 213, 255]),
-    ("purple-300", [216, 180, 254]),
-    ("purple-400", [192, 132, 252]),
-    ("purple-500", [168, 85, 247]),
-    ("purple-600", [147, 51, 234]),
-    ("purple-700", [126, 34, 206]),
-    ("purple-800", [107, 33, 168]),
-    ("purple-900", [88, 28, 135]),
-    ("fuchsia-50", [253, 244, 255]),
-    ("fuchsia-100", [250, 232, 255]),
-    ("fuchsia-200", [245, 208, 254]),
-    ("fuchsia-300", [240, 171, 252]),
-    ("fuchsia-400", [232, 121, 249]),
-    ("fuchsia-500", [217, 70, 239]),
-    ("fuchsia-600", [192, 38, 211]),
-    ("fuchsia-700", [162, 28, 175]),
-    ("fuchsia-800", [134, 25, 143]),
-    ("fuchsia-900", [112, 26, 117]),
-    ("pink-50", [253, 242, 248]),
-    ("pink-100", [252, 231, 243]),
-    ("pink-200", [251, 207, 232]),
-    ("pink-300", [249, 168, 212]),
-    ("pink-400", [244, 114, 182]),
-    ("pink-500", [236, 72, 153]),
-    ("pink-600", [219, 39, 119]),
-    ("pink-700", [190, 24, 93]),
-    ("pink-800", [157, 23, 77]),
-    ("pink-900", [131, 24, 67]),
-    ("rose-50", [255, 241, 242]),
-    ("rose-100", [255, 228, 230]),
-    ("rose-200", [254, 205, 211]),
-    ("rose-300", [253, 164, 175]),
-    ("rose-400", [251, 113, 133]),
-    ("rose-500", [244, 63, 94]),
-    ("rose-600", [225, 29, 72]),
-    ("rose-700", [190, 18, 60]),
-    ("rose-800", [159, 18, 57]),
-    ("rose-900", [136, 19, 55]),
+pub const BUILTIN_COLORS: &[(&str, (u8, u8, u8))] = &[
+    ("slate-50", (248, 250, 252)),
+    ("slate-100", (241, 245, 249)),
+    ("slate-200", (226, 232, 240)),
+    ("slate-300", (203, 213, 225)),
+    ("slate-400", (148, 163, 184)),
+    ("slate-500", (100, 116, 139)),
+    ("slate-600", (71, 85, 105)),
+    ("slate-700", (51, 65, 85)),
+    ("slate-800", (30, 41, 59)),
+    ("slate-900", (15, 23, 42)),
+    ("gray-50", (249, 250, 251)),
+    ("gray-100", (243, 244, 246)),
+    ("gray-200", (229, 231, 235)),
+    ("gray-300", (209, 213, 219)),
+    ("gray-400", (156, 163, 175)),
+    ("gray-500", (107, 114, 128)),
+    ("gray-600", (75, 85, 99)),
+    ("gray-700", (55, 65, 81)),
+    ("gray-800", (31, 41, 55)),
+    ("gray-900", (17, 24, 39)),
+    ("zinc-50", (250, 250, 250)),
+    ("zinc-100", (244, 244, 245)),
+    ("zinc-200", (228, 228, 231)),
+    ("zinc-300", (212, 212, 216)),
+    ("zinc-400", (161, 161, 170)),
+    ("zinc-500", (113, 113, 122)),
+    ("zinc-600", (82, 82, 91)),
+    ("zinc-700", (63, 63, 70)),
+    ("zinc-800", (39, 39, 42)),
+    ("zinc-900", (24, 24, 27)),
+    ("neutral-50", (250, 250, 250)),
+    ("neutral-100", (245, 245, 245)),
+    ("neutral-200", (229, 229, 229)),
+    ("neutral-300", (212, 212, 212)),
+    ("neutral-400", (163, 163, 163)),
+    ("neutral-500", (115, 115, 115)),
+    ("neutral-600", (82, 82, 82)),
+    ("neutral-700", (64, 64, 64)),
+    ("neutral-800", (38, 38, 38)),
+    ("neutral-900", (23, 23, 23)),
+    ("stone-50", (250, 250, 249)),
+    ("stone-100", (245, 245, 244)),
+    ("stone-200", (231, 229, 228)),
+    ("stone-300", (214, 211, 209)),
+    ("stone-400", (168, 162, 158)),
+    ("stone-500", (120, 113, 108)),
+    ("stone-600", (87, 83, 78)),
+    ("stone-700", (68, 64, 60)),
+    ("stone-800", (41, 37, 36)),
+    ("stone-900", (28, 25, 23)),
+    ("red-50", (254, 242, 242)),
+    ("red-100", (254, 226, 226)),
+    ("red-200", (254, 202, 202)),
+    ("red-300", (252, 165, 165)),
+    ("red-400", (248, 113, 113)),
+    ("red-500", (239, 68, 68)),
+    ("red-600", (220, 38, 38)),
+    ("red-700", (185, 28, 28)),
+    ("red-800", (153, 27, 27)),
+    ("red-900", (127, 29, 29)),
+    ("orange-50", (255, 247, 237)),
+    ("orange-100", (255, 237, 213)),
+    ("orange-200", (254, 215, 170)),
+    ("orange-300", (253, 186, 116)),
+    ("orange-400", (251, 146, 60)),
+    ("orange-500", (249, 115, 22)),
+    ("orange-600", (234, 88, 12)),
+    ("orange-700", (194, 65, 12)),
+    ("orange-800", (154, 52, 18)),
+    ("orange-900", (124, 45, 18)),
+    ("amber-50", (255, 251, 235)),
+    ("amber-100", (254, 243, 199)),
+    ("amber-200", (253, 230, 138)),
+    ("amber-300", (252, 211, 77)),
+    ("amber-400", (251, 191, 36)),
+    ("amber-500", (245, 158, 11)),
+    ("amber-600", (217, 119, 6)),
+    ("amber-700", (180, 83, 9)),
+    ("amber-800", (146, 64, 14)),
+    ("amber-900", (120, 53, 15)),
+    ("yellow-50", (254, 252, 232)),
+    ("yellow-100", (254, 249, 195)),
+    ("yellow-200", (254, 240, 138)),
+    ("yellow-300", (253, 224, 71)),
+    ("yellow-400", (250, 204, 21)),
+    ("yellow-500", (234, 179, 8)),
+    ("yellow-600", (202, 138, 4)),
+    ("yellow-700", (161, 98, 7)),
+    ("yellow-800", (133, 77, 14)),
+    ("yellow-900", (113, 63, 18)),
+    ("lime-50", (247, 254, 231)),
+    ("lime-100", (236, 252, 203)),
+    ("lime-200", (217, 249, 157)),
+    ("lime-300", (190, 242, 100)),
+    ("lime-400", (163, 230, 53)),
+    ("lime-500", (132, 204, 22)),
+    ("lime-600", (101, 163, 13)),
+    ("lime-700", (77, 124, 15)),
+    ("lime-800", (63, 98, 18)),
+    ("lime-900", (54, 83, 20)),
+    ("green-50", (240, 253, 244)),
+    ("green-100", (220, 252, 231)),
+    ("green-200", (187, 247, 208)),
+    ("green-300", (134, 239, 172)),
+    ("green-400", (74, 222, 128)),
+    ("green-500", (34, 197, 94)),
+    ("green-600", (22, 163, 74)),
+    ("green-700", (21, 128, 61)),
+    ("green-800", (22, 101, 52)),
+    ("green-900", (20, 83, 45)),
+    ("emerald-50", (236, 253, 245)),
+    ("emerald-100", (209, 250, 229)),
+    ("emerald-200", (167, 243, 208)),
+    ("emerald-300", (110, 231, 183)),
+    ("emerald-400", (52, 211, 153)),
+    ("emerald-500", (16, 185, 129)),
+    ("emerald-600", (5, 150, 105)),
+    ("emerald-700", (4, 120, 87)),
+    ("emerald-800", (6, 95, 70)),
+    ("emerald-900", (6, 78, 59)),
+    ("teal-50", (240, 253, 250)),
+    ("teal-100", (204, 251, 241)),
+    ("teal-200", (153, 246, 228)),
+    ("teal-300", (94, 234, 212)),
+    ("teal-400", (45, 212, 191)),
+    ("teal-500", (20, 184, 166)),
+    ("teal-600", (13, 148, 136)),
+    ("teal-700", (15, 118, 110)),
+    ("teal-800", (17, 94, 89)),
+    ("teal-900", (19, 78, 74)),
+    ("cyan-50", (236, 254, 255)),
+    ("cyan-100", (207, 250, 254)),
+    ("cyan-200", (165, 243, 252)),
+    ("cyan-300", (103, 232, 249)),
+    ("cyan-400", (34, 211, 238)),
+    ("cyan-500", (6, 182, 212)),
+    ("cyan-600", (8, 145, 178)),
+    ("cyan-700", (14, 116, 144)),
+    ("cyan-800", (21, 94, 117)),
+    ("cyan-900", (22, 78, 99)),
+    ("sky-50", (240, 249, 255)),
+    ("sky-100", (224, 242, 254)),
+    ("sky-200", (186, 230, 253)),
+    ("sky-300", (125, 211, 252)),
+    ("sky-400", (56, 189, 248)),
+    ("sky-500", (14, 165, 233)),
+    ("sky-600", (2, 132, 199)),
+    ("sky-700", (3, 105, 161)),
+    ("sky-800", (7, 89, 133)),
+    ("sky-900", (12, 74, 110)),
+    ("blue-50", (239, 246, 255)),
+    ("blue-100", (219, 234, 254)),
+    ("blue-200", (191, 219, 254)),
+    ("blue-300", (147, 197, 253)),
+    ("blue-400", (96, 165, 250)),
+    ("blue-500", (59, 130, 246)),
+    ("blue-600", (37, 99, 235)),
+    ("blue-700", (29, 78, 216)),
+    ("blue-800", (30, 64, 175)),
+    ("blue-900", (30, 58, 138)),
+    ("indigo-50", (238, 242, 255)),
+    ("indigo-100", (224, 231, 255)),
+    ("indigo-200", (199, 210, 254)),
+    ("indigo-300", (165, 180, 252)),
+    ("indigo-400", (129, 140, 248)),
+    ("indigo-500", (99, 102, 241)),
+    ("indigo-600", (79, 70, 229)),
+    ("indigo-700", (67, 56, 202)),
+    ("indigo-800", (55, 48, 163)),
+    ("indigo-900", (49, 46, 129)),
+    ("violet-50", (245, 243, 255)),
+    ("violet-100", (237, 233, 254)),
+    ("violet-200", (221, 214, 254)),
+    ("violet-300", (196, 181, 253)),
+    ("violet-400", (167, 139, 250)),
+    ("violet-500", (139, 92, 246)),
+    ("violet-600", (124, 58, 237)),
+    ("violet-700", (109, 40, 217)),
+    ("violet-800", (91, 33, 182)),
+    ("violet-900", (76, 29, 149)),
+    ("purple-50", (250, 245, 255)),
+    ("purple-100", (243, 232, 255)),
+    ("purple-200", (233, 213, 255)),
+    ("purple-300", (216, 180, 254)),
+    ("purple-400", (192, 132, 252)),
+    ("purple-500", (168, 85, 247)),
+    ("purple-600", (147, 51, 234)),
+    ("purple-700", (126, 34, 206)),
+    ("purple-800", (107, 33, 168)),
+    ("purple-900", (88, 28, 135)),
+    ("fuchsia-50", (253, 244, 255)),
+    ("fuchsia-100", (250, 232, 255)),
+    ("fuchsia-200", (245, 208, 254)),
+    ("fuchsia-300", (240, 171, 252)),
+    ("fuchsia-400", (232, 121, 249)),
+    ("fuchsia-500", (217, 70, 239)),
+    ("fuchsia-600", (192, 38, 211)),
+    ("fuchsia-700", (162, 28, 175)),
+    ("fuchsia-800", (134, 25, 143)),
+    ("fuchsia-900", (112, 26, 117)),
+    ("pink-50", (253, 242, 248)),
+    ("pink-100", (252, 231, 243)),
+    ("pink-200", (251, 207, 232)),
+    ("pink-300", (249, 168, 212)),
+    ("pink-400", (244, 114, 182)),
+    ("pink-500", (236, 72, 153)),
+    ("pink-600", (219, 39, 119)),
+    ("pink-700", (190, 24, 93)),
+    ("pink-800", (157, 23, 77)),
+    ("pink-900", (131, 24, 67)),
+    ("rose-50", (255, 241, 242)),
+    ("rose-100", (255, 228, 230)),
+    ("rose-200", (254, 205, 211)),
+    ("rose-300", (253, 164, 175)),
+    ("rose-400", (251, 113, 133)),
+    ("rose-500", (244, 63, 94)),
+    ("rose-600", (225, 29, 72)),
+    ("rose-700", (190, 18, 60)),
+    ("rose-800", (159, 18, 57)),
+    ("rose-900", (136, 19, 55)),
 ];
 
 /// The list of all default screen breakpoints.
@@ -517,161 +518,209 @@ pub const BUILTIN_SCREENS: &[(&str, &str)] = &[
 /// The list of all default variants.
 ///
 /// Based on [Tailwind's default variants](https://tailwindcss.com/docs/hover-focus-and-other-states).
-pub const BUILTIN_VARIANTS: &[(&str, Variant)] = &[
+pub const BUILTIN_VARIANTS: &[(&str, VariantType)] = &[
     // --- Pseudo element ---
     (
         "first-letter",
-        Variant::WrapClass(Cow::Borrowed("&::first-letter")),
+        VariantType::WrapClass(Cow::Borrowed("&::first-letter")),
     ),
     (
         "first-line",
-        Variant::WrapClass(Cow::Borrowed("&::first-line")),
+        VariantType::WrapClass(Cow::Borrowed("&::first-line")),
     ),
     (
         "file",
-        Variant::WrapClass(Cow::Borrowed("&::file-selector-button")),
+        VariantType::WrapClass(Cow::Borrowed("&::file-selector-button")),
     ),
     (
         "placeholder",
-        Variant::WrapClass(Cow::Borrowed("&::placeholder")),
+        VariantType::WrapClass(Cow::Borrowed("&::placeholder")),
     ),
     (
         "backdrop",
-        Variant::WrapClass(Cow::Borrowed("&::backdrop")),
+        VariantType::WrapClass(Cow::Borrowed("&::backdrop")),
     ),
-    ("backdrop", Variant::WrapClass(Cow::Borrowed("&::backdrop"))),
-    ("before", Variant::WrapClass(Cow::Borrowed("&::before"))),
-    ("after", Variant::WrapClass(Cow::Borrowed("&::after"))),
+    (
+        "backdrop",
+        VariantType::WrapClass(Cow::Borrowed("&::backdrop")),
+    ),
+    ("before", VariantType::WrapClass(Cow::Borrowed("&::before"))),
+    ("after", VariantType::WrapClass(Cow::Borrowed("&::after"))),
     (
         "marker",
-        Variant::WrapClass(Cow::Borrowed("& *::marker, &::marker")),
+        VariantType::WrapClass(Cow::Borrowed("& *::marker, &::marker")),
     ),
     (
         "selection",
-        Variant::WrapClass(Cow::Borrowed("& *::selection, &::selection")),
+        VariantType::WrapClass(Cow::Borrowed("& *::selection, &::selection")),
     ),
     // --- Pseudo class ---
 
     // Interactive
     (
         "focus-within",
-        Variant::WrapClass(Cow::Borrowed("&:focus-within")),
+        VariantType::WrapClass(Cow::Borrowed("&:focus-within")),
     ),
-    ("hover", Variant::WrapClass(Cow::Borrowed("&:hover"))),
-    ("focus", Variant::WrapClass(Cow::Borrowed("&:focus"))),
+    ("hover", VariantType::WrapClass(Cow::Borrowed("&:hover"))),
+    ("focus", VariantType::WrapClass(Cow::Borrowed("&:focus"))),
     (
         "focus-visible",
-        Variant::WrapClass(Cow::Borrowed("&:focus-visible")),
+        VariantType::WrapClass(Cow::Borrowed("&:focus-visible")),
     ),
     (
         "focus-within",
-        Variant::WrapClass(Cow::Borrowed("&:focus-within")),
+        VariantType::WrapClass(Cow::Borrowed("&:focus-within")),
     ),
-    ("active", Variant::WrapClass(Cow::Borrowed("&:active"))),
-    ("enabled", Variant::WrapClass(Cow::Borrowed("&:enabled"))),
-    ("disabled", Variant::WrapClass(Cow::Borrowed("&:disabled"))),
+    ("active", VariantType::WrapClass(Cow::Borrowed("&:active"))),
+    (
+        "enabled",
+        VariantType::WrapClass(Cow::Borrowed("&:enabled")),
+    ),
+    (
+        "disabled",
+        VariantType::WrapClass(Cow::Borrowed("&:disabled")),
+    ),
     (
         "not-disabled",
-        Variant::WrapClass(Cow::Borrowed("&:not(:disabled)")),
+        VariantType::WrapClass(Cow::Borrowed("&:not(:disabled)")),
     ),
     // Forms
-    ("default", Variant::WrapClass(Cow::Borrowed("&:default"))),
-    ("checked", Variant::WrapClass(Cow::Borrowed("&:checked"))),
+    (
+        "default",
+        VariantType::WrapClass(Cow::Borrowed("&:default")),
+    ),
+    (
+        "checked",
+        VariantType::WrapClass(Cow::Borrowed("&:checked")),
+    ),
     (
         "not-checked",
-        Variant::WrapClass(Cow::Borrowed("&:not(:checked)")),
+        VariantType::WrapClass(Cow::Borrowed("&:not(:checked)")),
     ),
     (
         "indeterminate",
-        Variant::WrapClass(Cow::Borrowed("&:indeterminate")),
+        VariantType::WrapClass(Cow::Borrowed("&:indeterminate")),
     ),
     (
         "placeholder-shown",
-        Variant::WrapClass(Cow::Borrowed("&:placeholder-shown")),
+        VariantType::WrapClass(Cow::Borrowed("&:placeholder-shown")),
     ),
-    ("autofill", Variant::WrapClass(Cow::Borrowed("&:autofill"))),
-    ("required", Variant::WrapClass(Cow::Borrowed("&:required"))),
-    ("valid", Variant::WrapClass(Cow::Borrowed("&:valid"))),
-    ("invalid", Variant::WrapClass(Cow::Borrowed("&:invalid"))),
-    ("in-range", Variant::WrapClass(Cow::Borrowed("&:in-range"))),
+    (
+        "autofill",
+        VariantType::WrapClass(Cow::Borrowed("&:autofill")),
+    ),
+    (
+        "required",
+        VariantType::WrapClass(Cow::Borrowed("&:required")),
+    ),
+    ("valid", VariantType::WrapClass(Cow::Borrowed("&:valid"))),
+    (
+        "invalid",
+        VariantType::WrapClass(Cow::Borrowed("&:invalid")),
+    ),
+    (
+        "in-range",
+        VariantType::WrapClass(Cow::Borrowed("&:in-range")),
+    ),
     (
         "out-of-range",
-        Variant::WrapClass(Cow::Borrowed("&:out-of-range")),
+        VariantType::WrapClass(Cow::Borrowed("&:out-of-range")),
     ),
     (
         "read-only",
-        Variant::WrapClass(Cow::Borrowed("&:read-only")),
+        VariantType::WrapClass(Cow::Borrowed("&:read-only")),
     ),
     (
         "read-write",
-        Variant::WrapClass(Cow::Borrowed("&:read-write")),
+        VariantType::WrapClass(Cow::Borrowed("&:read-write")),
     ),
     // Positional
-    ("first", Variant::WrapClass(Cow::Borrowed("&:first-child"))),
+    (
+        "first",
+        VariantType::WrapClass(Cow::Borrowed("&:first-child")),
+    ),
     (
         "not-first",
-        Variant::WrapClass(Cow::Borrowed("&:not(:first-child)")),
+        VariantType::WrapClass(Cow::Borrowed("&:not(:first-child)")),
     ),
-    ("last", Variant::WrapClass(Cow::Borrowed("&:last-child"))),
+    (
+        "last",
+        VariantType::WrapClass(Cow::Borrowed("&:last-child")),
+    ),
     (
         "not-last",
-        Variant::WrapClass(Cow::Borrowed("&:not(:last-child)")),
+        VariantType::WrapClass(Cow::Borrowed("&:not(:last-child)")),
     ),
-    ("only", Variant::WrapClass(Cow::Borrowed("&:only-child"))),
+    (
+        "only",
+        VariantType::WrapClass(Cow::Borrowed("&:only-child")),
+    ),
     (
         "not-only",
-        Variant::WrapClass(Cow::Borrowed("&:not(:only-child)")),
+        VariantType::WrapClass(Cow::Borrowed("&:not(:only-child)")),
     ),
-    ("odd", Variant::WrapClass(Cow::Borrowed("&:nth-child(odd)"))),
+    (
+        "odd",
+        VariantType::WrapClass(Cow::Borrowed("&:nth-child(odd)")),
+    ),
     (
         "even",
-        Variant::WrapClass(Cow::Borrowed("&:nth-child(even)")),
+        VariantType::WrapClass(Cow::Borrowed("&:nth-child(even)")),
     ),
     (
         "first-of-type",
-        Variant::WrapClass(Cow::Borrowed("&:first-of-type")),
+        VariantType::WrapClass(Cow::Borrowed("&:first-of-type")),
     ),
     (
         "not-first-of-type",
-        Variant::WrapClass(Cow::Borrowed("&:not(:first-of-type)")),
+        VariantType::WrapClass(Cow::Borrowed("&:not(:first-of-type)")),
     ),
     (
         "last-of-type",
-        Variant::WrapClass(Cow::Borrowed("&:last-of-type")),
+        VariantType::WrapClass(Cow::Borrowed("&:last-of-type")),
     ),
     (
         "not-last-of-type",
-        Variant::WrapClass(Cow::Borrowed("&:not(:last-of-type)")),
+        VariantType::WrapClass(Cow::Borrowed("&:not(:last-of-type)")),
     ),
-    ("empty", Variant::WrapClass(Cow::Borrowed("&:empty"))),
+    ("empty", VariantType::WrapClass(Cow::Borrowed("&:empty"))),
     // State
-    ("visited", Variant::WrapClass(Cow::Borrowed("&:visited"))),
-    ("target", Variant::WrapClass(Cow::Borrowed("&:target"))),
-    ("open", Variant::WrapClass(Cow::Borrowed("&[open]"))),
+    (
+        "visited",
+        VariantType::WrapClass(Cow::Borrowed("&:visited")),
+    ),
+    ("target", VariantType::WrapClass(Cow::Borrowed("&:target"))),
+    ("open", VariantType::WrapClass(Cow::Borrowed("&[open]"))),
     // --- Direction ---
-    ("ltr", Variant::WrapClass(Cow::Borrowed("[dir=\"ltr\"] &"))),
-    ("rtl", Variant::WrapClass(Cow::Borrowed("[dir=\"rtl\"] &"))),
+    (
+        "ltr",
+        VariantType::WrapClass(Cow::Borrowed("[dir=\"ltr\"] &")),
+    ),
+    (
+        "rtl",
+        VariantType::WrapClass(Cow::Borrowed("[dir=\"rtl\"] &")),
+    ),
     // --- Reduced motion ---
     (
         "motion-safe",
-        Variant::AtRule(Cow::Borrowed(
+        VariantType::AtRule(Cow::Borrowed(
             "@media (prefers-reduced-motion: no-preference)",
         )),
     ),
     (
         "motion-reduce",
-        Variant::AtRule(Cow::Borrowed("@media (prefers-reduced-motion: reduce)")),
+        VariantType::AtRule(Cow::Borrowed("@media (prefers-reduced-motion: reduce)")),
     ),
     // --- Print ---
-    ("print", Variant::AtRule(Cow::Borrowed("@media print"))),
+    ("print", VariantType::AtRule(Cow::Borrowed("@media print"))),
     // --- Orientation ---
     (
         "portrait",
-        Variant::AtRule(Cow::Borrowed("@media (orientation: portrait)")),
+        VariantType::AtRule(Cow::Borrowed("@media (orientation: portrait)")),
     ),
     (
         "landscape",
-        Variant::AtRule(Cow::Borrowed("@media (orientation: landscape)")),
+        VariantType::AtRule(Cow::Borrowed("@media (orientation: landscape)")),
     ),
     // TODO: Group, peer, parent variants
 ];
@@ -911,7 +960,7 @@ pub const BUILTIN_PLUGINS: [&'static (dyn Plugin + Send + Sync); 226] = [
 /// Configuration for the [`Theme::dark_mode`] field.
 ///
 /// It defines how the `dark:` variant should behaves.
-#[derive(Debug, PartialEq, Deserialize)]
+#[derive(Debug, PartialEq, Default, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum DarkMode {
     /// The `dark:` variant will modify the class of the selector. You'll then need to toggle this
@@ -928,8 +977,7 @@ pub enum DarkMode {
     /// let mut generator = EncreGenerator::from_config(config);
     /// generator.add_selector("dark:text-white");
     ///
-    /// assert!(generator.generate().expect("failed to generate the CSS").contains(r#"
-    /// body.dark .dark\:text-white {
+    /// assert!(generator.generate().expect("failed to generate the CSS").contains(r#"body.dark .dark\:text-white {
     ///   --en-text-opacity: 1;
     ///   color: rgb(255 255 255 / var(--en-text-opacity));
     /// }"#));
@@ -950,14 +998,14 @@ pub enum DarkMode {
     /// let mut generator = EncreGenerator::from_config(config);
     /// generator.add_selector("dark:text-white");
     ///
-    /// assert!(generator.generate().expect("failed to generate the CSS").contains(r#"
-    /// @media (prefers-color-scheme: dark) {
+    /// assert!(generator.generate().expect("failed to generate the CSS").contains(r#"@media (prefers-color-scheme: dark) {
     ///   .dark\:text-white {
     ///     --en-text-opacity: 1;
     ///     color: rgb(255 255 255 / var(--en-text-opacity));
     ///   }
     /// }"#));
     /// ```
+    #[default]
     Media,
 }
 
@@ -965,12 +1013,6 @@ impl DarkMode {
     /// Quickly build a [`DarkMode::Class`] value.
     pub fn new_class<T: Into<Cow<'static, str>>>(class: T) -> Self {
         Self::Class(class.into())
-    }
-}
-
-impl Default for DarkMode {
-    fn default() -> Self {
-        Self::Media
     }
 }
 
@@ -1068,15 +1110,19 @@ pub struct Config {
     #[serde(default)]
     pub theme: Theme,
 
-    /// A custom extractor used to scan content.
+    /// Preflight configuration.
+    #[serde(default)]
+    pub preflight: Preflight,
+
+    /// A custom scanner used to scan content.
     ///
     /// This field is skipped when deserializing from a [TOML](https://toml.io) file.
     #[serde(skip)]
-    pub extractor: Extractor,
-    // custom_variants: Vec<VariantConfig>,
+    pub scanner: Scanner,
+    // custom_variants: Vec<VariantTypeConfig>,
     // custom_plugins: Vec<PluginConfig>,
 
-    // TODO: Prefix (en-), preflight, safelist, separator for {variants, arbitrary values}
+    // TODO: Prefix (en-), safelist, separator for {variants, arbitrary values}
 }
 
 impl Config {
@@ -1094,14 +1140,6 @@ impl Config {
     /// yellow-400 = <span class="string">"#ffef0e"</span></code></pre></div>
     ///
     /// Then parse the configuration in Rust:
-    ///
-    /// ```rust
-    /// use encre_css::{Config, config::DarkMode};
-    ///
-    /// # std::env::set_current_dir("tests/fixtures");
-    /// let config = Config::from_file("custom_config.toml").expect("failed to get the config file");
-    /// assert_eq!(config.theme.dark_mode, DarkMode::Class(".dark".into()));
-    /// ```
     ///
     /// # Errors
     ///
@@ -1124,5 +1162,104 @@ impl fmt::Debug for Config {
         f.debug_struct("Config")
             .field("theme", &self.theme)
             .finish()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::EncreGenerator;
+
+    use pretty_assertions::assert_eq;
+
+    fn base_config() -> Config {
+        // Disable the preflight to simplify test assertions
+        Config {
+            preflight: Preflight::None,
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn gen_css_with_custom_config() {
+        let mut config = base_config();
+        config.theme.colors.add("rosa-500", "#e5186a");
+        config.theme.screens.add("3xl", "1600px");
+
+        let mut generator = EncreGenerator::from_config(config);
+        generator.add_selector("3xl:text-rosa-500");
+
+        assert_eq!(
+            generator.generate().unwrap(),
+            String::from(
+                r#"@media (min-width: 1600px) {
+  .\33xl\:text-rosa-500 {
+    --en-text-opacity: 1;
+    color: rgb(229 24 106 / var(--en-text-opacity));
+  }
+}"#
+            )
+        );
+    }
+
+    #[test]
+    fn parse_config_file() {
+        let mut config = base_config();
+        config.theme.colors.add("rosa-500", "#e5186a");
+        config.theme.colors.add("yellow-400", "#ffef0e");
+        config.theme.screens.add("lg", "2000px");
+        config.theme.screens.add("3xl", "1600px");
+        config.theme.dark_mode = DarkMode::new_class(".dark");
+
+        assert_eq!(
+            Config::from_file("tests/fixtures/custom_config.toml").unwrap(),
+            config
+        );
+    }
+
+    #[test]
+    fn config_is_extended_and_overridden() {
+        let config = Config::from_file("tests/fixtures/custom_config.toml").unwrap();
+
+        let mut generator = EncreGenerator::from_config(config);
+        generator.add_selector("bg-rosa-500");
+        generator.add_selector("bg-yellow-400");
+        generator.add_selector("bg-yellow-100");
+        generator.add_selector("3xl:underline");
+        generator.add_selector("lg:text-rosa-500");
+
+        assert_eq!(
+            generator.generate().unwrap(),
+            String::from(
+                r#".bg-rosa-500 {
+  --en-bg-opacity: 1;
+  background-color: rgb(229 24 106 / var(--en-bg-opacity));
+}
+
+.bg-yellow-100 {
+  --en-bg-opacity: 1;
+  background-color: rgb(254 249 195 / var(--en-bg-opacity));
+}
+
+.bg-yellow-400 {
+  --en-bg-opacity: 1;
+  background-color: rgb(255 239 14 / var(--en-bg-opacity));
+}
+
+@media (min-width: 2000px) {
+  .lg\:text-rosa-500 {
+    --en-text-opacity: 1;
+    color: rgb(229 24 106 / var(--en-text-opacity));
+  }
+}
+
+@media (min-width: 1600px) {
+  .\33xl\:underline {
+    -webkit-text-decoration-line: underline;
+    text-decoration-line: underline;
+  }
+}"#
+            )
+        );
     }
 }
