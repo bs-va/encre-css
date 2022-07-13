@@ -23,7 +23,7 @@ impl Plugin for PluginDefinition {
                 *hint == "generic-name"
                     || *hint == "family-name"
                     || (hint.is_empty()
-                        && value.split(',').all(|v| v[..1].parse::<usize>().is_err()))
+                        && value.split(',').all(|v| v.is_empty() || v[..1].parse::<usize>().is_err()))
             }
         }
     }
