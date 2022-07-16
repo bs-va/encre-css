@@ -42,6 +42,18 @@
 //! }");
 //! ```
 //!
+//! Finally you can disable it using [`Preflight::new_none`].
+//!
+//! ```rust
+//! use encre_css::{Preflight, Config, EncreGenerator};
+//!
+//! let mut config = Config::default();
+//! config.preflight = Preflight::new_none();
+//!
+//! let mut generator = EncreGenerator::from_config(config);
+//! assert_eq!(generator.generate().expect("failed to generate the CSS"), "");
+//! ```
+//!
 //! Based on [Tailwind's default preflight](https://tailwindcss.com/docs/preflight).
 //!
 //! [`Config::preflight`]: crate::config::Config::preflight
