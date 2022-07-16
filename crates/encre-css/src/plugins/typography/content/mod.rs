@@ -26,7 +26,11 @@ impl Plugin for PluginDefinition {
     fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
         match context.modifier {
-            Modifier::Builtin { .. } => writeln!(context.buffer, "--en-content: none;")?,
+            Modifier::Builtin { .. } => {
+                writeln!(context.buffer, "--en-content: none;")?;
+                indent(context.indentation, context.buffer)?;
+                writeln!(context.buffer, "content: var(--tw-content)")?;
+            },
             Modifier::Arbitrary { value, .. } => {
                 writeln!(context.buffer, "--en-content: {value};")?;
             }
