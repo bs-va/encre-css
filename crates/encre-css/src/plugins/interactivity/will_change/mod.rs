@@ -32,7 +32,7 @@ impl Plugin for PluginDefinition {
                 "auto" => writeln!(context.buffer, "will-change: auto;")?,
                 "scroll" => writeln!(context.buffer, "will-change: scroll-position;")?,
                 "contents" => writeln!(context.buffer, "will-change: contents;")?,
-                "transform" => writeln!(context.buffer, "will-change: transfrom;")?,
+                "transform" => writeln!(context.buffer, "will-change: transform;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => writeln!(context.buffer, "will-change: {value};")?,
