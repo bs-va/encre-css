@@ -813,7 +813,7 @@ mod tests {
             parse("hover:[mask-type:luminance]", &Config::default()).unwrap()[0],
             Selector {
                 full: "hover:[mask-type:luminance]",
-                order: 226,
+                order: BUILTIN_PLUGINS.len(),
                 plugin: &CssPropertyPlugin,
                 variants: vec![Variant::Builtin("hover")],
                 modifier: Modifier::Arbitrary {
