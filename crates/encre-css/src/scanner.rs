@@ -1,6 +1,4 @@
 //! Define a structure used to scan content.
-use std::collections::BTreeSet;
-
 use crate::utils::split_ignore_arbitrary;
 
 /// A structure responsible for scanning some content and returning a list of possible classes.
@@ -23,7 +21,7 @@ use crate::utils::split_ignore_arbitrary;
 /// config.scanner = Scanner::from_fn(|content| content.split(r#"data-en=""#)
 ///     .filter_map(|v| v.split_once("\"").map(|(classes, _)| classes.split_whitespace()))
 ///     .flatten()
-///     .collect::<BTreeSet<&str>>());
+///     .collect::<Vec<&str>>());
 ///
 /// let mut generator = EncreGenerator::from_config(config);
 /// generator.scan(r#"<h1 data-en="underline"></h1><p data-en="bg-red-200 text-blue-300"></p>"#);
@@ -47,19 +45,19 @@ use crate::utils::split_ignore_arbitrary;
 /// [`utils::split_ignore_arbitray`]: crate::utils::split_ignore_arbitrary
 #[allow(missing_debug_implementations)]
 pub struct Scanner {
-    scan_fn: Box<dyn Fn(&str) -> BTreeSet<&str> + Send + Sync>,
+    scan_fn: Box<dyn Fn(&str) -> Vec<&str> + Send + Sync>,
 }
 
 impl Scanner {
     /// Build an [`Scanner`] from a closure taking some content and returning a list of possible
     /// classes.
-    pub fn from_fn<T: 'static + Fn(&str) -> BTreeSet<&str> + Send + Sync>(scan_fn: T) -> Self {
+    pub fn from_fn<T: 'static + Fn(&str) -> Vec<&str> + Send + Sync>(scan_fn: T) -> Self {
         Self {
             scan_fn: Box::new(scan_fn),
         }
     }
 
-    pub(crate) fn scan<'a>(&self, val: &'a str) -> BTreeSet<&'a str> {
+    pub(crate) fn scan<'a>(&self, val: &'a str) -> Vec<&'a str> {
         (self.scan_fn)(val)
     }
 }
@@ -69,7 +67,7 @@ impl Default for Scanner {
         Self {
             scan_fn: Box::new(|val| {
                 split_ignore_arbitrary(val, |ch| ch == ' ' || ch == '"' || ch == '\'' || ch == '`')
-                    .collect::<BTreeSet<&str>>()
+                    .collect::<Vec<&str>>()
             }),
         }
     }
@@ -79,23 +77,21 @@ impl Default for Scanner {
 mod tests {
     use super::*;
 
-    use std::collections::BTreeSet;
-
     #[test]
     fn default_scanner_test() {
         assert_eq!(
             Scanner::default().scan("test bg-red-500 'hello'"),
-            BTreeSet::from(["", "test", "bg-red-500", "hello"])
+            vec!["test", "bg-red-500", "", "hello"],
         );
     }
 
     #[test]
     fn custom_scanner_test() {
-        let scanner = Scanner::from_fn(|val| val.split(|ch| ch == '|').collect::<BTreeSet<&str>>());
+        let scanner = Scanner::from_fn(|val| val.split(|ch| ch == '|').collect::<Vec<&str>>());
 
         assert_eq!(
             scanner.scan("test|bg-red-500|'hello'"),
-            BTreeSet::from(["test", "bg-red-500", "'hello'"])
+            vec!["test", "bg-red-500", "'hello'"],
         );
     }
 }

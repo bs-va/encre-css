@@ -55,7 +55,6 @@ impl Plugin for PluginXDefinition {
                             writeln!(context.buffer, "--en-divide-x-reverse: 0;")?;
                             indent(context.indentation, context.buffer)?;
 
-                            // TODO: class with `> :not([hidden]) ~ :not([hidden])`
                             if is_matching_line_width(value) {
                                 writeln!(context.buffer, "border-right-width: {value};")?;
                                 indent(context.indentation, context.buffer)?;
@@ -135,7 +134,6 @@ impl Plugin for PluginYDefinition {
                             writeln!(context.buffer, "--en-divide-y-reverse: 0;")?;
                             indent(context.indentation, context.buffer)?;
 
-                            // TODO: class with `> :not([hidden]) ~ :not([hidden])`
                             if is_matching_line_width(value) {
                                 writeln!(context.buffer, "border-top-width: {value};")?;
                                 indent(context.indentation, context.buffer)?;
