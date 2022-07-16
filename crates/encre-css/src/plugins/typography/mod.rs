@@ -24,3 +24,4 @@ pub mod text_underline_offset;
 pub mod vertical_align;
 pub mod whitespace;
 pub mod word_break;
+pub mod line_clamp;

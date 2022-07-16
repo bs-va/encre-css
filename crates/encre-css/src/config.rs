@@ -728,7 +728,7 @@ pub const BUILTIN_VARIANTS: &[(&str, VariantType)] = &[
 /// The list of all default plugins.
 ///
 /// Sorted following [Tailwind's order](https://github.com/tailwindlabs/tailwindcss/blob/master/src/corePlugins.js).
-pub const BUILTIN_PLUGINS: [&'static (dyn Plugin + Send + Sync); 226] = [
+pub const BUILTIN_PLUGINS: [&'static (dyn Plugin + Send + Sync); 227] = [
     &layout::container::PluginDefinition,
     &accessibility::screen_reader::PluginDefinition,
     &interactivity::pointer_events::PluginDefinition,
@@ -955,6 +955,7 @@ pub const BUILTIN_PLUGINS: [&'static (dyn Plugin + Send + Sync); 226] = [
     &transition::transition_timing_function::PluginDefinition,
     &interactivity::will_change::PluginDefinition,
     &typography::content::PluginDefinition,
+    &typography::line_clamp::PluginDefinition,
 ];
 
 /// Configuration for the [`Theme::dark_mode`] field.
