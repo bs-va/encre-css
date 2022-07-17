@@ -145,7 +145,7 @@ fn parse_recursive<'a>(
     let (variants, mut remaining) = {
         let mut variants = vec![];
         let mut remaining = "";
-        let mut iter = split_ignore_arbitrary(val, VARIANT_SEPARATOR).peekable();
+        let mut iter = split_ignore_arbitrary(val, VARIANT_SEPARATOR, true).peekable();
 
         while let Some(mut val) = iter.next() {
             if iter.peek().is_none() {
@@ -188,7 +188,7 @@ fn parse_recursive<'a>(
 
         let mut selectors = vec![];
 
-        split_ignore_arbitrary(remaining, GROUP_SELECTOR_SEPARATOR).for_each(|remaining| {
+        split_ignore_arbitrary(remaining, GROUP_SELECTOR_SEPARATOR, true).for_each(|remaining| {
             if let Some(mut new_selectors) = parse_recursive(
                 remaining,
                 Some(if let Some(full_class) = full_class {

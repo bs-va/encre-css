@@ -68,7 +68,7 @@ impl Default for Scanner {
     fn default() -> Self {
         Self {
             scan_fn: Box::new(|val| {
-                split_ignore_arbitrary(val, |ch| ch == ' ' || ch == '"' || ch == '\'' || ch == '`')
+                split_ignore_arbitrary(val, |ch| ch == ' ' || ch == '"' || ch == '\'' || ch == '`', false)
                     .collect::<BTreeSet<&str>>()
             }),
         }

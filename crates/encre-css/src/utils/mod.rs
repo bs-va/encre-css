@@ -102,6 +102,7 @@ pub struct SplitIgnoreArbitrary<'a, P: Pattern> {
     val: &'a str,
     iter: CharIndices<'a>,
     searched_pattern: P,
+    ignore_parenthesis: bool,
     is_next_escaped: bool,
     parenthesis_level: usize,
     bracket_level: usize,
@@ -125,8 +126,8 @@ impl<'a, P: Pattern> Iterator for SplitIgnoreArbitrary<'a, P> {
             if let Some(ch) = ch {
                 match ch.1 {
                     ESCAPE => self.is_next_escaped = true,
-                    GROUP_START => self.parenthesis_level += 1,
-                    GROUP_END => {
+                    GROUP_START if self.ignore_parenthesis => self.parenthesis_level += 1,
+                    GROUP_END if self.ignore_parenthesis => {
                         if self.parenthesis_level > 0 {
                             self.parenthesis_level -= 1;
                             self.seek_index = ch.0 + 1;
@@ -149,8 +150,8 @@ impl<'a, P: Pattern> Iterator for SplitIgnoreArbitrary<'a, P> {
                         if self
                             .searched_pattern
                             .is_matching(&self.val[self.seek_index..ch.0 + ch.1.len_utf8()])
-                            && self.parenthesis_level == 0
                             && self.bracket_level == 0
+                            && !(self.ignore_parenthesis && self.parenthesis_level > 0)
                         {
                             let last_index = self.last_index;
                             self.last_index = ch.0 + ch.1.len_utf8();
@@ -174,24 +175,28 @@ impl<'a, P: Pattern> Iterator for SplitIgnoreArbitrary<'a, P> {
 }
 
 /// Split a value while prevent splitting arbitrary values / variants and variant groups, by
-/// ignoring values wrapped in parenthesis and brackets.
+/// ignoring values wrapped in brackets.
+///
+/// The last argument indicates whether parenthesis are also ignored.
 ///
 /// # Example
 ///
 /// ```rust
 /// use encre_css::utils::split_ignore_arbitrary;
 ///
-/// let value = "bg-red-500 content-[wrapped in `[]`, will not be splitted] (words wrapped in parenthesis are not splitted too)";
-/// assert_eq!(split_ignore_arbitrary(value, ' ').collect::<Vec<&str>>(), vec!["bg-red-500", "content-[wrapped in `[]`, will not be splitted]", "(words wrapped in parenthesis are not splitted too)"]);
+/// let value = "bg-red-500 content-[wrapped in `[]`, will not be split] (words wrapped in parenthesis are not split too)";
+/// assert_eq!(split_ignore_arbitrary(value, ' ', true).collect::<Vec<&str>>(), vec!["bg-red-500", "content-[wrapped in `[]`, will not be split]", "(words wrapped in parenthesis are not split too)"]);
 /// ```
 pub fn split_ignore_arbitrary<P: Pattern>(
     val: &str,
     searched_pattern: P,
+    ignore_parenthesis: bool,
 ) -> SplitIgnoreArbitrary<P> {
     SplitIgnoreArbitrary {
         val,
         iter: val.char_indices(),
         searched_pattern,
+        ignore_parenthesis,
         is_next_escaped: false,
         parenthesis_level: 0,
         bracket_level: 0,
