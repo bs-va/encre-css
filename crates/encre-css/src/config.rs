@@ -518,211 +518,74 @@ pub const BUILTIN_SCREENS: &[(&str, &str)] = &[
 /// The list of all default variants.
 ///
 /// Based on [Tailwind's default variants](https://tailwindcss.com/docs/hover-focus-and-other-states).
+#[rustfmt::skip]
 pub const BUILTIN_VARIANTS: &[(&str, VariantType)] = &[
     // --- Pseudo element ---
-    (
-        "first-letter",
-        VariantType::WrapClass(Cow::Borrowed("&::first-letter")),
-    ),
-    (
-        "first-line",
-        VariantType::WrapClass(Cow::Borrowed("&::first-line")),
-    ),
-    (
-        "file",
-        VariantType::WrapClass(Cow::Borrowed("&::file-selector-button")),
-    ),
-    (
-        "placeholder",
-        VariantType::WrapClass(Cow::Borrowed("&::placeholder")),
-    ),
-    (
-        "backdrop",
-        VariantType::WrapClass(Cow::Borrowed("&::backdrop")),
-    ),
-    (
-        "backdrop",
-        VariantType::WrapClass(Cow::Borrowed("&::backdrop")),
-    ),
-    ("before", VariantType::WrapClass(Cow::Borrowed("&::before"))),
-    ("after", VariantType::WrapClass(Cow::Borrowed("&::after"))),
-    (
-        "marker",
-        VariantType::WrapClass(Cow::Borrowed("& *::marker, &::marker")),
-    ),
-    (
-        "selection",
-        VariantType::WrapClass(Cow::Borrowed("& *::selection, &::selection")),
-    ),
-    // --- Pseudo class ---
+    ("first-letter", VariantType::PseudoElement("first-letter")),
+    ("first-line", VariantType::PseudoElement("first-line")),
+    ("marker", VariantType::WrapClass(Cow::Borrowed("& *::marker, &::marker"))),
+    ("selection", VariantType::WrapClass(Cow::Borrowed("& *::selection, &::selection"))),
+    ("file", VariantType::PseudoElement("file-selector-button")),
+    ("placeholder", VariantType::PseudoElement("placeholder")),
+    ("backdrop", VariantType::PseudoElement("backdrop")),
+    ("before", VariantType::PseudoElement("before")),
+    ("after", VariantType::PseudoElement("after")),
+    ("all", VariantType::WrapClass(Cow::Borrowed("& *"))),
+    ("children", VariantType::WrapClass(Cow::Borrowed("& > *"))),
+    ("siblings", VariantType::WrapClass(Cow::Borrowed("& ~ *"))),
+    ("sibling", VariantType::WrapClass(Cow::Borrowed("& + *"))),
 
-    // Interactive
-    (
-        "focus-within",
-        VariantType::WrapClass(Cow::Borrowed("&:focus-within")),
-    ),
-    ("hover", VariantType::WrapClass(Cow::Borrowed("&:hover"))),
-    ("focus", VariantType::WrapClass(Cow::Borrowed("&:focus"))),
-    (
-        "focus-visible",
-        VariantType::WrapClass(Cow::Borrowed("&:focus-visible")),
-    ),
-    (
-        "focus-within",
-        VariantType::WrapClass(Cow::Borrowed("&:focus-within")),
-    ),
-    ("active", VariantType::WrapClass(Cow::Borrowed("&:active"))),
-    (
-        "enabled",
-        VariantType::WrapClass(Cow::Borrowed("&:enabled")),
-    ),
-    (
-        "disabled",
-        VariantType::WrapClass(Cow::Borrowed("&:disabled")),
-    ),
-    (
-        "not-disabled",
-        VariantType::WrapClass(Cow::Borrowed("&:not(:disabled)")),
-    ),
-    // Forms
-    (
-        "default",
-        VariantType::WrapClass(Cow::Borrowed("&:default")),
-    ),
-    (
-        "checked",
-        VariantType::WrapClass(Cow::Borrowed("&:checked")),
-    ),
-    (
-        "not-checked",
-        VariantType::WrapClass(Cow::Borrowed("&:not(:checked)")),
-    ),
-    (
-        "indeterminate",
-        VariantType::WrapClass(Cow::Borrowed("&:indeterminate")),
-    ),
-    (
-        "placeholder-shown",
-        VariantType::WrapClass(Cow::Borrowed("&:placeholder-shown")),
-    ),
-    (
-        "autofill",
-        VariantType::WrapClass(Cow::Borrowed("&:autofill")),
-    ),
-    (
-        "required",
-        VariantType::WrapClass(Cow::Borrowed("&:required")),
-    ),
-    ("valid", VariantType::WrapClass(Cow::Borrowed("&:valid"))),
-    (
-        "invalid",
-        VariantType::WrapClass(Cow::Borrowed("&:invalid")),
-    ),
-    (
-        "in-range",
-        VariantType::WrapClass(Cow::Borrowed("&:in-range")),
-    ),
-    (
-        "out-of-range",
-        VariantType::WrapClass(Cow::Borrowed("&:out-of-range")),
-    ),
-    (
-        "read-only",
-        VariantType::WrapClass(Cow::Borrowed("&:read-only")),
-    ),
-    (
-        "read-write",
-        VariantType::WrapClass(Cow::Borrowed("&:read-write")),
-    ),
-    // Positional
-    (
-        "first",
-        VariantType::WrapClass(Cow::Borrowed("&:first-child")),
-    ),
-    (
-        "not-first",
-        VariantType::WrapClass(Cow::Borrowed("&:not(:first-child)")),
-    ),
-    (
-        "last",
-        VariantType::WrapClass(Cow::Borrowed("&:last-child")),
-    ),
-    (
-        "not-last",
-        VariantType::WrapClass(Cow::Borrowed("&:not(:last-child)")),
-    ),
-    (
-        "only",
-        VariantType::WrapClass(Cow::Borrowed("&:only-child")),
-    ),
-    (
-        "not-only",
-        VariantType::WrapClass(Cow::Borrowed("&:not(:only-child)")),
-    ),
-    (
-        "odd",
-        VariantType::WrapClass(Cow::Borrowed("&:nth-child(odd)")),
-    ),
-    (
-        "even",
-        VariantType::WrapClass(Cow::Borrowed("&:nth-child(even)")),
-    ),
-    (
-        "first-of-type",
-        VariantType::WrapClass(Cow::Borrowed("&:first-of-type")),
-    ),
-    (
-        "not-first-of-type",
-        VariantType::WrapClass(Cow::Borrowed("&:not(:first-of-type)")),
-    ),
-    (
-        "last-of-type",
-        VariantType::WrapClass(Cow::Borrowed("&:last-of-type")),
-    ),
-    (
-        "not-last-of-type",
-        VariantType::WrapClass(Cow::Borrowed("&:not(:last-of-type)")),
-    ),
-    ("empty", VariantType::WrapClass(Cow::Borrowed("&:empty"))),
-    // State
-    (
-        "visited",
-        VariantType::WrapClass(Cow::Borrowed("&:visited")),
-    ),
-    ("target", VariantType::WrapClass(Cow::Borrowed("&:target"))),
+    // --- Pseudo class ---
+    ("first", VariantType::PseudoClass("first-child")),
+    ("not-first", VariantType::PseudoClass("not(:first-child)")),
+    ("last", VariantType::PseudoClass("last-child")),
+    ("not-last", VariantType::PseudoClass("not(:last-child)")),
+    ("only", VariantType::PseudoClass("only-child")),
+    ("not-only", VariantType::PseudoClass("not(:only-child)")),
+    ("odd", VariantType::PseudoClass("nth-child(odd)")),
+    ("even", VariantType::PseudoClass("nth-child(even)")),
+    ("first-of-type", VariantType::PseudoClass("first-of-type")),
+    ("last-of-type", VariantType::PseudoClass("last-of-type")),
+    ("only-of-type", VariantType::PseudoClass("only-of-type")),
+    ("not-first-of-type", VariantType::PseudoClass("not(:first-of-type)")),
+    ("not-last-of-type", VariantType::PseudoClass("not(:last-of-type)")),
+    ("not-only-of-type", VariantType::PseudoClass("not(:only-of-type)")),
+    ("visited", VariantType::PseudoClass("visited")),
+    ("target", VariantType::PseudoClass("target")),
     ("open", VariantType::WrapClass(Cow::Borrowed("&[open]"))),
-    // --- Direction ---
-    (
-        "ltr",
-        VariantType::WrapClass(Cow::Borrowed("[dir=\"ltr\"] &")),
-    ),
-    (
-        "rtl",
-        VariantType::WrapClass(Cow::Borrowed("[dir=\"rtl\"] &")),
-    ),
-    // --- Reduced motion ---
-    (
-        "motion-safe",
-        VariantType::AtRule(Cow::Borrowed(
-            "@media (prefers-reduced-motion: no-preference)",
-        )),
-    ),
-    (
-        "motion-reduce",
-        VariantType::AtRule(Cow::Borrowed("@media (prefers-reduced-motion: reduce)")),
-    ),
-    // --- Print ---
+    ("default", VariantType::PseudoClass("default")),
+    ("checked", VariantType::PseudoClass("checked")),
+    ("not-checked", VariantType::PseudoClass("not(:checked)")),
+    ("indeterminate", VariantType::PseudoClass("indeterminate")),
+    ("placeholder-shown", VariantType::PseudoClass("placeholder-shown")),
+    ("autofill", VariantType::PseudoClass("autofill")),
+    ("optional", VariantType::PseudoClass("optional")),
+    ("required", VariantType::PseudoClass("required")),
+    ("valid", VariantType::PseudoClass("valid")),
+    ("invalid", VariantType::PseudoClass("invalid")),
+    ("in-range", VariantType::PseudoClass("in-range")),
+    ("out-of-range", VariantType::PseudoClass("out-of-range")),
+    ("read-only", VariantType::PseudoClass("read-only")),
+    ("read-write", VariantType::PseudoClass("read-write")),
+    ("empty", VariantType::PseudoClass("empty")),
+    ("focus-within", VariantType::PseudoClass("focus-within")),
+    ("hover", VariantType::PseudoClass("hover")),
+    ("focus", VariantType::PseudoClass("focus")),
+    ("focus-visible", VariantType::PseudoClass("focus-visible")),
+    ("active", VariantType::PseudoClass("active")),
+    ("enabled", VariantType::PseudoClass("enabled")),
+    ("disabled", VariantType::PseudoClass("disabled")),
+    ("ltr", VariantType::WrapClass(Cow::Borrowed("[dir=\"ltr\"] &"))),
+    ("rtl", VariantType::WrapClass(Cow::Borrowed("[dir=\"rtl\"] &"))),
+
+    // --- At rules ---
+    ("motion-safe", VariantType::AtRule(Cow::Borrowed("@media (prefers-reduced-motion: no-preference)"))),
+    ("motion-reduce", VariantType::AtRule(Cow::Borrowed("@media (prefers-reduced-motion: reduce)"))),
     ("print", VariantType::AtRule(Cow::Borrowed("@media print"))),
-    // --- Orientation ---
-    (
-        "portrait",
-        VariantType::AtRule(Cow::Borrowed("@media (orientation: portrait)")),
-    ),
-    (
-        "landscape",
-        VariantType::AtRule(Cow::Borrowed("@media (orientation: landscape)")),
-    ),
-    // TODO: Group, peer, parent variants
+    ("portrait", VariantType::AtRule(Cow::Borrowed("@media (orientation: portrait)"))),
+    ("landscape", VariantType::AtRule(Cow::Borrowed("@media (orientation: landscape)"))),
+    ("contrast-more", VariantType::AtRule(Cow::Borrowed("@media (prefers-contrast: more)"))),
+    ("contrast-less", VariantType::AtRule(Cow::Borrowed("@media (prefers-contrast: less)"))),
 ];
 
 /// The list of all default plugins.

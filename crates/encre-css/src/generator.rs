@@ -120,6 +120,7 @@ pub fn generate_at_rules<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
 /// Returns [`fmt::Error`] indicating whether writing to the buffer succeeded.
 ///
 /// [`fmt::Error`]: std::fmt::Error
+#[allow(clippy::too_many_lines)]
 pub fn generate_class<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
     context: &mut ContextHandle,
     rule_content_fn: T,
@@ -127,7 +128,6 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
 ) -> fmt::Result {
     // Write the class
     indent(context.indentation, context.buffer)?;
-
     let mut base_class = ".".to_string()
         + &context
             .selector
@@ -153,15 +153,62 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
             .iter()
             .rev()
             .for_each(|variant| match variant {
-                Variant::Builtin(variant) => {
-                    if let Some(VariantType::WrapClass(template)) = BUILTIN_VARIANTS
-                        .iter()
-                        .find_map(|v| if &v.0 == variant { Some(&v.1) } else { None })
-                        .or_else(|| context.custom_variant_list.get(&Cow::from(*variant)))
-                    {
+                Variant::Builtin(variant) => match BUILTIN_VARIANTS
+                    .iter()
+                    .find_map(|v| if &v.0 == variant { Some(&v.1) } else { None })
+                    .or_else(|| context.custom_variant_list.get(&Cow::from(*variant)))
+                {
+                    Some(VariantType::PseudoElement(element)) => {
+                        write!(base_class, "::{}", element).expect("writing to a String can't fail");
+                    }
+                    Some(VariantType::PseudoClass(class)) => {
+                        write!(base_class, ":{}", class).expect("writing to a String can't fail");
+                    }
+                    Some(VariantType::WrapClass(template)) => {
                         base_class = template.replace('&', &base_class);
                     }
-                }
+                    Some(VariantType::AtRule(_)) => (),
+                    None => {
+                        // Maybe a parent or peer variant
+                        if let Some(group_variant) = variant.strip_prefix("group-") {
+                            if let Some(VariantType::PseudoClass(class)) =
+                                BUILTIN_VARIANTS.iter().find_map(|v| {
+                                    if v.0 == group_variant {
+                                        Some(&v.1)
+                                    } else {
+                                        None
+                                    }
+                                })
+                            {
+                                base_class = format!(".group:{class} {base_class}");
+                            }
+                        } else if let Some(peer_variant) = variant.strip_prefix("peer-not-") {
+                            if let Some(VariantType::PseudoClass(class)) =
+                                BUILTIN_VARIANTS.iter().find_map(|v| {
+                                    if v.0 == peer_variant {
+                                        Some(&v.1)
+                                    } else {
+                                        None
+                                    }
+                                })
+                            {
+                                base_class = format!(".peer:not(:{class}) ~ {base_class}");
+                            }
+                        } else if let Some(peer_variant) = variant.strip_prefix("peer-") {
+                            if let Some(VariantType::PseudoClass(class)) =
+                                BUILTIN_VARIANTS.iter().find_map(|v| {
+                                    if v.0 == peer_variant {
+                                        Some(&v.1)
+                                    } else {
+                                        None
+                                    }
+                                })
+                            {
+                                base_class = format!(".peer:{class} ~ {base_class}");
+                            }
+                        }
+                    }
+                },
                 Variant::Arbitrary(template) if !template.starts_with('@') => {
                     base_class = template.replace('&', &base_class);
                 }
@@ -210,7 +257,6 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
             } else {
                 index
             };
-
             let replace_with = " !important;";
             context.buffer.replace_range(index - 1..index, replace_with);
             extra_index += replace_with.len() - 1;
@@ -218,7 +264,6 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
     }
 
     context.indentation -= 1;
-
     if context.indentation == 0 {
         write!(context.buffer, "}}")?;
     } else {
@@ -785,6 +830,10 @@ mod tests {
         generator.add_selector("file:hover:bg-pink-600");
         generator.add_selector("sm:before:target:content-['Hello_world!']");
         generator.add_selector("marker:selection:hover:bg-green-200");
+        generator.add_selector("group-hover:bg-green-300");
+        generator.add_selector("group-focus:bg-green-400");
+        generator.add_selector("peer-invalid:bg-red-500");
+        generator.add_selector("peer-not-invalid:bg-green-500");
 
         assert_eq!(
             generator.generate().unwrap(),
@@ -815,6 +864,16 @@ mod tests {
   background-color: rgb(220 38 38 / var(--en-bg-opacity));
 }
 
+.group:focus .group-focus\:bg-green-400 {
+  --en-bg-opacity: 1;
+  background-color: rgb(74 222 128 / var(--en-bg-opacity));
+}
+
+.group:hover .group-hover\:bg-green-300 {
+  --en-bg-opacity: 1;
+  background-color: rgb(134 239 172 / var(--en-bg-opacity));
+}
+
 .hover\:file\:bg-pink-600::file-selector-button:hover {
   --en-bg-opacity: 1;
   background-color: rgb(219 39 119 / var(--en-bg-opacity));
@@ -830,6 +889,16 @@ mod tests {
     --en-bg-opacity: 1;
     background-color: rgb(219 234 254 / var(--en-bg-opacity));
   }
+}
+
+.peer:invalid ~ .peer-invalid\:bg-red-500 {
+  --en-bg-opacity: 1;
+  background-color: rgb(239 68 68 / var(--en-bg-opacity));
+}
+
+.peer:not(:invalid) ~ .peer-not-invalid\:bg-green-500 {
+  --en-bg-opacity: 1;
+  background-color: rgb(34 197 94 / var(--en-bg-opacity));
 }
 
 @media (min-width: 640px) {

@@ -30,7 +30,7 @@ impl Plugin for PluginDefinition {
                 writeln!(context.buffer, "--en-content: none;")?;
                 indent(context.indentation, context.buffer)?;
                 writeln!(context.buffer, "content: var(--tw-content)")?;
-            },
+            }
             Modifier::Arbitrary { value, .. } => {
                 writeln!(context.buffer, "--en-content: {value};")?;
             }

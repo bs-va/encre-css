@@ -26,17 +26,19 @@ impl Plugin for PluginDefinition {
     fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
         indent(context.indentation, context.buffer)?;
         match context.modifier {
-            Modifier::Builtin { value, .. } => if *value == "none" {
-                writeln!(context.buffer, "-webkit-line-clamp: unset;")
-            } else {
-                writeln!(context.buffer, "overflow: hidden;")?;
-                indent(context.indentation, context.buffer)?;
-                writeln!(context.buffer, "display: -webkit-box;")?;
-                indent(context.indentation, context.buffer)?;
-                writeln!(context.buffer, "-webkit-box-orient: vertical;")?;
-                indent(context.indentation, context.buffer)?;
-                writeln!(context.buffer, "-webkit-line-clamp: {value};")
-            },
+            Modifier::Builtin { value, .. } => {
+                if *value == "none" {
+                    writeln!(context.buffer, "-webkit-line-clamp: unset;")
+                } else {
+                    writeln!(context.buffer, "overflow: hidden;")?;
+                    indent(context.indentation, context.buffer)?;
+                    writeln!(context.buffer, "display: -webkit-box;")?;
+                    indent(context.indentation, context.buffer)?;
+                    writeln!(context.buffer, "-webkit-box-orient: vertical;")?;
+                    indent(context.indentation, context.buffer)?;
+                    writeln!(context.buffer, "-webkit-line-clamp: {value};")
+                }
+            }
             Modifier::Arbitrary { .. } => unreachable!(),
         }
     }
