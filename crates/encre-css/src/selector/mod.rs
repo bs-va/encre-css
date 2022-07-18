@@ -174,8 +174,19 @@ pub enum VariantType {
     /// class is `".bg-red-500"`, the class will become `"@media (orientation: portrait) { .bg-red-500 { ... } }"`).
     AtRule(Cow<'static, str>),
 
+    /// A variant applied to a group element like `group-hover`.
+    ///
+    /// This variant should not be built manually.
     Group(&'static str),
+
+    /// A variant applied to a peer element like `peer-focus`.
+    ///
+    /// This variant should not be built manually.
     Peer(&'static str),
+
+    /// A negated variant applied to a peer element like `peer-not-hover`.
+    ///
+    /// This variant should not be built manually.
     PeerNot(&'static str),
 }
 
