@@ -137,9 +137,51 @@ pub enum Modifier<'a> {
     },
 }
 
+/// Structure used to add pseudo-selectors, pseudo-elements, pseudo classes and media queries to
+/// CSS rules.
+///
+/// Variant are useful to <i>conditionally</i> apply utility classes.
+///
+/// See [Tailwind's documentation](https://tailwindcss.com/docs/hover-focus-and-other-states) to learn more about variants.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum VariantType {
+    /// A CSS [pseudo element](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements)
+    ///
+    /// # Example
+    ///
+    /// If the variant is `VariantType::PseudoClass("before")` and the original class is `".bg-red-500"`, the class will become `".bg-red-500::before"`).
+    PseudoElement(&'static str),
+
+    /// A CSS [pseudo class](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes)
+    ///
+    /// # Example
+    ///
+    /// If the variant is `VariantType::PseudoClass("hover")` and the original class is `".bg-red-500"`, the class will become `".bg-red-500:hover"`).
+    PseudoClass(&'static str),
+
+    /// Wrap the original class to make another one.
+    ///
+    /// # Example
+    ///
+    /// If the variant is `VariantType::WrapClass("&[open]")` and the original class is `".bg-red-500"`, the class will become `".bg-red-500[open]"`).
+    WrapClass(Cow<'static, str>),
+
+    /// Add a `@` CSS rule (like `@media`, `@supports`)
+    ///
+    /// # Example
+    ///
+    /// If the variant is `VariantType::AtRule("@media (orientation: portrait)")` and the original
+    /// class is `".bg-red-500"`, the class will become `"@media (orientation: portrait) { .bg-red-500 { ... } }"`).
+    AtRule(Cow<'static, str>),
+
+    Group(&'static str),
+    Peer(&'static str),
+    PeerNot(&'static str),
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum Variant<'a> {
-    Builtin(&'a str),
+    Builtin(usize, VariantType),
     Arbitrary(Cow<'a, str>),
 }
 
@@ -189,6 +231,20 @@ impl<'a> Ord for Selector<'a> {
             Ordering::Less
         } else if !self.variants.is_empty() && other.variants.is_empty() {
             Ordering::Greater
+        } else if !self.variants.is_empty() && !other.variants.is_empty() {
+            match self.variants.get(0).unwrap() {
+                Variant::Builtin(order, _) => order,
+                Variant::Arbitrary(_) => &1_000_000,
+            }
+            .cmp(match other.variants.get(0).unwrap() {
+                Variant::Builtin(order, _) => order,
+                Variant::Arbitrary(_) => &1_000_001,
+            })
+            .then_with(|| {
+                self.order
+                    .cmp(&other.order)
+                    .then_with(|| self.full.cmp(other.full))
+            })
         } else {
             self.order
                 .cmp(&other.order)

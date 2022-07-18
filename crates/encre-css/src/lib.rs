@@ -167,8 +167,7 @@
 //!
 //! 1. The documentation about the composition of a class (also named selector) is [here](crate::selector).
 //! 2. The documentation about all utility classes (handled by plugins) is [here](crate::plugins).
-//! 3. The documentation about the prefixes used to conditionally apply utility classes (also named variant) is [here](crate::variant).
-//! 4. The documentation about the reset CSS commonly used (also named preflight) is [here](crate::preflight).
+//! 3. The documentation about the reset CSS commonly used (also named preflight) is [here](crate::preflight).
 //!
 //! ## Command line interface
 //!
@@ -208,7 +207,6 @@
     clippy::use_self,
     clippy::useless_let_if_seq,
     clippy::verbose_file_reads,
-    clippy::expect_used,
     clippy::panic,
     clippy::unimplemented,
     clippy::todo
@@ -223,7 +221,6 @@ pub mod preflight;
 pub mod scanner;
 pub mod selector;
 pub mod utils;
-pub mod variant;
 
 pub use config::Config;
 pub use error::{Error, Result};

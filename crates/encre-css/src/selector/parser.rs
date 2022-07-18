@@ -1,6 +1,6 @@
-use super::{Modifier, Selector, Variant};
+use super::{Modifier, Selector, Variant, VariantType};
 use crate::{
-    config::{Config, BUILTIN_PLUGINS},
+    config::{Config, BUILTIN_PLUGINS, BUILTIN_VARIANTS},
     generator::ContextCanHandle,
     plugins::{css_property::CssPropertyPlugin, Plugin},
     utils::split_ignore_arbitrary,
@@ -143,6 +143,7 @@ fn parse_recursive<'a>(
 ) -> Option<Vec<Selector<'a>>> {
     // Parse variants
     let (variants, mut remaining) = {
+        let custom_variant_list = config.get_custom_variant_list();
         let mut variants = vec![];
         let mut remaining = "";
         let mut iter = split_ignore_arbitrary(val, VARIANT_SEPARATOR, true).peekable();
@@ -162,11 +163,54 @@ fn parse_recursive<'a>(
                 }
             };
 
-            variants.push(if is_arbitrary {
-                Variant::Arbitrary(underscores_to_spaces(unescape(Cow::from(variant))))
+            if is_arbitrary {
+                variants.push(Variant::Arbitrary(underscores_to_spaces(unescape(
+                    Cow::from(variant),
+                ))));
+            } else if let Some((order, variant)) = BUILTIN_VARIANTS
+                // TODO: Prevent cloning
+                .iter()
+                .cloned()
+                .map(|(key, val)| (Cow::from(key), val))
+                .enumerate()
+                .chain(
+                    custom_variant_list
+                        .iter()
+                        .cloned()
+                        .enumerate()
+                        .map(|(order, v)| (order + BUILTIN_VARIANTS.len(), v)),
+                )
+                .find(|(_, v)| v.0 == variant)
+            {
+                variants.push(Variant::Builtin(order, variant.1));
             } else {
-                Variant::Builtin(variant)
-            });
+                // Maybe a parent or peer variant
+                if let Some(group_variant) = variant.strip_prefix("group-") {
+                    if let Some((order, (_, VariantType::PseudoClass(class)))) = BUILTIN_VARIANTS
+                        .iter()
+                        .enumerate()
+                        .find(|(_, v)| v.0 == group_variant)
+                    {
+                        variants.push(Variant::Builtin(order + 1000, VariantType::Group(class)));
+                    }
+                } else if let Some(peer_not_variant) = variant.strip_prefix("peer-not-") {
+                    if let Some((order, (_, VariantType::PseudoClass(class)))) = BUILTIN_VARIANTS
+                        .iter()
+                        .enumerate()
+                        .find(|(_, v)| v.0 == peer_not_variant)
+                    {
+                        variants.push(Variant::Builtin(order + 2000, VariantType::PeerNot(class)));
+                    }
+                } else if let Some(peer_variant) = variant.strip_prefix("peer-") {
+                    if let Some((order, (_, VariantType::PseudoClass(class)))) = BUILTIN_VARIANTS
+                        .iter()
+                        .enumerate()
+                        .find(|(_, v)| v.0 == peer_variant)
+                    {
+                        variants.push(Variant::Builtin(order + 3000, VariantType::Peer(class)));
+                    }
+                }
+            }
         }
 
         (variants, remaining)
@@ -474,7 +518,7 @@ mod tests {
                 full: "hover:text-center",
                 order: 165,
                 plugin: &typography::text_align::PluginDefinition,
-                variants: vec![Variant::Builtin("hover")],
+                variants: vec![Variant::Builtin(46, VariantType::PseudoClass("hover"))],
                 modifier: Modifier::Builtin {
                     is_negative: false,
                     value: "center",
@@ -493,9 +537,15 @@ mod tests {
                 order: 165,
                 plugin: &typography::text_align::PluginDefinition,
                 variants: vec![
-                    Variant::Builtin("marker"),
-                    Variant::Builtin("xl"),
-                    Variant::Builtin("hover")
+                    Variant::Builtin(
+                        2,
+                        VariantType::WrapClass(Cow::from("& *::marker, &::marker"))
+                    ),
+                    Variant::Builtin(
+                        64,
+                        VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                    ),
+                    Variant::Builtin(46, VariantType::PseudoClass("hover"))
                 ],
                 modifier: Modifier::Builtin {
                     is_negative: false,
@@ -513,11 +563,17 @@ mod tests {
             Selector {
                 full: "marker:xl:hover:-mx-4",
                 order: 20,
-                plugin: &spacing::margin::PluginDefinition,
+                plugin: &spacing::margin::PluginXDefinition,
                 variants: vec![
-                    Variant::Builtin("marker"),
-                    Variant::Builtin("xl"),
-                    Variant::Builtin("hover")
+                    Variant::Builtin(
+                        2,
+                        VariantType::WrapClass(Cow::from("& *::marker, &::marker"))
+                    ),
+                    Variant::Builtin(
+                        64,
+                        VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                    ),
+                    Variant::Builtin(46, VariantType::PseudoClass("hover"))
                 ],
                 modifier: Modifier::Builtin {
                     is_negative: true,
@@ -575,9 +631,12 @@ mod tests {
                 order: 165,
                 plugin: &typography::text_align::PluginDefinition,
                 variants: vec![
-                    Variant::Builtin("xl"),
+                    Variant::Builtin(
+                        64,
+                        VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                    ),
                     Variant::Arbitrary(Cow::from("&>*")),
-                    Variant::Builtin("focus")
+                    Variant::Builtin(47, VariantType::PseudoClass("focus"))
                 ],
                 modifier: Modifier::Builtin {
                     is_negative: false,
@@ -597,9 +656,12 @@ mod tests {
                 order: 19,
                 plugin: &spacing::margin::PluginDefinition,
                 variants: vec![
-                    Variant::Builtin("xl"),
+                    Variant::Builtin(
+                        64,
+                        VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                    ),
                     Variant::Arbitrary(Cow::from("&>*")),
-                    Variant::Builtin("focus")
+                    Variant::Builtin(47, VariantType::PseudoClass("focus"))
                 ],
                 modifier: Modifier::Builtin {
                     is_negative: true,
@@ -675,7 +737,16 @@ mod tests {
                 full: "xl:marker:bg-[#fff]",
                 order: 140,
                 plugin: &background::background_color::PluginDefinition,
-                variants: vec![Variant::Builtin("xl"), Variant::Builtin("marker")],
+                variants: vec![
+                    Variant::Builtin(
+                        64,
+                        VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                    ),
+                    Variant::Builtin(
+                        2,
+                        VariantType::WrapClass(Cow::from("& *::marker, &::marker"))
+                    ),
+                ],
                 modifier: Modifier::Arbitrary {
                     prefix: "",
                     hint: "",
@@ -694,7 +765,16 @@ mod tests {
                 full: "xl:marker:bg-[color:#fff]",
                 order: 140,
                 plugin: &background::background_color::PluginDefinition,
-                variants: vec![Variant::Builtin("xl"), Variant::Builtin("marker")],
+                variants: vec![
+                    Variant::Builtin(
+                        64,
+                        VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                    ),
+                    Variant::Builtin(
+                        2,
+                        VariantType::WrapClass(Cow::from("& *::marker, &::marker"))
+                    ),
+                ],
                 modifier: Modifier::Arbitrary {
                     prefix: "",
                     hint: "color",
@@ -751,9 +831,12 @@ mod tests {
                 order: 140,
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![
-                    Variant::Builtin("xl"),
+                    Variant::Builtin(
+                        64,
+                        VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                    ),
                     Variant::Arbitrary(Cow::from("&>*")),
-                    Variant::Builtin("hover")
+                    Variant::Builtin(46, VariantType::PseudoClass("hover"))
                 ],
                 modifier: Modifier::Arbitrary {
                     prefix: "",
@@ -774,9 +857,12 @@ mod tests {
                 order: 140,
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![
-                    Variant::Builtin("xl"),
+                    Variant::Builtin(
+                        64,
+                        VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                    ),
                     Variant::Arbitrary(Cow::from("&>*")),
-                    Variant::Builtin("hover")
+                    Variant::Builtin(46, VariantType::PseudoClass("hover"))
                 ],
                 modifier: Modifier::Arbitrary {
                     prefix: "",
@@ -815,7 +901,7 @@ mod tests {
                 full: "hover:[mask-type:luminance]",
                 order: BUILTIN_PLUGINS.len(),
                 plugin: &CssPropertyPlugin,
-                variants: vec![Variant::Builtin("hover")],
+                variants: vec![Variant::Builtin(46, VariantType::PseudoClass("hover"))],
                 modifier: Modifier::Arbitrary {
                     prefix: "",
                     hint: "",
@@ -831,7 +917,7 @@ mod tests {
         assert_eq!(
             parse(
                 "hover:(focus:bg-gray-500,text-[color:black,])",
-                &Config::default()
+                &Config::default(),
             )
             .unwrap(),
             vec![
@@ -839,7 +925,10 @@ mod tests {
                     full: "hover:(focus:bg-gray-500,text-[color:black,])",
                     order: 140,
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![Variant::Builtin("focus"), Variant::Builtin("hover")],
+                    variants: vec![
+                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
+                        Variant::Builtin(46, VariantType::PseudoClass("hover"))
+                    ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
                         value: "gray-500",
@@ -850,7 +939,7 @@ mod tests {
                     full: "hover:(focus:bg-gray-500,text-[color:black,])",
                     order: 176,
                     plugin: &typography::text_color::PluginDefinition,
-                    variants: vec![Variant::Builtin("hover")],
+                    variants: vec![Variant::Builtin(46, VariantType::PseudoClass("hover"))],
                     modifier: Modifier::Arbitrary {
                         prefix: "",
                         hint: "color",
@@ -870,7 +959,7 @@ mod tests {
                 full: "hover:(bg-gray-500)",
                 order: 140,
                 plugin: &background::background_color::PluginDefinition,
-                variants: vec![Variant::Builtin("hover")],
+                variants: vec![Variant::Builtin(46, VariantType::PseudoClass("hover"))],
                 modifier: Modifier::Builtin {
                     is_negative: false,
                     value: "gray-500",
@@ -885,7 +974,7 @@ mod tests {
         assert_eq!(
             parse(
                 "focus:([&>*]:-m-4,xl:dark:(bg-red-100,rtl:text-[color:black]))",
-                &Config::default()
+                &Config::default(),
             )
             .unwrap(),
             vec![
@@ -895,7 +984,7 @@ mod tests {
                     plugin: &spacing::margin::PluginDefinition,
                     variants: vec![
                         Variant::Arbitrary(Cow::from("&>*")),
-                        Variant::Builtin("focus"),
+                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: true,
@@ -908,9 +997,15 @@ mod tests {
                     order: 140,
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin("xl"),
-                        Variant::Builtin("dark"),
-                        Variant::Builtin("focus"),
+                        Variant::Builtin(
+                            64,
+                            VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                        ),
+                        Variant::Builtin(
+                            66,
+                            VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)"))
+                        ),
+                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -923,10 +1018,16 @@ mod tests {
                     order: 176,
                     plugin: &typography::text_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin("rtl"),
-                        Variant::Builtin("xl"),
-                        Variant::Builtin("dark"),
-                        Variant::Builtin("focus"),
+                        Variant::Builtin(53, VariantType::WrapClass(Cow::from("[dir=\"rtl\"] &"))),
+                        Variant::Builtin(
+                            64,
+                            VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                        ),
+                        Variant::Builtin(
+                            66,
+                            VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)"))
+                        ),
+                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
                     ],
                     modifier: Modifier::Arbitrary {
                         prefix: "",
@@ -953,7 +1054,7 @@ mod tests {
                     plugin: &spacing::margin::PluginDefinition,
                     variants: vec![
                         Variant::Arbitrary(Cow::from("&>*")),
-                        Variant::Builtin("focus"),
+                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: true,
@@ -967,9 +1068,9 @@ mod tests {
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Arbitrary(Cow::from(r"[type='text'].light &,.foo")),
-                        Variant::Builtin("xl"),
-                        Variant::Builtin("dark"),
-                        Variant::Builtin("focus"),
+                        Variant::Builtin(64, VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))),
+                        Variant::Builtin(66, VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)"))),
+                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -982,9 +1083,9 @@ mod tests {
                     order: 176,
                     plugin: &typography::text_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin("xl"),
-                        Variant::Builtin("dark"),
-                        Variant::Builtin("focus"),
+                        Variant::Builtin(64, VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))),
+                        Variant::Builtin(66, VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)"))),
+                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
                     ],
                     modifier: Modifier::Arbitrary {
                         prefix: "",
@@ -1010,7 +1111,13 @@ mod tests {
                     full: r"xl:(focus:(outline,outline-red-200),dark:(bg-black,text-white))",
                     order: 191,
                     plugin: &border::outline_style::PluginDefinition,
-                    variants: vec![Variant::Builtin("focus"), Variant::Builtin("xl"),],
+                    variants: vec![
+                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
+                        Variant::Builtin(
+                            64,
+                            VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                        )
+                    ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
                         value: "",
@@ -1021,7 +1128,13 @@ mod tests {
                     full: r"xl:(focus:(outline,outline-red-200),dark:(bg-black,text-white))",
                     order: 194,
                     plugin: &border::outline_color::PluginDefinition,
-                    variants: vec![Variant::Builtin("focus"), Variant::Builtin("xl"),],
+                    variants: vec![
+                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
+                        Variant::Builtin(
+                            64,
+                            VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                        )
+                    ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
                         value: "red-200",
@@ -1032,7 +1145,16 @@ mod tests {
                     full: r"xl:(focus:(outline,outline-red-200),dark:(bg-black,text-white))",
                     order: 140,
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![Variant::Builtin("dark"), Variant::Builtin("xl"),],
+                    variants: vec![
+                        Variant::Builtin(
+                            66,
+                            VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)"))
+                        ),
+                        Variant::Builtin(
+                            64,
+                            VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                        ),
+                    ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
                         value: "black",
@@ -1043,7 +1165,16 @@ mod tests {
                     full: r"xl:(focus:(outline,outline-red-200),dark:(bg-black,text-white))",
                     order: 176,
                     plugin: &typography::text_color::PluginDefinition,
-                    variants: vec![Variant::Builtin("dark"), Variant::Builtin("xl"),],
+                    variants: vec![
+                        Variant::Builtin(
+                            66,
+                            VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)"))
+                        ),
+                        Variant::Builtin(
+                            64,
+                            VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                        ),
+                    ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
                         value: "white",

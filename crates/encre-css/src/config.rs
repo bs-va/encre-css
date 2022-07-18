@@ -37,14 +37,14 @@ use crate::{
     error::{Error, Result},
     preflight::Preflight,
     scanner::Scanner,
-    variant::VariantType,
+    selector::VariantType,
 };
 
 #[allow(clippy::wildcard_imports)]
 use crate::plugins::*;
 
 use serde::Deserialize;
-use std::{borrow::Cow, collections::BTreeMap, fmt, fs, path::Path};
+use std::{borrow::Cow, collections::BTreeMap, fmt, fs, iter, path::Path, sync::{Mutex, MutexGuard}};
 
 /// The list of all default colors.
 ///
@@ -525,7 +525,7 @@ pub const BUILTIN_VARIANTS: &[(&str, VariantType)] = &[
     ("first-line", VariantType::PseudoElement("first-line")),
     ("marker", VariantType::WrapClass(Cow::Borrowed("& *::marker, &::marker"))),
     ("selection", VariantType::WrapClass(Cow::Borrowed("& *::selection, &::selection"))),
-    ("file", VariantType::PseudoElement("file-selector-button")),
+    ("file", VariantType::WrapClass(Cow::Borrowed("&::file-selector-button, &::-webkit-file-upload-button"))),
     ("placeholder", VariantType::PseudoElement("placeholder")),
     ("backdrop", VariantType::PseudoElement("backdrop")),
     ("before", VariantType::PseudoElement("before")),
@@ -983,6 +983,9 @@ pub struct Config {
     /// This field is skipped when deserializing from a [TOML](https://toml.io) file.
     #[serde(skip)]
     pub scanner: Scanner,
+
+    #[serde(skip)]
+    custom_variant_list: Mutex<Vec<(Cow<'static, str>, VariantType)>>,
     // custom_variants: Vec<VariantTypeConfig>,
     // custom_plugins: Vec<PluginConfig>,
 
@@ -990,6 +993,41 @@ pub struct Config {
 }
 
 impl Config {
+    pub(crate) fn get_custom_variant_list(&self) -> MutexGuard<Vec<(Cow<'static, str>, VariantType)>> {
+        // Initialize the list of custom variants if not already initialized
+        let mut custom_variant_list = self.custom_variant_list.try_lock().expect("failed to lock the list of custom variants");
+
+        if custom_variant_list.is_empty() {
+            *custom_variant_list = self.theme.screens.iter().map(|screen| {
+                    (
+                        screen.0.clone(),
+                        VariantType::AtRule(Cow::Owned(format!("@media (min-width: {})", screen.1))),
+                    )
+                })
+                .chain(BUILTIN_SCREENS
+                .iter()
+                .map(|screen| {
+                    (
+                        Cow::from(screen.0),
+                        VariantType::AtRule(Cow::Owned(format!("@media (min-width: {})", screen.1))),
+                    )
+                }))
+                .chain(iter::once(match &self.theme.dark_mode {
+                    DarkMode::Media => (
+                        Cow::from("dark"),
+                        VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)")),
+                    ),
+                    DarkMode::Class(name) => (
+                        Cow::from("dark"),
+                        VariantType::WrapClass(name.clone() + " &"),
+                    ),
+                }))
+                .collect::<Vec<(Cow<'static, str>, VariantType)>>();
+        }
+
+        custom_variant_list
+    }
+
     /// Deserialize the content of a [TOML](https://toml.io) file to get the configuration.
     ///
     /// # Example
@@ -1110,17 +1148,17 @@ mod tests {
   background-color: rgb(255 239 14 / var(--en-bg-opacity));
 }
 
-@media (min-width: 2000px) {
-  .lg\:text-rosa-500 {
-    --en-text-opacity: 1;
-    color: rgb(229 24 106 / var(--en-text-opacity));
-  }
-}
-
 @media (min-width: 1600px) {
   .\33xl\:underline {
     -webkit-text-decoration-line: underline;
     text-decoration-line: underline;
+  }
+}
+
+@media (min-width: 2000px) {
+  .lg\:text-rosa-500 {
+    --en-text-opacity: 1;
+    color: rgb(229 24 106 / var(--en-text-opacity));
   }
 }"#
             )

@@ -1,17 +1,15 @@
 //! Define the main [`EncreGenerator`] structure used to scan content and to generate CSS styles.
 use crate::{
-    config::{Config, BUILTIN_VARIANTS},
+    config::Config,
     error::Result,
     plugins::transition::animation,
     preflight::Preflight,
-    selector::{parse, Modifier, Selector, Variant},
+    selector::{parse, Modifier, Selector, Variant, VariantType},
     utils::indent,
-    variant::{init_variants, VariantType},
 };
 
 use std::{
-    borrow::Cow,
-    collections::{BTreeMap, BTreeSet},
+    collections::BTreeSet,
     fmt::{self, Write},
     path::Path,
     sync::{atomic::Ordering, Arc},
@@ -33,7 +31,7 @@ pub struct ContextCanHandle<'a, 'b, 'c> {
 ///
 /// [`Plugin::handle`]: crate::plugins::Plugin::handle
 #[derive(Debug)]
-pub struct ContextHandle<'a, 'b, 'c, 'd, 'e, 'f> {
+pub struct ContextHandle<'a, 'b, 'c, 'd, 'e> {
     /// The generator's configuration.
     pub config: &'a Config,
 
@@ -48,7 +46,6 @@ pub struct ContextHandle<'a, 'b, 'c, 'd, 'e, 'f> {
 
     // Private fields used in `generate_rule`
     selector: &'e Selector<'e>,
-    custom_variant_list: &'f BTreeMap<Cow<'f, str>, VariantType>,
 }
 
 /// Generate the needed CSS at-rules (e.g @media).
@@ -69,23 +66,17 @@ pub fn generate_at_rules<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
     if !context.selector.variants.is_empty() {
         context.selector.variants.iter().try_for_each(|variant| {
             match variant {
-                Variant::Builtin(variant) => {
-                    if let Some(VariantType::AtRule(variant)) = BUILTIN_VARIANTS
-                        .iter()
-                        .find_map(|v| if &v.0 == variant { Some(&v.1) } else { None })
-                        .or_else(|| context.custom_variant_list.get(&Cow::from(*variant)))
-                    {
-                        indent(context.indentation, context.buffer)?;
-                        writeln!(context.buffer, "{} {{", variant)?;
-                        context.indentation += 1;
-                    }
+                Variant::Builtin(_, VariantType::AtRule(variant)) => {
+                    indent(context.indentation, context.buffer)?;
+                    writeln!(context.buffer, "{} {{", variant)?;
+                    context.indentation += 1;
                 }
                 Variant::Arbitrary(variant) if variant.starts_with('@') => {
                     indent(context.indentation, context.buffer)?;
                     writeln!(context.buffer, "{} {{", variant)?;
                     context.indentation += 1;
                 }
-                Variant::Arbitrary(_) => (),
+                _ => (),
             }
 
             Ok::<(), fmt::Error>(())
@@ -153,60 +144,26 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
             .iter()
             .rev()
             .for_each(|variant| match variant {
-                Variant::Builtin(variant) => match BUILTIN_VARIANTS
-                    .iter()
-                    .find_map(|v| if &v.0 == variant { Some(&v.1) } else { None })
-                    .or_else(|| context.custom_variant_list.get(&Cow::from(*variant)))
-                {
-                    Some(VariantType::PseudoElement(element)) => {
-                        write!(base_class, "::{}", element).expect("writing to a String can't fail");
+                Variant::Builtin(_, variant) => match variant {
+                    VariantType::PseudoElement(element) => {
+                        write!(base_class, "::{}", element)
+                            .expect("writing to a String can't fail");
                     }
-                    Some(VariantType::PseudoClass(class)) => {
+                    VariantType::PseudoClass(class) => {
                         write!(base_class, ":{}", class).expect("writing to a String can't fail");
                     }
-                    Some(VariantType::WrapClass(template)) => {
+                    VariantType::WrapClass(template) => {
                         base_class = template.replace('&', &base_class);
                     }
-                    Some(VariantType::AtRule(_)) => (),
-                    None => {
-                        // Maybe a parent or peer variant
-                        if let Some(group_variant) = variant.strip_prefix("group-") {
-                            if let Some(VariantType::PseudoClass(class)) =
-                                BUILTIN_VARIANTS.iter().find_map(|v| {
-                                    if v.0 == group_variant {
-                                        Some(&v.1)
-                                    } else {
-                                        None
-                                    }
-                                })
-                            {
-                                base_class = format!(".group:{class} {base_class}");
-                            }
-                        } else if let Some(peer_variant) = variant.strip_prefix("peer-not-") {
-                            if let Some(VariantType::PseudoClass(class)) =
-                                BUILTIN_VARIANTS.iter().find_map(|v| {
-                                    if v.0 == peer_variant {
-                                        Some(&v.1)
-                                    } else {
-                                        None
-                                    }
-                                })
-                            {
-                                base_class = format!(".peer:not(:{class}) ~ {base_class}");
-                            }
-                        } else if let Some(peer_variant) = variant.strip_prefix("peer-") {
-                            if let Some(VariantType::PseudoClass(class)) =
-                                BUILTIN_VARIANTS.iter().find_map(|v| {
-                                    if v.0 == peer_variant {
-                                        Some(&v.1)
-                                    } else {
-                                        None
-                                    }
-                                })
-                            {
-                                base_class = format!(".peer:{class} ~ {base_class}");
-                            }
-                        }
+                    VariantType::AtRule(_) => (),
+                    VariantType::Group(class) => {
+                        base_class = format!(".group:{class} {base_class}");
+                    }
+                    VariantType::Peer(class) => {
+                        base_class = format!(".peer:{class} ~ {base_class}");
+                    }
+                    VariantType::PeerNot(class) => {
+                        base_class = format!(".peer:not(:{class}) ~ {base_class}");
                     }
                 },
                 Variant::Arbitrary(template) if !template.starts_with('@') => {
@@ -227,8 +184,9 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
     // If the rule is selecting the `::before` or `::after` pseudo elements, we need to generate a
     // default `content` property
     if context.selector.variants.iter().any(|variant| {
-        if let Variant::Builtin(variant) = variant {
-            *variant == "before" || *variant == "after"
+        if let Variant::Builtin(_, variant) = variant {
+            *variant == VariantType::PseudoElement("before")
+                || *variant == VariantType::PseudoElement("after")
         } else {
             false
         }
@@ -327,8 +285,9 @@ impl<'a> EncreGenerator<'a> {
     ///
     /// The configuration can either be a [`Config`] structure or an [`Arc<Config>`].
     pub fn from_config<T: Into<Arc<Config>>>(config: T) -> Self {
+        let config = config.into();
         Self {
-            config: config.into(),
+            config,
             scanned_selectors: BTreeSet::new(),
         }
     }
@@ -395,8 +354,6 @@ impl<'a> EncreGenerator<'a> {
             .iter()
             .for_each(|animation| animation.store(false, Ordering::Relaxed));
 
-        let custom_variant_list = init_variants(&self.config);
-
         let preflight = self.config.preflight.build();
         let mut buffer = String::with_capacity(10 * self.scanned_selectors.len()); // TODO: More accurate value
         buffer.push_str(&preflight); // TODO: Push and reserve at the same time
@@ -412,7 +369,6 @@ impl<'a> EncreGenerator<'a> {
                 indentation: 0,
                 buffer: &mut buffer,
                 selector,
-                custom_variant_list: &custom_variant_list,
             };
 
             if selector.plugin.needs_wrapping() {
@@ -436,10 +392,9 @@ mod tests {
 
     fn base_config() -> Config {
         // Disable the preflight to simplify test assertions
-        Config {
-            preflight: Preflight::None,
-            ..Default::default()
-        }
+        let mut config = Config::default();
+        config.preflight = Preflight::None;
+        config
     }
 
     #[test]
@@ -546,18 +501,18 @@ mod tests {
   margin-left: calc(0.25rem * calc(1 - var(--en-space-x-reverse)));
 }
 
-.\[\&\:has\(\.class\)_\>_\*\]\:space-y-3:has(.class) > * > :not([hidden]) ~ :not([hidden]) {
-  --en-space-y-reverse: 0;
-  margin-top: calc(0.75rem * calc(1 - var(--en-space-y-reverse)));
-  margin-bottom: calc(0.75rem * var(--en-space-y-reverse));
-}
-
 @media (min-width: 1280px) {
   .xl\:\[\&_\>_\*\]\:divide-y-2 > * > :not([hidden]) ~ :not([hidden]) {
     --en-divide-y-reverse: 0;
     border-top-width: calc(2px * calc(1 - var(--en-divide-y-reverse)));
     border-bottom-width: calc(2px * var(--en-divide-y-reverse));
   }
+}
+
+.\[\&\:has\(\.class\)_\>_\*\]\:space-y-3:has(.class) > * > :not([hidden]) ~ :not([hidden]) {
+  --en-space-y-reverse: 0;
+  margin-top: calc(0.75rem * calc(1 - var(--en-space-y-reverse)));
+  margin-bottom: calc(0.75rem * var(--en-space-y-reverse));
 }"#
             )
         );
@@ -838,23 +793,17 @@ mod tests {
         assert_eq!(
             generator.generate().unwrap(),
             String::from(
-                r#"@media (min-width: 1536px) {
-  @media (prefers-reduced-motion: no-preference) {
-    @media (orientation: landscape) {
-      [dir="rtl"] .\32xl\:motion-safe\:landscape\:focus-within\:visited\:first\:odd\:checked\:open\:rtl\:bg-purple-100[open]:checked:nth-child(odd):first-child:visited:focus-within {
-        --en-bg-opacity: 1;
-        background-color: rgb(243 232 255 / var(--en-bg-opacity));
-      }
-    }
-  }
-}
-
-[dir="rtl"] .active\:rtl\:bg-red-800:active {
+                r#".marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection *::marker, .marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection::marker {
   --en-bg-opacity: 1;
-  background-color: rgb(153 27 27 / var(--en-bg-opacity));
+  background-color: rgb(187 247 208 / var(--en-bg-opacity));
 }
 
-.file\:hover\:bg-pink-600:hover::file-selector-button {
+.file\:hover\:bg-pink-600:hover::file-selector-button, .file\:hover\:bg-pink-600:hover::-webkit-file-upload-button {
+  --en-bg-opacity: 1;
+  background-color: rgb(219 39 119 / var(--en-bg-opacity));
+}
+
+.hover\:file\:bg-pink-600::file-selector-button, .hover\:file\:bg-pink-600::-webkit-file-upload-button:hover {
   --en-bg-opacity: 1;
   background-color: rgb(219 39 119 / var(--en-bg-opacity));
 }
@@ -864,47 +813,15 @@ mod tests {
   background-color: rgb(220 38 38 / var(--en-bg-opacity));
 }
 
-.group:focus .group-focus\:bg-green-400 {
+[dir="rtl"] .active\:rtl\:bg-red-800:active {
   --en-bg-opacity: 1;
-  background-color: rgb(74 222 128 / var(--en-bg-opacity));
+  background-color: rgb(153 27 27 / var(--en-bg-opacity));
 }
 
-.group:hover .group-hover\:bg-green-300 {
-  --en-bg-opacity: 1;
-  background-color: rgb(134 239 172 / var(--en-bg-opacity));
-}
-
-.hover\:file\:bg-pink-600::file-selector-button:hover {
-  --en-bg-opacity: 1;
-  background-color: rgb(219 39 119 / var(--en-bg-opacity));
-}
-
-.marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection *::marker, .marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection::marker {
-  --en-bg-opacity: 1;
-  background-color: rgb(187 247 208 / var(--en-bg-opacity));
-}
-
-@media (min-width: 768px) {
-  .md\:focus\:selection\:bg-blue-100 *::selection, .md\:focus\:selection\:bg-blue-100::selection:focus {
-    --en-bg-opacity: 1;
-    background-color: rgb(219 234 254 / var(--en-bg-opacity));
-  }
-}
-
-.peer:invalid ~ .peer-invalid\:bg-red-500 {
-  --en-bg-opacity: 1;
-  background-color: rgb(239 68 68 / var(--en-bg-opacity));
-}
-
-.peer:not(:invalid) ~ .peer-not-invalid\:bg-green-500 {
-  --en-bg-opacity: 1;
-  background-color: rgb(34 197 94 / var(--en-bg-opacity));
-}
-
-@media (min-width: 640px) {
-  .sm\:hover\:bg-red-400:hover {
-    --en-bg-opacity: 1;
-    background-color: rgb(248 113 113 / var(--en-bg-opacity));
+@media (min-width: 1024px) {
+  [dir="rtl"] .rtl\:active\:focus\:lg\:underline:focus:active {
+    -webkit-text-decoration-line: underline;
+    text-decoration-line: underline;
   }
 }
 
@@ -917,10 +834,10 @@ mod tests {
   }
 }
 
-@media (min-width: 1024px) {
-  [dir="rtl"] .rtl\:active\:focus\:lg\:underline:focus:active {
-    -webkit-text-decoration-line: underline;
-    text-decoration-line: underline;
+@media (min-width: 640px) {
+  .sm\:hover\:bg-red-400:hover {
+    --en-bg-opacity: 1;
+    background-color: rgb(248 113 113 / var(--en-bg-opacity));
   }
 }
 
@@ -929,6 +846,44 @@ mod tests {
     --en-content: 'Hello world!';
     content: var(--en-content);
   }
+}
+
+@media (min-width: 768px) {
+  .md\:focus\:selection\:bg-blue-100 *::selection, .md\:focus\:selection\:bg-blue-100::selection:focus {
+    --en-bg-opacity: 1;
+    background-color: rgb(219 234 254 / var(--en-bg-opacity));
+  }
+}
+
+@media (min-width: 1536px) {
+  @media (prefers-reduced-motion: no-preference) {
+    @media (orientation: landscape) {
+      [dir="rtl"] .\32xl\:motion-safe\:landscape\:focus-within\:visited\:first\:odd\:checked\:open\:rtl\:bg-purple-100[open]:checked:nth-child(odd):first-child:visited:focus-within {
+        --en-bg-opacity: 1;
+        background-color: rgb(243 232 255 / var(--en-bg-opacity));
+      }
+    }
+  }
+}
+
+.group:hover .group-hover\:bg-green-300 {
+  --en-bg-opacity: 1;
+  background-color: rgb(134 239 172 / var(--en-bg-opacity));
+}
+
+.group:focus .group-focus\:bg-green-400 {
+  --en-bg-opacity: 1;
+  background-color: rgb(74 222 128 / var(--en-bg-opacity));
+}
+
+.peer:not(:invalid) ~ .peer-not-invalid\:bg-green-500 {
+  --en-bg-opacity: 1;
+  background-color: rgb(34 197 94 / var(--en-bg-opacity));
+}
+
+.peer:invalid ~ .peer-invalid\:bg-red-500 {
+  --en-bg-opacity: 1;
+  background-color: rgb(239 68 68 / var(--en-bg-opacity));
 }"#
             )
         );
@@ -1011,7 +966,19 @@ mod tests {
         assert_eq!(
             generator.generate().unwrap(),
             String::from(
-                r#"@media (prefers-color-scheme: dark) {
+                r#"@media (min-width: 1280px) {
+  .xl\:\(focus\:\(outline\,outline-red-200\)\,dark\:\(bg-black\,text-white\)\):focus {
+    outline-style: solid;
+  }
+}
+
+@media (min-width: 1280px) {
+  .xl\:\(focus\:\(outline\,outline-red-200\)\,dark\:\(bg-black\,text-white\)\):focus {
+    outline-color: rgb(254 202 202);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
   @media (min-width: 1280px) {
     .xl\:\(focus\:\(outline\,outline-red-200\)\,dark\:\(bg-black\,text-white\)\) {
       --en-bg-opacity: 1;
@@ -1026,18 +993,6 @@ mod tests {
       --en-text-opacity: 1;
       color: rgb(255 255 255 / var(--en-text-opacity));
     }
-  }
-}
-
-@media (min-width: 1280px) {
-  .xl\:\(focus\:\(outline\,outline-red-200\)\,dark\:\(bg-black\,text-white\)\):focus {
-    outline-style: solid;
-  }
-}
-
-@media (min-width: 1280px) {
-  .xl\:\(focus\:\(outline\,outline-red-200\)\,dark\:\(bg-black\,text-white\)\):focus {
-    outline-color: rgb(254 202 202);
   }
 }"#
             )
@@ -1227,24 +1182,24 @@ mod tests {
         assert_eq!(
             generator.generate().unwrap(),
             String::from(
-                r#".after\:rounded-full::after {
-  border-radius: 9999px;
-  content: var(--en-content);
-}
-
-.before\:bg-red-500::before {
+                r#".before\:bg-red-500::before {
   --en-bg-opacity: 1;
   background-color: rgb(239 68 68 / var(--en-bg-opacity));
   content: var(--en-content);
 }
 
-.after\:content-\[counter\(foo\)\]::after {
-  --en-content: counter(foo);
+.before\:content-\[\'Hello_world\!\'\]::before {
+  --en-content: 'Hello world!';
   content: var(--en-content);
 }
 
-.before\:content-\[\'Hello_world\!\'\]::before {
-  --en-content: 'Hello world!';
+.after\:rounded-full::after {
+  border-radius: 9999px;
+  content: var(--en-content);
+}
+
+.after\:content-\[counter\(foo\)\]::after {
+  --en-content: counter(foo);
   content: var(--en-content);
 }"#
             )
