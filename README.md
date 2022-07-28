@@ -109,7 +109,7 @@ Add `encre-css` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-encre-css = { git = "https://gitlab.com/encre-css/encre-css.git", tag = "v0.3.0" }
+encre-css = { git = "https://gitlab.com/encre-css/encre-css.git", tag = "v0.5.0" }
 ```
 
 Generating styles takes three steps:
