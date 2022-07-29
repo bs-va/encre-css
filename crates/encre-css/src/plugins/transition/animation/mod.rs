@@ -160,10 +160,12 @@ impl Plugin for PluginDefinition {
                 })
             }
             Modifier::Arbitrary { value, .. } => {
-                indent(context.indentation, context.buffer)?;
-                writeln!(context.buffer, "-webkit-animation: {value};")?;
-                indent(context.indentation, context.buffer)?;
-                writeln!(context.buffer, "animation: {value};")
+                generate_wrapper(context, |context| {
+                    indent(context.indentation, context.buffer)?;
+                    writeln!(context.buffer, "-webkit-animation: {value};")?;
+                    indent(context.indentation, context.buffer)?;
+                    writeln!(context.buffer, "animation: {value};")
+                })
             }
         }
     }
