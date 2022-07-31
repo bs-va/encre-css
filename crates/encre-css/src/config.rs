@@ -824,7 +824,7 @@ pub const BUILTIN_PLUGINS: [&'static (dyn Plugin + Send + Sync); 227] = [
 /// Configuration for the [`Theme::dark_mode`] field.
 ///
 /// It defines how the `dark:` variant should behaves.
-#[derive(Debug, PartialEq, Default, Deserialize)]
+#[derive(Debug, PartialEq, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum DarkMode {
     /// The `dark:` variant will modify the class of the selector. You'll then need to toggle this
@@ -869,8 +869,13 @@ pub enum DarkMode {
     ///   }
     /// }"#));
     /// ```
-    #[default]
     Media,
+}
+
+impl Default for DarkMode {
+    fn default() -> Self {
+        Self::Media
+    }
 }
 
 impl DarkMode {
