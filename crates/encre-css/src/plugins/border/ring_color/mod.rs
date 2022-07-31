@@ -37,10 +37,10 @@ impl Plugin for PluginDefinition {
                     indent(context.indentation, context.buffer)?;
                 }
 
-                writeln!(context.buffer, "--ring-color: {color};")?;
+                writeln!(context.buffer, "--en-ring-color: {color};")?;
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "--ring-color: {value};")?;
+                writeln!(context.buffer, "--en-ring-color: {value};")?;
             }
         }
 
