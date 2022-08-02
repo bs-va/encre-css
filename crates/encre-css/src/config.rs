@@ -24,13 +24,21 @@
 //! let mut generator = EncreGenerator::from_config(config);
 //! generator.add_selector("tablet:dark:bg-primary");
 //!
-//! assert!(generator.generate().expect("failed to generate the CSS").contains(r#"@media (min-width: 640px) {
+//! assert!(generator.generate().ends_with(r#"@media (min-width: 640px) {
 //!   .dark .tablet\:dark\:bg-primary {
 //!     --en-bg-opacity: 1;
 //!     background-color: rgb(211 25 140 / var(--en-bg-opacity));
 //!   }
 //! }"#));
 //! ```
+//!
+//! The previous example is equivalent to the following TOML configuration file:
+//!
+//! <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">[theme]</span>
+//! dark_mode = { class = <span class="string">".dark"</span> }
+//! colors = { primary = <span class="string">"#d3198c"</span>, secondary = <span class="string">"#fff"</span> }
+//! screens = { tablet = <span class="string">"640px"</span>, laptop = <span class="string">"1024px"</span>, desktop = <span class="string">"1280px"</span> }
+//! </code></pre></div>
 //!
 //! [`EncreGenerator`]: crate::EncreGenerator
 use crate::{
@@ -44,7 +52,13 @@ use crate::{
 use crate::plugins::*;
 
 use serde::Deserialize;
-use std::{borrow::Cow, collections::BTreeMap, fmt, fs, iter, path::Path, sync::{Mutex, MutexGuard}};
+use std::{
+    borrow::Cow,
+    collections::BTreeMap,
+    fmt, fs, iter,
+    path::Path,
+    sync::{Mutex, MutexGuard},
+};
 
 /// The list of all default colors.
 ///
@@ -519,73 +533,73 @@ pub const BUILTIN_SCREENS: &[(&str, &str)] = &[
 ///
 /// Based on [Tailwind's default variants](https://tailwindcss.com/docs/hover-focus-and-other-states).
 #[rustfmt::skip]
-pub const BUILTIN_VARIANTS: &[(&str, VariantType)] = &[
+pub const BUILTIN_VARIANTS: &[(Cow<'static, str>, VariantType)] = &[
     // --- Pseudo element ---
-    ("first-letter", VariantType::PseudoElement("first-letter")),
-    ("first-line", VariantType::PseudoElement("first-line")),
-    ("marker", VariantType::WrapClass(Cow::Borrowed("& *::marker, &::marker"))),
-    ("selection", VariantType::WrapClass(Cow::Borrowed("& *::selection, &::selection"))),
-    ("file", VariantType::WrapClass(Cow::Borrowed("&::file-selector-button, &::-webkit-file-upload-button"))),
-    ("placeholder", VariantType::PseudoElement("placeholder")),
-    ("backdrop", VariantType::PseudoElement("backdrop")),
-    ("before", VariantType::PseudoElement("before")),
-    ("after", VariantType::PseudoElement("after")),
-    ("all", VariantType::WrapClass(Cow::Borrowed("& *"))),
-    ("children", VariantType::WrapClass(Cow::Borrowed("& > *"))),
-    ("siblings", VariantType::WrapClass(Cow::Borrowed("& ~ *"))),
-    ("sibling", VariantType::WrapClass(Cow::Borrowed("& + *"))),
+    (Cow::Borrowed("first-letter"), VariantType::PseudoElement("first-letter")),
+    (Cow::Borrowed("first-line"), VariantType::PseudoElement("first-line")),
+    (Cow::Borrowed("marker"), VariantType::WrapClass(Cow::Borrowed("& *::marker, &::marker"))),
+    (Cow::Borrowed("selection"), VariantType::WrapClass(Cow::Borrowed("& *::selection, &::selection"))),
+    (Cow::Borrowed("file"), VariantType::WrapClass(Cow::Borrowed("&::file-selector-button, &::-webkit-file-upload-button"))),
+    (Cow::Borrowed("placeholder"), VariantType::PseudoElement("placeholder")),
+    (Cow::Borrowed("backdrop"), VariantType::PseudoElement("backdrop")),
+    (Cow::Borrowed("before"), VariantType::PseudoElement("before")),
+    (Cow::Borrowed("after"), VariantType::PseudoElement("after")),
+    (Cow::Borrowed("all"), VariantType::WrapClass(Cow::Borrowed("& *"))),
+    (Cow::Borrowed("children"), VariantType::WrapClass(Cow::Borrowed("& > *"))),
+    (Cow::Borrowed("siblings"), VariantType::WrapClass(Cow::Borrowed("& ~ *"))),
+    (Cow::Borrowed("sibling"), VariantType::WrapClass(Cow::Borrowed("& + *"))),
 
     // --- Pseudo class ---
-    ("first", VariantType::PseudoClass("first-child")),
-    ("not-first", VariantType::PseudoClass("not(:first-child)")),
-    ("last", VariantType::PseudoClass("last-child")),
-    ("not-last", VariantType::PseudoClass("not(:last-child)")),
-    ("only", VariantType::PseudoClass("only-child")),
-    ("not-only", VariantType::PseudoClass("not(:only-child)")),
-    ("odd", VariantType::PseudoClass("nth-child(odd)")),
-    ("even", VariantType::PseudoClass("nth-child(even)")),
-    ("first-of-type", VariantType::PseudoClass("first-of-type")),
-    ("last-of-type", VariantType::PseudoClass("last-of-type")),
-    ("only-of-type", VariantType::PseudoClass("only-of-type")),
-    ("not-first-of-type", VariantType::PseudoClass("not(:first-of-type)")),
-    ("not-last-of-type", VariantType::PseudoClass("not(:last-of-type)")),
-    ("not-only-of-type", VariantType::PseudoClass("not(:only-of-type)")),
-    ("visited", VariantType::PseudoClass("visited")),
-    ("target", VariantType::PseudoClass("target")),
-    ("open", VariantType::WrapClass(Cow::Borrowed("&[open]"))),
-    ("default", VariantType::PseudoClass("default")),
-    ("checked", VariantType::PseudoClass("checked")),
-    ("not-checked", VariantType::PseudoClass("not(:checked)")),
-    ("indeterminate", VariantType::PseudoClass("indeterminate")),
-    ("placeholder-shown", VariantType::PseudoClass("placeholder-shown")),
-    ("autofill", VariantType::PseudoClass("autofill")),
-    ("optional", VariantType::PseudoClass("optional")),
-    ("required", VariantType::PseudoClass("required")),
-    ("valid", VariantType::PseudoClass("valid")),
-    ("invalid", VariantType::PseudoClass("invalid")),
-    ("in-range", VariantType::PseudoClass("in-range")),
-    ("out-of-range", VariantType::PseudoClass("out-of-range")),
-    ("read-only", VariantType::PseudoClass("read-only")),
-    ("read-write", VariantType::PseudoClass("read-write")),
-    ("empty", VariantType::PseudoClass("empty")),
-    ("focus-within", VariantType::PseudoClass("focus-within")),
-    ("hover", VariantType::PseudoClass("hover")),
-    ("focus", VariantType::PseudoClass("focus")),
-    ("focus-visible", VariantType::PseudoClass("focus-visible")),
-    ("active", VariantType::PseudoClass("active")),
-    ("enabled", VariantType::PseudoClass("enabled")),
-    ("disabled", VariantType::PseudoClass("disabled")),
-    ("ltr", VariantType::WrapClass(Cow::Borrowed("[dir=\"ltr\"] &"))),
-    ("rtl", VariantType::WrapClass(Cow::Borrowed("[dir=\"rtl\"] &"))),
+    (Cow::Borrowed("first"), VariantType::PseudoClass("first-child")),
+    (Cow::Borrowed("not-first"), VariantType::PseudoClass("not(:first-child)")),
+    (Cow::Borrowed("last"), VariantType::PseudoClass("last-child")),
+    (Cow::Borrowed("not-last"), VariantType::PseudoClass("not(:last-child)")),
+    (Cow::Borrowed("only"), VariantType::PseudoClass("only-child")),
+    (Cow::Borrowed("not-only"), VariantType::PseudoClass("not(:only-child)")),
+    (Cow::Borrowed("odd"), VariantType::PseudoClass("nth-child(odd)")),
+    (Cow::Borrowed("even"), VariantType::PseudoClass("nth-child(even)")),
+    (Cow::Borrowed("first-of-type"), VariantType::PseudoClass("first-of-type")),
+    (Cow::Borrowed("last-of-type"), VariantType::PseudoClass("last-of-type")),
+    (Cow::Borrowed("only-of-type"), VariantType::PseudoClass("only-of-type")),
+    (Cow::Borrowed("not-first-of-type"), VariantType::PseudoClass("not(:first-of-type)")),
+    (Cow::Borrowed("not-last-of-type"), VariantType::PseudoClass("not(:last-of-type)")),
+    (Cow::Borrowed("not-only-of-type"), VariantType::PseudoClass("not(:only-of-type)")),
+    (Cow::Borrowed("visited"), VariantType::PseudoClass("visited")),
+    (Cow::Borrowed("target"), VariantType::PseudoClass("target")),
+    (Cow::Borrowed("open"), VariantType::WrapClass(Cow::Borrowed("&[open]"))),
+    (Cow::Borrowed("default"), VariantType::PseudoClass("default")),
+    (Cow::Borrowed("checked"), VariantType::PseudoClass("checked")),
+    (Cow::Borrowed("not-checked"), VariantType::PseudoClass("not(:checked)")),
+    (Cow::Borrowed("indeterminate"), VariantType::PseudoClass("indeterminate")),
+    (Cow::Borrowed("placeholder-shown"), VariantType::PseudoClass("placeholder-shown")),
+    (Cow::Borrowed("autofill"), VariantType::PseudoClass("autofill")),
+    (Cow::Borrowed("optional"), VariantType::PseudoClass("optional")),
+    (Cow::Borrowed("required"), VariantType::PseudoClass("required")),
+    (Cow::Borrowed("valid"), VariantType::PseudoClass("valid")),
+    (Cow::Borrowed("invalid"), VariantType::PseudoClass("invalid")),
+    (Cow::Borrowed("in-range"), VariantType::PseudoClass("in-range")),
+    (Cow::Borrowed("out-of-range"), VariantType::PseudoClass("out-of-range")),
+    (Cow::Borrowed("read-only"), VariantType::PseudoClass("read-only")),
+    (Cow::Borrowed("read-write"), VariantType::PseudoClass("read-write")),
+    (Cow::Borrowed("empty"), VariantType::PseudoClass("empty")),
+    (Cow::Borrowed("focus-within"), VariantType::PseudoClass("focus-within")),
+    (Cow::Borrowed("hover"), VariantType::PseudoClass("hover")),
+    (Cow::Borrowed("focus"), VariantType::PseudoClass("focus")),
+    (Cow::Borrowed("focus-visible"), VariantType::PseudoClass("focus-visible")),
+    (Cow::Borrowed("active"), VariantType::PseudoClass("active")),
+    (Cow::Borrowed("enabled"), VariantType::PseudoClass("enabled")),
+    (Cow::Borrowed("disabled"), VariantType::PseudoClass("disabled")),
+    (Cow::Borrowed("ltr"), VariantType::WrapClass(Cow::Borrowed("[dir=\"ltr\"] &"))),
+    (Cow::Borrowed("rtl"), VariantType::WrapClass(Cow::Borrowed("[dir=\"rtl\"] &"))),
 
     // --- At rules ---
-    ("motion-safe", VariantType::AtRule(Cow::Borrowed("@media (prefers-reduced-motion: no-preference)"))),
-    ("motion-reduce", VariantType::AtRule(Cow::Borrowed("@media (prefers-reduced-motion: reduce)"))),
-    ("print", VariantType::AtRule(Cow::Borrowed("@media print"))),
-    ("portrait", VariantType::AtRule(Cow::Borrowed("@media (orientation: portrait)"))),
-    ("landscape", VariantType::AtRule(Cow::Borrowed("@media (orientation: landscape)"))),
-    ("contrast-more", VariantType::AtRule(Cow::Borrowed("@media (prefers-contrast: more)"))),
-    ("contrast-less", VariantType::AtRule(Cow::Borrowed("@media (prefers-contrast: less)"))),
+    (Cow::Borrowed("motion-safe"), VariantType::AtRule(Cow::Borrowed("@media (prefers-reduced-motion: no-preference)"))),
+    (Cow::Borrowed("motion-reduce"), VariantType::AtRule(Cow::Borrowed("@media (prefers-reduced-motion: reduce)"))),
+    (Cow::Borrowed("print"), VariantType::AtRule(Cow::Borrowed("@media print"))),
+    (Cow::Borrowed("portrait"), VariantType::AtRule(Cow::Borrowed("@media (orientation: portrait)"))),
+    (Cow::Borrowed("landscape"), VariantType::AtRule(Cow::Borrowed("@media (orientation: landscape)"))),
+    (Cow::Borrowed("contrast-more"), VariantType::AtRule(Cow::Borrowed("@media (prefers-contrast: more)"))),
+    (Cow::Borrowed("contrast-less"), VariantType::AtRule(Cow::Borrowed("@media (prefers-contrast: less)"))),
 ];
 
 /// The list of all default plugins.
@@ -841,7 +855,7 @@ pub enum DarkMode {
     /// let mut generator = EncreGenerator::from_config(config);
     /// generator.add_selector("dark:text-white");
     ///
-    /// assert!(generator.generate().expect("failed to generate the CSS").contains(r#"body.dark .dark\:text-white {
+    /// assert!(generator.generate().ends_with(r#"body.dark .dark\:text-white {
     ///   --en-text-opacity: 1;
     ///   color: rgb(255 255 255 / var(--en-text-opacity));
     /// }"#));
@@ -862,7 +876,7 @@ pub enum DarkMode {
     /// let mut generator = EncreGenerator::from_config(config);
     /// generator.add_selector("dark:text-white");
     ///
-    /// assert!(generator.generate().expect("failed to generate the CSS").contains(r#"@media (prefers-color-scheme: dark) {
+    /// assert!(generator.generate().ends_with(r#"@media (prefers-color-scheme: dark) {
     ///   .dark\:text-white {
     ///     --en-text-opacity: 1;
     ///     color: rgb(255 255 255 / var(--en-text-opacity));
@@ -989,55 +1003,170 @@ pub struct Config {
     #[serde(skip)]
     pub scanner: Scanner,
 
+    /// A list of custom plugins.
+    ///
+    /// This field is skipped when deserializing from a [TOML](https://toml.io) file.
     #[serde(skip)]
-    custom_variant_list: Mutex<Vec<(Cow<'static, str>, VariantType)>>,
-    // custom_variants: Vec<VariantTypeConfig>,
-    // custom_plugins: Vec<PluginConfig>,
+    pub(crate) custom_plugins: Vec<&'static (dyn Plugin + Send + Sync)>,
 
+    /// A list of custom variants.
+    ///
+    /// This field is skipped when deserializing from a [TOML](https://toml.io) file.
+    #[serde(skip)]
+    custom_variants: Mutex<Vec<(Cow<'static, str>, VariantType)>>,
     // TODO: Prefix (en-), safelist, separator for {variants, arbitrary values}
 }
 
 impl Config {
-    pub(crate) fn get_custom_variant_list(&self) -> MutexGuard<Vec<(Cow<'static, str>, VariantType)>> {
+    pub(crate) fn get_custom_variants(&self) -> MutexGuard<Vec<(Cow<'static, str>, VariantType)>> {
         // Initialize the list of custom variants if not already initialized
-        let mut custom_variant_list = self.custom_variant_list.try_lock().expect("failed to lock the list of custom variants");
+        let mut custom_variants = self
+            .custom_variants
+            .try_lock()
+            .expect("failed to lock the list of custom variants");
 
-        if custom_variant_list.is_empty() {
-            *custom_variant_list = self.theme.screens.iter().map(|screen| {
-                    (
-                        screen.0.clone(),
-                        VariantType::AtRule(Cow::Owned(format!("@media (min-width: {})", screen.1))),
-                    )
-                })
-                .chain(BUILTIN_SCREENS
-                .iter()
-                .map(|screen| {
-                    (
-                        Cow::from(screen.0),
-                        VariantType::AtRule(Cow::Owned(format!("@media (min-width: {})", screen.1))),
-                    )
-                }))
-                .chain(iter::once(match &self.theme.dark_mode {
-                    DarkMode::Media => (
-                        Cow::from("dark"),
-                        VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)")),
-                    ),
-                    DarkMode::Class(name) => (
-                        Cow::from("dark"),
-                        VariantType::WrapClass(name.clone() + " &"),
-                    ),
-                }))
-                .collect::<Vec<(Cow<'static, str>, VariantType)>>();
+        if !custom_variants.iter().any(|v| v.0 == Cow::Borrowed("dark")) {
+            custom_variants.extend(
+                self.theme
+                    .screens
+                    .iter()
+                    .map(|screen| {
+                        (
+                            screen.0.clone(),
+                            VariantType::AtRule(Cow::Owned(format!(
+                                "@media (min-width: {})",
+                                screen.1
+                            ))),
+                        )
+                    })
+                    .chain(BUILTIN_SCREENS.iter().map(|screen| {
+                        (
+                            Cow::from(screen.0),
+                            VariantType::AtRule(Cow::Owned(format!(
+                                "@media (min-width: {})",
+                                screen.1
+                            ))),
+                        )
+                    }))
+                    .chain(iter::once(match &self.theme.dark_mode {
+                        DarkMode::Media => (
+                            Cow::from("dark"),
+                            VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)")),
+                        ),
+                        DarkMode::Class(name) => (
+                            Cow::from("dark"),
+                            VariantType::WrapClass(name.clone() + " &"),
+                        ),
+                    })),
+            );
         }
 
-        custom_variant_list
+        custom_variants
+    }
+
+    /// Register a custom plugin which will be used during CSS generation.
+    ///
+    /// Note that if you are not the maintainer of a crate providing plugins, you can ignore this
+    /// function, see [`crate::plugins`].
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use encre_css::{
+    ///     Config,
+    ///     EncreGenerator,
+    ///     plugins::Plugin,
+    ///     selector::{VariantType, Modifier},
+    ///     generator::{ContextCanHandle, ContextHandle},
+    ///     utils::indent,
+    /// };
+    /// use std::fmt::{self, Write};
+    ///
+    /// #[derive(Debug)]
+    /// struct Prose;
+    ///
+    /// impl Plugin for Prose {
+    ///     fn namespace(&self) -> &'static str {
+    ///         "prose"
+    ///     }
+    ///
+    ///     fn can_handle(&self, context: ContextCanHandle) -> bool {
+    ///         match context.modifier {
+    ///             Modifier::Builtin { value, .. } => *value == "" || *value == "invert",
+    ///             Modifier::Arbitrary { .. } => false,
+    ///         }
+    ///     }
+    ///
+    ///     fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    ///         indent(context.indentation, context.buffer)?;
+    ///         match context.modifier {
+    ///             Modifier::Builtin { value, .. } => match *value {
+    ///                 "" => writeln!(context.buffer, "color: #333;"),
+    ///                 "invert" => writeln!(context.buffer, "color: #eee;"),
+    ///                 _ => unreachable!(),
+    ///             },
+    ///             Modifier::Arbitrary { .. } => unreachable!(),
+    ///         }
+    ///     }
+    /// }
+    ///
+    /// let mut config = Config::default();
+    /// config.register_plugin(&Prose);
+    ///
+    /// let mut generator = EncreGenerator::from_config(config);
+    /// generator.add_selector("prose");
+    /// generator.add_selector("prose-invert");
+    ///
+    /// assert!(generator.generate().ends_with(".prose {
+    ///   color: #333;
+    /// }
+    ///
+    /// .prose-invert {
+    ///   color: #eee;
+    /// }"));
+    /// ```
+    pub fn register_plugin(&mut self, plugin: &'static (dyn Plugin + Send + Sync)) {
+        self.custom_plugins.push(plugin);
+    }
+
+    /// Register a custom variant which will be used during CSS generation.
+    ///
+    /// Note that if you are not the maintainer of a crate providing variants, you can ignore this
+    /// function.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use encre_css::{Config, EncreGenerator, selector::VariantType};
+    /// use std::borrow::Cow;
+    ///
+    /// let mut config = Config::default();
+    /// config.register_variant("headings", VariantType::WrapClass(Cow::Borrowed("& :where(h1, h2, h3, h4, h5, h6)")));
+    ///
+    /// let mut generator = EncreGenerator::from_config(config);
+    /// generator.add_selector("headings:text-gray-700");
+    ///
+    /// assert!(generator.generate().ends_with(".headings\\:text-gray-700 :where(h1, h2, h3, h4, h5, h6) {
+    ///   --en-text-opacity: 1;
+    ///   color: rgb(55 65 81 / var(--en-text-opacity));
+    /// }"));
+    /// ```
+    pub fn register_variant<T: Into<Cow<'static, str>>>(
+        &mut self,
+        variant_name: T,
+        variant_type: VariantType,
+    ) {
+        self.custom_variants
+            .try_lock()
+            .expect("failed to lock the list of custom variants")
+            .push((variant_name.into(), variant_type));
     }
 
     /// Deserialize the content of a [TOML](https://toml.io) file to get the configuration.
     ///
     /// # Example
     ///
-    /// In a `custom_config.toml` file:
+    /// In a `encre-css.toml` file:
     ///
     /// <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">[theme]</span>
     /// dark_mode = { class = <span class="string">".dark"</span> }
@@ -1048,9 +1177,19 @@ impl Config {
     ///
     /// Then parse the configuration in Rust:
     ///
+    /// ```rust,ignore
+    /// use encre_css::Config;
+    /// let config = Config::from_file("encre-css.toml");
+    /// ```
+    ///
+    /// Note that if you don't change the config after parsing it, you can just use
+    /// [`EncreGenerator::new`].
+    ///
     /// # Errors
     ///
     /// Returns [`Error::ConfigFileNotFound`] if the given file does not exist.
+    ///
+    /// [`EncreGenerator::new`]: crate::EncreGenerator::new
     pub fn from_file<T: AsRef<Path>>(path: T) -> Result<Self> {
         Ok(toml::from_str(&fs::read_to_string(&path).map_err(
             |e| Error::ConfigFileNotFound(path.as_ref().to_path_buf(), e),
@@ -1097,7 +1236,7 @@ mod tests {
         generator.add_selector("3xl:text-rosa-500");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#"@media (min-width: 1600px) {
   .\33xl\:text-rosa-500 {
@@ -1136,7 +1275,7 @@ mod tests {
         generator.add_selector("lg:text-rosa-500");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#".bg-rosa-500 {
   --en-bg-opacity: 1;

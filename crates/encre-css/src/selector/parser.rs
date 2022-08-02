@@ -142,10 +142,11 @@ fn parse_recursive<'a>(
     config: &Config,
 ) -> Option<Vec<Selector<'a>>> {
     // Parse variants
-    let (variants, mut remaining) = {
-        let custom_variant_list = config.get_custom_variant_list();
-        let mut variants = vec![];
-        let mut remaining = "";
+    let mut variants = vec![];
+    let mut remaining = "";
+
+    {
+        let custom_variants = config.get_custom_variants();
         let mut iter = split_ignore_arbitrary(val, VARIANT_SEPARATOR, true).peekable();
 
         while let Some(mut val) = iter.next() {
@@ -168,21 +169,20 @@ fn parse_recursive<'a>(
                     Cow::from(variant),
                 ))));
             } else if let Some((order, variant)) = BUILTIN_VARIANTS
-                // TODO: Prevent cloning
                 .iter()
-                .cloned()
-                .map(|(key, val)| (Cow::from(key), val))
                 .enumerate()
-                .chain(
-                    custom_variant_list
-                        .iter()
-                        .cloned()
-                        .enumerate()
-                        .map(|(order, v)| (order + BUILTIN_VARIANTS.len(), v)),
-                )
                 .find(|(_, v)| v.0 == variant)
+                .or_else(|| {
+                    custom_variants.iter().enumerate().find_map(|(order, v)| {
+                        if v.0 == variant {
+                            Some((order + BUILTIN_VARIANTS.len(), v))
+                        } else {
+                            None
+                        }
+                    })
+                })
             {
-                variants.push(Variant::Builtin(order, variant.1));
+                variants.push(Variant::Builtin(order, variant.1.clone()));
             } else {
                 // Maybe a parent or peer variant
                 if let Some(group_variant) = variant.strip_prefix("group-") {
@@ -212,9 +212,7 @@ fn parse_recursive<'a>(
                 }
             }
         }
-
-        (variants, remaining)
-    };
+    }
 
     if remaining.is_empty() {
         // Parsing error, abort.
@@ -274,7 +272,7 @@ fn parse_recursive<'a>(
 
             Some(vec![Selector {
                 // Arbitrary properties will be placed at the end of the CSS
-                order: BUILTIN_PLUGINS.len(),
+                order: BUILTIN_PLUGINS.len() + config.custom_plugins.len(),
                 full: if let Some(full_class) = full_class {
                     full_class
                 } else {
@@ -291,23 +289,21 @@ fn parse_recursive<'a>(
             }])
         } else {
             // Find the right plugin for handling this selector
-            BUILTIN_PLUGINS.iter().enumerate().find_map(
-                move |(order, plugin): (usize, &&'static (dyn Plugin + Send + Sync))| {
-                    // Find the modifier
-                    if let Some(modifier_part) = remaining.strip_prefix(&plugin.namespace()) {
-                        let modifier_part = modifier_part
-                            .strip_prefix(MODIFIER_SEPARATOR)
-                            .unwrap_or(modifier_part);
+            let find = move |(order, plugin): (usize, &&'static (dyn Plugin + Send + Sync))| {
+                // Find the modifier
+                if let Some(modifier_part) = remaining.strip_prefix(&plugin.namespace()) {
+                    let modifier_part = modifier_part
+                        .strip_prefix(MODIFIER_SEPARATOR)
+                        .unwrap_or(modifier_part);
 
-                        let modifier = if let Some((mut prefix, mut value)) =
-                            modifier_part.split_once(ARBITRARY_START)
-                        {
-                            prefix = prefix.strip_prefix(MODIFIER_SEPARATOR).unwrap_or(prefix);
-                            value = value.strip_suffix(ARBITRARY_END)?;
+                    let modifier = if let Some((mut prefix, mut value)) =
+                        modifier_part.split_once(ARBITRARY_START)
+                    {
+                        prefix = prefix.strip_prefix(MODIFIER_SEPARATOR).unwrap_or(prefix);
+                        value = value.strip_suffix(ARBITRARY_END)?;
 
-                            let (hint, value) = if let Some((maybe_hint, rest)) =
-                                value.split_once(HINT_SEPARATOR)
-                            {
+                        let (hint, value) =
+                            if let Some((maybe_hint, rest)) = value.split_once(HINT_SEPARATOR) {
                                 if VALID_PLUGIN_HINT.contains(&maybe_hint) {
                                     (maybe_hint, to_css_value(rest))
                                 } else {
@@ -317,44 +313,60 @@ fn parse_recursive<'a>(
                                 ("", to_css_value(value))
                             };
 
-                            Modifier::Arbitrary {
-                                prefix,
-                                hint,
-                                value,
-                            }
-                        } else {
-                            Modifier::Builtin {
-                                is_negative,
-                                value: modifier_part,
-                            }
-                        };
-
-                        let context = ContextCanHandle {
-                            config,
-                            modifier: &modifier,
-                        };
-
-                        if plugin.can_handle(context) {
-                            Some(Some(vec![Selector {
-                                order,
-                                full: if let Some(full_class) = full_class {
-                                    full_class
-                                } else {
-                                    val
-                                },
-                                modifier,
-                                variants: variants.clone(),
-                                is_important,
-                                plugin: *plugin,
-                            }]))
-                        } else {
-                            None
+                        Modifier::Arbitrary {
+                            prefix,
+                            hint,
+                            value,
                         }
+                    } else {
+                        Modifier::Builtin {
+                            is_negative,
+                            value: modifier_part,
+                        }
+                    };
+
+                    let context = ContextCanHandle {
+                        config,
+                        modifier: &modifier,
+                    };
+
+                    if plugin.can_handle(context) {
+                        Some(vec![Selector {
+                            order,
+                            full: if let Some(full_class) = full_class {
+                                full_class
+                            } else {
+                                val
+                            },
+                            modifier,
+                            variants: variants.clone(),
+                            is_important,
+                            plugin: *plugin,
+                        }])
                     } else {
                         None
                     }
-                },
-            )?
+                } else {
+                    None
+                }
+            };
+            BUILTIN_PLUGINS
+                .iter()
+                .enumerate()
+                .find_map(&find)
+                .or_else(|| {
+                    config
+                        .custom_plugins
+                        .iter()
+                        .enumerate()
+                        .find_map(find)
+                        .map(|mut plugins| {
+                            plugins
+                                .iter_mut()
+                                .for_each(|p| p.order += BUILTIN_PLUGINS.len());
+                            plugins
+                        })
+                })
         }
     }
 }

@@ -109,7 +109,7 @@ Add `encre-css` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-encre-css = { git = "https://gitlab.com/encre-css/encre-css.git", tag = "v0.5.0" }
+encre-css = { git = "https://gitlab.com/encre-css/encre-css.git", tag = "v0.6.0" }
 ```
 
 Generating styles takes three steps:
@@ -155,6 +155,11 @@ cargo install --git https://gitlab.com/encre-css/encre-css.git
 ```
 
 Then run `encre --help` for instructions on how to use it.
+
+## Plugins
+
+`encre-css` was built with modularity in mind and it is possible to write or use
+custom plugins. [Learn more](https://encre-css.gitlab.io/encre-css/encre_css/plugins/index.html)
 
 ## About the name
 

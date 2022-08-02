@@ -1,7 +1,6 @@
 //! Define the main [`EncreGenerator`] structure used to scan content and to generate CSS styles.
 use crate::{
     config::Config,
-    error::Result,
     plugins::transition::animation,
     preflight::Preflight,
     selector::{parse, Modifier, Selector, Variant, VariantType},
@@ -339,16 +338,10 @@ impl<'a> EncreGenerator<'a> {
     /// - [`add_selectors`] to add a list of selectors to the scanned list;
     /// - [`scan`] to scan a string (e.g. the contents of a file).
     ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Format`] indicating whether writing to the buffer succeeded.
-    ///
-    /// [`Error::Format`]: crate::error::Error::Format
-    ///
     /// [`add_selector`]: EncreGenerator::add_selector
     /// [`add_selectors`]: EncreGenerator::add_selectors
     /// [`scan`]: EncreGenerator::scan
-    pub fn generate(&self) -> Result<String> {
+    pub fn generate(&self) -> String {
         // Make sure that animations are not defined
         animation::ANIMATIONS_ALREADY_DEFINED
             .iter()
@@ -358,9 +351,9 @@ impl<'a> EncreGenerator<'a> {
         let mut buffer = String::with_capacity(10 * self.scanned_selectors.len()); // TODO: More accurate value
         buffer.push_str(&preflight); // TODO: Push and reserve at the same time
 
-        self.scanned_selectors.iter().try_for_each(|selector| {
+        self.scanned_selectors.iter().for_each(|selector| {
             if buffer.len() != preflight.len() || self.config.preflight != Preflight::None {
-                write!(buffer, "\n\n")?;
+                write!(buffer, "\n\n").expect("writing to a String can't fail");
             }
 
             let mut context = ContextHandle {
@@ -376,9 +369,10 @@ impl<'a> EncreGenerator<'a> {
             } else {
                 selector.plugin.handle(&mut context)
             }
-        })?;
+            .expect("writing to a String can't fail");
+        });
 
-        Ok(buffer)
+        buffer
     }
 }
 
@@ -472,7 +466,7 @@ mod tests {
         generator.add_selector("xl:[&_>_*]:divide-y-2");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#".space-x-2 > :not([hidden]) ~ :not([hidden]) {
   --en-space-x-reverse: 0;
@@ -537,7 +531,7 @@ mod tests {
         generator.add_selector("-backdrop-hue-rotate-90");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#".-top-2 {
   top: -0.5rem;
@@ -615,7 +609,7 @@ mod tests {
         generator.add_selector("w-full");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#".w-full {
   width: 100%;
@@ -635,7 +629,7 @@ mod tests {
         generator.add_selector("focus:!-mb-2");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#".\!-mb-8 {
   margin-bottom: -2rem !important;
@@ -674,7 +668,7 @@ mod tests {
         generator.add_selector("animate-pulse");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#"@-webkit-keyframes pulse {
   50% {
@@ -709,7 +703,7 @@ mod tests {
         generator.add_selector("2xl:pb-[calc((100%/2)-10px+2rem)]");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#".mt-\[calc\(100\%-10px\)\] {
   margin-top: calc(100% - 10px);
@@ -743,7 +737,7 @@ mod tests {
         generator.add_selector("hover:bg-[color:red]");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#".bg-\[color\:red\] {
   background-color: red;
@@ -762,7 +756,7 @@ mod tests {
         generator.add_selector("focus:w-full");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#".focus\:w-full:focus {
   width: 100%;
@@ -791,7 +785,7 @@ mod tests {
         generator.add_selector("peer-not-invalid:bg-green-500");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#".marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection *::marker, .marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection::marker {
   --en-bg-opacity: 1;
@@ -897,7 +891,7 @@ mod tests {
         generator.add_selector("bg-red-500");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#".bg-red-500 {
   --en-bg-opacity: 1;
@@ -913,7 +907,7 @@ mod tests {
         generator.add_selector("hover:[mask-type:luminance]");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#".hover\:\[mask-type\:luminance\]:hover {
   mask-type: luminance;
@@ -931,7 +925,7 @@ mod tests {
         generator.add_selector("[@supports_not_(display:grid)]:float-right");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#"@supports not (display:grid) {
   .\[\@supports_not_\(display\:grid\)\]\:float-right {
@@ -964,7 +958,7 @@ mod tests {
         generator.add_selector("xl:(focus:(outline,outline-red-200),dark:(bg-black,text-white))");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#"@media (min-width: 1280px) {
   .xl\:\(focus\:\(outline\,outline-red-200\)\,dark\:\(bg-black\,text-white\)\):focus {
@@ -1005,7 +999,7 @@ mod tests {
         generator.scan("rounded-tr rounded-tr-md rounded rounded-md rounded-t-sm rounded-bl-xl border-x border border-4 border-t-2");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#".rounded {
   border-radius: 0.25rem;
@@ -1059,7 +1053,7 @@ mod tests {
         generator.add_selector("font-[Roboto,'Open_Sans',sans-serif]");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#".font-\[\'Times_New_Roman\'\,Helvetica\,serif\] {
   font-family: 'Times New Roman',Helvetica,serif;
@@ -1078,7 +1072,7 @@ mod tests {
         generator.add_selector("container");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#".container {
   width: 100%;
@@ -1121,7 +1115,7 @@ mod tests {
         generator.add_selector("md:mx-auto");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#"@media (min-width: 768px) {
   .md\:container {
@@ -1180,7 +1174,7 @@ mod tests {
         generator.add_selector("after:content-[counter(foo)]");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#".before\:bg-red-500::before {
   --en-bg-opacity: 1;
@@ -1212,7 +1206,7 @@ mod tests {
         generator.add_selector("dark:mt-px");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#"@media (prefers-color-scheme: dark) {
   .dark\:mt-px {
@@ -1229,7 +1223,7 @@ mod tests {
         generator.add_selector("dark:mt-px");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#".dark .dark\:mt-px {
   margin-top: 1px;
@@ -1245,6 +1239,6 @@ mod tests {
         let file_content = fs::read_to_string("tests/fixtures/arbitrary-values.html").unwrap();
         let mut generator = EncreGenerator::from_config(base_config());
         generator.scan(&file_content);
-        generator.generate().unwrap();
+        generator.generate();
     }
 }

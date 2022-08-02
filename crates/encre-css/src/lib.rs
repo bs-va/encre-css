@@ -128,7 +128,7 @@
 //! Add `encre-css` to your `Cargo.toml`:
 //!
 //! <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">[dependencies]</span>
-//! encre-css = { git = <span class="string">"https://gitlab.com/encre-css/encre-css.git"</span>, tag = <span class="string">"v0.5.0"</span> }</code></pre></div>
+//! encre-css = { git = <span class="string">"https://gitlab.com/encre-css/encre-css.git"</span>, tag = <span class="string">"v0.6.0"</span> }</code></pre></div>
 //!
 //! Generating styles takes three steps:
 //! - First, you need to _configure_ the main [`EncreGenerator`] structure
@@ -149,7 +149,7 @@
 //! let mut generator = EncreGenerator::from_config(Config::default());
 //! generator.scan(r#"<p class="w-auto bg-red-200 rounded-md">Hello world!</p>"#);
 //!
-//! assert!(generator.generate().expect("failed to generate the CSS").contains(r#".w-auto {
+//! assert!(generator.generate().ends_with(".w-auto {
 //!   width: auto;
 //! }
 //!
@@ -160,7 +160,7 @@
 //! .bg-red-200 {
 //!   --en-bg-opacity: 1;
 //!   background-color: rgb(254 202 202 / var(--en-bg-opacity));
-//! }"#));
+//! }"));
 //! ```
 //!
 //! ### What to do next

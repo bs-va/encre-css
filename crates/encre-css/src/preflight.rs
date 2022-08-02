@@ -14,7 +14,7 @@
 //!     .border_color("#444");
 //!
 //! let mut generator = EncreGenerator::from_config(config);
-//! assert!(generator.generate().expect("failed to generate the CSS").contains("*, ::before, ::after {
+//! assert!(generator.generate().contains("*, ::before, ::after {
 //!   box-sizing: border-box;
 //!   border-width: 0;
 //!   border-style: solid;
@@ -35,7 +35,7 @@
 //! }");
 //!
 //! let mut generator = EncreGenerator::from_config(config);
-//! assert_eq!(generator.generate().expect("failed to generate the CSS"), "html, body {
+//! assert_eq!(generator.generate(), "html, body {
 //!   width: 100vw;
 //!   height: 100vh;
 //!   margin: 0;
@@ -51,7 +51,7 @@
 //! config.preflight = Preflight::new_none();
 //!
 //! let mut generator = EncreGenerator::from_config(config);
-//! assert_eq!(generator.generate().expect("failed to generate the CSS"), "");
+//! assert_eq!(generator.generate(), "");
 //! ```
 //!
 //! Based on [Tailwind's default preflight](https://tailwindcss.com/docs/preflight).
@@ -676,7 +676,7 @@ mod tests {
         generator.add_selector("w-full");
 
         assert_eq!(
-            generator.generate().unwrap(),
+            generator.generate(),
             String::from(
                 r#"*, ::before, ::after {
   box-sizing: border-box;

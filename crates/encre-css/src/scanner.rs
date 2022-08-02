@@ -28,7 +28,7 @@ use crate::utils::split_ignore_arbitrary;
 /// let mut generator = EncreGenerator::from_config(config);
 /// generator.scan(r#"<h1 data-en="underline"></h1><p data-en="bg-red-200 text-blue-300"></p>"#);
 ///
-/// assert!(generator.generate().expect("failed to generate the CSS").contains(r#".bg-red-200 {
+/// assert!(generator.generate().contains(".bg-red-200 {
 ///   --en-bg-opacity: 1;
 ///   background-color: rgb(254 202 202 / var(--en-bg-opacity));
 /// }
@@ -41,7 +41,7 @@ use crate::utils::split_ignore_arbitrary;
 /// .underline {
 ///   -webkit-text-decoration-line: underline;
 ///   text-decoration-line: underline;
-/// }"#));
+/// }"));
 /// ```
 ///
 /// [`utils::split_ignore_arbitray`]: crate::utils::split_ignore_arbitrary

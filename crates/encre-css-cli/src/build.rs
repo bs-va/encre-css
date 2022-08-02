@@ -51,9 +51,14 @@ fn result_equal<T: PartialEq, E>(res1: result::Result<T, E>, res2: result::Resul
 }
 
 fn gen_css<T: AsRef<Path>>(generator: &EncreGenerator, output: Option<T>) {
-    let css = generator.generate().expect("failed to generate the CSS");
+    let css = generator.generate();
 
     if let Some(file) = output {
+        if let Some(parent) = file.as_ref().parent() {
+            // Create parent directories
+            fs::create_dir_all(parent).expect("failed to create parent directories");
+        }
+
         fs::write(file, css).expect("failed to write to the file");
     } else {
         // If no file is specified, the CSS generated is written to the standard output

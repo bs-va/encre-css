@@ -1,6 +1,6 @@
 [package]
 name = "encre-css-cli"
-version = "0.5.0"
+version = "0.6.0"
 description = "A TailwindCSS-compatible utility-first CSS generation library written in Rust"
 authors = ["nifou <nifou@mailfence.com>"]
 license = "MIT"

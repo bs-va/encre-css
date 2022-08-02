@@ -357,7 +357,7 @@ checksum = "e78d4f1cc4ae33bbfc157ed5d5a5ef3bc29227303d595861deb238fcec4e9457"
 
 [[package]]
 name = "encre-css"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "criterion",
  "pretty_assertions",
@@ -368,7 +368,7 @@ dependencies = [
 
 [[package]]
 name = "encre-css-cli"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "clap 3.2.6",
  "color-eyre",
@@ -379,6 +379,13 @@ dependencies = [
  "serde",
  "toml",
  "wax",
+]
+
+[[package]]
+name = "encre-css-typography"
+version = "0.1.0"
+dependencies = [
+ "encre-css",
 ]
 
 [[package]]
