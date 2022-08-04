@@ -6,7 +6,7 @@ use encre_css::{
 };
 use notify::{
     watcher,
-    DebouncedEvent::{Create, Remove, Rename, Write},
+    DebouncedEvent::{Create, Remove, Rename, Write, Chmod},
     RecursiveMode, Watcher,
 };
 use serde::Deserialize;
@@ -130,6 +130,7 @@ fn build_single<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, outpu
     gen_css(&generator, output);
 }
 
+#[allow(clippy::too_many_lines)]
 fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Option<String>) {
     let (tx, rx) = channel();
 
@@ -174,7 +175,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
     loop {
         match rx.recv() {
             Ok(event) => {
-                if let Create(ref path) | Write(ref path) | Remove(ref path) | Rename(_, ref path) =
+                if let Create(ref path) | Write(ref path) | Remove(ref path) | Chmod(ref path) | Rename(_, ref path) =
                     event
                 {
                     let mut need_reloading = false;
