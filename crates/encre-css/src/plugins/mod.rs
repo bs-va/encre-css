@@ -21,7 +21,7 @@
 //!
 //! # Official plugins
 //!
-//! - [`encre-css-typography`](https://encre-css.gitlab.io/encre-css/encre-css-typography/index.html): used to define beautiful typographic defaults for HTML you don't control.
+//! - [`encre-css-typography`](https://gitlab.com/encre-css/encre-css/tree/main/crates/encre-css-typography): used to define beautiful typographic defaults for HTML you don't control.
 //!
 //! If you want to write your own plugins, see [`Plugin`].
 //!
