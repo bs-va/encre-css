@@ -60,13 +60,17 @@ pub fn hex_to_rgb(mut hex: &str) -> Result<(u8, u8, u8)> {
 /// - `current`, `inherit`, `transparent`, `black`, `white`;
 /// - Any key contained in the [`BUILTIN_COLORS`] list.
 pub fn is_matching_builtin_color(config: &Config, mut modifier: &str) -> bool {
-    if ["current", "inherit", "transparent", "black", "white"].contains(&modifier) {
+    if ["current", "inherit", "transparent"].contains(&modifier) {
         return true;
     }
 
     // Trim the opacity suffix, if present
     if let Some((new_modifier, _)) = modifier.split_once('/') {
         modifier = new_modifier;
+    }
+
+    if ["black", "white"].contains(&modifier) {
+        return true;
     }
 
     BUILTIN_COLORS.iter().any(|color| color.0 == modifier) || config.theme.colors.contains(modifier)
