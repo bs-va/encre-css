@@ -1,5 +1,11 @@
 //! Define some utility functions for quickly doing things.
-use crate::selector::parser::{ARBITRARY_END, ARBITRARY_START, ESCAPE, GROUP_END, GROUP_START};
+use crate::{
+    config::Config,
+    selector::{
+        Selector,
+        parser::{parse, ARBITRARY_END, ARBITRARY_START, ESCAPE, GROUP_END, GROUP_START},
+    },
+};
 
 use std::{
     fmt::{self, Write},
@@ -202,5 +208,41 @@ pub fn split_ignore_arbitrary<P: Pattern>(
         bracket_level: 0,
         last_index: 0,
         seek_index: 0,
+    }
+}
+
+/// Sort a list of selectors (separated by spaces) according to `encre-css` rules.
+///
+/// Note: selectors are also deduplicated.
+pub fn sort_selectors(val: &str, config: &Config) -> String {
+    let mut selectors = val.split_whitespace()
+        .filter_map(|v| parse(v.trim(), config))
+        .flatten()
+        .collect::<Vec<Selector>>();
+
+    // Deduplicate selectors belonging to a variant group
+    selectors.sort_unstable();
+    selectors.dedup_by_key(|s| s.full);
+
+    selectors.iter().map(|s| s.full).collect::<Vec<&str>>().join(" ")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn sort_selectors_test() {
+        assert_eq!(sort_selectors("text-white px-4 sm:px-8 py-2 sm:py-3 bg-sky-700 hover:bg-sky-800", &Config::default()), "bg-sky-700 px-4 py-2 text-white hover:bg-sky-800 sm:px-8 sm:py-3".to_string());
+    }
+
+    #[test]
+    fn sort_selectors_with_variant_groups() {
+        assert_eq!(sort_selectors("hover:(text-white,bg-sky-800) focus-within:bg-red-100 text-blue-500 md:flex", &Config::default()), "text-blue-500 focus-within:bg-red-100 hover:(text-white,bg-sky-800) md:flex".to_string());
+    }
+
+    #[test]
+    fn sort_selectors_selectors_are_deduplicated() {
+        assert_eq!(sort_selectors("text-blue-100 text-blue-100 md:flex lg:block md:flex focus:(hover:md:flex,lg:flex)", &Config::default()), "text-blue-100 focus:(hover:md:flex,lg:flex) md:flex focus:(hover:md:flex,lg:flex) lg:block".to_string());
     }
 }
