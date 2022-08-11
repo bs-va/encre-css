@@ -15,7 +15,7 @@
     <img alt="Dependency status" src="https://deps.rs/repo/gitlab/encre-css/encre-css/status.svg" />
   </a>
 
-  <a href="https://encre-css.gitlab.io/encre-css/encre_css">
+  <a href="https://encre-org.gitlab.io/encre-css/encre_css">
     <img alt="Documentation on gitlab.io" src="https://img.shields.io/static/v1?label=docs&message=gitlab.io&color=blue" />
   </a>
 
@@ -159,7 +159,7 @@ Then run `encre --help` for instructions on how to use it.
 ## Plugins
 
 `encre-css` was built with modularity in mind and it is possible to write or use
-custom plugins. [Learn more](https://encre-css.gitlab.io/encre-css/encre_css/plugins/index.html)
+custom plugins. [Learn more](https://encre-org.gitlab.io/encre-css/encre_css/plugins/index.html)
 
 ## About the name
 
