@@ -5,8 +5,8 @@ description = "A TailwindCSS-compatible utility-first CSS generation library wri
 authors = ["nifou <nifou@mailfence.com>"]
 license = "MIT"
 edition = "2021"
-repository = "https://gitlab.com/encre-css/encre-css"
-documentation = "https://encre-css.gitlab.io/encre-css/encre_css.git"
+repository = "https://gitlab.com/encre-org/encre-css"
+documentation = "https://encre-org.gitlab.io/encre-css/encre_css.git"
 
 [[bench]]
 name = "benchmark"

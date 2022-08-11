@@ -1276,6 +1276,11 @@ impl Plugin for Prose {
 }
 
 pub fn register(config: &mut Config) {
+    // Reset variables
+    for var in &ALREADY_DEFINED {
+        var.store(false, Ordering::Relaxed);
+    }
+
     for (name, selector) in [
         ("headings", Some(":where(h1, h2, h3, h4, h5, h6, th)")),
         ("h1", None),
@@ -1301,16 +1306,23 @@ pub fn register(config: &mut Config) {
         ("tr", None),
         ("th", None),
         ("td", None),
+        ("kbd", None),
         ("img", None),
         ("video", None),
         ("hr", None),
         ("lead", Some(r#"[class~="lead"]"#)),
     ] {
-        config.register_variant(format!("prose-{name}"), VariantType::WrapClass(Cow::from(format!(r#"& :is({}:not(:where([class~="not-prose"] *)))"#, if let Some(selector) = selector {
-            Cow::from(selector)
-        } else {
-            Cow::from(format!(":where({name})"))
-        }))));
+        config.register_variant(
+            format!("prose-{name}"),
+            VariantType::WrapClass(Cow::from(format!(
+                r#"& :is({}:not(:where([class~="not-prose"] *)))"#,
+                if let Some(selector) = selector {
+                    Cow::from(selector)
+                } else {
+                    Cow::from(format!(":where({name})"))
+                }
+            ))),
+        );
     }
 
     config.register_plugin(&Prose);

@@ -6,7 +6,7 @@ use encre_css::{
 };
 use notify::{
     watcher,
-    DebouncedEvent::{Create, Remove, Rename, Write, Chmod},
+    DebouncedEvent::{Chmod, Create, Remove, Rename, Write},
     RecursiveMode, Watcher,
 };
 use serde::Deserialize;
@@ -175,8 +175,11 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
     loop {
         match rx.recv() {
             Ok(event) => {
-                if let Create(ref path) | Write(ref path) | Remove(ref path) | Chmod(ref path) | Rename(_, ref path) =
-                    event
+                if let Create(ref path)
+                | Write(ref path)
+                | Remove(ref path)
+                | Chmod(ref path)
+                | Rename(_, ref path) = event
                 {
                     let mut need_reloading = false;
 

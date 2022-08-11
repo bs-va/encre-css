@@ -354,19 +354,16 @@ fn parse_recursive<'a>(
                 .iter()
                 .enumerate()
                 .find_map(&find)
-                .or_else(|| {
-                    config
-                        .custom_plugins
-                        .iter()
-                        .enumerate()
-                        .find_map(find)
-                        .map(|mut plugins| {
-                            plugins
-                                .iter_mut()
-                                .for_each(|p| p.order += BUILTIN_PLUGINS.len());
-                            plugins
-                        })
+                .map(|mut selectors| {
+                    // Selectors generated using custom plugins are placed first to be easily
+                    // overridden, so we need to shift the order of builtin plugins to take that
+                    // into account
+                    selectors
+                        .iter_mut()
+                        .for_each(|p| p.order += config.custom_plugins.len());
+                    selectors
                 })
+                .or_else(|| config.custom_plugins.iter().enumerate().find_map(find))
         }
     }
 }

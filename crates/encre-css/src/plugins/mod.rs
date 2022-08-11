@@ -21,7 +21,8 @@
 //!
 //! # Official plugins
 //!
-//! - [`encre-css-typography`](https://gitlab.com/encre-css/encre-css/tree/main/crates/encre-css-typography): used to define beautiful typographic defaults for HTML you don't control.
+//! - [`encre-css-typography`](https://gitlab.com/encre-org/encre-css/tree/main/crates/encre-css-typography): used to define beautiful typographic defaults for HTML you don't control.
+//! - [`encre-css-icons`](https://gitlab.com/encre-org/encre-css/tree/main/crates/encre-css-icons): used to quickly add pure CSS icons to your website.
 //!
 //! If you want to write your own plugins, see [`Plugin`].
 //!
@@ -207,7 +208,7 @@ pub mod typography;
 /// }
 /// ```
 ///
-/// Have a look at <https://gitlab.com/encre-css/encre-css/tree/main/crates/encre-css/src/plugins>
+/// Have a look at <https://gitlab.com/encre-org/encre-css/tree/main/crates/encre-css/src/plugins>
 /// for more examples.
 ///
 /// [`utils::indent`]: crate::utils::indent

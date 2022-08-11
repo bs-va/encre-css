@@ -3,4 +3,5 @@ members = [
   "crates/encre-css",
   "crates/encre-css-cli",
   "crates/encre-css-typography",
+  "crates/encre-css-icons",
 ]
