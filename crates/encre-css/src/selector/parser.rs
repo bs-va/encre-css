@@ -1,12 +1,13 @@
 use super::{Modifier, Selector, Variant, VariantType};
 use crate::{
     config::{Config, BUILTIN_PLUGINS, BUILTIN_VARIANTS},
+    error::{ParseError, ParseErrorKind},
     generator::ContextCanHandle,
     plugins::{css_property::CssPropertyPlugin, Plugin},
     utils::split_ignore_arbitrary,
 };
 
-use std::borrow::Cow;
+use std::{borrow::Cow, ops::Range};
 
 pub(crate) const ARBITRARY_START: char = '[';
 pub(crate) const ARBITRARY_END: char = ']';
@@ -126,41 +127,51 @@ pub(crate) fn to_css_value(val: &str) -> Cow<str> {
     unescape(val)
 }
 
-pub(crate) fn parse<'a>(val: &'a str, config: &Config) -> Option<Vec<Selector<'a>>> {
-    // The smallest selector is `m-1`
+pub(crate) fn parse<'a>(
+    val: &'a str,
+    span: Option<Range<usize>>,
+    config: &Config,
+) -> Vec<Result<Selector<'a>, ParseError<'a>>> {
+    // The shortest selector is `m-1`
     if val.len() < 3 {
-        return None;
+        return vec![Err(ParseError::new(
+            span.unwrap_or(0..val.len()),
+            ParseErrorKind::TooShort(val),
+        ))];
     }
 
-    parse_recursive(val, None, config)
+    parse_recursive(val, span, None, config)
 }
 
 #[allow(clippy::too_many_lines)]
 fn parse_recursive<'a>(
     val: &'a str,
+    span: Option<Range<usize>>,
     full_class: Option<&'a str>,
     config: &Config,
-) -> Option<Vec<Selector<'a>>> {
+) -> Vec<Result<Selector<'a>, ParseError<'a>>> {
+    let span = span.unwrap_or(0..val.len());
+
     // Parse variants
     let mut variants = vec![];
-    let mut remaining = "";
+    let mut remaining = (0, "");
 
     {
         let custom_variants = config.get_custom_variants();
         let mut iter = split_ignore_arbitrary(val, VARIANT_SEPARATOR, true).peekable();
 
-        while let Some(mut val) = iter.next() {
+        while let Some(mut part) = iter.next() {
             if iter.peek().is_none() {
-                remaining = val;
+                remaining = part;
                 continue;
             }
 
             let (is_arbitrary, variant) = {
-                if val.starts_with(ARBITRARY_START) && val.ends_with(ARBITRARY_END) {
-                    unwrap_string(&mut val);
-                    (true, val)
+                if part.1.starts_with(ARBITRARY_START) && part.1.ends_with(ARBITRARY_END) {
+                    unwrap_string(&mut part.1);
+                    (true, part.1)
                 } else {
-                    (false, val)
+                    (false, part.1)
                 }
             };
 
@@ -209,68 +220,81 @@ fn parse_recursive<'a>(
                     {
                         variants.push(Variant::Builtin(order + 3000, VariantType::Peer(class)));
                     }
+                } else {
+                    return vec![Err(ParseError::new(
+                        span,
+                        ParseErrorKind::UnknownVariant(variant, val),
+                    ))];
                 }
             }
         }
     }
 
-    if remaining.is_empty() {
-        // Parsing error, abort.
-        return None;
+    if remaining.1.is_empty() {
+        return vec![Err(ParseError::new(
+            span,
+            ParseErrorKind::VariantsWithoutModifier(val),
+        ))];
     }
 
     // Parse the namespace and modifier
-    if remaining.starts_with(GROUP_START) && remaining.ends_with(GROUP_END) {
+    if remaining.1.starts_with(GROUP_START) && remaining.1.ends_with(GROUP_END) {
         // Variant group (selectors are separated by `,`), we need to parse child selectors
-        unwrap_string(&mut remaining);
+        unwrap_string(&mut remaining.1);
 
-        if remaining.is_empty() {
-            return None;
+        if remaining.1.is_empty() {
+            return vec![Err(ParseError::new(
+                span,
+                ParseErrorKind::VariantsWithoutModifier(val),
+            ))];
         }
 
-        let mut selectors = vec![];
+        split_ignore_arbitrary(remaining.1, GROUP_SELECTOR_SEPARATOR, true)
+            .flat_map(|(i, sub_selector)| {
+                #[allow(clippy::range_plus_one)]
+                let mut new_selectors = parse_recursive(
+                    sub_selector,
+                    Some(
+                        span.start + remaining.0 + i + 1
+                            ..span.start + remaining.0 + i + sub_selector.len() + 1,
+                    ),
+                    Some(if let Some(full_class) = full_class {
+                        full_class
+                    } else {
+                        val
+                    }),
+                    config,
+                );
 
-        split_ignore_arbitrary(remaining, GROUP_SELECTOR_SEPARATOR, true).for_each(|remaining| {
-            if let Some(mut new_selectors) = parse_recursive(
-                remaining,
-                Some(if let Some(full_class) = full_class {
-                    full_class
-                } else {
-                    val
-                }),
-                config,
-            ) {
                 // Merge the common variants with each child selector variant list
+                for selector in new_selectors.iter_mut().flatten() {
+                    selector.variants.extend(variants.iter().cloned());
+                }
+
                 new_selectors
-                    .iter_mut()
-                    .for_each(|selector| selector.variants.extend(variants.iter().cloned()));
-
-                selectors.extend(new_selectors);
-            }
-        });
-
-        Some(selectors)
+            })
+            .collect()
     } else {
         // Child selector
-        let is_important = if let Some(new_remaining) = remaining.strip_prefix(IMPORTANT_FLAG) {
-            remaining = new_remaining;
+        let is_important = if let Some(new_remaining) = remaining.1.strip_prefix(IMPORTANT_FLAG) {
+            remaining = (remaining.0, new_remaining);
             true
         } else {
             false
         };
 
-        let is_negative = if let Some(new_remaining) = remaining.strip_prefix(NEGATIVE_FLAG) {
-            remaining = new_remaining;
+        let is_negative = if let Some(new_remaining) = remaining.1.strip_prefix(NEGATIVE_FLAG) {
+            remaining = (remaining.0, new_remaining);
             true
         } else {
             false
         };
 
-        if remaining.starts_with(ARBITRARY_START) && remaining.ends_with(ARBITRARY_END) {
+        if remaining.1.starts_with(ARBITRARY_START) && remaining.1.ends_with(ARBITRARY_END) {
             // Arbitrary CSS property (without namespace)
             let plugin = &CssPropertyPlugin;
 
-            Some(vec![Selector {
+            vec![Ok(Selector {
                 // Arbitrary properties will be placed at the end of the CSS
                 order: BUILTIN_PLUGINS.len() + config.custom_plugins.len(),
                 full: if let Some(full_class) = full_class {
@@ -281,17 +305,17 @@ fn parse_recursive<'a>(
                 modifier: Modifier::Arbitrary {
                     prefix: "",
                     hint: "",
-                    value: Cow::from(&remaining[1..remaining.len() - 1]),
+                    value: Cow::from(&remaining.1[1..remaining.1.len() - 1]),
                 },
                 variants,
                 is_important,
                 plugin,
-            }])
+            })]
         } else {
             // Find the right plugin for handling this selector
             let find = move |(order, plugin): (usize, &&'static (dyn Plugin + Send + Sync))| {
                 // Find the modifier
-                if let Some(modifier_part) = remaining.strip_prefix(&plugin.namespace()) {
+                if let Some(modifier_part) = remaining.1.strip_prefix(&plugin.namespace()) {
                     let modifier_part = modifier_part
                         .strip_prefix(MODIFIER_SEPARATOR)
                         .unwrap_or(modifier_part);
@@ -331,7 +355,7 @@ fn parse_recursive<'a>(
                     };
 
                     if plugin.can_handle(context) {
-                        Some(vec![Selector {
+                        Some(Selector {
                             order,
                             full: if let Some(full_class) = full_class {
                                 full_class
@@ -342,7 +366,7 @@ fn parse_recursive<'a>(
                             variants: variants.clone(),
                             is_important,
                             plugin: *plugin,
-                        }])
+                        })
                     } else {
                         None
                     }
@@ -350,20 +374,26 @@ fn parse_recursive<'a>(
                     None
                 }
             };
-            BUILTIN_PLUGINS
+
+            match BUILTIN_PLUGINS
                 .iter()
                 .enumerate()
                 .find_map(&find)
-                .map(|mut selectors| {
+                .map(|mut selector| {
                     // Selectors generated using custom plugins are placed first to be easily
                     // overridden, so we need to shift the order of builtin plugins to take that
                     // into account
-                    selectors
-                        .iter_mut()
-                        .for_each(|p| p.order += config.custom_plugins.len());
-                    selectors
+                    selector.order += config.custom_plugins.len();
+                    selector
                 })
                 .or_else(|| config.custom_plugins.iter().enumerate().find_map(find))
+            {
+                Some(s) => vec![Ok(s)],
+                None => vec![Err(ParseError::new(
+                    span,
+                    ParseErrorKind::UnknownPlugin(val),
+                ))],
+            }
         }
     }
 }
@@ -378,8 +408,10 @@ mod tests {
     #[test]
     fn basic_single() {
         assert_eq!(
-            parse("absolute", &Config::default()).unwrap()[0],
-            Selector {
+            parse("absolute", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "absolute",
                 order: 4,
                 plugin: &layout::position::PluginDefinition,
@@ -396,8 +428,10 @@ mod tests {
     #[test]
     fn basic_multiple() {
         assert_eq!(
-            parse("text-center", &Config::default()).unwrap()[0],
-            Selector {
+            parse("text-center", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "text-center",
                 order: 165,
                 plugin: &typography::text_align::PluginDefinition,
@@ -414,8 +448,10 @@ mod tests {
     #[test]
     fn basic_opacity() {
         assert_eq!(
-            parse("bg-red-500/25", &Config::default()).unwrap()[0],
-            Selector {
+            parse("bg-red-500/25", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "bg-red-500/25",
                 order: 140,
                 plugin: &background::background_color::PluginDefinition,
@@ -432,8 +468,10 @@ mod tests {
     #[test]
     fn basic_important() {
         assert_eq!(
-            parse("!px-4", &Config::default()).unwrap()[0],
-            Selector {
+            parse("!px-4", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "!px-4",
                 order: 159,
                 plugin: &spacing::padding::PluginDefinition,
@@ -450,8 +488,10 @@ mod tests {
     #[test]
     fn basic_negative() {
         assert_eq!(
-            parse("-px-4", &Config::default()).unwrap()[0],
-            Selector {
+            parse("-px-4", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "-px-4",
                 order: 159,
                 plugin: &spacing::padding::PluginDefinition,
@@ -468,8 +508,10 @@ mod tests {
     #[test]
     fn basic_important_and_negative() {
         assert_eq!(
-            parse("!-px-4", &Config::default()).unwrap()[0],
-            Selector {
+            parse("!-px-4", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "!-px-4",
                 order: 159,
                 plugin: &spacing::padding::PluginDefinition,
@@ -486,8 +528,8 @@ mod tests {
     #[test]
     fn basic_integer() {
         assert_eq!(
-            parse("px-4", &Config::default()).unwrap()[0],
-            Selector {
+            parse("px-4", None, &Config::default())[0].as_ref().unwrap(),
+            &Selector {
                 full: "px-4",
                 order: 159,
                 plugin: &spacing::padding::PluginDefinition,
@@ -504,8 +546,10 @@ mod tests {
     #[test]
     fn basic_float() {
         assert_eq!(
-            parse("px-1.5", &Config::default()).unwrap()[0],
-            Selector {
+            parse("px-1.5", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "px-1.5",
                 order: 159,
                 plugin: &spacing::padding::PluginDefinition,
@@ -522,8 +566,10 @@ mod tests {
     #[test]
     fn variants_single() {
         assert_eq!(
-            parse("hover:text-center", &Config::default()).unwrap()[0],
-            Selector {
+            parse("hover:text-center", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "hover:text-center",
                 order: 165,
                 plugin: &typography::text_align::PluginDefinition,
@@ -540,8 +586,10 @@ mod tests {
     #[test]
     fn variants_multiple() {
         assert_eq!(
-            parse("marker:xl:hover:text-center", &Config::default()).unwrap()[0],
-            Selector {
+            parse("marker:xl:hover:text-center", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "marker:xl:hover:text-center",
                 order: 165,
                 plugin: &typography::text_align::PluginDefinition,
@@ -568,8 +616,10 @@ mod tests {
     #[test]
     fn variants_negative() {
         assert_eq!(
-            parse("marker:xl:hover:-mx-4", &Config::default()).unwrap()[0],
-            Selector {
+            parse("marker:xl:hover:-mx-4", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "marker:xl:hover:-mx-4",
                 order: 20,
                 plugin: &spacing::margin::PluginXDefinition,
@@ -596,8 +646,10 @@ mod tests {
     #[test]
     fn arbitrary_variant() {
         assert_eq!(
-            parse("[&>*]:text-center", &Config::default()).unwrap()[0],
-            Selector {
+            parse("[&>*]:text-center", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "[&>*]:text-center",
                 order: 165,
                 plugin: &typography::text_align::PluginDefinition,
@@ -614,8 +666,14 @@ mod tests {
     #[test]
     fn arbitrary_variant_at_rule() {
         assert_eq!(
-            parse("[@supports_not_(display:grid)]:grid", &Config::default()).unwrap()[0],
-            Selector {
+            parse(
+                "[@supports_not_(display:grid)]:grid",
+                None,
+                &Config::default()
+            )[0]
+            .as_ref()
+            .unwrap(),
+            &Selector {
                 full: "[@supports_not_(display:grid)]:grid",
                 order: 27,
                 plugin: &layout::display::PluginDefinition,
@@ -634,8 +692,10 @@ mod tests {
     #[test]
     fn arbitrary_variant_multiple() {
         assert_eq!(
-            parse("xl:[&>*]:focus:text-center", &Config::default()).unwrap()[0],
-            Selector {
+            parse("xl:[&>*]:focus:text-center", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "xl:[&>*]:focus:text-center",
                 order: 165,
                 plugin: &typography::text_align::PluginDefinition,
@@ -659,8 +719,10 @@ mod tests {
     #[test]
     fn arbitrary_variant_negative() {
         assert_eq!(
-            parse("xl:[&>*]:focus:-m-4", &Config::default()).unwrap()[0],
-            Selector {
+            parse("xl:[&>*]:focus:-m-4", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "xl:[&>*]:focus:-m-4",
                 order: 19,
                 plugin: &spacing::margin::PluginDefinition,
@@ -684,8 +746,10 @@ mod tests {
     #[test]
     fn arbitrary_value() {
         assert_eq!(
-            parse("mx-[12px]", &Config::default()).unwrap()[0],
-            Selector {
+            parse("mx-[12px]", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "mx-[12px]",
                 order: 20,
                 plugin: &spacing::margin::PluginDefinition,
@@ -703,8 +767,10 @@ mod tests {
     #[test]
     fn complex_arbitrary_value() {
         assert_eq!(
-            parse("bg-[url('/hello_world.png')]", &Config::default()).unwrap()[0],
-            Selector {
+            parse("bg-[url('/hello_world.png')]", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "bg-[url('/hello_world.png')]",
                 order: 142,
                 plugin: &background::background_image::PluginDefinition,
@@ -722,8 +788,10 @@ mod tests {
     #[test]
     fn arbitrary_value_hint() {
         assert_eq!(
-            parse("bg-[color:#fff]", &Config::default()).unwrap()[0],
-            Selector {
+            parse("bg-[color:#fff]", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "bg-[color:#fff]",
                 order: 140,
                 plugin: &background::background_color::PluginDefinition,
@@ -741,8 +809,10 @@ mod tests {
     #[test]
     fn arbitrary_value_with_variants() {
         assert_eq!(
-            parse("xl:marker:bg-[#fff]", &Config::default()).unwrap()[0],
-            Selector {
+            parse("xl:marker:bg-[#fff]", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "xl:marker:bg-[#fff]",
                 order: 140,
                 plugin: &background::background_color::PluginDefinition,
@@ -769,8 +839,10 @@ mod tests {
     #[test]
     fn arbitrary_value_with_variants_and_hint() {
         assert_eq!(
-            parse("xl:marker:bg-[color:#fff]", &Config::default()).unwrap()[0],
-            Selector {
+            parse("xl:marker:bg-[color:#fff]", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "xl:marker:bg-[color:#fff]",
                 order: 140,
                 plugin: &background::background_color::PluginDefinition,
@@ -797,8 +869,10 @@ mod tests {
     #[test]
     fn arbitrary_value_with_arbitrary_variant() {
         assert_eq!(
-            parse("[&>*]:bg-[#fff]", &Config::default()).unwrap()[0],
-            Selector {
+            parse("[&>*]:bg-[#fff]", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "[&>*]:bg-[#fff]",
                 order: 140,
                 plugin: &background::background_color::PluginDefinition,
@@ -816,8 +890,14 @@ mod tests {
     #[test]
     fn arbitrary_variant_escaped() {
         assert_eq!(
-            parse(r"[\[type='input'\]_&>:*]:bg-red-300", &Config::default()).unwrap()[0],
-            Selector {
+            parse(
+                r"[\[type='input'\]_&>:*]:bg-red-300",
+                None,
+                &Config::default()
+            )[0]
+            .as_ref()
+            .unwrap(),
+            &Selector {
                 full: r"[\[type='input'\]_&>:*]:bg-red-300",
                 order: 140,
                 plugin: &background::background_color::PluginDefinition,
@@ -834,8 +914,10 @@ mod tests {
     #[test]
     fn arbitrary_value_with_arbitrary_variant_mixed() {
         assert_eq!(
-            parse("xl:[&>*]:hover:bg-[#fff]", &Config::default()).unwrap()[0],
-            Selector {
+            parse("xl:[&>*]:hover:bg-[#fff]", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "xl:[&>*]:hover:bg-[#fff]",
                 order: 140,
                 plugin: &background::background_color::PluginDefinition,
@@ -860,8 +942,10 @@ mod tests {
     #[test]
     fn arbitrary_value_with_arbitrary_variant_and_hint() {
         assert_eq!(
-            parse("xl:[&>*]:hover:bg-[color:#fff]", &Config::default()).unwrap()[0],
-            Selector {
+            parse("xl:[&>*]:hover:bg-[color:#fff]", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "xl:[&>*]:hover:bg-[color:#fff]",
                 order: 140,
                 plugin: &background::background_color::PluginDefinition,
@@ -886,8 +970,14 @@ mod tests {
     #[test]
     fn arbitrary_value_escaped() {
         assert_eq!(
-            parse(r"bg-[url('/url_with_\]\)\'.png')]", &Config::default()).unwrap()[0],
-            Selector {
+            parse(
+                r"bg-[url('/url_with_\]\)\'.png')]",
+                None,
+                &Config::default()
+            )[0]
+            .as_ref()
+            .unwrap(),
+            &Selector {
                 full: r"bg-[url('/url_with_\]\)\'.png')]",
                 order: 142,
                 plugin: &background::background_image::PluginDefinition,
@@ -905,8 +995,10 @@ mod tests {
     #[test]
     fn arbitrary_css_property() {
         assert_eq!(
-            parse("hover:[mask-type:luminance]", &Config::default()).unwrap()[0],
-            Selector {
+            parse("hover:[mask-type:luminance]", None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
+            &Selector {
                 full: "hover:[mask-type:luminance]",
                 order: BUILTIN_PLUGINS.len(),
                 plugin: &CssPropertyPlugin,
@@ -926,11 +1018,11 @@ mod tests {
         assert_eq!(
             parse(
                 "hover:(focus:bg-gray-500,text-[color:black,])",
+                None,
                 &Config::default(),
-            )
-            .unwrap(),
+            ),
             vec![
-                Selector {
+                Ok(Selector {
                     full: "hover:(focus:bg-gray-500,text-[color:black,])",
                     order: 140,
                     plugin: &background::background_color::PluginDefinition,
@@ -943,8 +1035,8 @@ mod tests {
                         value: "gray-500",
                     },
                     is_important: false,
-                },
-                Selector {
+                }),
+                Ok(Selector {
                     full: "hover:(focus:bg-gray-500,text-[color:black,])",
                     order: 176,
                     plugin: &typography::text_color::PluginDefinition,
@@ -955,7 +1047,7 @@ mod tests {
                         value: Cow::from("black,"),
                     },
                     is_important: false,
-                }
+                })
             ],
         );
     }
@@ -963,8 +1055,8 @@ mod tests {
     #[test]
     fn variant_grouping_single() {
         assert_eq!(
-            parse("hover:(bg-gray-500)", &Config::default()).unwrap(),
-            vec![Selector {
+            parse("hover:(bg-gray-500)", None, &Config::default()),
+            vec![Ok(Selector {
                 full: "hover:(bg-gray-500)",
                 order: 140,
                 plugin: &background::background_color::PluginDefinition,
@@ -974,7 +1066,7 @@ mod tests {
                     value: "gray-500",
                 },
                 is_important: false,
-            }],
+            })],
         );
     }
 
@@ -983,11 +1075,11 @@ mod tests {
         assert_eq!(
             parse(
                 "focus:([&>*]:-m-4,xl:dark:(bg-red-100,rtl:text-[color:black]))",
+                None,
                 &Config::default(),
-            )
-            .unwrap(),
+            ),
             vec![
-                Selector {
+                Ok(Selector {
                     full: "focus:([&>*]:-m-4,xl:dark:(bg-red-100,rtl:text-[color:black]))",
                     order: 19,
                     plugin: &spacing::margin::PluginDefinition,
@@ -1000,8 +1092,8 @@ mod tests {
                         value: "4",
                     },
                     is_important: false,
-                },
-                Selector {
+                }),
+                Ok(Selector {
                     full: "focus:([&>*]:-m-4,xl:dark:(bg-red-100,rtl:text-[color:black]))",
                     order: 140,
                     plugin: &background::background_color::PluginDefinition,
@@ -1021,8 +1113,8 @@ mod tests {
                         value: "red-100",
                     },
                     is_important: false,
-                },
-                Selector {
+                }),
+                Ok(Selector {
                     full: "focus:([&>*]:-m-4,xl:dark:(bg-red-100,rtl:text-[color:black]))",
                     order: 176,
                     plugin: &typography::text_color::PluginDefinition,
@@ -1044,7 +1136,7 @@ mod tests {
                         value: Cow::from("black"),
                     },
                     is_important: false,
-                },
+                }),
             ],
         );
     }
@@ -1054,10 +1146,11 @@ mod tests {
         assert_eq!(
             parse(
                 r"focus:([&>*]:-m-4,xl:dark:([\[type='text'\].light_&,.foo]:bg-red-100,text-[color:black,]))",
+                None,
                 &Config::default(),
-            ).unwrap(),
+            ),
             vec![
-                Selector {
+                Ok(Selector {
                     full: r"focus:([&>*]:-m-4,xl:dark:([\[type='text'\].light_&,.foo]:bg-red-100,text-[color:black,]))",
                     order: 19,
                     plugin: &spacing::margin::PluginDefinition,
@@ -1070,15 +1163,21 @@ mod tests {
                         value: "4",
                     },
                     is_important: false,
-                },
-                Selector {
+                }),
+                Ok(Selector {
                     full: r"focus:([&>*]:-m-4,xl:dark:([\[type='text'\].light_&,.foo]:bg-red-100,text-[color:black,]))",
                     order: 140,
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Arbitrary(Cow::from(r"[type='text'].light &,.foo")),
-                        Variant::Builtin(64, VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))),
-                        Variant::Builtin(66, VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)"))),
+                        Variant::Builtin(
+                            64,
+                            VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                        ),
+                        Variant::Builtin(
+                            66,
+                            VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)"))
+                        ),
                         Variant::Builtin(47, VariantType::PseudoClass("focus")),
                     ],
                     modifier: Modifier::Builtin {
@@ -1086,14 +1185,20 @@ mod tests {
                         value: "red-100",
                     },
                     is_important: false,
-                },
-                Selector {
+                }),
+                Ok(Selector {
                     full: r"focus:([&>*]:-m-4,xl:dark:([\[type='text'\].light_&,.foo]:bg-red-100,text-[color:black,]))",
                     order: 176,
                     plugin: &typography::text_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin(64, VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))),
-                        Variant::Builtin(66, VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)"))),
+                        Variant::Builtin(
+                            64,
+                            VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                        ),
+                        Variant::Builtin(
+                            66,
+                            VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)"))
+                        ),
                         Variant::Builtin(47, VariantType::PseudoClass("focus")),
                     ],
                     modifier: Modifier::Arbitrary {
@@ -1102,7 +1207,7 @@ mod tests {
                         value: Cow::from("black,"),
                     },
                     is_important: false,
-                },
+                }),
             ],
         );
     }
@@ -1112,11 +1217,11 @@ mod tests {
         assert_eq!(
             parse(
                 r"xl:(focus:(outline,outline-red-200),dark:(bg-black,text-white))",
+                None,
                 &Config::default(),
-            )
-            .unwrap(),
+            ),
             vec![
-                Selector {
+                Ok(Selector {
                     full: r"xl:(focus:(outline,outline-red-200),dark:(bg-black,text-white))",
                     order: 191,
                     plugin: &border::outline_style::PluginDefinition,
@@ -1132,8 +1237,8 @@ mod tests {
                         value: "",
                     },
                     is_important: false,
-                },
-                Selector {
+                }),
+                Ok(Selector {
                     full: r"xl:(focus:(outline,outline-red-200),dark:(bg-black,text-white))",
                     order: 194,
                     plugin: &border::outline_color::PluginDefinition,
@@ -1149,8 +1254,8 @@ mod tests {
                         value: "red-200",
                     },
                     is_important: false,
-                },
-                Selector {
+                }),
+                Ok(Selector {
                     full: r"xl:(focus:(outline,outline-red-200),dark:(bg-black,text-white))",
                     order: 140,
                     plugin: &background::background_color::PluginDefinition,
@@ -1169,8 +1274,8 @@ mod tests {
                         value: "black",
                     },
                     is_important: false,
-                },
-                Selector {
+                }),
+                Ok(Selector {
                     full: r"xl:(focus:(outline,outline-red-200),dark:(bg-black,text-white))",
                     order: 176,
                     plugin: &typography::text_color::PluginDefinition,
@@ -1189,7 +1294,7 @@ mod tests {
                         value: "white",
                     },
                     is_important: false,
-                },
+                }),
             ],
         );
     }

@@ -73,6 +73,7 @@ impl Default for Scanner {
                     |ch| ch == ' ' || ch == '"' || ch == '\'' || ch == '`',
                     false,
                 )
+                .map(|(_, v)| v)
                 .collect::<BTreeSet<&str>>()
             }),
         }

@@ -300,9 +300,11 @@ impl<'a> EncreGenerator<'a> {
     ///
     /// [scan]: EncreGenerator::scan
     pub fn add_selector(&mut self, val: &'a str) {
-        if let Some(s) = parse(val, &self.config) {
-            self.scanned_selectors.extend(s);
-        }
+        self.scanned_selectors.extend(
+            parse(val, None, &self.config)
+                .into_iter()
+                .filter_map(Result::ok),
+        );
     }
 
     /// Add several selectors which will have their CSS generated.
@@ -316,8 +318,8 @@ impl<'a> EncreGenerator<'a> {
     pub fn add_selectors<T: IntoIterator<Item = &'a str>>(&mut self, val: T) {
         self.scanned_selectors.extend(
             val.into_iter()
-                .filter_map(|v| parse(v.trim(), &self.config))
-                .flatten(),
+                .flat_map(|v| parse(v.trim(), None, &self.config))
+                .filter_map(Result::ok),
         );
     }
 
@@ -395,20 +397,34 @@ mod tests {
     fn simple_scan() {
         let config = base_config();
         let expected = BTreeSet::from([
-            parse("flex", &config).unwrap(),
-            parse("w-full", &config).unwrap(),
-            parse("h-full", &config).unwrap(),
-            parse("absolute", &config).unwrap(),
-            parse("bg-blue-500", &config).unwrap(),
-            parse("border-[#333]", &config).unwrap(),
-            parse("text-[color:var(--hello)]", &config).unwrap(),
-            parse("sm:focus:ring", &config).unwrap(),
-            parse("hover:bg-black", &config).unwrap(),
-        ])
-        .iter()
-        .flatten()
-        .cloned()
-        .collect::<BTreeSet<Selector>>();
+            parse("flex", None, &config)[0].as_ref().unwrap().clone(),
+            parse("w-full", None, &config)[0].as_ref().unwrap().clone(),
+            parse("h-full", None, &config)[0].as_ref().unwrap().clone(),
+            parse("absolute", None, &config)[0]
+                .as_ref()
+                .unwrap()
+                .clone(),
+            parse("bg-blue-500", None, &config)[0]
+                .as_ref()
+                .unwrap()
+                .clone(),
+            parse("border-[#333]", None, &config)[0]
+                .as_ref()
+                .unwrap()
+                .clone(),
+            parse("text-[color:var(--hello)]", None, &config)[0]
+                .as_ref()
+                .unwrap()
+                .clone(),
+            parse("sm:focus:ring", None, &config)[0]
+                .as_ref()
+                .unwrap()
+                .clone(),
+            parse("hover:bg-black", None, &config)[0]
+                .as_ref()
+                .unwrap()
+                .clone(),
+        ]);
 
         let mut generator = EncreGenerator::from_config(base_config());
         generator.scan(
@@ -422,13 +438,15 @@ mod tests {
     fn utf8_scan() {
         let config = base_config();
         let expected = BTreeSet::from([
-            parse("before:content-[Jäsøn_Doe]", &config).unwrap(),
-            parse("content-[→]", &config).unwrap(),
-        ])
-        .iter()
-        .flatten()
-        .cloned()
-        .collect::<BTreeSet<Selector>>();
+            parse("before:content-[Jäsøn_Doe]", None, &config)[0]
+                .as_ref()
+                .unwrap()
+                .clone(),
+            parse("content-[→]", None, &config)[0]
+                .as_ref()
+                .unwrap()
+                .clone(),
+        ]);
 
         let mut generator = EncreGenerator::from_config(base_config());
         generator.scan(r#"<div class="before:content-[Jäsøn_Doe] content-[→]">y̆</div>"#);
@@ -440,13 +458,15 @@ mod tests {
     fn scan_prevent_splitting_arbitrary_values() {
         let config = base_config();
         let expected = BTreeSet::from([
-            parse("bg-red-300", &config).unwrap(),
-            parse("content-['hello']", &config).unwrap(),
-        ])
-        .iter()
-        .flatten()
-        .cloned()
-        .collect::<BTreeSet<Selector>>();
+            parse("bg-red-300", None, &config)[0]
+                .as_ref()
+                .unwrap()
+                .clone(),
+            parse("content-['hello']", None, &config)[0]
+                .as_ref()
+                .unwrap()
+                .clone(),
+        ]);
 
         let mut generator = EncreGenerator::from_config(base_config());
         generator.scan(r#"<div class="bg-red-300 content-['hello']"></div>"#);

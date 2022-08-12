@@ -189,7 +189,7 @@ impl<'a> ShadowList<'a> {
         let mut last_index = 0;
         let mut shadows = vec![Shadow::new_raw()];
 
-        for (ch_index, ch) in value.chars().enumerate() {
+        for (ch_index, ch) in value.char_indices() {
             match ch {
                 '(' => {
                     parenthesis_level += 1;

@@ -1,6 +1,7 @@
 //! Define some utility functions for quickly doing things.
 use crate::{
     config::Config,
+    error::ParseError,
     selector::{
         parser::{parse, ARBITRARY_END, ARBITRARY_START, ESCAPE, GROUP_END, GROUP_START},
         Selector,
@@ -9,6 +10,7 @@ use crate::{
 
 use std::{
     fmt::{self, Write},
+    iter,
     str::CharIndices,
 };
 
@@ -23,9 +25,9 @@ const INDENTATION_SIZE: usize = 2;
 ///
 /// # Errors
 ///
-/// Returns [`Error::Format`] if writing to the buffer failed.
+/// Returns an [`fmt::Error`] when writing to the buffer failed.
 ///
-/// [`Error::Format`]: crate::Error::Format
+/// [`fmt::Error`]: std::fmt::Error
 pub fn indent(num: usize, buffer: &mut String) -> fmt::Result {
     write!(buffer, "{:indent$}", "", indent = num * INDENTATION_SIZE)
 }
@@ -110,6 +112,7 @@ pub struct SplitIgnoreArbitrary<'a, P: Pattern> {
     searched_pattern: P,
     ignore_parenthesis: bool,
     is_next_escaped: bool,
+    last_slice_returned: bool,
     parenthesis_level: usize,
     bracket_level: usize,
     last_index: usize,
@@ -117,7 +120,7 @@ pub struct SplitIgnoreArbitrary<'a, P: Pattern> {
 }
 
 impl<'a, P: Pattern> Iterator for SplitIgnoreArbitrary<'a, P> {
-    type Item = &'a str;
+    type Item = (usize, &'a str);
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
@@ -162,15 +165,16 @@ impl<'a, P: Pattern> Iterator for SplitIgnoreArbitrary<'a, P> {
                             let last_index = self.last_index;
                             self.last_index = ch.0 + ch.1.len_utf8();
                             self.seek_index = self.last_index;
-                            return Some(&self.val[last_index..ch.0]);
+                            return Some((last_index, &self.val[last_index..ch.0]));
                         }
                     }
                 }
-            } else if self.last_index != self.val.len() {
+            } else if !self.last_slice_returned {
                 // The characters are all handled, return the last slice
                 let last_index = self.last_index;
                 self.last_index = self.val.len();
-                return Some(&self.val[last_index..self.val.len()]);
+                self.last_slice_returned = true;
+                return Some((last_index, &self.val[last_index..self.val.len()]));
             } else {
                 // The characters are all handled, and the last slice was returned if no character is
                 // searched, return `None`
@@ -191,19 +195,20 @@ impl<'a, P: Pattern> Iterator for SplitIgnoreArbitrary<'a, P> {
 /// use encre_css::utils::split_ignore_arbitrary;
 ///
 /// let value = "bg-red-500 content-[wrapped in `[]`, will not be split] (words wrapped in parenthesis are not split too)";
-/// assert_eq!(split_ignore_arbitrary(value, ' ', true).collect::<Vec<&str>>(), vec!["bg-red-500", "content-[wrapped in `[]`, will not be split]", "(words wrapped in parenthesis are not split too)"]);
+/// assert_eq!(split_ignore_arbitrary(value, ' ', true).collect::<Vec<(usize, &str)>>(), vec![(0, "bg-red-500"), (11, "content-[wrapped in `[]`, will not be split]"), (56, "(words wrapped in parenthesis are not split too)")]);
 /// ```
 pub fn split_ignore_arbitrary<P: Pattern>(
     val: &str,
     searched_pattern: P,
     ignore_parenthesis: bool,
-) -> impl Iterator<Item = &str> {
+) -> impl Iterator<Item = (usize, &str)> {
     SplitIgnoreArbitrary {
         val,
         iter: val.char_indices(),
         searched_pattern,
         ignore_parenthesis,
         is_next_escaped: false,
+        last_slice_returned: false,
         parenthesis_level: 0,
         bracket_level: 0,
         last_index: 0,
@@ -214,11 +219,20 @@ pub fn split_ignore_arbitrary<P: Pattern>(
 /// Sort a list of selectors (separated by spaces) according to `encre-css` rules.
 ///
 /// Note: selectors are also deduplicated.
+///
+/// # Example
+///
+/// ```rust
+/// use encre_css::{Config, utils::sort_selectors};
+///
+/// let value = "text-white px-4 sm:px-8 py-2 sm:py-3 bg-sky-700 hover:bg-sky-800";
+/// assert_eq!(sort_selectors(value, &Config::default()), "bg-sky-700 px-4 py-2 text-white hover:bg-sky-800 sm:px-8 sm:py-3".to_string());
+/// ```
 pub fn sort_selectors(val: &str, config: &Config) -> String {
     let mut selectors = val
         .split_whitespace()
-        .filter_map(|v| parse(v.trim(), config))
-        .flatten()
+        .flat_map(|v| parse(v.trim(), None, config))
+        .filter_map(Result::ok)
         .collect::<Vec<Selector>>();
 
     // Deduplicate selectors belonging to a variant group
@@ -232,20 +246,43 @@ pub fn sort_selectors(val: &str, config: &Config) -> String {
         .join(" ")
 }
 
+/// Return the list of errors encountered when parsing a list of selectors
+///
+/// # Example
+///
+/// ```rust
+/// use encre_css::{Config, error::{ParseError, ParseErrorKind}, utils::check_selectors};
+///
+/// let value = "bg text-red hover:a lg: focus:() dark:(md:,shadow-8xl) bar:text-black md:foo:flex";
+/// assert_eq!(check_selectors(value, &Config::default()), vec![
+///     ParseError { span: 0..2, kind: ParseErrorKind::TooShort("bg") },
+///     ParseError { span: 3..11, kind: ParseErrorKind::UnknownPlugin("text-red") },
+///     ParseError { span: 12..19, kind: ParseErrorKind::UnknownPlugin("hover:a") },
+///     ParseError { span: 20..23, kind: ParseErrorKind::VariantsWithoutModifier("lg:") },
+///     ParseError { span: 24..32, kind: ParseErrorKind::VariantsWithoutModifier("focus:()") },
+///     ParseError { span: 39..42, kind: ParseErrorKind::VariantsWithoutModifier("md:") },
+///     ParseError { span: 43..53, kind: ParseErrorKind::UnknownPlugin("shadow-8xl") },
+///     ParseError { span: 55..69, kind: ParseErrorKind::UnknownVariant("bar", "bar:text-black") },
+///     ParseError { span: 70..81, kind: ParseErrorKind::UnknownVariant("foo", "md:foo:flex") }
+/// ]);
+/// ```
+pub fn check_selectors<'a>(val: &'a str, config: &Config) -> Vec<ParseError<'a>> {
+    val.char_indices()
+        .chain(iter::once((val.len(), ' ')))
+        .filter(|(_, ch)| *ch == ' ')
+        .scan(0, |last_i, (i, _)| {
+            let old_i = *last_i;
+            *last_i = i + 1;
+            Some((old_i..i, &val[old_i..i]))
+        })
+        .flat_map(|(span, v)| parse(v.trim(), Some(span), config))
+        .filter_map(|s| if let Err(e) = s { Some(e) } else { None })
+        .collect::<Vec<ParseError>>()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn sort_selectors_test() {
-        assert_eq!(
-            sort_selectors(
-                "text-white px-4 sm:px-8 py-2 sm:py-3 bg-sky-700 hover:bg-sky-800",
-                &Config::default()
-            ),
-            "bg-sky-700 px-4 py-2 text-white hover:bg-sky-800 sm:px-8 sm:py-3".to_string()
-        );
-    }
 
     #[test]
     fn sort_selectors_with_variant_groups() {

@@ -274,9 +274,12 @@ mod tests {
     fn sorting_test() {
         let config = Config::default();
 
+        let selectors1 = parse("lg:bg-red-500", None, &config);
+        let selectors2 = parse("bg-red-500", None, &config);
+
         let mut selectors = BTreeSet::new();
-        selectors.extend(parse("lg:bg-red-500", &config).unwrap());
-        selectors.extend(parse("bg-red-500", &config).unwrap());
+        selectors.insert(selectors1[0].as_ref().unwrap());
+        selectors.insert(selectors2[0].as_ref().unwrap());
 
         let mut iter = selectors.iter();
         assert!(

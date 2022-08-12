@@ -10,7 +10,7 @@ To integrate `encre-css-icons` with `encre-css`, add it in your `Cargo.toml`:
 
 ```toml
 [dependencies]
-encre-css-icons = { git = "https://gitlab.com/encre-org/encre-css.git", tag = "v0.6.0" }
+encre-css-icons = { git = "https://gitlab.com/encre-org/encre-css.git", tag = "v0.7.0" }
 ```
 
 Then, call the `register` function with a mutable reference to a `Config`
