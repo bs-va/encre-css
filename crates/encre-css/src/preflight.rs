@@ -57,7 +57,7 @@
 //! Based on [Tailwind's default preflight](https://tailwindcss.com/docs/preflight).
 //!
 //! [`Config::preflight`]: crate::config::Config::preflight
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 
 const DEFAULT_RING_COLOR: &str = "rgb(59 130 246 / 0.5)";
@@ -469,7 +469,7 @@ ol, ul, menu {
 /// The set of default styles.
 ///
 /// See [`crate::preflight`].
-#[derive(Debug, PartialEq, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Preflight {
     /// No preflight will be generated.
