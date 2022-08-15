@@ -209,7 +209,6 @@ pub(crate) struct Selector<'a> {
     pub(crate) plugin: &'static (dyn Plugin + Sync + Send),
 }
 
-// Use a faster implementation when we are not testing
 #[cfg(not(test))]
 impl<'a> PartialEq for Selector<'a> {
     fn eq(&self, other: &Self) -> bool {
@@ -217,6 +216,7 @@ impl<'a> PartialEq for Selector<'a> {
     }
 }
 
+// Use a stricter implementation when testing
 #[cfg(test)]
 impl<'a> PartialEq for Selector<'a> {
     fn eq(&self, other: &Self) -> bool {

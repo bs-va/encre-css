@@ -1,14 +1,15 @@
 //! Define some utility functions for quickly doing things.
 use crate::{
     config::Config,
-    error::ParseError,
+    error::{ParseError, ParseErrorKind},
     selector::{
         parser::{parse, ARBITRARY_END, ARBITRARY_START, ESCAPE, GROUP_END, GROUP_START},
-        Selector,
+        Selector
     },
 };
 
 use std::{
+    cmp::Ordering,
     fmt::{self, Write},
     iter,
     str::CharIndices,
@@ -184,10 +185,9 @@ impl<'a, P: Pattern> Iterator for SplitIgnoreArbitrary<'a, P> {
     }
 }
 
-/// Split a value while avoiding arbitrary values/variants and variant groups from being split.
-/// Actually, this function is used to ignore values wrapped in brackets.
+/// Split a value while avoiding arbitrary values/variants (wrapped in brackets) from being split.
 ///
-/// The last argument indicates whether parentheses are also ignored.
+/// The last argument indicates whether variant groups (wrapped in parentheses) are also ignored.
 ///
 /// # Example
 ///
@@ -225,23 +225,59 @@ pub fn split_ignore_arbitrary<P: Pattern>(
 /// ```rust
 /// use encre_css::{Config, utils::sort_selectors};
 ///
-/// let value = "text-white px-4 sm:px-8 py-2 sm:py-3 bg-sky-700 hover:bg-sky-800";
-/// assert_eq!(sort_selectors(value, &Config::default()), "bg-sky-700 px-4 py-2 text-white hover:bg-sky-800 sm:px-8 sm:py-3".to_string());
+/// let value = "foo text-white px-4 sm:px-8 py-2 qux:(bg-green-500,dark:bar:foo) sm:py-3 bar bg-sky-700 foo focus:(md:text-white,lg:text-gray-500) hover:bg-sky-800";
+/// assert_eq!(sort_selectors(value, &Config::default()), "bar foo qux:(bg-green-500,dark:bar:foo) bg-sky-700 px-4 py-2 text-white hover:bg-sky-800 sm:px-8 sm:py-3 focus:(md:text-white,lg:text-gray-500)".to_string());
 /// ```
 pub fn sort_selectors(val: &str, config: &Config) -> String {
+    #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+    enum FoundSelector<'a> {
+        UnknownSelector(&'a str),
+        KnownSelector(Selector<'a>),
+    }
+
     let mut selectors = val
         .split_whitespace()
         .flat_map(|v| parse(v.trim(), None, config))
-        .filter_map(Result::ok)
-        .collect::<Vec<Selector>>();
+        .map(|s| match s {
+            Ok(selector) => FoundSelector::KnownSelector(selector),
+            Err(ParseError {
+                kind:
+                    ParseErrorKind::TooShort(selector)
+                    | ParseErrorKind::VariantsWithoutModifier(selector)
+                    | ParseErrorKind::UnknownPlugin(selector)
+                    | ParseErrorKind::UnknownVariant(_, selector),
+                ..
+            }) => FoundSelector::UnknownSelector(selector),
+        })
+        .collect::<Vec<FoundSelector>>();
 
     // Deduplicate selectors belonging to a variant group
-    selectors.sort_unstable();
-    selectors.dedup_by_key(|s| s.full);
+    selectors.sort_by(|a, b| match (a, b) {
+        (FoundSelector::KnownSelector(a), FoundSelector::KnownSelector(b)) => {
+            if a.full.contains(GROUP_START) {
+                Ordering::Greater
+            } else if b.full.contains(GROUP_START) {
+                Ordering::Less
+            } else {
+                a.cmp(b)
+            }
+        }
+        (FoundSelector::KnownSelector(_), FoundSelector::UnknownSelector(_)) => Ordering::Greater,
+        (FoundSelector::UnknownSelector(_), FoundSelector::KnownSelector(_)) => Ordering::Less,
+        (FoundSelector::UnknownSelector(a), FoundSelector::UnknownSelector(b)) => a.cmp(b),
+    });
+
+    selectors.dedup_by_key(|s| match s {
+        FoundSelector::KnownSelector(s) => s.full,
+        FoundSelector::UnknownSelector(s) => s,
+    });
 
     selectors
         .iter()
-        .map(|s| s.full)
+        .map(|s| match s {
+            FoundSelector::KnownSelector(s) => s.full,
+            FoundSelector::UnknownSelector(s) => s,
+        })
         .collect::<Vec<&str>>()
         .join(" ")
 }
@@ -291,13 +327,13 @@ mod tests {
                 "hover:(text-white,bg-sky-800) focus-within:bg-red-100 text-blue-500 md:flex",
                 &Config::default()
             ),
-            "text-blue-500 focus-within:bg-red-100 hover:(text-white,bg-sky-800) md:flex"
+            "text-blue-500 focus-within:bg-red-100 md:flex hover:(text-white,bg-sky-800)"
                 .to_string()
         );
     }
 
     #[test]
-    fn sort_selectors_selectors_are_deduplicated() {
-        assert_eq!(sort_selectors("text-blue-100 text-blue-100 md:flex lg:block md:flex focus:(hover:md:flex,lg:flex)", &Config::default()), "text-blue-100 focus:(hover:md:flex,lg:flex) md:flex focus:(hover:md:flex,lg:flex) lg:block".to_string());
+    fn sort_selectors_are_deduplicated() {
+        assert_eq!(sort_selectors("text-blue-100 text-blue-100 md:flex lg:block md:flex focus:(hover:md:flex,lg:flex)", &Config::default()), "text-blue-100 md:flex lg:block focus:(hover:md:flex,lg:flex)".to_string());
     }
 }
