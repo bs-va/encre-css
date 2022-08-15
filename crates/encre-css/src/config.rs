@@ -1172,7 +1172,7 @@ impl Config {
     /// dark_mode = { class = <span class="string">".dark"</span> }
     /// screens = { 3xl = <span class="string">"1600px"</span>, lg = <span class="string">"2000px"</span> }<br>
     /// <span class="kw">[theme.colors]</span>
-    /// rosa-500 = <span class="string">"#e5186a"</span>
+    /// primary = <span class="string">"#e5186a"</span>
     /// yellow-400 = <span class="string">"#ffef0e"</span></code></pre></div>
     ///
     /// Then parse the configuration in Rust:

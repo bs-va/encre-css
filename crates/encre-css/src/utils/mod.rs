@@ -184,10 +184,10 @@ impl<'a, P: Pattern> Iterator for SplitIgnoreArbitrary<'a, P> {
     }
 }
 
-/// Split a value while prevent splitting arbitrary values / variants and variant groups, by
-/// ignoring values wrapped in brackets.
+/// Split a value while avoiding arbitrary values/variants and variant groups from being split.
+/// Actually, this function is used to ignore values wrapped in brackets.
 ///
-/// The last argument indicates whether parenthesis are also ignored.
+/// The last argument indicates whether parentheses are also ignored.
 ///
 /// # Example
 ///

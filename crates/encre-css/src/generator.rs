@@ -326,7 +326,7 @@ impl<'a> EncreGenerator<'a> {
     /// Scan the contents of a file and store all the selectors found.
     ///
     /// By default, it splits the content by spaces, double quotes, single quotes and backticks and
-    /// ignores arbitrary values / variants and variant groups.
+    /// ignores arbitrary values/variants and variant groups.
     ///
     /// This function automatically handles duplicated selectors and sorting.
     pub fn scan(&mut self, content: &'a str) {
