@@ -22,19 +22,19 @@
   <br>
 
   <a href="https://gitlab.com/encre-css/encre-css">
-    <img alt="Number of files" src="https://tokei.rs/b1/gitlab/encre-css/encre-css?category=files" />
+    <img alt="Number of files" src="https://tokei.ekzhang.com/b1/gitlab/encre-css/encre-css?category=files" />
   </a>
 
   <a href="https://gitlab.com/encre-css/encre-css">
-    <img alt="Number of lines of code" src="https://tokei.rs/b1/gitlab/encre-css/encre-css?category=code" />
+    <img alt="Number of lines of code" src="https://tokei.ekzhang.com/b1/gitlab/encre-css/encre-css?category=code" />
   </a>
 
   <a href="https://gitlab.com/encre-css/encre-css">
-    <img alt="Number of lines of comments" src="https://tokei.rs/b1/gitlab/encre-css/encre-css?category=comments" />
+    <img alt="Number of lines of comments" src="https://tokei.ekzhang.com/b1/gitlab/encre-css/encre-css?category=comments" />
   </a>
 
   <a href="https://gitlab.com/encre-css/encre-css">
-    <img alt="Total number of lines" src="https://tokei.rs/b1/gitlab/encre-css/encre-css" />
+    <img alt="Total number of lines" src="https://tokei.ekzhang.com/b1/gitlab/encre-css/encre-css" />
   </a>
 </div>
 
