@@ -4,7 +4,7 @@ use crate::{
     error::{ParseError, ParseErrorKind},
     selector::{
         parser::{parse, ARBITRARY_END, ARBITRARY_START, ESCAPE, GROUP_END, GROUP_START},
-        Selector
+        Selector,
     },
 };
 
@@ -232,50 +232,50 @@ pub fn sort_selectors(val: &str, config: &Config) -> String {
     #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
     enum FoundSelector<'a> {
         UnknownSelector(&'a str),
-        KnownSelector(Selector<'a>),
+        KnownSelector(bool, Selector<'a>),
     }
 
     let mut selectors = val
         .split_whitespace()
-        .flat_map(|v| parse(v.trim(), None, config))
-        .map(|s| match s {
-            Ok(selector) => FoundSelector::KnownSelector(selector),
-            Err(ParseError {
-                kind:
-                    ParseErrorKind::TooShort(selector)
-                    | ParseErrorKind::VariantsWithoutModifier(selector)
-                    | ParseErrorKind::UnknownPlugin(selector)
-                    | ParseErrorKind::UnknownVariant(_, selector),
-                ..
-            }) => FoundSelector::UnknownSelector(selector),
+        .flat_map(|v| {
+            let selectors = parse(v.trim(), None, config);
+            let is_in_group = selectors.len() > 1;
+
+            selectors.into_iter().map(move |s| match s {
+                Ok(selector) => FoundSelector::KnownSelector(is_in_group, selector),
+                Err(ParseError {
+                    kind:
+                        ParseErrorKind::TooShort(selector)
+                        | ParseErrorKind::VariantsWithoutModifier(selector)
+                        | ParseErrorKind::UnknownPlugin(selector)
+                        | ParseErrorKind::UnknownVariant(_, selector),
+                    ..
+                }) => FoundSelector::UnknownSelector(selector),
+            })
         })
         .collect::<Vec<FoundSelector>>();
 
     // Deduplicate selectors belonging to a variant group
-    selectors.sort_by(|a, b| match (a, b) {
-        (FoundSelector::KnownSelector(a), FoundSelector::KnownSelector(b)) => {
-            if a.full.contains(GROUP_START) {
-                Ordering::Greater
-            } else if b.full.contains(GROUP_START) {
-                Ordering::Less
-            } else {
-                a.cmp(b)
-            }
+    selectors.sort_unstable_by(|a, b| match (a, b) {
+        (FoundSelector::KnownSelector(true, _), FoundSelector::KnownSelector(_, _))
+        | (FoundSelector::KnownSelector(_, _), FoundSelector::UnknownSelector(_)) => {
+            Ordering::Greater
         }
-        (FoundSelector::KnownSelector(_), FoundSelector::UnknownSelector(_)) => Ordering::Greater,
-        (FoundSelector::UnknownSelector(_), FoundSelector::KnownSelector(_)) => Ordering::Less,
+        (FoundSelector::KnownSelector(_, _), FoundSelector::KnownSelector(true, _))
+        | (FoundSelector::UnknownSelector(_), FoundSelector::KnownSelector(_, _)) => Ordering::Less,
+        (FoundSelector::KnownSelector(_, a), FoundSelector::KnownSelector(_, b)) => a.cmp(b),
         (FoundSelector::UnknownSelector(a), FoundSelector::UnknownSelector(b)) => a.cmp(b),
     });
 
     selectors.dedup_by_key(|s| match s {
-        FoundSelector::KnownSelector(s) => s.full,
+        FoundSelector::KnownSelector(_, s) => s.full,
         FoundSelector::UnknownSelector(s) => s,
     });
 
     selectors
         .iter()
         .map(|s| match s {
-            FoundSelector::KnownSelector(s) => s.full,
+            FoundSelector::KnownSelector(_, s) => s.full,
             FoundSelector::UnknownSelector(s) => s,
         })
         .collect::<Vec<&str>>()
@@ -334,6 +334,6 @@ mod tests {
 
     #[test]
     fn sort_selectors_are_deduplicated() {
-        assert_eq!(sort_selectors("text-blue-100 text-blue-100 md:flex lg:block md:flex focus:(hover:md:flex,lg:flex)", &Config::default()), "text-blue-100 md:flex lg:block focus:(hover:md:flex,lg:flex)".to_string());
+        assert_eq!(sort_selectors("text-blue-100 text-blue-100 md:flex lg:block content-['hover:(md:text-white)'] md:flex focus:(hover:md:flex,lg:flex)", &Config::default()), "text-blue-100 content-['hover:(md:text-white)'] md:flex lg:block focus:(hover:md:flex,lg:flex)".to_string());
     }
 }
