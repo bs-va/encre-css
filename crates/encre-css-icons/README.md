@@ -23,7 +23,7 @@ use encre_css::{Config, EncreGenerator};
 let mut config = Config::from_file("encre-css.toml");
 // Or let mut config = Config::default();
 
-encre_css_icons::register(Some("i-"), None, Some(1.2), &mut config);
+encre_css_icons::register(&mut config, Some("i-"), None, Some(1.2));
 // First parameter (Option<&str>): a prefix applied to all icons (default is "")
 // Second parameter (Option<&str>): a custom CDN used to fetch icons (default is "https://esm.sh")
 // Third parameter (Option<f32>): the scale of icons (default is 1)

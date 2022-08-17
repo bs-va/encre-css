@@ -413,10 +413,10 @@ impl Plugin for Icons {
 }
 
 pub fn register(
+    config: &mut Config,
     prefix: Option<&'static str>,
     custom_cdn: Option<&'static str>,
     scale: Option<f32>,
-    config: &mut Config,
 ) {
     // Reset variables
     *PREFIX.lock().unwrap() = prefix.unwrap_or("").trim_end_matches('-');
@@ -437,7 +437,7 @@ mod tests {
         let expected = fs::read_to_string("tests/fixtures/icons.css").unwrap();
 
         let mut config = Config::default();
-        super::register(Some("i-"), None, None, &mut config);
+        super::register(&mut config, Some("i-"), None, None);
 
         let mut generator = EncreGenerator::from_config(config);
         generator.scan(&content);
