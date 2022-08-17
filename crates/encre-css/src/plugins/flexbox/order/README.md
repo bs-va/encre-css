@@ -17,7 +17,7 @@ Utilities for controlling the order of flex and grid items.
 
 ### Tailwind compatibility
 
-Order values don't follow Tailwind's philosophy of restraining possible values and all numbers
+Order values don't follow Tailwind's philosophy of limiting possible values and all numbers
 are supported. They are however perfectly compatible with Tailwind's values.
 
 ### Negative values

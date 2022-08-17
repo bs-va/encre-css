@@ -15,7 +15,7 @@ Utilities for specifying the rows in a grid layout.
 
 ### Tailwind compatibility
 
-Template row values don't follow Tailwind's philosophy of restraining possible values and all numbers
+Template row values don't follow Tailwind's philosophy of limiting possible values and all numbers
 are supported. They are however perfectly compatible with Tailwind's values.
 
 ### Arbitrary values

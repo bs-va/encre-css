@@ -41,7 +41,7 @@ Utilities for controlling an element's scroll offset within a snap container.
 
 ### Tailwind compatibility
 
-Scroll padding values don't follow Tailwind's philosophy of restraining possible values and all
+Scroll padding values don't follow Tailwind's philosophy of limiting possible values and all
 spacing values are supported. They are however perfectly compatible with Tailwind's values.
 
 ### Arbitrary values

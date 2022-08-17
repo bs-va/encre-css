@@ -14,7 +14,7 @@ Utilities for applying hue-rotate filters to an element.
 
 ### Tailwind compatibility
 
-Hue rotate values don't follow Tailwind's philosophy of restraining possible values and all
+Hue rotate values don't follow Tailwind's philosophy of limiting possible values and all
 values from 0 to 360 are supported. They are however perfectly compatible with Tailwind's values.
 
 ### Arbitrary values

@@ -14,7 +14,7 @@ Utilities for applying brightness filters to an element.
 
 ### Tailwind compatibility
 
-Brightness values don't follow Tailwind's philosophy of restraining possible values and all
+Brightness values don't follow Tailwind's philosophy of limiting possible values and all
 numbers are supported. They are however perfectly compatible with Tailwind's values.
 
 [Tailwind reference](https://tailwindcss.com/docs/brightness)

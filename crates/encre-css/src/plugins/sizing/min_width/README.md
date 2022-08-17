@@ -21,7 +21,7 @@ Utilities for setting the minimum width of an element.
 
 ### Tailwind compatibility
 
-Minimum width values don't follow Tailwind's philosophy of restraining possible values and all
+Minimum width values don't follow Tailwind's philosophy of limiting possible values and all
 spacing values are supported (`screen` also). They are however perfectly compatible with
 Tailwind's values.
 

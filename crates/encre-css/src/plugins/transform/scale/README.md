@@ -16,7 +16,7 @@ Utilities for scaling elements with transform.
 
 ### Tailwind compatibility
 
-Scale values don't follow Tailwind's philosophy of restraining possible values and all
+Scale values don't follow Tailwind's philosophy of limiting possible values and all
 numbers are supported. They are however perfectly compatible with Tailwind's values.
 
 ### Negative values

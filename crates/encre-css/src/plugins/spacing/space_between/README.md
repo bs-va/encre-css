@@ -21,7 +21,7 @@ Utilities for controlling the space between child elements.
 
 ### Tailwind compatibility
 
-Spacing between values don't follow Tailwind's philosophy of restraining possible values and all
+Spacing between values don't follow Tailwind's philosophy of limiting possible values and all
 spacing values are supported. They are however perfectly compatible with Tailwind's values.
 
 ### Arbitrary values

@@ -16,7 +16,7 @@ Utilities for controlling the amount of empty space shown before text in a block
 
 ### Tailwind compatibility
 
-Indent values don't follow Tailwind's philosophy of restraining possible values and all spacing values
+Indent values don't follow Tailwind's philosophy of limiting possible values and all spacing values
 are supported. They are however perfectly compatible with Tailwind's values.
 
 ### Arbitrary values

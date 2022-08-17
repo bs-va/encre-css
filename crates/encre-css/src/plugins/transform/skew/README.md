@@ -15,7 +15,7 @@ Utilities for skewing elements with transform.
 
 ### Tailwind compatibility
 
-Skew values don't follow Tailwind's philosophy of restraining possible values and all
+Skew values don't follow Tailwind's philosophy of limiting possible values and all
 numbers from 0 to 360 are supported. They are however perfectly compatible with Tailwind's values.
 
 ### Arbitrary values

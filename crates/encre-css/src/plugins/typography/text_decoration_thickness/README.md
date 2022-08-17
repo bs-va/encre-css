@@ -16,7 +16,7 @@ Utilities for controlling the thickness of text decorations.
 
 ### Tailwind compatibility
 
-Thickness values don't follow Tailwind's philosophy of restraining possible values and all
+Thickness values don't follow Tailwind's philosophy of limiting possible values and all
 numbers are supported. They are however perfectly compatible with Tailwind's values.
 
 ### Arbitrary values

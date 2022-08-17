@@ -14,7 +14,7 @@ Utilities for simulating an offset when adding outline rings.
 
 ### Tailwind compatibility
 
-Ring offset width values don't follow Tailwind's philosophy of restraining possible values and all
+Ring offset width values don't follow Tailwind's philosophy of limiting possible values and all
 numbers are supported. They are however perfectly compatible with Tailwind's values.
 
 ### Arbitrary values

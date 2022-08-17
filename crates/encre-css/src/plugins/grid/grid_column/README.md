@@ -20,7 +20,7 @@ Utilities for controlling how elements are sized and placed across grid columns.
 
 ### Tailwind compatibility
 
-Grid column start/end/span values don't follow Tailwind's philosophy of restraining possible values and all numbers
+Grid column start/end/span values don't follow Tailwind's philosophy of limiting possible values and all numbers
 are supported. They are however perfectly compatible with Tailwind's values.
 
 ### Arbitrary values

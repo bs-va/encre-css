@@ -17,7 +17,7 @@ Utilities for controlling the border width between children.
 
 ### Tailwind compatibility
 
-Divide width values don't follow Tailwind's philosophy of restraining possible values and all
+Divide width values don't follow Tailwind's philosophy of limiting possible values and all
 numbers are supported. They are however perfectly compatible with Tailwind's values.
 
 ### Arbitrary values

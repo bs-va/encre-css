@@ -14,7 +14,7 @@ Utilities for controlling the opacity of an element.
 
 ### Tailwind compatibility
 
-Opacity values don't follow Tailwind's philosophy of restraining possible values and all numbers
+Opacity values don't follow Tailwind's philosophy of limiting possible values and all numbers
 from 0 to 100 are supported. They are however perfectly compatible with Tailwind's values.
 
 [Tailwind reference](https://tailwindcss.com/docs/opacity)

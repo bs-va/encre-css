@@ -16,7 +16,7 @@ pub fn is_matching_builtin_spacing(value: &str) -> bool {
 
 /// Get a spacing value from a modifier.
 ///
-/// Spacing values don't follow Tailwind's philosophy of restraining possible values and are closer
+/// Spacing values don't follow Tailwind's philosophy of limiting possible values and are closer
 /// to [Windi CSS](https://windicss.org/features/value-auto-infer.html#numbers). They are
 /// however perfectly compatible with Tailwind's values.
 pub fn get(value: &str, is_negative: bool) -> Option<Cow<str>> {

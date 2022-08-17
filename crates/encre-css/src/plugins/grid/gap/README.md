@@ -22,7 +22,7 @@ Utilities for controlling gutters between grid and flexbox items.
 
 ### Tailwind compatibility
 
-Gap values don't follow Tailwind's philosophy of restraining possible values and all spacing values
+Gap values don't follow Tailwind's philosophy of limiting possible values and all spacing values
 are supported. They are however perfectly compatible with Tailwind's values.
 
 ### Arbitrary values

@@ -15,7 +15,7 @@ Utilities for specifying the columns in a grid layout.
 
 ### Tailwind compatibility
 
-Template column values don't follow Tailwind's philosophy of restraining possible values and all numbers
+Template column values don't follow Tailwind's philosophy of limiting possible values and all numbers
 are supported. They are however perfectly compatible with Tailwind's values.
 
 ### Arbitrary values

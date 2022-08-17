@@ -42,7 +42,6 @@
 
 - [A brief introduction to utility-first CSS frameworks](#a-brief-introduction-to-utility-first-css-frameworks)
 - [Getting started](#getting-started)
-- [Cargo features](#cargo-features)
 - [Command line interface](#command-line-interface)
 - [About the name](#about-the-name)
 - [License](#license)

@@ -33,7 +33,7 @@ Utilities for setting the maximum height of an element.
 
 ### Tailwind compatibility
 
-Maximum height values don't follow Tailwind's philosophy of restraining possible values and all
+Maximum height values don't follow Tailwind's philosophy of limiting possible values and all
 spacing values are supported (`screen` also). They are however perfectly compatible with
 Tailwind's values.
 

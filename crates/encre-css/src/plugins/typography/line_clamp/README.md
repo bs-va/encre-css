@@ -15,7 +15,7 @@ Utilities for visually truncating text after a fixed number of lines.
 
 ### Tailwind compatibility
 
-Line clamp values don't follow Tailwind's philosophy of restraining possible values and all
+Line clamp values don't follow Tailwind's philosophy of limiting possible values and all
 numbers are supported. They are however perfectly compatible with Tailwind's values.
 
 [Tailwind reference](https://github.com/tailwindlabs/tailwindcss-line-clamp)

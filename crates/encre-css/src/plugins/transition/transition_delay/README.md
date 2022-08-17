@@ -14,7 +14,7 @@ Utilities for controlling the delay of CSS transitions.
 
 ### Tailwind compatibility
 
-Delay values don't follow Tailwind's philosophy of restraining possible values and all
+Delay values don't follow Tailwind's philosophy of limiting possible values and all
 numbers are supported. They are however perfectly compatible with Tailwind's values.
 
 ### Arbitrary values

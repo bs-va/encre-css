@@ -15,7 +15,7 @@ Utilities for controlling the stack order of an element.
 
 ### Tailwind compatibility
 
-Z-Index values don't follow Tailwind's philosophy of restraining possible values and all
+Z-Index values don't follow Tailwind's philosophy of limiting possible values and all
 spacing values are supported. They are however perfectly compatible with Tailwind's values.
 
 ### Negative values

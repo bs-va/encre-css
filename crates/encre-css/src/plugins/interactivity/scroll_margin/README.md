@@ -41,7 +41,7 @@ Utilities for controlling the scroll offset around items in a snap container.
 
 ### Tailwind compatibility
 
-Scroll margin values don't follow Tailwind's philosophy of restraining possible values and all
+Scroll margin values don't follow Tailwind's philosophy of limiting possible values and all
 spacing values are supported. They are however perfectly compatible with Tailwind's values.
 
 ### Arbitrary values

@@ -14,7 +14,7 @@ Utilities for applying contrast filters to an element.
 
 ### Tailwind compatibility
 
-Contrast values don't follow Tailwind's philosophy of restraining possible values and all
+Contrast values don't follow Tailwind's philosophy of limiting possible values and all
 numbers are supported. They are however perfectly compatible with Tailwind's values.
 
 [Tailwind reference](https://tailwindcss.com/docs/contrast)
