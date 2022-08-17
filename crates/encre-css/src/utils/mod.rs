@@ -305,12 +305,13 @@ pub fn sort_selectors(val: &str, config: &Config) -> String {
 pub fn check_selectors<'a>(val: &'a str, config: &Config) -> Vec<ParseError<'a>> {
     val.char_indices()
         .chain(iter::once((val.len(), ' ')))
-        .filter(|(_, ch)| *ch == ' ')
+        .filter(|(_, ch)| ch.is_whitespace())
         .scan(0, |last_i, (i, _)| {
             let old_i = *last_i;
             *last_i = i + 1;
             Some((old_i..i, &val[old_i..i]))
         })
+        .filter(|(_, v)| !v.is_empty())
         .flat_map(|(span, v)| parse(v.trim(), Some(span), config))
         .filter_map(|s| if let Err(e) = s { Some(e) } else { None })
         .collect::<Vec<ParseError>>()
@@ -319,6 +320,7 @@ pub fn check_selectors<'a>(val: &'a str, config: &Config) -> Vec<ParseError<'a>>
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::error::ParseErrorKind;
 
     #[test]
     fn sort_selectors_with_variant_groups() {
@@ -335,5 +337,14 @@ mod tests {
     #[test]
     fn sort_selectors_are_deduplicated() {
         assert_eq!(sort_selectors("text-blue-100 text-blue-100 md:flex lg:block content-['hover:(md:text-white)'] md:flex focus:(hover:md:flex,lg:flex)", &Config::default()), "text-blue-100 content-['hover:(md:text-white)'] md:flex lg:block focus:(hover:md:flex,lg:flex)".to_string());
+    }
+
+    #[test]
+    fn check_selectors_ignore_newlines_and_spaces() {
+        assert_eq!(check_selectors("text-blue-100   text-blue-100  md:flex   lg:block
+content-['hover:(md:text-white)'] md:blue-flex
+
+focus:(hover:md:flex,lg:flex)
+  lg:bg-red-500", &Config::default()), vec![ParseError { span: 84..96, kind: ParseErrorKind::UnknownPlugin("md:blue-flex") }]);
     }
 }
