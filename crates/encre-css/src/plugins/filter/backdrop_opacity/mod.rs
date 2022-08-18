@@ -1,4 +1,5 @@
 #![doc = include_str!("README.md")]
+#![doc(alias = "filter")]
 use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,

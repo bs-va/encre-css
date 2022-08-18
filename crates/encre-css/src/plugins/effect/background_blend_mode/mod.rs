@@ -1,4 +1,5 @@
 #![doc = include_str!("README.md")]
+#![doc(alias("effect", "bg", "background"))]
 use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,

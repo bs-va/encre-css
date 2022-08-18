@@ -1,4 +1,5 @@
 #![doc = include_str!("README.md")]
+#![doc(alias = "table")]
 use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,

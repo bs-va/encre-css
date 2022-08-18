@@ -1,4 +1,5 @@
 #![doc = include_str!("README.md")]
+#![doc(alias = "accessibility")]
 
 use crate::{
     generator::{ContextCanHandle, ContextHandle},

@@ -1,4 +1,5 @@
 #![doc = include_str!("README.md")]
+#![doc(alias = "transform")]
 use super::CSS_TRANSFORM;
 use crate::{
     generator::{ContextCanHandle, ContextHandle},

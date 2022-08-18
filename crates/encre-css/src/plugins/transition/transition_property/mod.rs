@@ -1,4 +1,5 @@
 #![doc = include_str!("README.md")]
+#![doc(alias = "transition")]
 use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,

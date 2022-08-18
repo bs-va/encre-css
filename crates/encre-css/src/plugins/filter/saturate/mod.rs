@@ -1,4 +1,5 @@
 #![doc = include_str!("README.md")]
+#![doc(alias = "filter")]
 use super::CSS_FILTER;
 use crate::{
     generator::{ContextCanHandle, ContextHandle},

@@ -1,4 +1,5 @@
 #![doc = include_str!("README.md")]
+#![doc(alias("spacing", "space"))]
 use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,

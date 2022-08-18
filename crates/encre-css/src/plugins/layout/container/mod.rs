@@ -1,4 +1,5 @@
 #![doc = include_str!("README.md")]
+#![doc(alias = "layout")]
 use crate::{
     config::BUILTIN_SCREENS,
     generator::{
