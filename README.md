@@ -3,16 +3,16 @@
   <h1>encre-css</h1>
   <p>A TailwindCSS-compatible utility-first CSS generation library written in Rust</p>
 
-  <a href="https://gitlab.com/encre-css/encre-css/blob/main/LICENSE">
+  <a href="https://gitlab.com/encre-org/encre-css/blob/main/LICENSE">
     <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-success" />
   </a>
 
-  <a href="https://gitlab.com/encre-css/encre-css/-/pipelines">
-    <img alt="Pipeline status" src="https://gitlab.com/encre-css/encre-css/badges/main/pipeline.svg" />
+  <a href="https://gitlab.com/encre-org/encre-css/-/pipelines">
+    <img alt="Pipeline status" src="https://gitlab.com/encre-org/encre-css/badges/main/pipeline.svg" />
   </a>
 
-  <a href="https://deps.rs/repo/gitlab/encre-css/encre-css">
-    <img alt="Dependency status" src="https://deps.rs/repo/gitlab/encre-css/encre-css/status.svg" />
+  <a href="https://deps.rs/repo/gitlab/encre-org/encre-css">
+    <img alt="Dependency status" src="https://deps.rs/repo/gitlab/encre-org/encre-css/status.svg" />
   </a>
 
   <a href="https://encre-org.gitlab.io/encre-css/encre_css">
@@ -21,20 +21,20 @@
 
   <br>
 
-  <a href="https://gitlab.com/encre-css/encre-css">
-    <img alt="Number of files" src="https://tokei.ekzhang.com/b1/gitlab/encre-css/encre-css?category=files" />
+  <a href="https://gitlab.com/encre-org/encre-css">
+    <img alt="Number of files" src="https://tokei.ekzhang.com/b1/gitlab/encre-org/encre-css?category=files" />
   </a>
 
-  <a href="https://gitlab.com/encre-css/encre-css">
-    <img alt="Number of lines of code" src="https://tokei.ekzhang.com/b1/gitlab/encre-css/encre-css?category=code" />
+  <a href="https://gitlab.com/encre-org/encre-css">
+    <img alt="Number of lines of code" src="https://tokei.ekzhang.com/b1/gitlab/encre-org/encre-css?category=code" />
   </a>
 
-  <a href="https://gitlab.com/encre-css/encre-css">
-    <img alt="Number of lines of comments" src="https://tokei.ekzhang.com/b1/gitlab/encre-css/encre-css?category=comments" />
+  <a href="https://gitlab.com/encre-org/encre-css">
+    <img alt="Number of lines of comments" src="https://tokei.ekzhang.com/b1/gitlab/encre-org/encre-css?category=comments" />
   </a>
 
-  <a href="https://gitlab.com/encre-css/encre-css">
-    <img alt="Total number of lines" src="https://tokei.ekzhang.com/b1/gitlab/encre-css/encre-css" />
+  <a href="https://gitlab.com/encre-org/encre-css">
+    <img alt="Total number of lines" src="https://tokei.ekzhang.com/b1/gitlab/encre-org/encre-css" />
   </a>
 </div>
 
@@ -108,7 +108,7 @@ Add `encre-css` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-encre-css = { git = "https://gitlab.com/encre-css/encre-css.git", tag = "v0.7.0" }
+encre-css = { git = "https://gitlab.com/encre-org/encre-css.git", tag = "v0.7.0" }
 ```
 
 Generating styles takes three steps:
@@ -150,7 +150,7 @@ assert!(generator.generate().expect("failed to generate the CSS").contains(r#"
 A command line interface is also available. Install it using:
 
 ```bash
-cargo install --git https://gitlab.com/encre-css/encre-css.git
+cargo install --git https://gitlab.com/encre-org/encre-css.git
 ```
 
 Then run `encre --help` for instructions on how to use it.
@@ -166,4 +166,4 @@ custom plugins. [Learn more](https://encre-org.gitlab.io/encre-css/encre_css/plu
 
 ## License
 
-`encre-css` is published under the [MIT license](https://gitlab.com/encre-css/encre-css/blob/main/LICENSE).
+`encre-css` is published under the [MIT license](https://gitlab.com/encre-org/encre-css/blob/main/LICENSE).
