@@ -30,7 +30,7 @@ to use the default value):
 ```rust
 use encre_css::{Config, EncreGenerator};
 
-let mut config = Config::from_file("encre-css.toml");
+let mut config = Config::from_file("encre-css.toml").expect("failed to parse the configuration file");
 // Or let mut config = Config::default();
 
 encre_css_icons::register(&mut config, Some("i-"), None, Some(1.2));

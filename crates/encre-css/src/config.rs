@@ -1179,7 +1179,7 @@ impl Config {
     ///
     /// ```rust,ignore
     /// use encre_css::Config;
-    /// let config = Config::from_file("encre-css.toml");
+    /// let config = Config::from_file("encre-css.toml").expect("failed to parse the configuration file");
     /// ```
     ///
     /// Note that if you don't change the config after parsing it, you can just use
