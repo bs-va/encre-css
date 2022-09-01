@@ -438,18 +438,20 @@ mod tests {
     fn utf8_scan() {
         let config = base_config();
         let expected = BTreeSet::from([
-            parse("before:content-[Jäsøn_Doe]", None, &config)[0]
+            parse("before:content-[J\u{e4}s\u{f8}n_Doe]", None, &config)[0]
                 .as_ref()
                 .unwrap()
                 .clone(),
-            parse("content-[→]", None, &config)[0]
+            parse("content-[\u{2192}]", None, &config)[0]
                 .as_ref()
                 .unwrap()
                 .clone(),
         ]);
 
         let mut generator = EncreGenerator::from_config(base_config());
-        generator.scan(r#"<div class="before:content-[Jäsøn_Doe] content-[→]">y̆</div>"#);
+        generator.scan(
+            "<div class=\"before:content-[J\u{e4}s\u{f8}n_Doe] content-[\u{2192}]\">\u{306}</div>",
+        );
 
         assert_eq!(expected, generator.scanned_selectors);
     }
@@ -538,7 +540,7 @@ mod tests {
         generator.add_selector("-top-2");
         generator.add_selector("-z-2");
         generator.add_selector("-order-2");
-        generator.add_selector("-mb-8");
+        generator.add_selector("-mb8");
         generator.add_selector("-translate-x-52");
         generator.add_selector("-rotate-90");
         generator.add_selector("-skew-x-2");
@@ -565,7 +567,7 @@ mod tests {
   order: -2;
 }
 
-.-mb-8 {
+.-mb8 {
   margin-bottom: -2rem;
 }
 
@@ -716,7 +718,7 @@ mod tests {
     #[test]
     fn gen_css_for_arbitrary_value() {
         let mut generator = EncreGenerator::from_config(base_config());
-        generator.add_selector("w-[12px]");
+        generator.add_selector("w[12px]");
         generator.add_selector("bg-[red]");
         generator.add_selector("bg-[url('../img/image_with_underscores.png')]");
         generator.add_selector("mt-[calc(100%-10px)]");
@@ -729,7 +731,7 @@ mod tests {
   margin-top: calc(100% - 10px);
 }
 
-.w-\[12px\] {
+.w\[12px\] {
   width: 12px;
 }
 

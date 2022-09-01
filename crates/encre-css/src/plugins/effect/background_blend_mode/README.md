@@ -18,7 +18,7 @@ Utilities for controlling how an element's background image should blend with it
   margin: 10px;
   width: 80px;
   height: 80px;
-  background-image: url("http://gitlab.com/encre-css/encre-css/raw/main/.assets/logo.svg");
+  background-image: url("https://gitlab.com/encre-css/encre-css/raw/main/.assets/logo.svg");
   background-color: rgb(168 85 247);
 }
 </style>

@@ -132,8 +132,8 @@ pub(crate) fn parse<'a>(
     span: Option<Range<usize>>,
     config: &Config,
 ) -> Vec<Result<Selector<'a>, ParseError<'a>>> {
-    // The shortest selector is `m-1`
-    if val.len() < 3 {
+    // The shortest selector is `m1`
+    if val.len() < 2 {
         return vec![Err(ParseError::new(
             span.unwrap_or(0..val.len()),
             ParseErrorKind::TooShort(val),

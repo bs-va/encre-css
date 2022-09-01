@@ -178,7 +178,7 @@
 //! ```
 //!
 //! Then run `encre --help` for instructions on how to use it.
-#![doc(html_logo_url = "http://gitlab.com/encre-css/encre-css/raw/main/.assets/logo.svg")]
+#![doc(html_logo_url = "https://gitlab.com/encre-org/encre-css/raw/main/.assets/logo.png")]
 #![forbid(unsafe_code)]
 #![warn(
     missing_docs,

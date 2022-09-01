@@ -26,7 +26,7 @@ pub enum Error {
 /// The kind of parsing error
 #[derive(ErrorTrait, Debug, PartialEq)]
 pub enum ParseErrorKind<'a> {
-    /// Indicate that the selector is too short to be an existing selector (the shortest selector has 3 characters).
+    /// Indicate that the selector is too short to be an existing selector (the shortest selector has 2 characters).
     #[error("the selector `{0}` is too short to be an existing selector")]
     TooShort(&'a str),
 

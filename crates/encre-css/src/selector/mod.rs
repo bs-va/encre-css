@@ -68,8 +68,9 @@
 //!    same variant), in this case the class will be expanded to `dark:text-white` and
 //!    `dark:bg-gray-500`.
 //!
-//! As you can see, by default variants are separated by `:`, modifiers by `-`, arbitrary
-//! values/variants are surrounded by `[]` and variant groups are surrounded by `()`.
+//! As you can see, by default variants are separated by `:`, modifiers by `-` (the dash after the
+//! first modifier can be omitted, e.g. `m1` instead of `m-1`), arbitrary values/variants are surrounded by `[]` and variant
+//! groups are surrounded by `()`.
 //!
 //! [`BUILTIN_SCREENS`]: crate::config::BUILTIN_SCREENS
 //! [`BUILTIN_COLORS`]: crate::config::BUILTIN_COLORS
