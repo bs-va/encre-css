@@ -1,7 +1,7 @@
 [package]
 name = "encre-css-typography"
 version = "0.1.0"
-description = "Define beautiful typographic defaults for HTML you don't control."
+description = "Define beautiful typographic defaults for HTML you don't control"
 edition = "2021"
 
 [dependencies]

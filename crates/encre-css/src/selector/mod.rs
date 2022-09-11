@@ -146,14 +146,14 @@ pub enum Modifier<'a> {
 /// See [Tailwind's documentation](https://tailwindcss.com/docs/hover-focus-and-other-states) to learn more about variants.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum VariantType {
-    /// A CSS [pseudo element](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements)
+    /// A CSS [pseudo element](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements).
     ///
     /// # Example
     ///
     /// If the variant is `VariantType::PseudoClass("before")` and the original class is `".bg-red-500"`, the class will become `".bg-red-500::before"`).
     PseudoElement(&'static str),
 
-    /// A CSS [pseudo class](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes)
+    /// A CSS [pseudo class](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes).
     ///
     /// # Example
     ///
@@ -167,7 +167,7 @@ pub enum VariantType {
     /// If the variant is `VariantType::WrapClass("&[open]")` and the original class is `".bg-red-500"`, the class will become `".bg-red-500[open]"`).
     WrapClass(Cow<'static, str>),
 
-    /// Add a `@` CSS rule (like `@media`, `@supports`)
+    /// Add a `@` CSS rule (like `@media`, `@supports`).
     ///
     /// # Example
     ///
