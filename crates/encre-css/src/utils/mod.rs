@@ -136,14 +136,11 @@ impl<'a, P: Pattern> Iterator for SplitIgnoreArbitrary<'a, P> {
             if let Some(ch) = ch {
                 match ch.1 {
                     ESCAPE => self.is_next_escaped = true,
-                    GROUP_START if self.ignore_parenthesis => self.parenthesis_level += 1,
-                    GROUP_END if self.ignore_parenthesis => {
+                    GROUP_START if self.ignore_parenthesis && self.bracket_level == 0 => self.parenthesis_level += 1,
+                    GROUP_END if self.ignore_parenthesis && self.bracket_level == 0 => {
                         if self.parenthesis_level > 0 {
                             self.parenthesis_level -= 1;
                             self.seek_index = ch.0 + 1;
-                        } else {
-                            // Parenthesis not opened, abort.
-                            return None;
                         }
                     }
                     ARBITRARY_START => self.bracket_level += 1,
@@ -151,9 +148,6 @@ impl<'a, P: Pattern> Iterator for SplitIgnoreArbitrary<'a, P> {
                         if self.bracket_level > 0 {
                             self.bracket_level -= 1;
                             self.seek_index = ch.0 + 1;
-                        } else {
-                            // Bracket not opened, abort.
-                            return None;
                         }
                     }
                     _ => {
@@ -216,6 +210,89 @@ pub fn split_ignore_arbitrary<P: Pattern>(
     }
 }
 
+fn sort_selectors_recursive<'a>(
+    val: impl Iterator<Item = &'a str>,
+    separator: &str,
+    config: &Config,
+) -> String {
+    #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+    enum FoundSelector<'a> {
+        UnknownSelector(&'a str),
+        KnownSelector(Selector<'a>),
+        Group(String),
+    }
+
+    fn split_map_closure(s: (usize, &str)) -> &str {
+        s.1
+    }
+
+    fn dedup_key<'a>(s: &'a FoundSelector<'a>) -> &'a str {
+        match s {
+            FoundSelector::KnownSelector(s) => s.full,
+            FoundSelector::UnknownSelector(s) => s,
+            FoundSelector::Group(g) => g,
+        }
+    }
+
+    let mut selectors = val
+        .filter_map(|v| {
+            let selectors = parse(v.trim(), None, config);
+
+            if selectors.len() > 1 {
+                // Sort variant groups
+                let start = split_ignore_arbitrary(v.trim(), "(", false).nth(1).unwrap().0;
+
+                Some(FoundSelector::Group(format!(
+                    "{}{})",
+                    &v[..start],
+                    sort_selectors_recursive(
+                        split_ignore_arbitrary(v[start..v.len() - 1].trim(), ",", true).map(split_map_closure),
+                        ",",
+                        config,
+                    )
+                )))
+            } else if !selectors.is_empty() {
+                match selectors.into_iter().next().unwrap() {
+                    Ok(selector) => Some(FoundSelector::KnownSelector(selector)),
+                    Err(ParseError {
+                        kind:
+                            ParseErrorKind::TooShort(selector)
+                            | ParseErrorKind::VariantsWithoutModifier(selector)
+                            | ParseErrorKind::UnknownPlugin(selector)
+                            | ParseErrorKind::UnknownVariant(_, selector),
+                        ..
+                    }) => Some(FoundSelector::UnknownSelector(selector)),
+                }
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<FoundSelector>>();
+
+    // Sort selectors
+    selectors.sort_unstable_by(|a, b| match (a, b) {
+        (FoundSelector::KnownSelector(_), FoundSelector::UnknownSelector(_))
+        | (FoundSelector::Group(_), _) => Ordering::Greater,
+        (FoundSelector::UnknownSelector(_), FoundSelector::KnownSelector(_))
+        | (_, FoundSelector::Group(_)) => Ordering::Less,
+        (FoundSelector::KnownSelector(a), FoundSelector::KnownSelector(b)) => a.cmp(b),
+        (FoundSelector::UnknownSelector(a), FoundSelector::UnknownSelector(b)) => a.cmp(b),
+    });
+
+    // Deduplicate selectors
+    selectors.dedup_by(|a, b| dedup_key(&*a) == dedup_key(&*b));
+
+    selectors
+        .iter()
+        .map(|s| match s {
+            FoundSelector::KnownSelector(s) => s.full,
+            FoundSelector::UnknownSelector(s) => s,
+            FoundSelector::Group(g) => g,
+        })
+        .collect::<Vec<&str>>()
+        .join(separator)
+}
+
 /// Sort a list of selectors (separated by spaces) according to `encre-css` rules.
 ///
 /// Note: selectors are also deduplicated.
@@ -229,57 +306,7 @@ pub fn split_ignore_arbitrary<P: Pattern>(
 /// assert_eq!(sort_selectors(value, &Config::default()), "bar foo qux:(bg-green-500,dark:bar:foo) bg-sky-700 px-4 py-2 text-white hover:bg-sky-800 sm:px-8 sm:py-3 focus:(md:text-white,lg:text-gray-500)".to_string());
 /// ```
 pub fn sort_selectors(val: &str, config: &Config) -> String {
-    #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-    enum FoundSelector<'a> {
-        UnknownSelector(&'a str),
-        KnownSelector(bool, Selector<'a>),
-    }
-
-    let mut selectors = val
-        .split_whitespace()
-        .flat_map(|v| {
-            let selectors = parse(v.trim(), None, config);
-            let is_in_group = selectors.len() > 1;
-
-            selectors.into_iter().map(move |s| match s {
-                Ok(selector) => FoundSelector::KnownSelector(is_in_group, selector),
-                Err(ParseError {
-                    kind:
-                        ParseErrorKind::TooShort(selector)
-                        | ParseErrorKind::VariantsWithoutModifier(selector)
-                        | ParseErrorKind::UnknownPlugin(selector)
-                        | ParseErrorKind::UnknownVariant(_, selector),
-                    ..
-                }) => FoundSelector::UnknownSelector(selector),
-            })
-        })
-        .collect::<Vec<FoundSelector>>();
-
-    // Deduplicate selectors belonging to a variant group
-    selectors.sort_unstable_by(|a, b| match (a, b) {
-        (FoundSelector::KnownSelector(true, _), FoundSelector::KnownSelector(_, _))
-        | (FoundSelector::KnownSelector(_, _), FoundSelector::UnknownSelector(_)) => {
-            Ordering::Greater
-        }
-        (FoundSelector::KnownSelector(_, _), FoundSelector::KnownSelector(true, _))
-        | (FoundSelector::UnknownSelector(_), FoundSelector::KnownSelector(_, _)) => Ordering::Less,
-        (FoundSelector::KnownSelector(_, a), FoundSelector::KnownSelector(_, b)) => a.cmp(b),
-        (FoundSelector::UnknownSelector(a), FoundSelector::UnknownSelector(b)) => a.cmp(b),
-    });
-
-    selectors.dedup_by_key(|s| match s {
-        FoundSelector::KnownSelector(_, s) => s.full,
-        FoundSelector::UnknownSelector(s) => s,
-    });
-
-    selectors
-        .iter()
-        .map(|s| match s {
-            FoundSelector::KnownSelector(_, s) => s.full,
-            FoundSelector::UnknownSelector(s) => s,
-        })
-        .collect::<Vec<&str>>()
-        .join(" ")
+    sort_selectors_recursive(val.split_whitespace(), " ", config)
 }
 
 /// Return the list of errors encountered when parsing a list of selectors
@@ -326,16 +353,16 @@ mod tests {
     fn sort_selectors_with_variant_groups() {
         assert_eq!(
             sort_selectors(
-                "hover:(text-white,bg-sky-800) focus-within:bg-red-100 text-blue-500 md:flex",
+                "hover:(text-white,bg-sky-800) focus-within:bg-red-100 text-blue-500 md:flex [()())):]:checked:([))]:text-white,[))]:bg-red-500)",
                 &Config::default()
             ),
-            "text-blue-500 focus-within:bg-red-100 md:flex hover:(text-white,bg-sky-800)"
+            "text-blue-500 focus-within:bg-red-100 md:flex hover:(bg-sky-800,text-white) [()())):]:checked:([))]:bg-red-500,[))]:text-white)"
                 .to_string()
         );
     }
 
     #[test]
-    fn sort_selectors_are_deduplicated() {
+    fn sort_selectors_deduplicate() {
         assert_eq!(sort_selectors("text-blue-100 text-blue-100 md:flex lg:block content-['hover:(md:text-white)'] md:flex focus:(hover:md:flex,lg:flex)", &Config::default()), "text-blue-100 content-['hover:(md:text-white)'] md:flex lg:block focus:(hover:md:flex,lg:flex)".to_string());
     }
 
