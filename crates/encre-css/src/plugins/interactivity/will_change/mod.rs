@@ -22,7 +22,7 @@ impl Plugin for PluginDefinition {
             Modifier::Builtin { value, .. } => {
                 ["auto", "scroll", "contents", "transform"].contains(&&**value)
             }
-            Modifier::Arbitrary { value, .. } => is_matching_all(value), // TODO: Better matching
+            Modifier::Arbitrary { value, .. } => is_matching_all(value),
         }
     }
 

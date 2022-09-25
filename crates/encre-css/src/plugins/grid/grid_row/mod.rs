@@ -31,7 +31,7 @@ impl Plugin for PluginDefinition {
                         .strip_prefix("end-")
                         .map_or(false, |v| v == "auto" || v.parse::<usize>().is_ok())
             }
-            Modifier::Arbitrary { value, .. } => is_matching_all(value), // TODO: Better matching
+            Modifier::Arbitrary { value, .. } => is_matching_all(value),
         }
     }
 

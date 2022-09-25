@@ -19,8 +19,8 @@ impl Plugin for PluginDefinition {
 
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         match context.modifier {
-            Modifier::Builtin { value, .. } => ["1", "auto", "initial", "none"].contains(&*value),
-            Modifier::Arbitrary { value, .. } => is_matching_all(value), // TODO: Better matching
+            Modifier::Builtin { value, .. } => ["1", "auto", "initial", "none"].contains(value),
+            Modifier::Arbitrary { value, .. } => is_matching_all(value),
         }
     }
 

@@ -58,7 +58,7 @@ impl Plugin for PluginDefinition {
                 "zoom-out",
             ]
             .contains(&&**value),
-            Modifier::Arbitrary { value, .. } => is_matching_all(value), // TODO: Better matching
+            Modifier::Arbitrary { value, .. } => is_matching_all(value),
         }
     }
 

@@ -20,7 +20,7 @@ impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         match context.modifier {
             Modifier::Builtin { value, .. } => value.parse::<usize>().is_ok() || *value == "none",
-            Modifier::Arbitrary { value, .. } => is_matching_all(value), // TODO: Better matching
+            Modifier::Arbitrary { value, .. } => is_matching_all(value),
         }
     }
 
