@@ -1,0 +1,282 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## [unreleased]
+
+### Bug Fixes
+
+- Avoid losing classes when sorting them + deduplicate variant groups
+- Improve sorting of selectors
+- Ignore newlines and whitespaces in the `check_selectors` function
+- [**breaking**] Use the config as the first argument of the `register` function
+- Fix Clippy warnings
+
+### Documentation
+
+- Fix some typos
+- Use another instance of tokei
+- Fix vocabulary mistake
+- Improve documentation + add `display: inline-block;` to all icons by default
+- Add keywork aliases to all plugins
+- Handle errors when calling `Config::from_file`
+- Update the links
+- Improve the use of Flexbox in the notification footer example
+
+### Features
+
+- Implement `Serialize` for `Config`
+- Support omitting the dash after the first modifier, run `cargo fmt`, fix clippy warnings
+- Sort selectors in variant groups in `sort_selectors` (+ fix splitting when parenthesis are wrapped in brackets)
+
+### Miscellaneous Tasks
+
+- Commit `Cargo.lock` and fix links in `Cargo.toml`
+- Clean up documentation, update dependencies
+- Remove TODOs about better matching arbitrary values
+
+## [0.7.0] - 2022-08-12
+
+### Bug Fixes
+
+- Watch `Chmod` events
+- Support changing opacity for the `black` and `white` colors
+
+### Documentation
+
+- Fix link
+- Update README
+
+### Features
+
+- Add a function to sort selectors
+- Add `encre-css-icons` providing a plugin to easily use pure CSS icons
+- [**breaking**] Add a `check_selectors` function used to get errors occurred when parsing selectors, selectors using unknown variant are now fully ignored
+
+## [0.6.0] - 2022-08-03
+
+### Bug Fixes
+
+- Color parsing when the opacity suffix is empty
+- Font family parsing when the arbitrary value is empty
+- Typo in the `will-change` plugin
+- `content-none` utility
+- Don't ignore parenthesis in the default scanner
+- Animation utility with arbitrary values
+- Wrong CSS variables
+- Manually implement Default for the `config::DarkMode` enum for compatibility reasons
+
+### Documentation
+
+- Include `Preflight::new_none` in the documentation
+- Add documentation for the rest of the `VariantType` enum
+- Update the readme
+
+### Features
+
+- Support the `line-clamp` utilities by default
+- Support parent and peer variants
+- Better sorting of variants
+- [**breaking**] Allow creating custom plugins and variants
+
+### Refactor
+
+- [**breaking**] Return a `Vec` instead of a `BTreeSet` in the closure passed to a `Scanner`
+
+### Testing
+
+- Fix tests
+
+### Revert
+
+- "refactor!: return a `Vec` instead of a `BTreeSet` in the closure passed to a `Scanner`"
+
+## [0.5.0] - 2022-07-13
+
+### Bug Fixes
+
+- Trim scanned selectors
+
+### Documentation
+
+- Fix formatting
+- Fix color contrast
+
+### Features
+
+- Support the `::backdrop` variant
+- Improve compatibility with the latest Tailwind
+
+### Styling
+
+- Run `cargo fmt`
+
+## [0.4.0] - 2022-07-01
+
+### Bug Fixes
+
+- Negative values with variants
+- Support TailwindCSS-compatible sorting of selectors + support latest Tailwind plugins + fix various bugs with plugins
+- Extra input not watched
+- `current` and `inherit` colors
+- `transparent` color
+- Extractor when the feature `rayon` is set
+
+### Features
+
+- Implement `EncreGenerator::add_selectors` for adding several selectors previously scanned
+- Implement a configurable selector extractor
+- Sort breakpoints in `ContainerPlugin`
+- Support screen variants in `ContainerPlugin`
+- Support wrapping class in variants
+- [**breaking**] More universal values + document all items + some bug fixes
+
+### Refactor
+
+- Use context structures in `can_handle` and `handle`
+
+## [0.3.0] - 2022-06-24
+
+### Bug Fixes
+
+- Fix typo in `border-left-width`
+- Re-enable support for the WASM target
+- Show real duration of commands
+- Fix badly generated font families due to spaces
+
+### Documentation
+
+- Update the readme and add a logo
+
+### Performance
+
+- Check that a plugin can handle a selector in Selector::new, so bad selectors are not stored in memory + declare builtin plugins as static
+
+### Refactor
+
+- Better way of handling opacity in `default_colors`
+- Make `wax` optional
+- Make `rayon` optional
+- Use `once_cell` instead of `lazy_static`
+- [**breaking**] Optimize selector scanning, remove some dependencies
+
+### Styling
+
+- Run `cargo fmt`
+
+### Ci
+
+- Cache the cargo directory
+
+## [0.2.0] - 2022-06-15
+
+### Bug Fixes
+
+- Rename prefix -> variant
+- Fix binary glob pattern for simple paths
+- Really support all border utilities
+- Use `is_matching_auto` instead of `== "auto"`
+- Add some tests for stacking variants, fix some bugs with them and add a better support for indentation
+- Fix some bugs and support WASM targets
+- Use new API
+- Fix the example
+- Use the `derive` feature of the `serde` crate instead of using `serde_derive`
+- Use `absolute_size`, `relative_size` and `line_width` value matchers
+- Fix color value matcher
+- Fix shadow color matcher
+- Fix color regex
+- Reload only when a watched file is changed + handle configuration file changes
+- Better support for the `calc` and `url` functions + remove some `.clone()`s + avoid `.replace`ing a lot in `gen_css_rule`
+- Remove some `.to_string()` + fix bad indentation
+- Fix Clippy warnings
+- Bump wax to `0.5.0` + fix extra newlines in `space-x` and `space-y`
+
+### Documentation
+
+- Rename the project as `encre_css` and add a README
+- Add a license and update the readme
+- Fix a typo
+- Fix a typo
+
+### Features
+
+- Full support for the `bg` namespace
+- Full support for all layout utilities
+- Full support for all filter utilities (+ huge performance improvements)
+- Implement various utilities
+- Display time in the cli, better performances, support more utilities
+- Add a function for generating CSS from the content of a file
+- Support more variants
+- Support important and negative modifiers
+- Support the `content` CSS property (+ run `cargo fmt`)
+- Remove scope name in plugins, fix some todos, support all filter, SVG and table utilities (+ support the color `inherit` everywhere)
+- Add a structure handling CSS generation (+ add more documentation)
+- Support all alignment utilities
+- Support all border, filter and spacing utilities properly
+- Support all effect utilities
+- Support all grid utilities
+- Support all accessibility utilities
+- Support all interactivity utilities
+- Support all transform utilities
+- Support all typography utilities
+- Support all transition utilities
+- Support stacking variants
+- Support all values in the stroke utility
+- Create a basic CLI interface using `clap`, start creating a basic configuration file using `toml` and `serde`, start defining errors using `thiserror`
+- Add a file watcher to trigger rebuilds automatically
+- Add a subcommand for quickly prototyping ideas
+- Support changing the dark mode using a configuration option
+- Use the config in each plugin, support overriding screen breakpoints and colors in the config
+- Support extending and overriding configuration
+- Support animations and fix backdrop-filter bugs
+- Use hexadecimal colors in the configuration structure (+ fix color shorthand parsing)
+- [**breaking**] New plugin internal API + fallible CSS generation
+
+### Miscellaneous Tasks
+
+- Initial commit
+- Set up tracing and eyre
+
+### Performance
+
+- Huge performance improvements
+- Ignore `class` and `className` selectors during scan
+- Optimize filtering scanned selectors
+- Add some benchmarks with Criterion
+- Avoid copying custom css + better `if`s and `for`s sorting
+- Use Option for variants, inline some functions, fix parsing of variants
+- Use parallel iterators when possible + better sorting of selectors + align navigator prefixes with their non-prefixed version
+- Use smol_str in selectors
+
+### Refactor
+
+- Use write! and a shared buffer for generating the CSS
+- Clean up code
+- Add a `Modifier` structure for handling negative values better (+ fix some TODOs)
+- Use a workspace
+- Rename `tw-` prefix to `en-`
+- [**breaking**] Rename `scan_content` to `scan_raw` and `clear_scanned_selectors` to `reset`
+- Separate EncreGenerator and Extractor
+- Replace some `PathBuf`s with `AsRef<Path>`
+
+### Styling
+
+- Fix clippy warnings and run rustfmt
+- Run `cargo fmt`
+
+### Testing
+
+- Add some tests
+- Add tests for configuring screen breakpoints and colors
+- Add tests for all value matchers
+- Add a test for arbitrary values (+ fix background urls)
+- Fix failing tests due to different sorting
+
+### Ci
+
+- Add Gitlab CI configuration file
+- Cache cargo build artifacts
+- Fix Gitlab CI configuration file
+- Print rustc and cargo version
+
+<!-- generated by git-cliff -->
