@@ -353,10 +353,10 @@ mod tests {
     fn sort_selectors_with_variant_groups() {
         assert_eq!(
             sort_selectors(
-                "hover:(text-white,bg-sky-800) focus-within:bg-red-100 text-blue-500 md:flex [()())):]:checked:([))]:text-white,[))]:bg-red-500)",
+                "hover:(text-white,bg-sky-800) focus-within:bg-red-100 text-blue-500 md:flex [()())):]:checked:([))]:text-white,[))]:bg-red-500) hover:(focus:(focus-within:bg-red-500,checked:text-black),active:bg-red-500)",
                 &Config::default()
             ),
-            "text-blue-500 focus-within:bg-red-100 md:flex hover:(bg-sky-800,text-white) [()())):]:checked:([))]:bg-red-500,[))]:text-white)"
+            "text-blue-500 focus-within:bg-red-100 md:flex hover:(bg-sky-800,text-white) [()())):]:checked:([))]:bg-red-500,[))]:text-white) hover:(active:bg-red-500,focus:(checked:text-black,focus-within:bg-red-500))"
                 .to_string()
         );
     }

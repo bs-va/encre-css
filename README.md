@@ -63,7 +63,6 @@ file and apply the rules using classes in your HTML, like that:
   </div>
   <div class="notification-footer">
     <a href="#" class="dismiss-button">Dismiss</a>
-    <div class="blank-space"></div>
     <a href="#" class="try-button">Try it here!</a>
   </div>
 </div>
@@ -89,9 +88,8 @@ system (if you have one):
     The library <code>react</code> was just released, did you know it?
     It is <i>a JavaScript library for creating user interfaces</i>.
   </div>
-  <div class="flex">
+  <div class="flex justify-between">
     <a href="#" class="p-3 text-rose-600">Dismiss</a>
-    <div class="flex-1"></div>
     <a href="#" class="p-3 bg-blue-600 text-white rounded-br-xl rounded-tl-xl shadow shadow-blue-600">Try it here!</a>
   </div>
 </div>

@@ -18,7 +18,6 @@
 //!   </div>
 //!   <div class="notification-footer">
 //!     <a href="#" class="dismiss-button">Dismiss</a>
-//!     <div class="blank-space"></div>
 //!     <a href="#" class="try-button">Try it here!</a>
 //!   </div>
 //! </div>
@@ -53,15 +52,12 @@
 //!
 //! .notification-footer {
 //!   display: flex;
+//!   justify-content: space-between;
 //! }
 //!
 //! .dismiss-button {
 //!   color: rgb(225 29 72);
 //!   padding: 0.5rem 1rem;
-//! }
-//!
-//! .blank-space {
-//!   flex: 1;
 //! }
 //!
 //! .try-button {
@@ -85,7 +81,6 @@
 //!   <span class="kw">&lt;/div&gt;</span>
 //!   <span class="kw">&lt;div</span> class=<span class="string">"notification-footer"</span><span class="kw">&gt;</span>
 //!     <span class="kw">&lt;a</span> href=<span class="string">"#"</span> class=<span class="string">"dismiss-button"</span><span class="kw">&gt;</span>Dismiss<span class="kw">&lt;/a&gt;</span>
-//!     <span class="kw">&lt;div</span> class=<span class="string">"blank-space"</span><span class="kw">&gt;&lt;/div&gt;</span>
 //!     <span class="kw">&lt;a</span> href=<span class="string">"#"</span> class=<span class="string">"try-button"</span>&gt;Try it here!<span class="kw">&lt;/a&gt;</span>
 //!   <span class="kw">&lt;/div&gt;</span>
 //! <span class="kw">&lt;/div&gt;</span>
@@ -110,9 +105,8 @@
 //!     The library <span class="kw">&lt;code&gt;</span>react<span class="kw">&lt;/code&gt;</span> was just released, did you know it?
 //!     It is <span class="kw">&lt;i&gt;</span>a JavaScript library for creating user interfaces<span class="kw">&lt;/i&gt;</span>.
 //!   <span class="kw">&lt;/div&gt;</span>
-//!   <span class="kw">&lt;div</span> class=<span class="string">"flex"</span><span class="kw">&gt;</span>
+//!   <span class="kw">&lt;div</span> class=<span class="string">"flex justify-between"</span><span class="kw">&gt;</span>
 //!     <span class="kw">&lt;a</span> href=<span class="string">"#"</span> class=<span class="string">"p-3 text-rose-600"</span><span class="kw">&gt;</span>Dismiss<span class="kw">&lt;/a&gt;</span>
-//!     <span class="kw">&lt;div</span> class=<span class="string">"flex-1"</span><span class="kw">&gt;&lt;/div&gt;</span>
 //!     <span class="kw">&lt;a</span> href=<span class="string">"#"</span> class=<span class="string">"p-3 bg-blue-600 text-white rounded-br-xl rounded-tl-xl shadow shadow-blue-600"</span>&gt;Try it here!<span class="kw">&lt;/a&gt;</span>
 //!   <span class="kw">&lt;/div&gt;</span>
 //! <span class="kw">&lt;/div&gt;</span>
