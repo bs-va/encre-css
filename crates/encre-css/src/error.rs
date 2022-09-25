@@ -24,7 +24,7 @@ pub enum Error {
 }
 
 /// The kind of parsing error
-#[derive(ErrorTrait, Debug, PartialEq)]
+#[derive(ErrorTrait, Debug, PartialEq, Eq)]
 pub enum ParseErrorKind<'a> {
     /// Indicate that the selector is too short to be an existing selector (the shortest selector has 2 characters).
     #[error("the selector `{0}` is too short to be an existing selector")]
@@ -49,7 +49,7 @@ pub enum ParseErrorKind<'a> {
 /// you can use [`utils::check_selectors`].
 ///
 /// [`utils::check_selectors`]: crate::utils::check_selectors
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct ParseError<'a> {
     /// The location of the error in the provided content
     pub span: Range<usize>,

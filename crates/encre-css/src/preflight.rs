@@ -469,7 +469,7 @@ ol, ul, menu {
 /// The set of default styles.
 ///
 /// See [`crate::preflight`].
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Preflight {
     /// No preflight will be generated.

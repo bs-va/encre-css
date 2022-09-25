@@ -838,7 +838,7 @@ pub const BUILTIN_PLUGINS: [&'static (dyn Plugin + Send + Sync); 227] = [
 /// Configuration for the [`Theme::dark_mode`] field.
 ///
 /// It defines how the `dark:` variant should behaves.
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum DarkMode {
     /// The `dark:` variant will modify the class of the selector. You'll then need to toggle this
@@ -902,7 +902,7 @@ impl DarkMode {
 /// Configuration for the [`Theme::screens`] field.
 ///
 /// It defines a list of custom screen breakpoints.
-#[derive(Debug, PartialEq, Default, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub struct Screens(BTreeMap<Cow<'static, str>, Cow<'static, str>>);
 
 impl Screens {
@@ -928,7 +928,7 @@ impl Screens {
 /// Configuration for the [`Theme::colors`] field.
 ///
 /// It defines a list of custom colors.
-#[derive(Debug, PartialEq, Default, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub struct Colors(BTreeMap<Cow<'static, str>, Cow<'static, str>>);
 
 impl Colors {
@@ -958,7 +958,7 @@ impl Colors {
 /// Configuration for the [`Config::theme`] field.
 ///
 /// It defines some design system specific values like custom colors or screen breakpoints.
-#[derive(Debug, PartialEq, Default, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub struct Theme {
     /// Dark mode configuration.
     ///

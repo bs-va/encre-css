@@ -12,7 +12,7 @@ use notify::{
 use serde::Deserialize;
 use std::{
     fs,
-    io::{BufReader, Read},
+    io::{BufReader, Read, Seek, SeekFrom},
     iter,
     path::{Path, PathBuf},
     result,
@@ -80,7 +80,12 @@ fn scan_path<T: AsRef<Path>>(glob_path: T, buffer: &mut String) {
     if prefix == glob_path.as_ref() {
         match fs::File::open(&glob_path) {
             Ok(mut file) => {
-                buffer.reserve(file.metadata().unwrap().len() as usize); // TODO: Error handling
+                let file_len = file.seek(SeekFrom::End(0)).expect("failed to seek to the end of the file");
+                file.rewind().expect("failed to seek to the start of the file");
+
+                #[allow(clippy::cast_possible_truncation)]
+                buffer.reserve(file_len as usize);
+
                 if let Err(e) = file.read_to_string(buffer) {
                     eprintln!("Failed to read the file {:?}: {:?}", glob_path.as_ref(), e);
                 }
@@ -93,6 +98,12 @@ fn scan_path<T: AsRef<Path>>(glob_path: T, buffer: &mut String) {
                 match fs::File::open(entry.path()) {
                     Ok(file) => {
                         let mut reader = BufReader::new(file);
+                        let file_len = reader.seek(SeekFrom::End(0)).expect("failed to seek to the end of the file");
+                        reader.rewind().expect("failed to seek to the start of the file");
+
+                        #[allow(clippy::cast_possible_truncation)]
+                        buffer.reserve(file_len as usize);
+
                         if let Err(e) = reader.read_to_string(buffer) {
                             eprintln!("Failed to read the file {:?}: {:?}", glob_path.as_ref(), e);
                         }

@@ -198,7 +198,6 @@
     clippy::map_err_ignore,
     clippy::use_debug,
     clippy::map_err_ignore,
-    clippy::use_self,
     clippy::useless_let_if_seq,
     clippy::verbose_file_reads,
     clippy::panic,

@@ -46,6 +46,7 @@ use crate::utils::split_ignore_arbitrary;
 ///
 /// [`utils::split_ignore_arbitray`]: crate::utils::split_ignore_arbitrary
 #[allow(missing_debug_implementations)]
+#[allow(clippy::type_complexity)]
 pub struct Scanner {
     scan_fn: Box<dyn Fn(&str) -> BTreeSet<&str> + Send + Sync>,
 }
