@@ -240,9 +240,10 @@ pub trait Plugin: fmt::Debug {
     /// The [`Plugin::can_handle`] method **must be** called before to know if it can handle
     /// the modifier, otherwise this function **will panic**.
     ///
-    /// Note: the CSS should end with a newline.
-    ///
-    /// Note: arbitrary values are already normalized (e.g. underscores are replaced by spaces).
+    /// Various notes:
+    /// - The CSS returned should end with a newline;
+    /// - Arbitrary values are already normalized (e.g. underscores are replaced by spaces);
+    /// - This function is guaranteed to be called only once per selector.
     ///
     /// # Errors
     ///

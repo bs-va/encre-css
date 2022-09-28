@@ -1,7 +1,6 @@
 //! Define the main [`EncreGenerator`] structure used to scan content and to generate CSS styles.
 use crate::{
     config::Config,
-    plugins::transition::animation,
     preflight::Preflight,
     selector::{parse, Modifier, Selector, Variant, VariantType},
     utils::{indent, unindent},
@@ -11,7 +10,7 @@ use std::{
     collections::BTreeSet,
     fmt::{self, Write},
     path::Path,
-    sync::{atomic::Ordering, Arc},
+    sync::Arc,
 };
 
 /// The context used in the [`Plugin::can_handle`] method.
@@ -343,11 +342,6 @@ impl<'a> EncreGenerator<'a> {
     /// [`add_selectors`]: EncreGenerator::add_selectors
     /// [`scan`]: EncreGenerator::scan
     pub fn generate(&self) -> String {
-        // Make sure that animations are not defined
-        animation::ANIMATIONS_ALREADY_DEFINED
-            .iter()
-            .for_each(|animation| animation.store(false, Ordering::Relaxed));
-
         let preflight = self.config.preflight.build();
         let mut buffer = String::with_capacity(10 * self.scanned_selectors.len()); // TODO: More accurate value
         buffer.push_str(&preflight); // TODO: Push and reserve at the same time

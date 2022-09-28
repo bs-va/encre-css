@@ -8,10 +8,7 @@ use crate::{
     utils::value_matchers::is_matching_all,
 };
 
-use std::{
-    fmt::{self, Write},
-    sync::atomic::{AtomicBool, Ordering},
-};
+use std::fmt::{self, Write};
 
 const SPIN_ANIMATION: &str = "@-webkit-keyframes spin {
   to {
@@ -84,13 +81,6 @@ const BOUNCE_ANIMATION: &str = "@-webkit-keyframes bounce {
   }
 }\n";
 
-pub(crate) static ANIMATIONS_ALREADY_DEFINED: [AtomicBool; 4] = [
-    AtomicBool::new(false), // Spin
-    AtomicBool::new(false), // Ping
-    AtomicBool::new(false), // Pulse
-    AtomicBool::new(false), // Bounce
-];
-
 #[derive(Debug)]
 pub(crate) struct PluginDefinition;
 
@@ -120,27 +110,19 @@ impl Plugin for PluginDefinition {
                 let animation = match *value {
                     "none" => "none",
                     "spin" => {
-                        if !ANIMATIONS_ALREADY_DEFINED[0].swap(true, Ordering::Relaxed) {
-                            writeln!(buffer, "{}", SPIN_ANIMATION)?;
-                        }
+                        writeln!(buffer, "{}", SPIN_ANIMATION)?;
                         "spin 1s linear infinite"
                     }
                     "ping" => {
-                        if !ANIMATIONS_ALREADY_DEFINED[1].swap(true, Ordering::Relaxed) {
-                            writeln!(buffer, "{}", PING_ANIMATION)?;
-                        }
+                        writeln!(buffer, "{}", PING_ANIMATION)?;
                         "ping 1s cubic-bezier(0, 0, 0.2, 1) infinite"
                     }
                     "pulse" => {
-                        if !ANIMATIONS_ALREADY_DEFINED[2].swap(true, Ordering::Relaxed) {
-                            writeln!(buffer, "{}", PULSE_ANIMATION)?;
-                        }
+                        writeln!(buffer, "{}", PULSE_ANIMATION)?;
                         "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite"
                     }
                     "bounce" => {
-                        if !ANIMATIONS_ALREADY_DEFINED[3].swap(true, Ordering::Relaxed) {
-                            writeln!(buffer, "{}", BOUNCE_ANIMATION)?;
-                        }
+                        writeln!(buffer, "{}", BOUNCE_ANIMATION)?;
                         "bounce 1s infinite"
                     }
                     _ => unreachable!(),

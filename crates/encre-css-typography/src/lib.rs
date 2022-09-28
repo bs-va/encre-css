@@ -13,23 +13,7 @@ use encre_css::{
 use std::{
     borrow::Cow,
     fmt::{self, Write},
-    sync::atomic::{AtomicBool, Ordering},
 };
-
-static ALREADY_DEFINED: [AtomicBool; 12] = [
-    AtomicBool::new(false),
-    AtomicBool::new(false),
-    AtomicBool::new(false),
-    AtomicBool::new(false),
-    AtomicBool::new(false),
-    AtomicBool::new(false),
-    AtomicBool::new(false),
-    AtomicBool::new(false),
-    AtomicBool::new(false),
-    AtomicBool::new(false),
-    AtomicBool::new(false),
-    AtomicBool::new(false),
-];
 
 const PROSE_DEFAULT_CSS: &str = r#".prose {
   color: var(--en-prose-body);
@@ -1106,152 +1090,128 @@ impl Plugin for Prose {
         match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
                 "" => {
-                    if !ALREADY_DEFINED[0].swap(true, Ordering::Relaxed) {
-                        generate_at_rules(context, |ContextHandle { indentation, buffer, .. }| {
-                            PROSE_DEFAULT_CSS.lines().try_for_each(|line| {
-                                writeln!(buffer, "{indentation}{line}")
-                            })
-                        })?;
-                    }
+                    generate_at_rules(context, |ContextHandle { indentation, buffer, .. }| {
+                        PROSE_DEFAULT_CSS.lines().try_for_each(|line| {
+                            writeln!(buffer, "{indentation}{line}")
+                        })
+                    })?;
                 }
                 "sm" => {
-                    if !ALREADY_DEFINED[1].swap(true, Ordering::Relaxed) {
-                        generate_at_rules(context, |context| {
-                            PROSE_SM_CSS.iter().try_for_each(|rule| {
-                                generate_class(
-                                    context,
-                                    |ContextHandle { indentation, buffer, .. }| {
-                                        rule.1.lines().try_for_each(|line| {
-                                            writeln!(buffer, "{indentation}{line}")
-                                        })
-                                    },
-                                    rule.0,
-                                )
-                            })
-                        })?;
-                    }
+                    generate_at_rules(context, |context| {
+                        PROSE_SM_CSS.iter().try_for_each(|rule| {
+                            generate_class(
+                                context,
+                                |ContextHandle { indentation, buffer, .. }| {
+                                    rule.1.lines().try_for_each(|line| {
+                                        writeln!(buffer, "{indentation}{line}")
+                                    })
+                                },
+                                rule.0,
+                            )
+                        })
+                    })?;
                 }
                 "base" => {
-                    if !ALREADY_DEFINED[2].swap(true, Ordering::Relaxed) {
-                        generate_at_rules(context, |context| {
-                            PROSE_BASE_CSS.iter().try_for_each(|rule| {
-                                generate_class(
-                                    context,
-                                    |ContextHandle { indentation, buffer, .. }| {
-                                        rule.1.lines().try_for_each(|line| {
-                                            writeln!(buffer, "{indentation}{line}")
-                                        })
-                                    },
-                                    rule.0,
-                                )
-                            })
-                        })?;
-                    }
+                    generate_at_rules(context, |context| {
+                        PROSE_BASE_CSS.iter().try_for_each(|rule| {
+                            generate_class(
+                                context,
+                                |ContextHandle { indentation, buffer, .. }| {
+                                    rule.1.lines().try_for_each(|line| {
+                                        writeln!(buffer, "{indentation}{line}")
+                                    })
+                                },
+                                rule.0,
+                            )
+                        })
+                    })?;
                 }
                 "lg" => {
-                    if !ALREADY_DEFINED[3].swap(true, Ordering::Relaxed) {
-                        generate_at_rules(context, |context| {
-                            PROSE_LG_CSS.iter().try_for_each(|rule| {
-                                generate_class(
-                                    context,
-                                    |ContextHandle { indentation, buffer, .. }| {
-                                        rule.1.lines().try_for_each(|line| {
-                                            writeln!(buffer, "{indentation}{line}")
-                                        })
-                                    },
-                                    rule.0,
-                                )
-                            })
-                        })?;
-                    }
+                    generate_at_rules(context, |context| {
+                        PROSE_LG_CSS.iter().try_for_each(|rule| {
+                            generate_class(
+                                context,
+                                |ContextHandle { indentation, buffer, .. }| {
+                                    rule.1.lines().try_for_each(|line| {
+                                        writeln!(buffer, "{indentation}{line}")
+                                    })
+                                },
+                                rule.0,
+                            )
+                        })
+                    })?;
                 }
                 "xl" => {
-                    if !ALREADY_DEFINED[4].swap(true, Ordering::Relaxed) {
-                        generate_at_rules(context, |context| {
-                            PROSE_XL_CSS.iter().try_for_each(|rule| {
-                                generate_class(
-                                    context,
-                                    |ContextHandle { indentation, buffer, .. }| {
-                                        rule.1.lines().try_for_each(|line| {
-                                            writeln!(buffer, "{indentation}{line}")
-                                        })
-                                    },
-                                    rule.0,
-                                )
-                            })
-                        })?;
-                    }
+                    generate_at_rules(context, |context| {
+                        PROSE_XL_CSS.iter().try_for_each(|rule| {
+                            generate_class(
+                                context,
+                                |ContextHandle { indentation, buffer, .. }| {
+                                    rule.1.lines().try_for_each(|line| {
+                                        writeln!(buffer, "{indentation}{line}")
+                                    })
+                                },
+                                rule.0,
+                            )
+                        })
+                    })?;
                 }
                 "2xl" => {
-                    if !ALREADY_DEFINED[5].swap(true, Ordering::Relaxed) {
-                        generate_at_rules(context, |context| {
-                            PROSE_2XL_CSS.iter().try_for_each(|rule| {
-                                generate_class(
-                                    context,
-                                    |ContextHandle { indentation, buffer, .. }| {
-                                        rule.1.lines().try_for_each(|line| {
-                                            writeln!(buffer, "{indentation}{line}")
-                                        })
-                                    },
-                                    rule.0,
-                                )
-                            })
-                        })?;
-                    }
+                    generate_at_rules(context, |context| {
+                        PROSE_2XL_CSS.iter().try_for_each(|rule| {
+                            generate_class(
+                                context,
+                                |ContextHandle { indentation, buffer, .. }| {
+                                    rule.1.lines().try_for_each(|line| {
+                                        writeln!(buffer, "{indentation}{line}")
+                                    })
+                                },
+                                rule.0,
+                            )
+                        })
+                    })?;
                 }
                 "gray" => {
-                    if !ALREADY_DEFINED[6].swap(true, Ordering::Relaxed) {
-                        generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
-                            PROSE_GRAY_CSS.lines().try_for_each(|line| {
-                                writeln!(buffer, "{indentation}{line}")
-                            })
-                        })?;
-                    }
+                    generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
+                        PROSE_GRAY_CSS.lines().try_for_each(|line| {
+                            writeln!(buffer, "{indentation}{line}")
+                        })
+                    })?;
                 }
                 "slate" => {
-                    if !ALREADY_DEFINED[7].swap(true, Ordering::Relaxed) {
-                        generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
-                            PROSE_SLATE_CSS.lines().try_for_each(|line| {
-                                writeln!(buffer, "{indentation}{line}")
-                            })
-                        })?;
-                    }
+                    generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
+                        PROSE_SLATE_CSS.lines().try_for_each(|line| {
+                            writeln!(buffer, "{indentation}{line}")
+                        })
+                    })?;
                 }
                 "zinc" => {
-                    if !ALREADY_DEFINED[8].swap(true, Ordering::Relaxed) {
-                        generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
-                            PROSE_ZINC_CSS.lines().try_for_each(|line| {
-                                writeln!(buffer, "{indentation}{line}")
-                            })
-                        })?;
-                    }
+                    generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
+                        PROSE_ZINC_CSS.lines().try_for_each(|line| {
+                            writeln!(buffer, "{indentation}{line}")
+                        })
+                    })?;
                 }
                 "neutral" => {
-                    if !ALREADY_DEFINED[9].swap(true, Ordering::Relaxed) {
-                        generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
-                            PROSE_NEUTRAL_CSS.lines().try_for_each(|line| {
-                                writeln!(buffer, "{indentation}{line}")
-                            })
-                        })?;
-                    }
+                    generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
+                        PROSE_NEUTRAL_CSS.lines().try_for_each(|line| {
+                            writeln!(buffer, "{indentation}{line}")
+                        })
+                    })?;
                 }
                 "stone" => {
-                    if !ALREADY_DEFINED[10].swap(true, Ordering::Relaxed) {
-                        generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
-                            PROSE_STONE_CSS.lines().try_for_each(|line| {
-                                writeln!(buffer, "{indentation}{line}")
-                            })
-                        })?;
-                    }
+                    generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
+                        PROSE_STONE_CSS.lines().try_for_each(|line| {
+                            writeln!(buffer, "{indentation}{line}")
+                        })
+                    })?;
                 }
                 "invert" => {
-                    if !ALREADY_DEFINED[11].swap(true, Ordering::Relaxed) {
-                        generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
-                            PROSE_INVERT_CSS.lines().try_for_each(|line| {
-                                writeln!(buffer, "{indentation}{line}")
-                            })
-                        })?;
-                    }
+                    generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
+                        PROSE_INVERT_CSS.lines().try_for_each(|line| {
+                            writeln!(buffer, "{indentation}{line}")
+                        })
+                    })?;
                 }
                 _ => unreachable!(),
             },
@@ -1263,11 +1223,6 @@ impl Plugin for Prose {
 }
 
 pub fn register(config: &mut Config) {
-    // Reset variables
-    for var in &ALREADY_DEFINED {
-        var.store(false, Ordering::Relaxed);
-    }
-
     for (name, selector) in [
         ("headings", Some(":where(h1, h2, h3, h4, h5, h6, th)")),
         ("h1", None),
