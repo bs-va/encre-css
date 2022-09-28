@@ -5,7 +5,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{indent, value_matchers::is_matching_all},
+    utils::value_matchers::is_matching_all,
 };
 
 use std::{
@@ -113,49 +113,45 @@ impl Plugin for PluginDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        match context.modifier {
+        let ContextHandle { modifier, buffer, .. } = context;
+
+        match modifier {
             Modifier::Builtin { value, .. } => {
                 let animation = match *value {
                     "none" => "none",
                     "spin" => {
                         if !ANIMATIONS_ALREADY_DEFINED[0].swap(true, Ordering::Relaxed) {
-                            writeln!(context.buffer, "{}", SPIN_ANIMATION)?;
+                            writeln!(buffer, "{}", SPIN_ANIMATION)?;
                         }
                         "spin 1s linear infinite"
                     }
                     "ping" => {
                         if !ANIMATIONS_ALREADY_DEFINED[1].swap(true, Ordering::Relaxed) {
-                            writeln!(context.buffer, "{}", PING_ANIMATION)?;
+                            writeln!(buffer, "{}", PING_ANIMATION)?;
                         }
                         "ping 1s cubic-bezier(0, 0, 0.2, 1) infinite"
                     }
                     "pulse" => {
                         if !ANIMATIONS_ALREADY_DEFINED[2].swap(true, Ordering::Relaxed) {
-                            writeln!(context.buffer, "{}", PULSE_ANIMATION)?;
+                            writeln!(buffer, "{}", PULSE_ANIMATION)?;
                         }
                         "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite"
                     }
                     "bounce" => {
                         if !ANIMATIONS_ALREADY_DEFINED[3].swap(true, Ordering::Relaxed) {
-                            writeln!(context.buffer, "{}", BOUNCE_ANIMATION)?;
+                            writeln!(buffer, "{}", BOUNCE_ANIMATION)?;
                         }
                         "bounce 1s infinite"
                     }
                     _ => unreachable!(),
                 };
 
-                generate_wrapper(context, |context| {
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "-webkit-animation: {animation};")?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "animation: {animation};")
+                generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
+                    writeln!(buffer, "{indentation}-webkit-animation: {animation};\n{indentation}animation: {animation};")
                 })
             }
-            Modifier::Arbitrary { value, .. } => generate_wrapper(context, |context| {
-                indent(context.indentation, context.buffer)?;
-                writeln!(context.buffer, "-webkit-animation: {value};")?;
-                indent(context.indentation, context.buffer)?;
-                writeln!(context.buffer, "animation: {value};")
+            Modifier::Arbitrary { value, .. } => generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
+                writeln!(buffer, "{indentation}-webkit-animation: {value};\n{indentation}animation: {value};")
             }),
         }
     }

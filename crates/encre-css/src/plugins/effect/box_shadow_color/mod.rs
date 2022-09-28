@@ -4,7 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{color, indent, value_matchers::is_matching_color},
+    utils::{color, value_matchers::is_matching_color},
 };
 
 use std::fmt::{self, Write};
@@ -28,21 +28,19 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, config, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => writeln!(
-                context.buffer,
-                "--en-shadow-color: {};",
-                color::get(context.config, value, None).unwrap()
+                buffer,
+                "{indentation}--en-shadow-color: {};",
+                color::get(config, value, None).unwrap()
             )?,
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "--en-shadow-color: {value};")?;
+                writeln!(buffer, "{indentation}--en-shadow-color: {value};")?;
             }
         }
 
-        indent(context.indentation, context.buffer)?;
-        writeln!(context.buffer, "--en-shadow: var(--en-shadow-colored);")?;
+        writeln!(buffer, "{indentation}--en-shadow: var(--en-shadow-colored);")?;
 
         Ok(())
     }

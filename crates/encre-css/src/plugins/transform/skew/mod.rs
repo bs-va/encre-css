@@ -5,7 +5,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{format_negative, indent, value_matchers::is_matching_angle},
+    utils::{format_negative, value_matchers::is_matching_angle},
 };
 
 use std::fmt::{self, Write};
@@ -17,22 +17,20 @@ fn skew_can_handle(context: &mut ContextCanHandle) -> bool {
     }
 }
 
-fn skew_handle(css_prop: &str, context: &mut ContextHandle) -> fmt::Result {
-    indent(context.indentation, context.buffer)?;
-    match context.modifier {
+fn skew_handle(css_prop: &str, ContextHandle { modifier, indentation, buffer, .. }: &mut ContextHandle) -> fmt::Result {
+    match modifier {
         Modifier::Builtin { is_negative, value } => writeln!(
-            context.buffer,
-            "{}: {}{value}deg;",
+            buffer,
+            "{indentation}{}: {}{value}deg;",
             css_prop,
             format_negative(is_negative),
         )?,
         Modifier::Arbitrary { value, .. } => {
-            writeln!(context.buffer, "{css_prop}: {value};")?;
+            writeln!(buffer, "{indentation}{css_prop}: {value};")?;
         }
     }
 
-    indent(context.indentation, context.buffer)?;
-    writeln!(context.buffer, "{}", CSS_TRANSFORM)?;
+    writeln!(buffer, "{indentation}{}", CSS_TRANSFORM)?;
     Ok(())
 }
 

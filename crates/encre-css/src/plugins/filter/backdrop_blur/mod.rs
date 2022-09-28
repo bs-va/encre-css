@@ -5,7 +5,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{indent, value_matchers::is_matching_length},
+    utils::value_matchers::is_matching_length,
 };
 
 use std::fmt::{self, Write};
@@ -27,29 +27,25 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "" => writeln!(context.buffer, "--en-backdrop-blur: blur(8px);")?,
-                "sm" => writeln!(context.buffer, "--en-backdrop-blur: blur(4px);")?,
-                "md" => writeln!(context.buffer, "--en-backdrop-blur: blur(12px);")?,
-                "lg" => writeln!(context.buffer, "--en-backdrop-blur: blur(16px);")?,
-                "xl" => writeln!(context.buffer, "--en-backdrop-blur: blur(24px);")?,
-                "2xl" => writeln!(context.buffer, "--en-backdrop-blur: blur(40px);")?,
-                "3xl" => writeln!(context.buffer, "--en-backdrop-blur: blur(64px);")?,
-                "none" => writeln!(context.buffer, "--en-backdrop-blur: blur(0);")?,
+                "" => writeln!(buffer, "{indentation}--en-backdrop-blur: blur(8px);")?,
+                "sm" => writeln!(buffer, "{indentation}--en-backdrop-blur: blur(4px);")?,
+                "md" => writeln!(buffer, "{indentation}--en-backdrop-blur: blur(12px);")?,
+                "lg" => writeln!(buffer, "{indentation}--en-backdrop-blur: blur(16px);")?,
+                "xl" => writeln!(buffer, "{indentation}--en-backdrop-blur: blur(24px);")?,
+                "2xl" => writeln!(buffer, "{indentation}--en-backdrop-blur: blur(40px);")?,
+                "3xl" => writeln!(buffer, "{indentation}--en-backdrop-blur: blur(64px);")?,
+                "none" => writeln!(buffer, "{indentation}--en-backdrop-blur: blur(0);")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "--en-backdrop-blur: blur({value});")?;
+                writeln!(buffer, "{indentation}--en-backdrop-blur: blur({value});")?;
             }
         }
 
-        indent(context.indentation, context.buffer)?;
-        writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_1)?;
-        indent(context.indentation, context.buffer)?;
-        writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_2)?;
+        writeln!(buffer, "{indentation}{}\n{indentation}{}", CSS_BACKDROP_FILTER_1, CSS_BACKDROP_FILTER_2)?;
 
         Ok(())
     }

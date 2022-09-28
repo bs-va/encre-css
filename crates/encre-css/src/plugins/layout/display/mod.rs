@@ -4,7 +4,6 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
 };
 
 use std::fmt::{self, Write};
@@ -43,31 +42,30 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "hidden" => writeln!(context.buffer, "display: none;")?,
-                "contents" => writeln!(context.buffer, "display: contents;")?,
-                "list-item" => writeln!(context.buffer, "display: list-item;")?,
-                "block" => writeln!(context.buffer, "display: block;")?,
-                "inline-block" => writeln!(context.buffer, "display: inline-block;")?,
-                "flex" => writeln!(context.buffer, "display: flex;")?,
-                "inline-flex" => writeln!(context.buffer, "display: inline-flex;")?,
-                "inline" => writeln!(context.buffer, "display: inline;")?,
-                "table" => writeln!(context.buffer, "display: table;")?,
-                "inline-table" => writeln!(context.buffer, "display: inline-table;")?,
-                "table-cell" => writeln!(context.buffer, "display: table-cell;")?,
-                "table-caption" => writeln!(context.buffer, "display: table-caption;")?,
-                "table-column" => writeln!(context.buffer, "display: table-column;")?,
-                "table-column-group" => writeln!(context.buffer, "display: table-column-group;")?,
-                "table-footer-group" => writeln!(context.buffer, "display: table-footer-group;")?,
-                "table-header-group" => writeln!(context.buffer, "display: table-header-group;")?,
-                "table-row-group" => writeln!(context.buffer, "display: table-row-group;")?,
-                "table-row" => writeln!(context.buffer, "display: table-row;")?,
-                "flow-root" => writeln!(context.buffer, "display: flow-root;")?,
-                "grid" => writeln!(context.buffer, "display: grid;")?,
-                "inline-grid" => writeln!(context.buffer, "display: inline-grid;")?,
+                "hidden" => writeln!(buffer, "{indentation}display: none;")?,
+                "contents" => writeln!(buffer, "{indentation}display: contents;")?,
+                "list-item" => writeln!(buffer, "{indentation}display: list-item;")?,
+                "block" => writeln!(buffer, "{indentation}display: block;")?,
+                "inline-block" => writeln!(buffer, "{indentation}display: inline-block;")?,
+                "flex" => writeln!(buffer, "{indentation}display: flex;")?,
+                "inline-flex" => writeln!(buffer, "{indentation}display: inline-flex;")?,
+                "inline" => writeln!(buffer, "{indentation}display: inline;")?,
+                "table" => writeln!(buffer, "{indentation}display: table;")?,
+                "inline-table" => writeln!(buffer, "{indentation}display: inline-table;")?,
+                "table-cell" => writeln!(buffer, "{indentation}display: table-cell;")?,
+                "table-caption" => writeln!(buffer, "{indentation}display: table-caption;")?,
+                "table-column" => writeln!(buffer, "{indentation}display: table-column;")?,
+                "table-column-group" => writeln!(buffer, "{indentation}display: table-column-group;")?,
+                "table-footer-group" => writeln!(buffer, "{indentation}display: table-footer-group;")?,
+                "table-header-group" => writeln!(buffer, "{indentation}display: table-header-group;")?,
+                "table-row-group" => writeln!(buffer, "{indentation}display: table-row-group;")?,
+                "table-row" => writeln!(buffer, "{indentation}display: table-row;")?,
+                "flow-root" => writeln!(buffer, "{indentation}display: flow-root;")?,
+                "grid" => writeln!(buffer, "{indentation}display: grid;")?,
+                "inline-grid" => writeln!(buffer, "{indentation}display: inline-grid;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),

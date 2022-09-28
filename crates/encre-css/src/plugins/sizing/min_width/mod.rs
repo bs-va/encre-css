@@ -4,7 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{indent, spacing, value_matchers::is_matching_length},
+    utils::{spacing, value_matchers::is_matching_length},
 };
 
 use std::fmt::{self, Write};
@@ -27,23 +27,22 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { is_negative, value } => match *value {
-                "full" => writeln!(context.buffer, "min-width: 100%;")?,
-                "min" => writeln!(context.buffer, "min-width: min-content;")?,
-                "max" => writeln!(context.buffer, "min-width: max-content;")?,
-                "fit" => writeln!(context.buffer, "min-width: fit-content;")?,
-                "screen" => writeln!(context.buffer, "min-width: 100vw;")?,
+                "full" => writeln!(buffer, "{indentation}min-width: 100%;")?,
+                "min" => writeln!(buffer, "{indentation}min-width: min-content;")?,
+                "max" => writeln!(buffer, "{indentation}min-width: max-content;")?,
+                "fit" => writeln!(buffer, "{indentation}min-width: fit-content;")?,
+                "screen" => writeln!(buffer, "{indentation}min-width: 100vw;")?,
                 _ => writeln!(
-                    context.buffer,
-                    "min-width: {};",
+                    buffer,
+                    "{indentation}min-width: {};",
                     spacing::get(value, *is_negative).unwrap()
                 )?,
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "min-width: {value};")?;
+                writeln!(buffer, "{indentation}min-width: {value};")?;
             }
         }
 

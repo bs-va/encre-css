@@ -5,7 +5,6 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
 };
 
 use std::fmt::{self, Write};
@@ -25,13 +24,12 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "" | "cpu" => writeln!(context.buffer, "{}", CSS_TRANSFORM)?,
-                "gpu" => writeln!(context.buffer, "transform: translate3d(var(--en-translate-x), var(--en-translate-y), 0) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));")?,
-                "none" => writeln!(context.buffer, "transform: none;")?,
+                "" | "cpu" => writeln!(buffer, "{indentation}{}", CSS_TRANSFORM)?,
+                "gpu" => writeln!(buffer, "{indentation}transform: translate3d(var(--en-translate-x), var(--en-translate-y), 0) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));")?,
+                "none" => writeln!(buffer, "{indentation}transform: none;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),

@@ -8,7 +8,6 @@ use encre_css::{
     },
     plugins::Plugin,
     selector::{Modifier, VariantType},
-    utils::indent,
     Config,
 };
 use std::{
@@ -1108,10 +1107,9 @@ impl Plugin for Prose {
             Modifier::Builtin { value, .. } => match *value {
                 "" => {
                     if !ALREADY_DEFINED[0].swap(true, Ordering::Relaxed) {
-                        generate_at_rules(context, |context| {
+                        generate_at_rules(context, |ContextHandle { indentation, buffer, .. }| {
                             PROSE_DEFAULT_CSS.lines().try_for_each(|line| {
-                                indent(context.indentation, context.buffer)?;
-                                writeln!(context.buffer, "{line}")
+                                writeln!(buffer, "{indentation}{line}")
                             })
                         })?;
                     }
@@ -1122,10 +1120,9 @@ impl Plugin for Prose {
                             PROSE_SM_CSS.iter().try_for_each(|rule| {
                                 generate_class(
                                     context,
-                                    |context| {
+                                    |ContextHandle { indentation, buffer, .. }| {
                                         rule.1.lines().try_for_each(|line| {
-                                            indent(context.indentation, context.buffer)?;
-                                            writeln!(context.buffer, "{line}")
+                                            writeln!(buffer, "{indentation}{line}")
                                         })
                                     },
                                     rule.0,
@@ -1140,10 +1137,9 @@ impl Plugin for Prose {
                             PROSE_BASE_CSS.iter().try_for_each(|rule| {
                                 generate_class(
                                     context,
-                                    |context| {
+                                    |ContextHandle { indentation, buffer, .. }| {
                                         rule.1.lines().try_for_each(|line| {
-                                            indent(context.indentation, context.buffer)?;
-                                            writeln!(context.buffer, "{line}")
+                                            writeln!(buffer, "{indentation}{line}")
                                         })
                                     },
                                     rule.0,
@@ -1158,10 +1154,9 @@ impl Plugin for Prose {
                             PROSE_LG_CSS.iter().try_for_each(|rule| {
                                 generate_class(
                                     context,
-                                    |context| {
+                                    |ContextHandle { indentation, buffer, .. }| {
                                         rule.1.lines().try_for_each(|line| {
-                                            indent(context.indentation, context.buffer)?;
-                                            writeln!(context.buffer, "{line}")
+                                            writeln!(buffer, "{indentation}{line}")
                                         })
                                     },
                                     rule.0,
@@ -1176,10 +1171,9 @@ impl Plugin for Prose {
                             PROSE_XL_CSS.iter().try_for_each(|rule| {
                                 generate_class(
                                     context,
-                                    |context| {
+                                    |ContextHandle { indentation, buffer, .. }| {
                                         rule.1.lines().try_for_each(|line| {
-                                            indent(context.indentation, context.buffer)?;
-                                            writeln!(context.buffer, "{line}")
+                                            writeln!(buffer, "{indentation}{line}")
                                         })
                                     },
                                     rule.0,
@@ -1194,10 +1188,9 @@ impl Plugin for Prose {
                             PROSE_2XL_CSS.iter().try_for_each(|rule| {
                                 generate_class(
                                     context,
-                                    |context| {
+                                    |ContextHandle { indentation, buffer, .. }| {
                                         rule.1.lines().try_for_each(|line| {
-                                            indent(context.indentation, context.buffer)?;
-                                            writeln!(context.buffer, "{line}")
+                                            writeln!(buffer, "{indentation}{line}")
                                         })
                                     },
                                     rule.0,
@@ -1208,60 +1201,54 @@ impl Plugin for Prose {
                 }
                 "gray" => {
                     if !ALREADY_DEFINED[6].swap(true, Ordering::Relaxed) {
-                        generate_wrapper(context, |context| {
+                        generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
                             PROSE_GRAY_CSS.lines().try_for_each(|line| {
-                                indent(context.indentation, context.buffer)?;
-                                writeln!(context.buffer, "{line}")
+                                writeln!(buffer, "{indentation}{line}")
                             })
                         })?;
                     }
                 }
                 "slate" => {
                     if !ALREADY_DEFINED[7].swap(true, Ordering::Relaxed) {
-                        generate_wrapper(context, |context| {
+                        generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
                             PROSE_SLATE_CSS.lines().try_for_each(|line| {
-                                indent(context.indentation, context.buffer)?;
-                                writeln!(context.buffer, "{line}")
+                                writeln!(buffer, "{indentation}{line}")
                             })
                         })?;
                     }
                 }
                 "zinc" => {
                     if !ALREADY_DEFINED[8].swap(true, Ordering::Relaxed) {
-                        generate_wrapper(context, |context| {
+                        generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
                             PROSE_ZINC_CSS.lines().try_for_each(|line| {
-                                indent(context.indentation, context.buffer)?;
-                                writeln!(context.buffer, "{line}")
+                                writeln!(buffer, "{indentation}{line}")
                             })
                         })?;
                     }
                 }
                 "neutral" => {
                     if !ALREADY_DEFINED[9].swap(true, Ordering::Relaxed) {
-                        generate_wrapper(context, |context| {
+                        generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
                             PROSE_NEUTRAL_CSS.lines().try_for_each(|line| {
-                                indent(context.indentation, context.buffer)?;
-                                writeln!(context.buffer, "{line}")
+                                writeln!(buffer, "{indentation}{line}")
                             })
                         })?;
                     }
                 }
                 "stone" => {
                     if !ALREADY_DEFINED[10].swap(true, Ordering::Relaxed) {
-                        generate_wrapper(context, |context| {
+                        generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
                             PROSE_STONE_CSS.lines().try_for_each(|line| {
-                                indent(context.indentation, context.buffer)?;
-                                writeln!(context.buffer, "{line}")
+                                writeln!(buffer, "{indentation}{line}")
                             })
                         })?;
                     }
                 }
                 "invert" => {
                     if !ALREADY_DEFINED[11].swap(true, Ordering::Relaxed) {
-                        generate_wrapper(context, |context| {
+                        generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
                             PROSE_INVERT_CSS.lines().try_for_each(|line| {
-                                indent(context.indentation, context.buffer)?;
-                                writeln!(context.buffer, "{line}")
+                                writeln!(buffer, "{indentation}{line}")
                             })
                         })?;
                     }

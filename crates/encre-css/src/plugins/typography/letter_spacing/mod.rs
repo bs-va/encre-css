@@ -4,7 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{indent, value_matchers::is_matching_length},
+    utils::value_matchers::is_matching_length,
 };
 
 use std::fmt::{self, Write};
@@ -25,20 +25,19 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "tighter" => writeln!(context.buffer, "letter-spacing: -0.05em;")?,
-                "tight" => writeln!(context.buffer, "letter-spacing: -0.025em;")?,
-                "normal" => writeln!(context.buffer, "letter-spacing: 0;")?,
-                "wide" => writeln!(context.buffer, "letter-spacing: 0.025em;")?,
-                "wider" => writeln!(context.buffer, "letter-spacing: 0.05em;")?,
-                "widest" => writeln!(context.buffer, "letter-spacing: 0.1em;")?,
+                "tighter" => writeln!(buffer, "{indentation}letter-spacing: -0.05em;")?,
+                "tight" => writeln!(buffer, "{indentation}letter-spacing: -0.025em;")?,
+                "normal" => writeln!(buffer, "{indentation}letter-spacing: 0;")?,
+                "wide" => writeln!(buffer, "{indentation}letter-spacing: 0.025em;")?,
+                "wider" => writeln!(buffer, "{indentation}letter-spacing: 0.05em;")?,
+                "widest" => writeln!(buffer, "{indentation}letter-spacing: 0.1em;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "letter-spacing: {value};")?;
+                writeln!(buffer, "{indentation}letter-spacing: {value};")?;
             }
         }
 

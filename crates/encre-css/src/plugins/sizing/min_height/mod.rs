@@ -4,7 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{indent, spacing, value_matchers::is_matching_length},
+    utils::{spacing, value_matchers::is_matching_length},
 };
 
 use std::fmt::{self, Write};
@@ -27,23 +27,22 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { is_negative, value } => match *value {
-                "full" => writeln!(context.buffer, "min-height: 100%;")?,
-                "min" => writeln!(context.buffer, "min-height: min-content;")?,
-                "max" => writeln!(context.buffer, "min-height: max-content;")?,
-                "fit" => writeln!(context.buffer, "min-height: fit-content;")?,
-                "screen" => writeln!(context.buffer, "min-height: 100vh;")?,
+                "full" => writeln!(buffer, "{indentation}min-height: 100%;")?,
+                "min" => writeln!(buffer, "{indentation}min-height: min-content;")?,
+                "max" => writeln!(buffer, "{indentation}min-height: max-content;")?,
+                "fit" => writeln!(buffer, "{indentation}min-height: fit-content;")?,
+                "screen" => writeln!(buffer, "{indentation}min-height: 100vh;")?,
                 _ => writeln!(
-                    context.buffer,
-                    "min-height: {};",
+                    buffer,
+                    "{indentation}min-height: {};",
                     spacing::get(value, *is_negative).unwrap()
                 )?,
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "min-height: {value};")?;
+                writeln!(buffer, "{indentation}min-height: {value};")?;
             }
         }
 

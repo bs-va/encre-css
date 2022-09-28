@@ -4,7 +4,6 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
 };
 use std::fmt::{self, Write};
 
@@ -31,16 +30,15 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "repeat" => writeln!(context.buffer, "background-repeat: repeat;")?,
-                "no-repeat" => writeln!(context.buffer, "background-repeat: no-repeat;")?,
-                "repeat-x" => writeln!(context.buffer, "background-repeat: repeat-x;")?,
-                "repeat-y" => writeln!(context.buffer, "background-repeat: repeat-y;")?,
-                "repeat-round" => writeln!(context.buffer, "background-repeat: round;")?,
-                "repeat-space" => writeln!(context.buffer, "background-repeat: space;")?,
+                "repeat" => writeln!(buffer, "{indentation}background-repeat: repeat;")?,
+                "no-repeat" => writeln!(buffer, "{indentation}background-repeat: no-repeat;")?,
+                "repeat-x" => writeln!(buffer, "{indentation}background-repeat: repeat-x;")?,
+                "repeat-y" => writeln!(buffer, "{indentation}background-repeat: repeat-y;")?,
+                "repeat-round" => writeln!(buffer, "{indentation}background-repeat: round;")?,
+                "repeat-space" => writeln!(buffer, "{indentation}background-repeat: space;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),

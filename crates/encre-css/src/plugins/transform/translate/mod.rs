@@ -6,7 +6,7 @@ use crate::{
     plugins::Plugin,
     selector::Modifier,
     utils::{
-        indent, spacing,
+        spacing,
         value_matchers::{is_matching_length, is_matching_percentage},
     },
 };
@@ -27,12 +27,11 @@ fn translate_can_handle(context: &mut ContextCanHandle) -> bool {
     }
 }
 
-fn translate_handle(css_prop: &str, context: &mut ContextHandle) -> fmt::Result {
-    indent(context.indentation, context.buffer)?;
-    match context.modifier {
+fn translate_handle(css_prop: &str, ContextHandle { modifier, indentation, buffer, .. }: &mut ContextHandle) -> fmt::Result {
+    match modifier {
         Modifier::Builtin { is_negative, value } => writeln!(
-            context.buffer,
-            "{}: {};",
+            buffer,
+            "{indentation}{}: {};",
             css_prop,
             if *value == "auto" {
                 Cow::from("auto")
@@ -43,12 +42,11 @@ fn translate_handle(css_prop: &str, context: &mut ContextHandle) -> fmt::Result 
             },
         )?,
         Modifier::Arbitrary { value, .. } => {
-            writeln!(context.buffer, "{css_prop}: {value};")?;
+            writeln!(buffer, "{indentation}{css_prop}: {value};")?;
         }
     }
 
-    indent(context.indentation, context.buffer)?;
-    writeln!(context.buffer, "{}", CSS_TRANSFORM)?;
+    writeln!(buffer, "{indentation}{}", CSS_TRANSFORM)?;
     Ok(())
 }
 

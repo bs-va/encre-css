@@ -4,10 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{
-        indent,
-        value_matchers::{is_matching_integer, is_matching_var},
-    },
+    utils::value_matchers::{is_matching_integer, is_matching_var},
 };
 
 use std::fmt::{self, Write};
@@ -44,23 +41,22 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "thin" => writeln!(context.buffer, "font-weight: 100;")?,
-                "extralight" => writeln!(context.buffer, "font-weight: 200;")?,
-                "light" => writeln!(context.buffer, "font-weight: 300;")?,
-                "normal" => writeln!(context.buffer, "font-weight: 400;")?,
-                "medium" => writeln!(context.buffer, "font-weight: 500;")?,
-                "semibold" => writeln!(context.buffer, "font-weight: 600;")?,
-                "bold" => writeln!(context.buffer, "font-weight: 700;")?,
-                "extrabold" => writeln!(context.buffer, "font-weight: 800;")?,
-                "black" => writeln!(context.buffer, "font-weight: 900;")?,
+                "thin" => writeln!(buffer, "{indentation}font-weight: 100;")?,
+                "extralight" => writeln!(buffer, "{indentation}font-weight: 200;")?,
+                "light" => writeln!(buffer, "{indentation}font-weight: 300;")?,
+                "normal" => writeln!(buffer, "{indentation}font-weight: 400;")?,
+                "medium" => writeln!(buffer, "{indentation}font-weight: 500;")?,
+                "semibold" => writeln!(buffer, "{indentation}font-weight: 600;")?,
+                "bold" => writeln!(buffer, "{indentation}font-weight: 700;")?,
+                "extrabold" => writeln!(buffer, "{indentation}font-weight: 800;")?,
+                "black" => writeln!(buffer, "{indentation}font-weight: 900;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "font-weight: {value};")?;
+                writeln!(buffer, "{indentation}font-weight: {value};")?;
             }
         }
 

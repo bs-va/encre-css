@@ -4,7 +4,6 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
 };
 
 use std::fmt::{self, Write};
@@ -26,16 +25,15 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "start" => writeln!(context.buffer, "align-content: flex-start;")?,
-                "center" => writeln!(context.buffer, "align-content: center;")?,
-                "end" => writeln!(context.buffer, "align-content: flex-end;")?,
-                "between" => writeln!(context.buffer, "align-content: space-between;")?,
-                "around" => writeln!(context.buffer, "align-content: space-around;")?,
-                "evenly" => writeln!(context.buffer, "align-content: space-evenly;")?,
+                "start" => writeln!(buffer, "{indentation}align-content: flex-start;")?,
+                "center" => writeln!(buffer, "{indentation}align-content: center;")?,
+                "end" => writeln!(buffer, "{indentation}align-content: flex-end;")?,
+                "between" => writeln!(buffer, "{indentation}align-content: space-between;")?,
+                "around" => writeln!(buffer, "{indentation}align-content: space-around;")?,
+                "evenly" => writeln!(buffer, "{indentation}align-content: space-evenly;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),

@@ -4,7 +4,6 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
 };
 
 use std::fmt::{self, Write};
@@ -26,50 +25,32 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
                 "none" => {
-                    writeln!(context.buffer, "-ms-scroll-snap-type: none;")?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "scroll-snap-type: none;")?;
+                    writeln!(buffer, "{indentation}-ms-scroll-snap-type: none;\n{indentation}scroll-snap-type: none;")?;
                 }
                 "x" => {
                     writeln!(
-                        context.buffer,
-                        "-ms-scroll-snap-type: x var(--en-scroll-snap-strictness);"
-                    )?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(
-                        context.buffer,
-                        "scroll-snap-type: x var(--en-scroll-snap-strictness);"
+                        buffer,
+                        "{indentation}-ms-scroll-snap-type: x var(--en-scroll-snap-strictness);\n{indentation}scroll-snap-type: x var(--en-scroll-snap-strictness);"
                     )?;
                 }
                 "y" => {
                     writeln!(
-                        context.buffer,
-                        "-ms-scroll-snap-type: y var(--en-scroll-snap-strictness);"
-                    )?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(
-                        context.buffer,
-                        "scroll-snap-type: y var(--en-scroll-snap-strictness);"
+                        buffer,
+                        "{indentation}-ms-scroll-snap-type: y var(--en-scroll-snap-strictness);\n{indentation}scroll-snap-type: y var(--en-scroll-snap-strictness);"
                     )?;
                 }
                 "both" => {
                     writeln!(
-                        context.buffer,
-                        "-ms-scroll-snap-type: both var(--en-scroll-snap-strictness);"
-                    )?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(
-                        context.buffer,
-                        "scroll-snap-type: both var(--en-scroll-snap-strictness);"
+                        buffer,
+                        "{indentation}-ms-scroll-snap-type: both var(--en-scroll-snap-strictness);\n{indentation}scroll-snap-type: both var(--en-scroll-snap-strictness);"
                     )?;
                 }
-                "mandatory" => writeln!(context.buffer, "--en-scroll-snap-strictness: mandatory;")?,
-                "proximity" => writeln!(context.buffer, "--en-scroll-snap-strictness: proximity;")?,
+                "mandatory" => writeln!(buffer, "{indentation}--en-scroll-snap-strictness: mandatory;")?,
+                "proximity" => writeln!(buffer, "{indentation}--en-scroll-snap-strictness: proximity;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),

@@ -4,7 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{indent, value_matchers::is_matching_all},
+    utils::value_matchers::is_matching_all,
 };
 
 use std::fmt::{self, Write};
@@ -26,17 +26,16 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "auto" => writeln!(context.buffer, "will-change: auto;")?,
-                "scroll" => writeln!(context.buffer, "will-change: scroll-position;")?,
-                "contents" => writeln!(context.buffer, "will-change: contents;")?,
-                "transform" => writeln!(context.buffer, "will-change: transform;")?,
+                "auto" => writeln!(buffer, "{indentation}will-change: auto;")?,
+                "scroll" => writeln!(buffer, "{indentation}will-change: scroll-position;")?,
+                "contents" => writeln!(buffer, "{indentation}will-change: contents;")?,
+                "transform" => writeln!(buffer, "{indentation}will-change: transform;")?,
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => writeln!(context.buffer, "will-change: {value};")?,
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "{indentation}will-change: {value};")?,
         }
 
         Ok(())

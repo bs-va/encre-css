@@ -10,7 +10,7 @@ use crate::{
 
 use std::{
     cmp::Ordering,
-    fmt::{self, Write},
+    fmt::Write,
     iter,
     str::CharIndices,
 };
@@ -20,17 +20,14 @@ pub mod shadow;
 pub mod spacing;
 pub mod value_matchers;
 
-const INDENTATION_SIZE: usize = 2;
-
 /// Indent a line using two spaces.
-///
-/// # Errors
-///
-/// Returns an [`fmt::Error`] when writing to the buffer failed.
-///
-/// [`fmt::Error`]: std::fmt::Error
-pub fn indent(num: usize, buffer: &mut String) -> fmt::Result {
-    write!(buffer, "{:indent$}", "", indent = num * INDENTATION_SIZE)
+pub fn indent(buffer: &mut String) {
+    let _ = write!(buffer, "  ");
+}
+
+/// Un-indent a line by two spaces.
+pub fn unindent(buffer: &mut String) {
+    buffer.truncate(buffer.len() - 2);
 }
 
 /// Quickly format a negative value (returns "-" if true or "" otherwise).

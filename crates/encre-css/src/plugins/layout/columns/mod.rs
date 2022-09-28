@@ -4,7 +4,6 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
 };
 
 use std::fmt::{self, Write};
@@ -31,24 +30,23 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "3xs" => writeln!(context.buffer, "columns: 16rem;")?,
-                "2xs" => writeln!(context.buffer, "columns: 18rem;")?,
-                "xs" => writeln!(context.buffer, "columns: 20rem;")?,
-                "sm" => writeln!(context.buffer, "columns: 24rem;")?,
-                "md" => writeln!(context.buffer, "columns: 28rem;")?,
-                "lg" => writeln!(context.buffer, "columns: 32rem;")?,
-                "xl" => writeln!(context.buffer, "columns: 36rem;")?,
-                "2xl" => writeln!(context.buffer, "columns: 42rem;")?,
-                "3xl" => writeln!(context.buffer, "columns: 48rem;")?,
-                "4xl" => writeln!(context.buffer, "columns: 56rem;")?,
-                "5xl" => writeln!(context.buffer, "columns: 64rem;")?,
-                "6xl" => writeln!(context.buffer, "columns: 72rem;")?,
-                "7xl" => writeln!(context.buffer, "columns: 80rem;")?,
-                _ => writeln!(context.buffer, "columns: {value};")?,
+                "3xs" => writeln!(buffer, "{indentation}columns: 16rem;")?,
+                "2xs" => writeln!(buffer, "{indentation}columns: 18rem;")?,
+                "xs" => writeln!(buffer, "{indentation}columns: 20rem;")?,
+                "sm" => writeln!(buffer, "{indentation}columns: 24rem;")?,
+                "md" => writeln!(buffer, "{indentation}columns: 28rem;")?,
+                "lg" => writeln!(buffer, "{indentation}columns: 32rem;")?,
+                "xl" => writeln!(buffer, "{indentation}columns: 36rem;")?,
+                "2xl" => writeln!(buffer, "{indentation}columns: 42rem;")?,
+                "3xl" => writeln!(buffer, "{indentation}columns: 48rem;")?,
+                "4xl" => writeln!(buffer, "{indentation}columns: 56rem;")?,
+                "5xl" => writeln!(buffer, "{indentation}columns: 64rem;")?,
+                "6xl" => writeln!(buffer, "{indentation}columns: 72rem;")?,
+                "7xl" => writeln!(buffer, "{indentation}columns: 80rem;")?,
+                _ => writeln!(buffer, "{indentation}columns: {value};")?,
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }

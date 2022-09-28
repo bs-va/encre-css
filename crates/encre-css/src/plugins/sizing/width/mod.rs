@@ -4,7 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{indent, spacing, value_matchers::is_matching_length},
+    utils::{spacing, value_matchers::is_matching_length},
 };
 
 use std::{
@@ -30,17 +30,16 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { is_negative, value } => {
                 if *value == "screen" {
-                    return writeln!(context.buffer, "width: 100vw;");
+                    return writeln!(buffer, "{indentation}width: 100vw;");
                 }
 
                 writeln!(
-                    context.buffer,
-                    "width: {};",
+                    buffer,
+                    "{indentation}width: {};",
                     match *value {
                         "auto" => Cow::from("auto"),
                         "full" => Cow::from("100%"),
@@ -53,7 +52,7 @@ impl Plugin for PluginDefinition {
                 )?;
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "width: {value};")?;
+                writeln!(buffer, "{indentation}width: {value};")?;
             }
         }
 

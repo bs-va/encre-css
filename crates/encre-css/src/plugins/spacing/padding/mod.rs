@@ -4,7 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{indent, spacing, value_matchers::is_matching_length},
+    utils::{spacing, value_matchers::is_matching_length},
 };
 
 use std::{
@@ -21,14 +21,13 @@ fn padding_can_handle(context: &mut ContextCanHandle) -> bool {
     }
 }
 
-fn padding_handle(css_properties: &[&str], context: &mut ContextHandle) -> fmt::Result {
-    match context.modifier {
+fn padding_handle(css_properties: &[&str], ContextHandle { modifier, indentation, buffer, .. }: &mut ContextHandle) -> fmt::Result {
+    match modifier {
         Modifier::Builtin { is_negative, value } => {
             for css_prop in css_properties {
-                indent(context.indentation, context.buffer)?;
                 writeln!(
-                    context.buffer,
-                    "{}: {};",
+                    buffer,
+                    "{indentation}{}: {};",
                     css_prop,
                     if *value == "auto" {
                         Cow::from("auto")
@@ -40,8 +39,7 @@ fn padding_handle(css_properties: &[&str], context: &mut ContextHandle) -> fmt::
         }
         Modifier::Arbitrary { value, .. } => {
             for css_prop in css_properties {
-                indent(context.indentation, context.buffer)?;
-                writeln!(context.buffer, "{css_prop}: {value};")?;
+                writeln!(buffer, "{indentation}{css_prop}: {value};")?;
             }
         }
     }

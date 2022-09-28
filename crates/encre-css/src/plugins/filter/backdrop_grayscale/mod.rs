@@ -5,7 +5,6 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
 };
 
 use std::fmt::{self, Write};
@@ -25,14 +24,13 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             #[allow(clippy::cast_precision_loss)]
             Modifier::Builtin { value, .. } => match *value {
-                "" => writeln!(context.buffer, "--en-backdrop-grayscale: grayscale(100%);")?,
+                "" => writeln!(buffer, "{indentation}--en-backdrop-grayscale: grayscale(100%);")?,
                 _ => writeln!(
-                    context.buffer,
+                    buffer,
                     "--en-backdrop-grayscale: grayscale({});",
                     value.parse::<usize>().unwrap() as f32 / 100.
                 )?,
@@ -40,10 +38,7 @@ impl Plugin for PluginDefinition {
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
-        indent(context.indentation, context.buffer)?;
-        writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_1)?;
-        indent(context.indentation, context.buffer)?;
-        writeln!(context.buffer, "{}", CSS_BACKDROP_FILTER_2)?;
+        writeln!(buffer, "{indentation}{}\n{indentation}{}", CSS_BACKDROP_FILTER_1, CSS_BACKDROP_FILTER_2)?;
 
         Ok(())
     }

@@ -4,7 +4,7 @@ use crate::{
     plugins::transition::animation,
     preflight::Preflight,
     selector::{parse, Modifier, Selector, Variant, VariantType},
-    utils::indent,
+    utils::{indent, unindent},
 };
 
 use std::{
@@ -38,7 +38,7 @@ pub struct ContextHandle<'a, 'b, 'c, 'd, 'e> {
     pub modifier: &'b Modifier<'c>,
 
     /// The current indentation of the CSS rule.
-    pub indentation: usize,
+    pub indentation: String,
 
     /// The buffer containing the whole generated CSS.
     pub buffer: &'d mut String,
@@ -62,18 +62,18 @@ pub fn generate_at_rules<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
     context: &mut ContextHandle,
     rule_content_fn: T,
 ) -> fmt::Result {
-    if !context.selector.variants.is_empty() {
-        context.selector.variants.iter().try_for_each(|variant| {
+    let ContextHandle { indentation, buffer, selector, .. } = context;
+
+    if !selector.variants.is_empty() {
+        selector.variants.iter().try_for_each(|variant| {
             match variant {
                 Variant::Builtin(_, VariantType::AtRule(variant)) => {
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "{} {{", variant)?;
-                    context.indentation += 1;
+                    writeln!(buffer, "{indentation}{} {{", variant)?;
+                    indent(indentation);
                 }
                 Variant::Arbitrary(variant) if variant.starts_with('@') => {
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "{} {{", variant)?;
-                    context.indentation += 1;
+                    writeln!(buffer, "{indentation}{} {{", variant)?;
+                    indent(indentation);
                 }
                 _ => (),
             }
@@ -84,14 +84,14 @@ pub fn generate_at_rules<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
 
     rule_content_fn(context)?;
 
-    while context.indentation > 0 {
-        context.indentation -= 1;
+    let ContextHandle { indentation, buffer, .. } = context;
+    while !indentation.is_empty() {
+        unindent(indentation);
 
-        if context.indentation == 0 {
-            write!(context.buffer, "}}")?;
+        if indentation.is_empty() {
+            write!(buffer, "}}")?;
         } else {
-            indent(context.indentation, context.buffer)?;
-            writeln!(context.buffer, "}}")?;
+            writeln!(buffer, "{indentation}}}")?;
         }
     }
 
@@ -116,11 +116,11 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
     rule_content_fn: T,
     custom_after_class: &str,
 ) -> fmt::Result {
+    let ContextHandle { indentation, buffer, selector, .. } = context;
+
     // Write the class
-    indent(context.indentation, context.buffer)?;
     let mut base_class = ".".to_string()
-        + &context
-            .selector
+        + &selector
             .full
             .chars()
             .enumerate()
@@ -136,9 +136,8 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
             })
             .collect::<String>();
 
-    if !context.selector.variants.is_empty() {
-        context
-            .selector
+    if !selector.variants.is_empty() {
+       selector
             .variants
             .iter()
             .rev()
@@ -171,18 +170,20 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
                 Variant::Arbitrary(_) => (),
             });
     }
-    writeln!(context.buffer, "{base_class}{} {{", custom_after_class)?;
+    writeln!(buffer, "{indentation}{base_class}{} {{", custom_after_class)?;
 
     // Store the index of the start of the class content (useful when the `important` flag is present)
-    let content_start = context.buffer.len();
+    let content_start = buffer.len();
 
     // Rule content
-    context.indentation += 1;
+    indent(indentation);
     rule_content_fn(context)?;
+
+    let ContextHandle { indentation, buffer, selector, .. } = context;
 
     // If the rule is selecting the `::before` or `::after` pseudo elements, we need to generate a
     // default `content` property
-    if context.selector.variants.iter().any(|variant| {
+    if selector.variants.iter().any(|variant| {
         if let Variant::Builtin(_, variant) = variant {
             *variant == VariantType::PseudoElement("before")
                 || *variant == VariantType::PseudoElement("after")
@@ -190,15 +191,14 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
             false
         }
     }) {
-        indent(context.indentation, context.buffer)?;
-        writeln!(context.buffer, "content: var(--en-content);")?;
+        writeln!(buffer, "{indentation}content: var(--en-content);")?;
     }
 
     // If the `important` flag is present we need to replace all `;\n` or `;\r\n`
     // to ` !important;\n` or ` !important;\r\n`
-    if context.selector.is_important {
+    if selector.is_important {
         let mut extra_index = 0;
-        let positions = context.buffer[content_start..]
+        let positions = buffer[content_start..]
             .match_indices('\n')
             .map(|i| i.0)
             .collect::<Vec<usize>>();
@@ -209,23 +209,22 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
             }
 
             let index = content_start + extra_index + index;
-            let index = if &context.buffer[index - 1..index] == "\r" {
+            let index = if &buffer[index - 1..index] == "\r" {
                 index - 1
             } else {
                 index
             };
             let replace_with = " !important;";
-            context.buffer.replace_range(index - 1..index, replace_with);
+            buffer.replace_range(index - 1..index, replace_with);
             extra_index += replace_with.len() - 1;
         }
     }
 
-    context.indentation -= 1;
-    if context.indentation == 0 {
-        write!(context.buffer, "}}")?;
+    unindent(indentation);
+    if indentation.is_empty() {
+        write!(buffer, "}}")?;
     } else {
-        indent(context.indentation, context.buffer)?;
-        writeln!(context.buffer, "}}")?;
+        writeln!(buffer, "{indentation}}}")?;
     }
 
     Ok(())
@@ -361,7 +360,7 @@ impl<'a> EncreGenerator<'a> {
             let mut context = ContextHandle {
                 config: &self.config,
                 modifier: &selector.modifier,
-                indentation: 0,
+                indentation: String::new(),
                 buffer: &mut buffer,
                 selector,
             };

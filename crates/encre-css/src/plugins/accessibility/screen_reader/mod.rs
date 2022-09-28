@@ -5,7 +5,6 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
 };
 
 use std::fmt::{self, Write};
@@ -21,36 +20,26 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "sr-only" => "position: absolute;
-width: 1px;
-height: 1px;
-padding: 0;
-margin: -1px;
-overflow: hidden;
-clip: rect(0, 0, 0, 0);
-white-space: nowrap;
-border-width: 0;"
-                    .lines()
-                    .try_for_each(|line| {
-                        indent(context.indentation, context.buffer)?;
-                        writeln!(context.buffer, "{line}")
-                    }),
-                "not-sr-only" => "position: static;
-width: auto;
-height: auto;
-padding: 0;
-margin: 0;
-overflow: visible;
-clip: auto;
-white-space: normal;"
-                    .lines()
-                    .try_for_each(|line| {
-                        indent(context.indentation, context.buffer)?;
-                        writeln!(context.buffer, "{line}")
-                    }),
+                "sr-only" => writeln!(buffer, "{indentation}position: absolute;
+{indentation}width: 1px;
+{indentation}height: 1px;
+{indentation}padding: 0;
+{indentation}margin: -1px;
+{indentation}overflow: hidden;
+{indentation}clip: rect(0, 0, 0, 0);
+{indentation}white-space: nowrap;
+{indentation}border-width: 0;"),
+                "not-sr-only" => writeln!(buffer, "{indentation}position: static;
+{indentation}width: auto;
+{indentation}height: auto;
+{indentation}padding: 0;
+{indentation}margin: 0;
+{indentation}overflow: visible;
+{indentation}clip: auto;
+{indentation}white-space: normal;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),

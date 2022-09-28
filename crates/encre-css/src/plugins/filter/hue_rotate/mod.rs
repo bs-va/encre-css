@@ -5,7 +5,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{format_negative, indent, value_matchers::is_matching_angle},
+    utils::{format_negative, value_matchers::is_matching_angle},
 };
 
 use std::fmt::{self, Write};
@@ -25,22 +25,20 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { is_negative, value } => writeln!(
-                context.buffer,
-                "--en-hue-rotate: hue-rotate({}{}deg);",
+                buffer,
+                "{indentation}--en-hue-rotate: hue-rotate({}{}deg);",
                 format_negative(is_negative),
                 value
             )?,
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "--en-hue-rotate: hue-rotate({value});")?;
+                writeln!(buffer, "{indentation}--en-hue-rotate: hue-rotate({value});")?;
             }
         }
 
-        indent(context.indentation, context.buffer)?;
-        writeln!(context.buffer, "{}", CSS_FILTER)?;
+        writeln!(buffer, "{indentation}{}", CSS_FILTER)?;
 
         Ok(())
     }

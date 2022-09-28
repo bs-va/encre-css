@@ -1097,12 +1097,11 @@ impl Config {
     ///         }
     ///     }
     ///
-    ///     fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-    ///         indent(context.indentation, context.buffer)?;
-    ///         match context.modifier {
+    ///     fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+    ///         match modifier {
     ///             Modifier::Builtin { value, .. } => match *value {
-    ///                 "" => writeln!(context.buffer, "color: #333;"),
-    ///                 "invert" => writeln!(context.buffer, "color: #eee;"),
+    ///                 "" => writeln!(buffer, "{indentation}color: #333;"),
+    ///                 "invert" => writeln!(buffer, "{indentation}color: #eee;"),
     ///                 _ => unreachable!(),
     ///             },
     ///             Modifier::Arbitrary { .. } => unreachable!(),

@@ -4,7 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{color, indent, value_matchers::is_matching_color},
+    utils::{color, value_matchers::is_matching_color},
 };
 
 use std::fmt::{self, Write};
@@ -18,23 +18,21 @@ fn color_can_handle(context: &mut ContextCanHandle) -> bool {
     }
 }
 
-fn color_handle(css_props: &[&str], context: &mut ContextHandle) -> fmt::Result {
-    indent(context.indentation, context.buffer)?;
-    match context.modifier {
+fn color_handle(css_props: &[&str], ContextHandle { config, modifier, indentation, buffer, .. }: &mut ContextHandle) -> fmt::Result {
+    match modifier {
         Modifier::Builtin { value, .. } => {
-            let color = color::get(context.config, value, Some("--en-border-opacity")).unwrap();
+            let color = color::get(config, value, Some("--en-border-opacity")).unwrap();
             if color.contains("--en-border-opacity") {
-                writeln!(context.buffer, "--en-border-opacity: 1;")?;
-                indent(context.indentation, context.buffer)?;
+                writeln!(buffer, "{indentation}--en-border-opacity: 1;")?;
             }
 
             for css_prop in css_props {
-                writeln!(context.buffer, "{css_prop}: {color};")?;
+                writeln!(buffer, "{indentation}{css_prop}: {color};")?;
             }
         }
         Modifier::Arbitrary { value, .. } => {
             for css_prop in css_props {
-                writeln!(context.buffer, "{css_prop}: {value};")?;
+                writeln!(buffer, "{indentation}{css_prop}: {value};")?;
             }
         }
     }

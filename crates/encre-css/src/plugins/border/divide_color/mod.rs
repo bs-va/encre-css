@@ -4,7 +4,7 @@ use crate::{
     generator::{generate_at_rules, generate_class, ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{color, indent, value_matchers::is_matching_color},
+    utils::{color, value_matchers::is_matching_color},
 };
 
 use std::fmt::{self, Write};
@@ -36,22 +36,20 @@ impl Plugin for PluginDefinition {
         generate_at_rules(context, |context| {
             generate_class(
                 context,
-                |context| {
-                    indent(context.indentation, context.buffer)?;
-                    match context.modifier {
+                |ContextHandle { modifier, indentation, buffer, config, .. }: &mut ContextHandle| {
+                    match modifier {
                         Modifier::Builtin { value, .. } => {
                             let color =
-                                color::get(context.config, value, Some("--en-divide-opacity"))
+                                color::get(config, value, Some("--en-divide-opacity"))
                                     .unwrap();
                             if color.contains("--en-divide-opacity") {
-                                writeln!(context.buffer, "--en-divide-opacity: 1;")?;
-                                indent(context.indentation, context.buffer)?;
+                                writeln!(buffer, "{indentation}--en-divide-opacity: 1;")?;
                             }
 
-                            writeln!(context.buffer, "border-color: {color};")?;
+                            writeln!(buffer, "{indentation}border-color: {color};")?;
                         }
                         Modifier::Arbitrary { value, .. } => {
-                            writeln!(context.buffer, "border-color: {value};")?;
+                            writeln!(buffer, "{indentation}border-color: {value};")?;
                         }
                     }
 

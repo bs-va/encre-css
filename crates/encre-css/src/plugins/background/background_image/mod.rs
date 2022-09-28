@@ -4,7 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{indent, value_matchers::is_matching_image},
+    utils::value_matchers::is_matching_image,
 };
 use std::fmt::{self, Write};
 
@@ -36,47 +36,46 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "none" => writeln!(context.buffer, "background-image: none;")?,
+                "none" => writeln!(buffer, "background-image: none;")?,
                 "gradient-to-t" => writeln!(
-                    context.buffer,
-                    "background-image: linear-gradient(to top, var(--en-gradient-stops));"
+                    buffer,
+                    "{indentation}background-image: linear-gradient(to top, var(--en-gradient-stops));"
                 )?,
                 "gradient-to-tr" => writeln!(
-                    context.buffer,
-                    "background-image: linear-gradient(to top right, var(--en-gradient-stops));"
+                    buffer,
+                    "{indentation}background-image: linear-gradient(to top right, var(--en-gradient-stops));"
                 )?,
                 "gradient-to-r" => writeln!(
-                    context.buffer,
-                    "background-image: linear-gradient(to right, var(--en-gradient-stops));"
+                    buffer,
+                    "{indentation}background-image: linear-gradient(to right, var(--en-gradient-stops));"
                 )?,
                 "gradient-to-br" => writeln!(
-                    context.buffer,
-                    "background-image: linear-gradient(to bottom right, var(--en-gradient-stops));"
+                    buffer,
+                    "{indentation}background-image: linear-gradient(to bottom right, var(--en-gradient-stops));"
                 )?,
                 "gradient-to-b" => writeln!(
-                    context.buffer,
-                    "background-image: linear-gradient(to bottom, var(--en-gradient-stops));"
+                    buffer,
+                    "{indentation}background-image: linear-gradient(to bottom, var(--en-gradient-stops));"
                 )?,
                 "gradient-to-bl" => writeln!(
-                    context.buffer,
-                    "background-image: linear-gradient(to bottom left, var(--en-gradient-stops));"
+                    buffer,
+                    "{indentation}background-image: linear-gradient(to bottom left, var(--en-gradient-stops));"
                 )?,
                 "gradient-to-l" => writeln!(
-                    context.buffer,
-                    "background-image: linear-gradient(to left, var(--en-gradient-stops));"
+                    buffer,
+                    "{indentation}background-image: linear-gradient(to left, var(--en-gradient-stops));"
                 )?,
                 "gradient-to-tl" => writeln!(
-                    context.buffer,
-                    "background-image: linear-gradient(to top left, var(--en-gradient-stops));"
+                    buffer,
+                    "{indentation}background-image: linear-gradient(to top left, var(--en-gradient-stops));"
                 )?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "background-image: {value};")?;
+                writeln!(buffer, "{indentation}background-image: {value};")?;
             }
         }
 

@@ -3,7 +3,6 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
 };
 
 use std::fmt::{self, Write};
@@ -23,17 +22,14 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
                 "normal" => {
-                    writeln!(context.buffer, "overflow-wrap: normal;")?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "word-break: normal;")?;
+                    writeln!(buffer, "{indentation}overflow-wrap: normal;\n{indentation}word-break: normal;")?;
                 }
-                "words" => writeln!(context.buffer, "overflow-wrap: break-word;")?,
-                "all" => writeln!(context.buffer, "word-break: break-all;")?,
+                "words" => writeln!(buffer, "{indentation}overflow-wrap: break-word;")?,
+                "all" => writeln!(buffer, "{indentation}word-break: break-all;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),

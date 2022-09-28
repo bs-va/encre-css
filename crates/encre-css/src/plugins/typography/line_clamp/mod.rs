@@ -4,7 +4,6 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
 };
 
 use std::fmt::{self, Write};
@@ -24,20 +23,16 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => {
                 if *value == "none" {
-                    writeln!(context.buffer, "-webkit-line-clamp: unset;")
+                    writeln!(buffer, "{indentation}-webkit-line-clamp: unset;")
                 } else {
-                    writeln!(context.buffer, "overflow: hidden;")?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "display: -webkit-box;")?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "-webkit-box-orient: vertical;")?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "-webkit-line-clamp: {value};")
+                    writeln!(buffer, "{indentation}overflow: hidden;
+{indentation}display: -webkit-box;
+{indentation}-webkit-box-orient: vertical;
+{indentation}-webkit-line-clamp: {value};")
                 }
             }
             Modifier::Arbitrary { .. } => unreachable!(),

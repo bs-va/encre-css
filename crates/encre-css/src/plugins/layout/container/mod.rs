@@ -7,7 +7,7 @@ use crate::{
     },
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
+    utils::{indent, unindent},
 };
 
 use std::{
@@ -37,9 +37,8 @@ impl Plugin for PluginDefinition {
 
     fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
         if let Modifier::Builtin { .. } = context.modifier {
-            generate_wrapper(context, |context| {
-                indent(context.indentation, context.buffer)?;
-                writeln!(context.buffer, "width: 100%;")
+            generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
+                writeln!(buffer, "{indentation}width: 100%;")
             })?;
 
             write!(context.buffer, "\n\n")?;
@@ -47,8 +46,7 @@ impl Plugin for PluginDefinition {
             let mut first_child = true;
 
             generate_at_rules(context, |context| {
-                let mut screens = context
-                    .config
+                let mut screens = context.config
                     .theme
                     .screens
                     .iter()
@@ -92,43 +90,41 @@ impl Plugin for PluginDefinition {
                 for (_, screen) in &screens {
                     if first_child {
                         first_child = false;
-                    } else if context.indentation == 0 {
+                    } else if context.indentation.is_empty() {
                         write!(context.buffer, "\n\n")?;
                     } else {
                         writeln!(context.buffer)?;
                     }
 
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "@media (min-width: {screen}) {{")?;
-                    context.indentation += 1;
+                    writeln!(context.buffer, "{}@media (min-width: {screen}) {{", context.indentation)?;
+                    indent(&mut context.indentation);
 
                     generate_class(
                         context,
-                        |context| {
-                            indent(context.indentation, context.buffer)?;
-                            writeln!(context.buffer, "max-width: {screen};")
+                        |ContextHandle { indentation, buffer, .. }| {
+                            writeln!(buffer, "{indentation}max-width: {screen};")
                         },
                         "",
                     )?;
 
-                    context.indentation -= 1;
-                    if context.indentation == 0 {
-                        write!(context.buffer, "}}")?;
+                    let ContextHandle { indentation, buffer, .. } = context;
+                    unindent(indentation);
+                    if indentation.is_empty() {
+                        write!(buffer, "}}")?;
                     } else {
-                        indent(context.indentation, context.buffer)?;
-                        writeln!(context.buffer, "}}")?;
+                        writeln!(buffer, "{indentation}}}")?;
                     }
                 }
 
                 // After rule
-                while context.indentation > 0 {
-                    context.indentation -= 1;
+                let ContextHandle { indentation, buffer, .. } = context;
+                while !indentation.is_empty() {
+                    unindent(indentation);
 
-                    if context.indentation == 0 {
-                        write!(context.buffer, "}}")?;
+                    if indentation.is_empty() {
+                        write!(buffer, "}}")?;
                     } else {
-                        indent(context.indentation, context.buffer)?;
-                        writeln!(context.buffer, "}}")?;
+                        writeln!(buffer, "{indentation}}}")?;
                     }
                 }
 

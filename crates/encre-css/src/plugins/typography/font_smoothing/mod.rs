@@ -4,7 +4,6 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
 };
 
 use std::fmt::{self, Write};
@@ -22,19 +21,14 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
                 "antialised" => {
-                    writeln!(context.buffer, "-webkit-font-smoothing: antialiased;")?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "-moz-osx-font-smoothing: grayscale;")?;
+                    writeln!(buffer, "{indentation}-webkit-font-smoothing: antialiased;\n{indentation}-moz-osx-font-smoothing: grayscale;")?;
                 }
                 "subpixel-antialised" => {
-                    writeln!(context.buffer, "-webkit-font-smoothing: auto;")?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "-moz-osx-font-smoothing: auto;")?;
+                    writeln!(buffer, "{indentation}-webkit-font-smoothing: auto;\n{indentation}-moz-osx-font-smoothing: auto;")?;
                 }
                 _ => unreachable!(),
             },

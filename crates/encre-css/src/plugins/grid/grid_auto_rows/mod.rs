@@ -4,7 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{indent, value_matchers::is_matching_all},
+    utils::value_matchers::is_matching_all,
 };
 
 use std::fmt::{self, Write};
@@ -24,18 +24,17 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "auto" => writeln!(context.buffer, "grid-auto-rows: auto;")?,
-                "min" => writeln!(context.buffer, "grid-auto-rows: min-content;")?,
-                "max" => writeln!(context.buffer, "grid-auto-rows: max-content;")?,
-                "fr" => writeln!(context.buffer, "grid-auto-rows: minmax(0, 1fr);")?,
+                "auto" => writeln!(buffer, "{indentation}grid-auto-rows: auto;")?,
+                "min" => writeln!(buffer, "{indentation}grid-auto-rows: min-content;")?,
+                "max" => writeln!(buffer, "{indentation}grid-auto-rows: max-content;")?,
+                "fr" => writeln!(buffer, "{indentation}grid-auto-rows: minmax(0, 1fr);")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "grid-auto-rows: {value};")?;
+                writeln!(buffer, "{indentation}grid-auto-rows: {value};")?;
             }
         }
 

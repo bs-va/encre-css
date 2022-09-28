@@ -5,7 +5,7 @@ use crate::{
     plugins::Plugin,
     selector::Modifier,
     utils::{
-        indent, spacing,
+        spacing,
         value_matchers::{is_matching_length, is_matching_number, is_matching_percentage},
     },
 };
@@ -35,24 +35,23 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { is_negative, value } => match *value {
-                "none" => writeln!(context.buffer, "line-height: 1;")?,
-                "tight" => writeln!(context.buffer, "line-height: 1.25;")?,
-                "snug" => writeln!(context.buffer, "line-height: 1.375;")?,
-                "normal" => writeln!(context.buffer, "line-height: 1.5;")?,
-                "relaxed" => writeln!(context.buffer, "line-height: 1.625;")?,
-                "loose" => writeln!(context.buffer, "line-height: 2;")?,
+                "none" => writeln!(buffer, "{indentation}line-height: 1;")?,
+                "tight" => writeln!(buffer, "{indentation}line-height: 1.25;")?,
+                "snug" => writeln!(buffer, "{indentation}line-height: 1.375;")?,
+                "normal" => writeln!(buffer, "{indentation}line-height: 1.5;")?,
+                "relaxed" => writeln!(buffer, "{indentation}line-height: 1.625;")?,
+                "loose" => writeln!(buffer, "{indentation}line-height: 2;")?,
                 _ => writeln!(
-                    context.buffer,
-                    "line-height: {};",
+                    buffer,
+                    "{indentation}line-height: {};",
                     spacing::get(value, *is_negative).unwrap()
                 )?,
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "line-height: {value};")?;
+                writeln!(buffer, "{indentation}line-height: {value};")?;
             }
         }
 

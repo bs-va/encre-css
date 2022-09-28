@@ -4,7 +4,6 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
 };
 
 use std::fmt::{self, Write};
@@ -38,22 +37,21 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "auto" => writeln!(context.buffer, "overflow: auto;")?,
-                "x-auto" => writeln!(context.buffer, "overflow-x: auto;")?,
-                "y-auto" => writeln!(context.buffer, "overflow-y: auto;")?,
-                "hidden" => writeln!(context.buffer, "overflow: hidden;")?,
-                "x-hidden" => writeln!(context.buffer, "overflow-x: hidden;")?,
-                "y-hidden" => writeln!(context.buffer, "overflow-y: hidden;")?,
-                "visible" => writeln!(context.buffer, "overflow: visible;")?,
-                "x-visible" => writeln!(context.buffer, "overflow-x: visible;")?,
-                "y-visible" => writeln!(context.buffer, "overflow-y: visible;")?,
-                "scroll" => writeln!(context.buffer, "overflow: scroll;")?,
-                "x-scroll" => writeln!(context.buffer, "overflow-x: scroll;")?,
-                "y-scroll" => writeln!(context.buffer, "overflow-y: scroll;")?,
+                "auto" => writeln!(buffer, "{indentation}overflow: auto;")?,
+                "x-auto" => writeln!(buffer, "{indentation}overflow-x: auto;")?,
+                "y-auto" => writeln!(buffer, "{indentation}overflow-y: auto;")?,
+                "hidden" => writeln!(buffer, "{indentation}overflow: hidden;")?,
+                "x-hidden" => writeln!(buffer, "{indentation}overflow-x: hidden;")?,
+                "y-hidden" => writeln!(buffer, "{indentation}overflow-y: hidden;")?,
+                "visible" => writeln!(buffer, "{indentation}overflow: visible;")?,
+                "x-visible" => writeln!(buffer, "{indentation}overflow-x: visible;")?,
+                "y-visible" => writeln!(buffer, "{indentation}overflow-y: visible;")?,
+                "scroll" => writeln!(buffer, "{indentation}overflow: scroll;")?,
+                "x-scroll" => writeln!(buffer, "{indentation}overflow-x: scroll;")?,
+                "y-scroll" => writeln!(buffer, "{indentation}overflow-y: scroll;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),

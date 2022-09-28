@@ -4,7 +4,6 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
 };
 
 use std::fmt::{self, Write};
@@ -22,19 +21,16 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
                 "truncate" => {
-                    writeln!(context.buffer, "overflow: hidden;")?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "text-overflow: ellipsis;")?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "white-space: nowrap;")?;
+                    writeln!(buffer, "{indentation}overflow: hidden;
+{indentation}text-overflow: ellipsis;
+{indentation}white-space: nowrap;")?;
                 }
-                "text-ellipsis" => writeln!(context.buffer, "text-overflow: ellipsis;")?,
-                "text-clip" => writeln!(context.buffer, "text-overflow: clip;")?,
+                "text-ellipsis" => writeln!(buffer, "{indentation}text-overflow: ellipsis;")?,
+                "text-clip" => writeln!(buffer, "{indentation}text-overflow: clip;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),

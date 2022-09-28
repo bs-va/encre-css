@@ -4,10 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{
-        indent,
-        value_matchers::{is_matching_length, is_matching_line_width},
-    },
+    utils::value_matchers::{is_matching_length, is_matching_line_width},
 };
 
 use std::fmt::{self, Write};
@@ -22,14 +19,13 @@ fn width_can_handle(context: &mut ContextCanHandle) -> bool {
     }
 }
 
-fn width_handle(css_properties: &[&str], context: &mut ContextHandle) -> fmt::Result {
-    match context.modifier {
+fn width_handle(css_properties: &[&str], ContextHandle { modifier, indentation, buffer, .. }: &mut ContextHandle) -> fmt::Result {
+    match modifier {
         Modifier::Builtin { value, .. } => {
             for css_prop in css_properties {
-                indent(context.indentation, context.buffer)?;
                 writeln!(
-                    context.buffer,
-                    "{}: {}px;",
+                    buffer,
+                    "{indentation}{}: {}px;",
                     css_prop,
                     if value.is_empty() { "1" } else { value }
                 )?;
@@ -37,8 +33,7 @@ fn width_handle(css_properties: &[&str], context: &mut ContextHandle) -> fmt::Re
         }
         Modifier::Arbitrary { value, .. } => {
             for css_prop in css_properties {
-                indent(context.indentation, context.buffer)?;
-                writeln!(context.buffer, "{css_prop}: {value};")?;
+                writeln!(buffer, "{indentation}{css_prop}: {value};")?;
             }
         }
     }

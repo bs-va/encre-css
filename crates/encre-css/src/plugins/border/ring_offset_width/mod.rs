@@ -4,7 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{indent, value_matchers::is_matching_length},
+    utils::value_matchers::is_matching_length,
 };
 
 use std::fmt::{self, Write};
@@ -26,16 +26,14 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        writeln!(context.buffer, "--en-ring-offset-shadow: var(--en-ring-inset) 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color);")?;
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        writeln!(buffer, "{indentation}--en-ring-offset-shadow: var(--en-ring-inset) 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color);")?;
+        match modifier {
             Modifier::Builtin { value, .. } => {
-                writeln!(context.buffer, "--en-ring-offset-width: {value}px;")?;
+                writeln!(buffer, "{indentation}--en-ring-offset-width: {value}px;")?;
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "--en-ring-offset-width: {value};",)?;
+                writeln!(buffer, "{indentation}--en-ring-offset-width: {value};",)?;
             }
         }
 

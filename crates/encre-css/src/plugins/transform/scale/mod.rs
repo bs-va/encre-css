@@ -5,7 +5,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{format_negative, indent},
+    utils::format_negative,
 };
 
 use std::fmt::{self, Write};
@@ -17,16 +17,14 @@ fn scale_can_handle(context: &mut ContextCanHandle) -> bool {
     }
 }
 
-fn scale_handle(css_properties: &[&str], context: &mut ContextHandle) -> fmt::Result {
-    match context.modifier {
+fn scale_handle(css_properties: &[&str], ContextHandle { modifier, indentation, buffer, .. }: &mut ContextHandle) -> fmt::Result {
+    match modifier {
         Modifier::Builtin { is_negative, value } => {
             for css_prop in css_properties {
-                indent(context.indentation, context.buffer)?;
-
                 #[allow(clippy::cast_precision_loss)]
                 writeln!(
-                    context.buffer,
-                    "{}: {}{};",
+                    buffer,
+                    "{indentation}{}: {}{};",
                     css_prop,
                     format_negative(is_negative),
                     value.parse::<usize>().unwrap() as f32 / 100.,
@@ -36,8 +34,7 @@ fn scale_handle(css_properties: &[&str], context: &mut ContextHandle) -> fmt::Re
         Modifier::Arbitrary { .. } => unreachable!(),
     }
 
-    indent(context.indentation, context.buffer)?;
-    writeln!(context.buffer, "{}", CSS_TRANSFORM)?;
+    writeln!(buffer, "{indentation}{}", CSS_TRANSFORM)?;
     Ok(())
 }
 

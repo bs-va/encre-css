@@ -104,14 +104,13 @@ pub mod typography;
 ///         }
 ///     }
 ///
-///     fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-///         indent(context.indentation, context.buffer)?;
-///         match context.modifier {
+///     fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+///         match modifier {
 ///             Modifier::Builtin { value, .. } => {
-///                 writeln!(context.buffer, "stroke-width: {value}px;")?;
+///                 writeln!(buffer, "{indentation}stroke-width: {value}px;")?;
 ///             }
 ///             Modifier::Arbitrary { value, .. } => {
-///                 writeln!(context.buffer, "stroke-width: {value};")?;
+///                 writeln!(buffer, "{indentation}stroke-width: {value};")?;
 ///             }
 ///         }
 ///
@@ -173,35 +172,34 @@ pub mod typography;
 ///     fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
 ///         match context.modifier {
 ///             Modifier::Builtin { value, .. } => {
+///                 let ContextHandle { modifier, buffer, indentation, .. } = context;
 ///                 let animation = match *value {
 ///                     "none" => "none",
 ///                     "spin" => {
-///                         writeln!(context.buffer, "@keyframes spin...")?;
+///                         writeln!(buffer, "{indentation}@keyframes spin...")?;
 ///                         "spin 1s linear infinite"
 ///                     }
 ///                     "ping" => {
-///                         writeln!(context.buffer, "@keyframes ping...")?;
+///                         writeln!(buffer, "{indentation}@keyframes ping...")?;
 ///                         "ping 1s cubic-bezier(0, 0, 0.2, 1) infinite"
 ///                     }
 ///                     "pulse" => {
-///                         writeln!(context.buffer, "@keyframes pulse...")?;
+///                         writeln!(buffer, "{indentation}@keyframes pulse...")?;
 ///                         "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite"
 ///                     }
 ///                     "bounce" => {
-///                         writeln!(context.buffer, "@keyframes bounce...")?;
+///                         writeln!(buffer, "{indentation}@keyframes bounce...")?;
 ///                         "bounce 1s infinite"
 ///                     }
 ///                     _ => unreachable!(),
 ///                 };
 ///
-///                 generate_wrapper(context, |context| {
-///                     indent(context.indentation, context.buffer)?;
-///                     writeln!(context.buffer, "animation: {animation};")
+///                 generate_wrapper(context, |ContextHandle { buffer, indentation, .. }| {
+///                     writeln!(buffer, "{indentation}animation: {animation};")
 ///                 })
 ///             }
-///             Modifier::Arbitrary { value, .. } => generate_wrapper(context, |context| {
-///                 indent(context.indentation, context.buffer)?;
-///                 writeln!(context.buffer, "animation: {value};")
+///             Modifier::Arbitrary { value, .. } => generate_wrapper(context, |ContextHandle { buffer, indentation, .. }| {
+///                 writeln!(buffer, "{indentation}animation: {value};")
 ///             }),
 ///         }
 ///     }

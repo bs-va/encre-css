@@ -4,7 +4,6 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
 };
 
 use std::fmt::{self, Write};
@@ -42,26 +41,25 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "normal" => writeln!(context.buffer, "background-blend-mode: normal;")?,
-                "multiply" => writeln!(context.buffer, "background-blend-mode: multiply;")?,
-                "screen" => writeln!(context.buffer, "background-blend-mode: screen;")?,
-                "overlay" => writeln!(context.buffer, "background-blend-mode: overlay;")?,
-                "darken" => writeln!(context.buffer, "background-blend-mode: darken;")?,
-                "lighten" => writeln!(context.buffer, "background-blend-mode: lighten;")?,
-                "color-dodge" => writeln!(context.buffer, "background-blend-mode: color-dodge;")?,
-                "color-burn" => writeln!(context.buffer, "background-blend-mode: color-burn;")?,
-                "hard-light" => writeln!(context.buffer, "background-blend-mode: hard-light;")?,
-                "soft-light" => writeln!(context.buffer, "background-blend-mode: soft-light;")?,
-                "difference" => writeln!(context.buffer, "background-blend-mode: difference;")?,
-                "exclusion" => writeln!(context.buffer, "background-blend-mode: exclusion;")?,
-                "hue" => writeln!(context.buffer, "background-blend-mode: hue;")?,
-                "saturation" => writeln!(context.buffer, "background-blend-mode: saturation;")?,
-                "color" => writeln!(context.buffer, "background-blend-mode: color;")?,
-                "luminosity" => writeln!(context.buffer, "background-blend-mode: luminosity;")?,
+                "normal" => writeln!(buffer, "{indentation}background-blend-mode: normal;")?,
+                "multiply" => writeln!(buffer, "{indentation}background-blend-mode: multiply;")?,
+                "screen" => writeln!(buffer, "{indentation}background-blend-mode: screen;")?,
+                "overlay" => writeln!(buffer, "{indentation}background-blend-mode: overlay;")?,
+                "darken" => writeln!(buffer, "{indentation}background-blend-mode: darken;")?,
+                "lighten" => writeln!(buffer, "{indentation}background-blend-mode: lighten;")?,
+                "color-dodge" => writeln!(buffer, "{indentation}background-blend-mode: color-dodge;")?,
+                "color-burn" => writeln!(buffer, "{indentation}background-blend-mode: color-burn;")?,
+                "hard-light" => writeln!(buffer, "{indentation}background-blend-mode: hard-light;")?,
+                "soft-light" => writeln!(buffer, "{indentation}background-blend-mode: soft-light;")?,
+                "difference" => writeln!(buffer, "{indentation}background-blend-mode: difference;")?,
+                "exclusion" => writeln!(buffer, "{indentation}background-blend-mode: exclusion;")?,
+                "hue" => writeln!(buffer, "{indentation}background-blend-mode: hue;")?,
+                "saturation" => writeln!(buffer, "{indentation}background-blend-mode: saturation;")?,
+                "color" => writeln!(buffer, "{indentation}background-blend-mode: color;")?,
+                "luminosity" => writeln!(buffer, "{indentation}background-blend-mode: luminosity;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),

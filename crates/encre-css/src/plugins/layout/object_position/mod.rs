@@ -4,7 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{indent, value_matchers::is_matching_position},
+    utils::value_matchers::is_matching_position,
 };
 
 use std::fmt::{self, Write};
@@ -35,23 +35,22 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "bottom" => writeln!(context.buffer, "object-position: bottom;")?,
-                "center" => writeln!(context.buffer, "object-position: center;")?,
-                "left" => writeln!(context.buffer, "object-position: left;")?,
-                "left-bottom" => writeln!(context.buffer, "object-position: left bottom;")?,
-                "left-top" => writeln!(context.buffer, "object-position: left top;")?,
-                "right" => writeln!(context.buffer, "object-position: right;")?,
-                "right-bottom" => writeln!(context.buffer, "object-position: right bottom;")?,
-                "right-top" => writeln!(context.buffer, "object-position: right top;")?,
-                "top" => writeln!(context.buffer, "object-position: top;")?,
+                "bottom" => writeln!(buffer, "{indentation}object-position: bottom;")?,
+                "center" => writeln!(buffer, "{indentation}object-position: center;")?,
+                "left" => writeln!(buffer, "{indentation}object-position: left;")?,
+                "left-bottom" => writeln!(buffer, "{indentation}object-position: left bottom;")?,
+                "left-top" => writeln!(buffer, "{indentation}object-position: left top;")?,
+                "right" => writeln!(buffer, "{indentation}object-position: right;")?,
+                "right-bottom" => writeln!(buffer, "{indentation}object-position: right bottom;")?,
+                "right-top" => writeln!(buffer, "{indentation}object-position: right top;")?,
+                "top" => writeln!(buffer, "{indentation}object-position: top;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "object-position: {value};")?;
+                writeln!(buffer, "{indentation}object-position: {value};")?;
             }
         }
 

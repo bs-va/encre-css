@@ -5,7 +5,6 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
 };
 
 use std::fmt::{self, Write};
@@ -19,14 +18,13 @@ impl Plugin for CssPropertyPlugin {
         unreachable!();
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { .. } => unreachable!(),
             Modifier::Arbitrary { value, .. } => {
                 for line in value.lines() {
                     if let Some((prop, value)) = line.split_once(':') {
-                        indent(context.indentation, context.buffer)?;
-                        writeln!(context.buffer, "{prop}: {value};")?;
+                        writeln!(buffer, "{indentation}{prop}: {value};")?;
                     }
                 }
             }

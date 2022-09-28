@@ -5,7 +5,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{indent, value_matchers::is_matching_shadow},
+    utils::value_matchers::is_matching_shadow,
 };
 
 use std::fmt::{self, Write};
@@ -27,24 +27,22 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "" => writeln!(context.buffer, "--en-drop-shadow: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));")?,
-                "sm" => writeln!(context.buffer, "--en-drop-shadow: drop-shadow(0 1px 1px rgb(0 0 0 / 0.05));")?,
-                "md" => writeln!(context.buffer, "--en-drop-shadow: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));")?,
-                "lg" => writeln!(context.buffer, "--en-drop-shadow: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));")?,
-                "xl" => writeln!(context.buffer, "--en-drop-shadow: drop-shadow(0 20px 13px rgb(0 0 0 / 0.03)) drop-shadow(0 8px 5px rgb(0 0 0 / 0.08));")?,
-                "2xl" => writeln!(context.buffer, "--en-drop-shadow: drop-shadow(0 25px 25px rgb(0 0 0 / 0.15));")?,
-                "none" => writeln!(context.buffer, "--en-drop-shadow: drop-shadow(0 0 #0000);")?,
+                "" => writeln!(buffer, "{indentation}--en-drop-shadow: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));")?,
+                "sm" => writeln!(buffer, "{indentation}--en-drop-shadow: drop-shadow(0 1px 1px rgb(0 0 0 / 0.05));")?,
+                "md" => writeln!(buffer, "{indentation}--en-drop-shadow: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));")?,
+                "lg" => writeln!(buffer, "{indentation}--en-drop-shadow: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));")?,
+                "xl" => writeln!(buffer, "{indentation}--en-drop-shadow: drop-shadow(0 20px 13px rgb(0 0 0 / 0.03)) drop-shadow(0 8px 5px rgb(0 0 0 / 0.08));")?,
+                "2xl" => writeln!(buffer, "{indentation}--en-drop-shadow: drop-shadow(0 25px 25px rgb(0 0 0 / 0.15));")?,
+                "none" => writeln!(buffer, "{indentation}--en-drop-shadow: drop-shadow(0 0 #0000);")?,
                 _ => unreachable!(),
             }
-            Modifier::Arbitrary { value, .. } => writeln!(context.buffer, "--en-drop-shadow: drop-shadow({value});")?,
+            Modifier::Arbitrary { value, .. } => writeln!(buffer, "{indentation}--en-drop-shadow: drop-shadow({value});")?,
         }
 
-        indent(context.indentation, context.buffer)?;
-        writeln!(context.buffer, "{}", CSS_FILTER)?;
+        writeln!(buffer, "{indentation}{}", CSS_FILTER)?;
 
         Ok(())
     }

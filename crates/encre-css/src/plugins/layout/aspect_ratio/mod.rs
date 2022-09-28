@@ -4,7 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{indent, value_matchers::is_matching_all},
+    utils::value_matchers::is_matching_all,
 };
 
 use std::fmt::{self, Write};
@@ -24,18 +24,17 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "auto" => writeln!(context.buffer, "aspect-ratio: auto;")?,
-                "square" => writeln!(context.buffer, "aspect-ratio: 1 / 1;")?,
-                "video" => writeln!(context.buffer, "aspect-ratio: 16 / 9;")?,
+                "auto" => writeln!(buffer, "{indentation}aspect-ratio: auto;")?,
+                "square" => writeln!(buffer, "{indentation}aspect-ratio: 1 / 1;")?,
+                "video" => writeln!(buffer, "{indentation}aspect-ratio: 16 / 9;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => writeln!(
-                context.buffer,
-                "aspect-ratio: {};",
+                buffer,
+                "{indentation}aspect-ratio: {};",
                 value.replace('/', " / "),
             )?,
         }

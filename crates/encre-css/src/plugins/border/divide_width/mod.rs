@@ -4,10 +4,7 @@ use crate::{
     generator::{generate_at_rules, generate_class, ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{
-        indent,
-        value_matchers::{is_matching_length, is_matching_line_width},
-    },
+    utils::value_matchers::{is_matching_length, is_matching_line_width},
 };
 
 use std::fmt::{self, Write};
@@ -45,52 +42,34 @@ impl Plugin for PluginXDefinition {
         generate_at_rules(context, |context| {
             generate_class(
                 context,
-                |context| {
-                    indent(context.indentation, context.buffer)?;
-                    match context.modifier {
+                |ContextHandle { modifier, indentation, buffer, .. }| {
+                    match modifier {
                         Modifier::Builtin { value, .. } => {
                             if *value == "reverse" {
-                                return writeln!(context.buffer, "--en-divide-x-reverse: 1;");
+                                return writeln!(buffer, "{indentation}--en-divide-x-reverse: 1;");
                             }
 
-                            writeln!(context.buffer, "--en-divide-x-reverse: 0;")?;
-                            indent(context.indentation, context.buffer)?;
+                            writeln!(buffer, "{indentation}--en-divide-x-reverse: 0;")?;
 
                             if is_matching_line_width(value) {
-                                writeln!(context.buffer, "border-right-width: {value};")?;
-                                indent(context.indentation, context.buffer)?;
-                                writeln!(context.buffer, "border-left-width: {value};")?;
+                                writeln!(buffer, "{indentation}border-right-width: {value};\n{indentation}border-left-width: {value};")?;
                             } else {
                                 writeln!(
-                                    context.buffer,
-                                    "border-right-width: calc({}px * var(--en-divide-x-reverse));",
-                                    if value.is_empty() { "1" } else { value }
+                                    buffer,
+                                    "{indentation}border-right-width: calc({value}px * var(--en-divide-x-reverse));\n{indentation}border-left-width: calc({value}px * calc(1 - var(--en-divide-x-reverse)));",
+                                    value = if value.is_empty() { "1" } else { value }
                                 )?;
-                                indent(context.indentation, context.buffer)?;
-                                writeln!(
-                            context.buffer,
-                            "border-left-width: calc({}px * calc(1 - var(--en-divide-x-reverse)));",
-                            if value.is_empty() { "1" } else { value }
-                        )?;
                             }
                         }
                         Modifier::Arbitrary { value, .. } => {
-                            writeln!(context.buffer, "--en-divide-x-reverse: 0;")?;
-                            indent(context.indentation, context.buffer)?;
+                            writeln!(buffer, "{indentation}--en-divide-x-reverse: 0;")?;
 
                             if is_matching_line_width(value) {
-                                writeln!(context.buffer, "border-right-width: {value};")?;
-                                indent(context.indentation, context.buffer)?;
-                                writeln!(context.buffer, "border-left-width: {value};")?;
+                                writeln!(buffer, "{indentation}border-right-width: {value};\n{indentation}border-left-width: {value};")?;
                             } else {
                                 writeln!(
-                            context.buffer,
-                            "border-right-width: calc({value} * var(--en-divide-x-reverse));"
-                        )?;
-                                indent(context.indentation, context.buffer)?;
-                                writeln!(
-                            context.buffer,
-                            "border-left-width: calc({value} * calc(1 - var(--en-divide-x-reverse)));"
+                            buffer,
+                            "{indentation}border-right-width: calc({value} * var(--en-divide-x-reverse));\n{indentation}border-left-width: calc({value} * calc(1 - var(--en-divide-x-reverse)));"
                         )?;
                             }
                         }
@@ -124,52 +103,34 @@ impl Plugin for PluginYDefinition {
         generate_at_rules(context, |context| {
             generate_class(
                 context,
-                |context| {
-                    indent(context.indentation, context.buffer)?;
-                    match context.modifier {
+                |ContextHandle { modifier, indentation, buffer, .. }| {
+                    match modifier {
                         Modifier::Builtin { value, .. } => {
                             if *value == "reverse" {
-                                return writeln!(context.buffer, "--en-divide-y-reverse: 1;");
+                                return writeln!(buffer, "{indentation}--en-divide-y-reverse: 1;");
                             }
 
-                            writeln!(context.buffer, "--en-divide-y-reverse: 0;")?;
-                            indent(context.indentation, context.buffer)?;
+                            writeln!(buffer, "{indentation}--en-divide-y-reverse: 0;")?;
 
                             if is_matching_line_width(value) {
-                                writeln!(context.buffer, "border-top-width: {value};")?;
-                                indent(context.indentation, context.buffer)?;
-                                writeln!(context.buffer, "border-bottom-width: {value};")?;
+                                writeln!(buffer, "{indentation}border-top-width: {value};\n{indentation}border-bottom-width: {value};")?;
                             } else {
                                 writeln!(
-                            context.buffer,
-                            "border-top-width: calc({}px * calc(1 - var(--en-divide-y-reverse)));",
-                            if value.is_empty() { "1" } else { value }
+                            buffer,
+                            "{indentation}border-top-width: calc({value}px * calc(1 - var(--en-divide-y-reverse)));\n{indentation}border-bottom-width: calc({value}px * var(--en-divide-y-reverse));",
+                            value = if value.is_empty() { "1" } else { value }
                         )?;
-                                indent(context.indentation, context.buffer)?;
-                                writeln!(
-                                    context.buffer,
-                                    "border-bottom-width: calc({}px * var(--en-divide-y-reverse));",
-                                    if value.is_empty() { "1" } else { value }
-                                )?;
                             }
                         }
                         Modifier::Arbitrary { value, .. } => {
-                            writeln!(context.buffer, "--en-divide-y-reverse: 0;")?;
-                            indent(context.indentation, context.buffer)?;
+                            writeln!(buffer, "{indentation}--en-divide-y-reverse: 0;")?;
 
                             if is_matching_line_width(value) {
-                                writeln!(context.buffer, "border-top-width: {value};")?;
-                                indent(context.indentation, context.buffer)?;
-                                writeln!(context.buffer, "border-bottom-width: {value};")?;
+                                writeln!(buffer, "{indentation}border-top-width: {value};\n{indentation}border-bottom-width: {value};")?;
                             } else {
                                 writeln!(
-                            context.buffer,
-                            "border-top-width: calc({value} * calc(1 - var(--en-divide-y-reverse)));"
-                        )?;
-                                indent(context.indentation, context.buffer)?;
-                                writeln!(
-                            context.buffer,
-                            "border-bottom-width: calc({value} * var(--en-divide-y-reverse));"
+                            buffer,
+                            "{indentation}border-top-width: calc({value} * calc(1 - var(--en-divide-y-reverse)));\n{indentation}border-bottom-width: calc({value} * var(--en-divide-y-reverse));"
                         )?;
                             }
                         }

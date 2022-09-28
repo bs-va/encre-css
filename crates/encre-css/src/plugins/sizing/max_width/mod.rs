@@ -4,7 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{indent, spacing, value_matchers::is_matching_length},
+    utils::{spacing, value_matchers::is_matching_length},
 };
 
 use std::fmt::{self, Write};
@@ -53,41 +53,40 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { is_negative, value } => match *value {
-                "none" => writeln!(context.buffer, "max-width: none;")?,
-                "xs" => writeln!(context.buffer, "max-width: 20rem;")?,
-                "sm" => writeln!(context.buffer, "max-width: 24rem;")?,
-                "md" => writeln!(context.buffer, "max-width: 28rem;")?,
-                "lg" => writeln!(context.buffer, "max-width: 32rem;")?,
-                "xl" => writeln!(context.buffer, "max-width: 36rem;")?,
-                "2xl" => writeln!(context.buffer, "max-width: 42rem;")?,
-                "3xl" => writeln!(context.buffer, "max-width: 48rem;")?,
-                "4xl" => writeln!(context.buffer, "max-width: 56rem;")?,
-                "5xl" => writeln!(context.buffer, "max-width: 64rem;")?,
-                "6xl" => writeln!(context.buffer, "max-width: 72rem;")?,
-                "7xl" => writeln!(context.buffer, "max-width: 80rem;")?,
-                "full" => writeln!(context.buffer, "max-width: 100%;")?,
-                "min" => writeln!(context.buffer, "max-width: min-content;")?,
-                "max" => writeln!(context.buffer, "max-width: max-content;")?,
-                "fit" => writeln!(context.buffer, "max-width: fit-content;")?,
-                "prose" => writeln!(context.buffer, "max-width: 65ch;")?,
-                "screen" => writeln!(context.buffer, "max-width: 100vw;")?,
-                "screen-sm" => writeln!(context.buffer, "max-width: 640px;")?,
-                "screen-md" => writeln!(context.buffer, "max-width: 768px;")?,
-                "screen-lg" => writeln!(context.buffer, "max-width: 1024px;")?,
-                "screen-xl" => writeln!(context.buffer, "max-width: 1280px;")?,
-                "screen-2xl" => writeln!(context.buffer, "max-width: 1536px;")?,
+                "none" => writeln!(buffer, "{indentation}max-width: none;")?,
+                "xs" => writeln!(buffer, "{indentation}max-width: 20rem;")?,
+                "sm" => writeln!(buffer, "{indentation}max-width: 24rem;")?,
+                "md" => writeln!(buffer, "{indentation}max-width: 28rem;")?,
+                "lg" => writeln!(buffer, "{indentation}max-width: 32rem;")?,
+                "xl" => writeln!(buffer, "{indentation}max-width: 36rem;")?,
+                "2xl" => writeln!(buffer, "{indentation}max-width: 42rem;")?,
+                "3xl" => writeln!(buffer, "{indentation}max-width: 48rem;")?,
+                "4xl" => writeln!(buffer, "{indentation}max-width: 56rem;")?,
+                "5xl" => writeln!(buffer, "{indentation}max-width: 64rem;")?,
+                "6xl" => writeln!(buffer, "{indentation}max-width: 72rem;")?,
+                "7xl" => writeln!(buffer, "{indentation}max-width: 80rem;")?,
+                "full" => writeln!(buffer, "{indentation}max-width: 100%;")?,
+                "min" => writeln!(buffer, "{indentation}max-width: min-content;")?,
+                "max" => writeln!(buffer, "{indentation}max-width: max-content;")?,
+                "fit" => writeln!(buffer, "{indentation}max-width: fit-content;")?,
+                "prose" => writeln!(buffer, "{indentation}max-width: 65ch;")?,
+                "screen" => writeln!(buffer, "{indentation}max-width: 100vw;")?,
+                "screen-sm" => writeln!(buffer, "{indentation}max-width: 640px;")?,
+                "screen-md" => writeln!(buffer, "{indentation}max-width: 768px;")?,
+                "screen-lg" => writeln!(buffer, "{indentation}max-width: 1024px;")?,
+                "screen-xl" => writeln!(buffer, "{indentation}max-width: 1280px;")?,
+                "screen-2xl" => writeln!(buffer, "{indentation}max-width: 1536px;")?,
                 _ => writeln!(
-                    context.buffer,
+                    buffer,
                     "min-width: {};",
                     spacing::get(value, *is_negative).unwrap()
                 )?,
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "max-width: {value};")?;
+                writeln!(buffer, "{indentation}max-width: {value};")?;
             }
         }
 

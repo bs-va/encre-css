@@ -4,7 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{indent, value_matchers::is_matching_all},
+    utils::value_matchers::is_matching_all,
 };
 
 use std::fmt::{self, Write};
@@ -24,27 +24,26 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "linear" => writeln!(context.buffer, "transition-timing-function: linear;")?,
+                "linear" => writeln!(buffer, "{indentation}transition-timing-function: linear;")?,
                 "in" => writeln!(
-                    context.buffer,
-                    "transition-timing-function: cubic-bezier(0.4, 0, 1, 1);"
+                    buffer,
+                    "{indentation}transition-timing-function: cubic-bezier(0.4, 0, 1, 1);"
                 )?,
                 "out" => writeln!(
-                    context.buffer,
-                    "transition-timing-function: cubic-bezier(0, 0, 0.2, 1);"
+                    buffer,
+                    "{indentation}transition-timing-function: cubic-bezier(0, 0, 0.2, 1);"
                 )?,
                 "in-out" => writeln!(
-                    context.buffer,
-                    "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"
+                    buffer,
+                    "{indentation}transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"
                 )?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "transition-timing-function: {value};")?;
+                writeln!(buffer, "{indentation}transition-timing-function: {value};")?;
             }
         }
 

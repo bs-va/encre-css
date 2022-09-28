@@ -4,7 +4,6 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
 };
 
 use std::fmt::{self, Write};
@@ -22,13 +21,11 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => {
-                writeln!(context.buffer, "-webkit-text-decoration-line: {value};")?;
-                indent(context.indentation, context.buffer)?;
-                writeln!(context.buffer, "text-decoration-line: {value};")?;
+                writeln!(buffer, "{indentation}-webkit-text-decoration-line: {value};
+{indentation}text-decoration-line: {value};")?;
             }
             Modifier::Arbitrary { .. } => unreachable!(),
         }

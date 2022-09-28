@@ -4,7 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{indent, spacing, value_matchers::is_matching_length},
+    utils::{spacing, value_matchers::is_matching_length},
 };
 
 use std::fmt::{self, Write};
@@ -26,16 +26,15 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { is_negative, value } => writeln!(
-                context.buffer,
-                "gap: {};",
+                buffer,
+                "{indentation}gap: {};",
                 spacing::get(value, *is_negative).unwrap()
             )?,
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "gap: {value};")?;
+                writeln!(buffer, "{indentation}gap: {value};")?;
             }
         }
 
@@ -58,16 +57,15 @@ impl Plugin for PluginXDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { is_negative, value } => writeln!(
-                context.buffer,
-                "column-gap: {};",
+                buffer,
+                "{indentation}column-gap: {};",
                 spacing::get(value, *is_negative).unwrap()
             )?,
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "column-gap: {value};")?;
+                writeln!(buffer, "{indentation}column-gap: {value};")?;
             }
         }
 
@@ -90,16 +88,15 @@ impl Plugin for PluginYDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { is_negative, value } => writeln!(
-                context.buffer,
-                "row-gap: {};",
+                buffer,
+                "{indentation}row-gap: {};",
                 spacing::get(value, *is_negative).unwrap()
             )?,
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "row-gap: {value};")?;
+                writeln!(buffer, "{indentation}row-gap: {value};")?;
             }
         }
 

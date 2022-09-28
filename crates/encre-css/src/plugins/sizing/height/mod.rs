@@ -4,7 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{indent, spacing, value_matchers::is_matching_length},
+    utils::{spacing, value_matchers::is_matching_length},
 };
 
 use std::{
@@ -30,13 +30,12 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { is_negative, value } => {
                 writeln!(
-                    context.buffer,
-                    "height: {};",
+                    buffer,
+                    "{indentation}height: {};",
                     match *value {
                         "auto" => Cow::from("auto"),
                         "full" => Cow::from("100%"),
@@ -49,7 +48,7 @@ impl Plugin for PluginDefinition {
                 )?;
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "height: {value};")?;
+                writeln!(buffer, "{indentation}height: {value};")?;
             }
         }
 

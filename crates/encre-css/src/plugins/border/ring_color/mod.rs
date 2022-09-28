@@ -4,7 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{color, indent, value_matchers::is_matching_color},
+    utils::{color, value_matchers::is_matching_color},
 };
 
 use std::fmt::{self, Write};
@@ -28,20 +28,18 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, config, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => {
-                let color = color::get(context.config, value, Some("--en-ring-opacity")).unwrap();
+                let color = color::get(config, value, Some("--en-ring-opacity")).unwrap();
                 if color.contains("--en-ring-opacity") {
-                    writeln!(context.buffer, "--en-ring-opacity: 1;")?;
-                    indent(context.indentation, context.buffer)?;
+                    writeln!(buffer, "{indentation}--en-ring-opacity: 1;")?;
                 }
 
-                writeln!(context.buffer, "--en-ring-color: {color};")?;
+                writeln!(buffer, "{indentation}--en-ring-color: {color};")?;
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "--en-ring-color: {value};")?;
+                writeln!(buffer, "{indentation}--en-ring-color: {value};")?;
             }
         }
 

@@ -4,10 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{
-        indent,
-        value_matchers::{is_matching_length, is_matching_percentage},
-    },
+    utils::value_matchers::{is_matching_length, is_matching_percentage},
 };
 
 use std::fmt::{self, Write};
@@ -33,14 +30,13 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => {
-                writeln!(context.buffer, "stroke-width: {value}px;")?;
+                writeln!(buffer, "{indentation}stroke-width: {value}px;")?;
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "stroke-width: {value};")?;
+                writeln!(buffer, "{indentation}stroke-width: {value};")?;
             }
         }
 

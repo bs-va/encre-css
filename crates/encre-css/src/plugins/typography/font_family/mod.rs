@@ -4,7 +4,6 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
 };
 
 use std::fmt::{self, Write};
@@ -31,26 +30,25 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
                 "sans" => writeln!(
-                    context.buffer,
-                    r#"font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";"#
+                    buffer,
+                    r#"{indentation}font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";"#
                 )?,
                 "serif" => writeln!(
-                    context.buffer,
-                    r#"font-family: Georgia, Cambria, "Times New Roman", Times, serif;"#
+                    buffer,
+                    r#"{indentation}font-family: Georgia, Cambria, "Times New Roman", Times, serif;"#
                 )?,
                 "mono" => writeln!(
-                    context.buffer,
-                    r#"font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;"#
+                    buffer,
+                    r#"{indentation}font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;"#
                 )?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "font-family: {value};")?;
+                writeln!(buffer, "{indentation}font-family: {value};")?;
             }
         }
 

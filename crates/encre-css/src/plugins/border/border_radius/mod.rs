@@ -4,10 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{
-        indent,
-        value_matchers::{is_matching_length, is_matching_percentage},
-    },
+    utils::value_matchers::{is_matching_length, is_matching_percentage},
 };
 
 use std::fmt::{self, Write};
@@ -24,14 +21,13 @@ fn radius_can_handle(context: &mut ContextCanHandle) -> bool {
     }
 }
 
-fn radius_handle(css_properties: &[&str], context: &mut ContextHandle) -> fmt::Result {
-    match context.modifier {
+fn radius_handle(css_properties: &[&str], ContextHandle { modifier, indentation, buffer, .. }: &mut ContextHandle) -> fmt::Result {
+    match modifier {
         Modifier::Builtin { value, .. } => {
             for css_prop in css_properties {
-                indent(context.indentation, context.buffer)?;
                 writeln!(
-                    context.buffer,
-                    "{}: {};",
+                    buffer,
+                    "{indentation}{}: {};",
                     css_prop,
                     match *value {
                         "" => "0.25rem",
@@ -50,8 +46,7 @@ fn radius_handle(css_properties: &[&str], context: &mut ContextHandle) -> fmt::R
         }
         Modifier::Arbitrary { value, .. } => {
             for css_prop in css_properties {
-                indent(context.indentation, context.buffer)?;
-                writeln!(context.buffer, "{css_prop}: {value};")?;
+                writeln!(buffer, "{indentation}{css_prop}: {value};")?;
             }
         }
     }

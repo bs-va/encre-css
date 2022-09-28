@@ -4,7 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{indent, value_matchers::is_matching_position},
+    utils::value_matchers::is_matching_position,
 };
 use std::fmt::{self, Write};
 
@@ -38,23 +38,22 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "bottom" => writeln!(context.buffer, "background-position: bottom;")?,
-                "center" => writeln!(context.buffer, "background-position: center;")?,
-                "left" => writeln!(context.buffer, "background-position: left;")?,
-                "left-bottom" => writeln!(context.buffer, "background-position: left-bottom;")?,
-                "left-top" => writeln!(context.buffer, "background-position: left-top;")?,
-                "right" => writeln!(context.buffer, "background-position: right;")?,
-                "right-bottom" => writeln!(context.buffer, "background-position: right-bottom;")?,
-                "right-top" => writeln!(context.buffer, "background-position: right-top;")?,
-                "top" => writeln!(context.buffer, "background-position: top;")?,
+                "bottom" => writeln!(buffer, "{indentation}background-position: bottom;")?,
+                "center" => writeln!(buffer, "{indentation}background-position: center;")?,
+                "left" => writeln!(buffer, "{indentation}background-position: left;")?,
+                "left-bottom" => writeln!(buffer, "{indentation}background-position: left-bottom;")?,
+                "left-top" => writeln!(buffer, "{indentation}background-position: left-top;")?,
+                "right" => writeln!(buffer, "{indentation}background-position: right;")?,
+                "right-bottom" => writeln!(buffer, "{indentation}background-position: right-bottom;")?,
+                "right-top" => writeln!(buffer, "{indentation}background-position: right-top;")?,
+                "top" => writeln!(buffer, "{indentation}background-position: top;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "background-position: {value};")?;
+                writeln!(buffer, "{indentation}background-position: {value};")?;
             }
         }
 

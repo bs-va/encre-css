@@ -80,7 +80,6 @@ use encre_css::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
     Config,
 };
 use once_cell::sync::Lazy;
@@ -438,9 +437,8 @@ impl Plugin for Icons {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => {
                 let (collection, rest) = COLLECTIONS
                     .iter()
@@ -454,34 +452,23 @@ impl Plugin for Icons {
                 ) {
                     if icon_data_uri.contains("currentColor") {
                         // From https://codepen.io/noahblon/post/coloring-svgs-in-css-background-images
-                        writeln!(context.buffer, r#"--en-icon: url("{icon_data_uri}");"#)?;
-                        indent(context.indentation, context.buffer)?;
-                        writeln!(context.buffer, "mask: var(--en-icon) no-repeat;")?;
-                        indent(context.indentation, context.buffer)?;
-                        writeln!(context.buffer, "mask-size: 100% 100%;")?;
-                        indent(context.indentation, context.buffer)?;
-                        writeln!(context.buffer, "-webkit-mask: var(--en-icon) no-repeat;")?;
-                        indent(context.indentation, context.buffer)?;
-                        writeln!(context.buffer, "-webkit-mask-size: 100% 100%;")?;
-                        indent(context.indentation, context.buffer)?;
-                        writeln!(context.buffer, "background-color: currentColor;")?;
+                        writeln!(buffer, r#"{indentation}--en-icon: url("{icon_data_uri}");
+{indentation}mask: var(--en-icon) no-repeat;
+{indentation}mask-size: 100% 100%;
+{indentation}-webkit-mask: var(--en-icon) no-repeat;
+{indentation}-webkit-mask-size: 100% 100%;
+{indentation}background-color: currentColor;"#)?;
                     } else {
                         writeln!(
-                            context.buffer,
-                            r#"background: url("{icon_data_uri}") no-repeat center;"#
-                        )?;
-                        indent(context.indentation, context.buffer)?;
-                        writeln!(context.buffer, "background-color: transparent;")?;
-                        indent(context.indentation, context.buffer)?;
-                        writeln!(context.buffer, "background-size: 100% 100%;")?;
+                            buffer,
+                            r#"{indentation}background: url("{icon_data_uri}") no-repeat center;
+{indentation}background-color: transparent;
+{indentation}background-size: 100% 100%;"#)?;
                     }
 
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "display: inline-block;")?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "width: {width};")?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "height: {height};")?;
+                    writeln!(buffer, "{indentation}display: inline-block;
+{indentation}width: {width};
+{indentation}height: {height};")?;
                 }
             }
             Modifier::Arbitrary { .. } => unreachable!(),

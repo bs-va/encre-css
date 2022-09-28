@@ -4,7 +4,6 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
 };
 
 use std::fmt::{self, Write};
@@ -35,19 +34,18 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "auto" => writeln!(context.buffer, "overscroll-behavior: auto;")?,
-                "x-auto" => writeln!(context.buffer, "overscroll-behavior-x: auto;")?,
-                "y-auto" => writeln!(context.buffer, "overscroll-behavior-y: auto;")?,
-                "contain" => writeln!(context.buffer, "overscroll-behavior: contain;")?,
-                "x-contain" => writeln!(context.buffer, "overscroll-behavior-x: contain;")?,
-                "y-contain" => writeln!(context.buffer, "overscroll-behavior-y: contain;")?,
-                "none" => writeln!(context.buffer, "overscroll-behavior: none;")?,
-                "x-none" => writeln!(context.buffer, "overscroll-behavior-x: none;")?,
-                "y-none" => writeln!(context.buffer, "overscroll-behavior-y: none;")?,
+                "auto" => writeln!(buffer, "{indentation}overscroll-behavior: auto;")?,
+                "x-auto" => writeln!(buffer, "{indentation}overscroll-behavior-x: auto;")?,
+                "y-auto" => writeln!(buffer, "{indentation}overscroll-behavior-y: auto;")?,
+                "contain" => writeln!(buffer, "{indentation}overscroll-behavior: contain;")?,
+                "x-contain" => writeln!(buffer, "{indentation}overscroll-behavior-x: contain;")?,
+                "y-contain" => writeln!(buffer, "{indentation}overscroll-behavior-y: contain;")?,
+                "none" => writeln!(buffer, "{indentation}overscroll-behavior: none;")?,
+                "x-none" => writeln!(buffer, "{indentation}overscroll-behavior-x: none;")?,
+                "y-none" => writeln!(buffer, "{indentation}overscroll-behavior-y: none;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),

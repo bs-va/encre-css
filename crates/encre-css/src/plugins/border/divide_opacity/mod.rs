@@ -4,7 +4,6 @@ use crate::{
     generator::{generate_at_rules, generate_class, ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
 };
 
 use std::fmt::{self, Write};
@@ -32,13 +31,12 @@ impl Plugin for PluginDefinition {
         generate_at_rules(context, |context| {
             generate_class(
                 context,
-                |context| {
-                    indent(context.indentation, context.buffer)?;
-                    match context.modifier {
+                |ContextHandle { modifier, indentation, buffer, .. }| {
+                    match modifier {
                         #[allow(clippy::cast_precision_loss)]
                         Modifier::Builtin { value, .. } => writeln!(
-                            context.buffer,
-                            "--en-divide-opacity: {};",
+                            buffer,
+                            "{indentation}--en-divide-opacity: {};",
                             value.parse::<usize>().unwrap() as f32 / 100.,
                         )?,
                         Modifier::Arbitrary { .. } => unreachable!(),

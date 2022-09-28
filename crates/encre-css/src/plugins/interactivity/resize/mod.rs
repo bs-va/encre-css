@@ -4,7 +4,6 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::indent,
 };
 
 use std::fmt::{self, Write};
@@ -24,14 +23,13 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "" => writeln!(context.buffer, "resize: both;")?,
-                "none" => writeln!(context.buffer, "resize: none;")?,
-                "x" => writeln!(context.buffer, "resize: horizontal;")?,
-                "y" => writeln!(context.buffer, "resize: vertical;")?,
+                "" => writeln!(buffer, "{indentation}resize: both;")?,
+                "none" => writeln!(buffer, "{indentation}resize: none;")?,
+                "x" => writeln!(buffer, "{indentation}resize: horizontal;")?,
+                "y" => writeln!(buffer, "{indentation}resize: vertical;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),

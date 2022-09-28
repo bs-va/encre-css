@@ -4,7 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{indent, value_matchers::is_matching_all},
+    utils::value_matchers::is_matching_all,
 };
 
 use std::fmt::{self, Write};
@@ -33,75 +33,44 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
                 "" => {
-                    writeln!(context.buffer, "transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;")?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(
-                        context.buffer,
-                        "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"
-                    )?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "transition-duration: 150ms;")?;
+                    writeln!(buffer, "{indentation}transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+{indentation}transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+{indentation}transition-duration: 150ms;")?;
                 }
-                "none" => writeln!(context.buffer, "transition-property: none;")?,
+                "none" => writeln!(buffer, "{indentation}transition-property: none;")?,
                 "all" => {
-                    writeln!(context.buffer, "transition-property: all;")?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(
-                        context.buffer,
-                        "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"
-                    )?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "transition-duration: 150ms;")?;
+                    writeln!(buffer, "{indentation}transition-property: all;
+{indentation}transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+{indentation}transition-duration: 150ms;")?;
                 }
                 "colors" => {
-                    writeln!(context.buffer, "transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;")?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(
-                        context.buffer,
-                        "transition-timing-function: cubic-bezier(0.4, 0, 0);"
-                    )?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "transition-duration: 150ms;")?;
+                    writeln!(buffer, "{indentation}transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+{indentation}transition-timing-function: cubic-bezier(0.4, 0, 0);
+{indentation}transition-duration: 150ms;")?;
                 }
                 "opacity" => {
-                    writeln!(context.buffer, "transition-property: opacity;")?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(
-                        context.buffer,
-                        "transition-timing-function: cubic-bezier(0.4, 0, 0);"
-                    )?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "transition-duration: 150ms;")?;
+                    writeln!(buffer, "{indentation}transition-property: opacity;
+{indentation}transition-timing-function: cubic-bezier(0.4, 0, 0);
+{indentation}transition-duration: 150ms;")?;
                 }
                 "shadow" => {
-                    writeln!(context.buffer, "transition-property: box-shadow;")?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(
-                        context.buffer,
-                        "transition-timing-function: cubic-bezier(0.4, 0, 0);"
-                    )?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "transition-duration: 150ms;")?;
+                    writeln!(buffer, "{indentation}transition-property: box-shadow;
+{indentation}transition-timing-function: cubic-bezier(0.4, 0, 0);
+{indentation}transition-duration: 150ms;")?;
                 }
                 "transform" => {
-                    writeln!(context.buffer, "transition-property: transform;")?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(
-                        context.buffer,
-                        "transition-timing-function: cubic-bezier(0.4, 0, 0);"
-                    )?;
-                    indent(context.indentation, context.buffer)?;
-                    writeln!(context.buffer, "transition-duration: 150ms;")?;
+                    writeln!(buffer, "{indentation}transition-property: transform;
+{indentation}transition-timing-function: cubic-bezier(0.4, 0, 0);
+{indentation}transition-duration: 150ms;")?;
                 }
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "transition-property: {value};")?;
+                writeln!(buffer, "{indentation}transition-property: {value};")?;
             }
         }
 

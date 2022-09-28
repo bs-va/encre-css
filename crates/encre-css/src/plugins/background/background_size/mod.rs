@@ -4,10 +4,7 @@ use crate::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
-    utils::{
-        indent,
-        value_matchers::{is_matching_length, is_matching_percentage},
-    },
+    utils::value_matchers::{is_matching_length, is_matching_percentage},
 };
 use std::fmt::{self, Write};
 
@@ -37,17 +34,16 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        indent(context.indentation, context.buffer)?;
-        match context.modifier {
+    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
+        match modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "auto" => writeln!(context.buffer, "background-size: auto;")?,
-                "cover" => writeln!(context.buffer, "background-size: cover;")?,
-                "contain" => writeln!(context.buffer, "background-size: contain;")?,
+                "auto" => writeln!(buffer, "{indentation}background-size: auto;")?,
+                "cover" => writeln!(buffer, "{indentation}background-size: cover;")?,
+                "contain" => writeln!(buffer, "{indentation}background-size: contain;")?,
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(context.buffer, "background-size: {value};")?;
+                writeln!(buffer, "{indentation}background-size: {value};")?;
             }
         }
 
