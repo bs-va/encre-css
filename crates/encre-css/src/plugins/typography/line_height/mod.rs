@@ -1,16 +1,6 @@
 #![doc = include_str!("README.md")]
 #![doc(alias = "typography")]
-use crate::{
-    generator::{ContextCanHandle, ContextHandle},
-    plugins::Plugin,
-    selector::Modifier,
-    utils::{
-        spacing,
-        value_matchers::{is_matching_length, is_matching_number, is_matching_percentage},
-    },
-};
-
-use std::fmt::{self, Write};
+use crate::prelude::build_plugin::*;
 
 #[derive(Debug)]
 pub(crate) struct PluginDefinition;

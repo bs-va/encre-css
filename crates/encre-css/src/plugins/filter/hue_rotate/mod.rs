@@ -1,14 +1,7 @@
 #![doc = include_str!("README.md")]
 #![doc(alias = "filter")]
 use super::CSS_FILTER;
-use crate::{
-    generator::{ContextCanHandle, ContextHandle},
-    plugins::Plugin,
-    selector::Modifier,
-    utils::{format_negative, value_matchers::is_matching_angle},
-};
-
-use std::fmt::{self, Write};
+use crate::prelude::build_plugin::*;
 
 #[derive(Debug)]
 pub(crate) struct PluginDefinition;

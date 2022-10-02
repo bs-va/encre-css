@@ -1,13 +1,6 @@
 #![doc = include_str!("README.md")]
 #![doc(alias = "border")]
-use crate::{
-    generator::{ContextCanHandle, ContextHandle},
-    plugins::Plugin,
-    selector::Modifier,
-    utils::value_matchers::{is_matching_length, is_matching_line_width},
-};
-
-use std::fmt::{self, Write};
+use crate::prelude::build_plugin::*;
 
 fn width_can_handle(context: &mut ContextCanHandle) -> bool {
     match context.modifier {

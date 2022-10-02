@@ -1072,15 +1072,7 @@ impl Config {
     /// # Example
     ///
     /// ```rust
-    /// use encre_css::{
-    ///     Config,
-    ///     EncreGenerator,
-    ///     plugins::Plugin,
-    ///     selector::{VariantType, Modifier},
-    ///     generator::{ContextCanHandle, ContextHandle},
-    ///     utils::indent,
-    /// };
-    /// use std::fmt::{self, Write};
+    /// use encre_css::{Config, EncreGenerator, prelude::build_plugin::*};
     ///
     /// #[derive(Debug)]
     /// struct Prose;

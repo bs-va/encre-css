@@ -1,16 +1,8 @@
 #![doc = include_str!("README.md")]
 #![doc(alias("sizing", "size"))]
-use crate::{
-    generator::{ContextCanHandle, ContextHandle},
-    plugins::Plugin,
-    selector::Modifier,
-    utils::{spacing, value_matchers::is_matching_length},
-};
+use crate::prelude::build_plugin::*;
 
-use std::{
-    borrow::Cow,
-    fmt::{self, Write},
-};
+use std::borrow::Cow;
 
 #[derive(Debug)]
 pub(crate) struct PluginDefinition;

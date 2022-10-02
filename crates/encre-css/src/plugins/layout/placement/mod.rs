@@ -1,19 +1,8 @@
 #![doc = include_str!("README.md")]
 #![doc(alias = "layout")]
-use crate::{
-    generator::{ContextCanHandle, ContextHandle},
-    plugins::Plugin,
-    selector::Modifier,
-    utils::{
-        spacing,
-        value_matchers::{is_matching_length, is_matching_percentage},
-    },
-};
+use crate::prelude::build_plugin::*;
 
-use std::{
-    borrow::Cow,
-    fmt::{self, Write},
-};
+use std::borrow::Cow;
 
 fn placement_can_handle(context: &mut ContextCanHandle) -> bool {
     match context.modifier {

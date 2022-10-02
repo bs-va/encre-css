@@ -1,13 +1,6 @@
 #![doc = include_str!("README.md")]
 #![doc(alias = "effect")]
-use crate::{
-    generator::{ContextCanHandle, ContextHandle},
-    plugins::Plugin,
-    selector::Modifier,
-    utils::{shadow::ShadowList, value_matchers::is_matching_shadow},
-};
-
-use std::fmt::{self, Write};
+use crate::prelude::build_plugin::*;
 
 #[derive(Debug)]
 pub(crate) struct PluginDefinition;
@@ -71,7 +64,7 @@ impl Plugin for PluginDefinition {
             },
             Modifier::Arbitrary { value, .. } => {
                 writeln!(buffer, "{indentation}--en-shadow: {value};")?;
-                let mut shadow = ShadowList::parse(value).unwrap();
+                let mut shadow = shadow::ShadowList::parse(value).unwrap();
                 shadow.replace_all_colors("var(--en-shadow-color)");
                 writeln!(buffer, "{indentation}--en-shadow-colored: {};", shadow)?;
             }

@@ -72,19 +72,10 @@ pub mod typography;
 /// # Example (defines the `stroke-width` plugin)
 ///
 /// ```rust
-/// use encre_css::{
-///    generator::{ContextCanHandle, ContextHandle},
-///    plugins::Plugin,
-///    selector::Modifier,
-///    utils::{
-///        indent,
-///        value_matchers::{is_matching_length, is_matching_percentage},
-///    },
-/// };
-/// use std::fmt::{self, Write};
+/// use encre_css::prelude::build_plugin::*;
 ///
 /// #[derive(Debug)]
-/// pub struct StrokeWidth;
+/// struct StrokeWidth;
 ///
 /// impl Plugin for StrokeWidth {
 ///     fn namespace(&self) -> &str {
@@ -140,16 +131,10 @@ pub mod typography;
 /// ### Example (roughly defines the `animation` plugin)
 ///
 /// ```rust
-/// # use encre_css::{
-/// #     generator::generate_wrapper,
-/// #     generator::{ContextCanHandle, ContextHandle},
-/// #     plugins::Plugin,
-/// #     selector::Modifier,
-/// #     utils::{indent, value_matchers::is_matching_all},
-/// # };
-/// # use std::{fmt::{self, Write}};
+/// use encre_css::prelude::build_plugin::*;
+///
 /// #[derive(Debug)]
-/// pub(crate) struct PluginDefinition;
+/// struct PluginDefinition;
 ///
 /// impl Plugin for PluginDefinition {
 ///     fn namespace(&self) -> &str {

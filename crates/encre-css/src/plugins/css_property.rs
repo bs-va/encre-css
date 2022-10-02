@@ -1,13 +1,7 @@
 //! Define a plugin used to generate CSS properties quickly.
 //!
 //! Used for arbitrary CSS properties like `[mask-type:luminance]`.
-use crate::{
-    generator::{ContextCanHandle, ContextHandle},
-    plugins::Plugin,
-    selector::Modifier,
-};
-
-use std::fmt::{self, Write};
+use crate::prelude::build_plugin::*;
 
 #[derive(Debug)]
 pub(crate) struct CssPropertyPlugin;

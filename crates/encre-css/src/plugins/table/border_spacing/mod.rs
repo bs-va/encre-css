@@ -1,13 +1,6 @@
 #![doc = include_str!("README.md")]
 #![doc(alias = "table")]
-use crate::{
-    generator::{ContextCanHandle, ContextHandle},
-    plugins::Plugin,
-    selector::Modifier,
-    utils::{spacing, value_matchers::is_matching_length},
-};
-
-use std::fmt::{self, Write};
+use crate::prelude::build_plugin::*;
 
 fn border_spacing_can_handle(context: &mut ContextCanHandle) -> bool {
     match context.modifier {

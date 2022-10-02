@@ -1,16 +1,8 @@
 #![doc = include_str!("README.md")]
 #![doc(alias("spacing", "space"))]
-use crate::{
-    generator::{ContextCanHandle, ContextHandle},
-    plugins::Plugin,
-    selector::Modifier,
-    utils::{spacing, value_matchers::is_matching_length},
-};
+use crate::prelude::build_plugin::*;
 
-use std::{
-    borrow::Cow,
-    fmt::{self, Write},
-};
+use std::borrow::Cow;
 
 fn padding_can_handle(context: &mut ContextCanHandle) -> bool {
     match context.modifier {

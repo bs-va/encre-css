@@ -1,13 +1,6 @@
 #![doc = include_str!("README.md")]
 #![doc(alias("spacing", "space"))]
-use crate::{
-    generator::{generate_at_rules, generate_class, ContextCanHandle, ContextHandle},
-    plugins::Plugin,
-    selector::Modifier,
-    utils::{spacing, value_matchers::is_matching_length},
-};
-
-use std::fmt::{self, Write};
+use crate::prelude::build_plugin::*;
 
 #[derive(Debug)]
 pub(crate) struct PluginXDefinition;

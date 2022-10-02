@@ -220,3 +220,12 @@ pub use error::{Error, Result};
 pub use generator::EncreGenerator;
 pub use preflight::Preflight;
 pub use scanner::Scanner;
+
+/// Various helper preludes.
+pub mod prelude {
+    /// Prelude including all necessary structures, functions and modules used to build a new plugin.
+    pub mod build_plugin {
+        pub use crate::{generator::{ContextCanHandle, ContextHandle}, plugins::Plugin, selector::Modifier, generator::{generate_class, generate_at_rules, generate_wrapper}, utils::{color, spacing, shadow, format_negative, value_matchers::*}};
+        pub use std::fmt::{self, Write};
+    }
+}

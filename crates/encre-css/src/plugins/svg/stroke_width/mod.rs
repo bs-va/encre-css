@@ -1,13 +1,6 @@
 #![doc = include_str!("README.md")]
 #![doc(alias = "svg")]
-use crate::{
-    generator::{ContextCanHandle, ContextHandle},
-    plugins::Plugin,
-    selector::Modifier,
-    utils::value_matchers::{is_matching_length, is_matching_percentage},
-};
-
-use std::fmt::{self, Write};
+use crate::prelude::build_plugin::*;
 
 #[derive(Debug)]
 pub(crate) struct PluginDefinition;

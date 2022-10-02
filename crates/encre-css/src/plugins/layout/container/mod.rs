@@ -1,19 +1,14 @@
 #![doc = include_str!("README.md")]
 #![doc(alias = "layout")]
 use crate::{
+    prelude::build_plugin::*,
     config::BUILTIN_SCREENS,
-    generator::{
-        generate_at_rules, generate_class, generate_wrapper, ContextCanHandle, ContextHandle,
-    },
-    plugins::Plugin,
-    selector::Modifier,
     utils::{indent, unindent},
 };
 
 use std::{
     borrow::Cow,
     cmp::Ordering,
-    fmt::{self, Write},
 };
 
 #[derive(Debug)]

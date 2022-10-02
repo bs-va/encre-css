@@ -1,14 +1,7 @@
 #![doc = include_str!("README.md")]
 #![doc(alias = "transform")]
 use super::CSS_TRANSFORM;
-use crate::{
-    generator::{ContextCanHandle, ContextHandle},
-    plugins::Plugin,
-    selector::Modifier,
-    utils::format_negative,
-};
-
-use std::fmt::{self, Write};
+use crate::prelude::build_plugin::*;
 
 fn scale_can_handle(context: &mut ContextCanHandle) -> bool {
     match context.modifier {

@@ -1,12 +1,7 @@
 #![doc = include_str!("README.md")]
 #![doc(alias = "filter")]
-use crate::{
-    generator::{ContextCanHandle, ContextHandle},
-    plugins::Plugin,
-    selector::Modifier,
-};
-
-use std::fmt::{self, Write};
+use super::{CSS_BACKDROP_FILTER_1, CSS_BACKDROP_FILTER_2};
+use crate::prelude::build_plugin::*;
 
 #[derive(Debug)]
 pub(crate) struct PluginDefinition;
@@ -33,6 +28,8 @@ impl Plugin for PluginDefinition {
             )?,
             Modifier::Arbitrary { .. } => unreachable!(),
         }
+
+        writeln!(buffer, "{indentation}{}\n{indentation}{}", CSS_BACKDROP_FILTER_1, CSS_BACKDROP_FILTER_2)?;
 
         Ok(())
     }
