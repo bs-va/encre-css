@@ -13,30 +13,27 @@ fn padding_can_handle(context: &mut ContextCanHandle) -> bool {
     }
 }
 
-fn padding_handle(css_properties: &[&str], ContextHandle { modifier, indentation, buffer, .. }: &mut ContextHandle) -> fmt::Result {
-    match modifier {
+fn padding_handle(css_properties: &[&str], context: &mut ContextHandle) {
+    match context.modifier {
         Modifier::Builtin { is_negative, value } => {
             for css_prop in css_properties {
-                writeln!(
-                    buffer,
-                    "{indentation}{}: {};",
+                context.buffer.line(format_args!(
+                    "{}: {};",
                     css_prop,
                     if *value == "auto" {
                         Cow::from("auto")
                     } else {
                         spacing::get(value, *is_negative).unwrap()
                     },
-                )?;
+                ));
             }
         }
         Modifier::Arbitrary { value, .. } => {
             for css_prop in css_properties {
-                writeln!(buffer, "{indentation}{css_prop}: {value};")?;
+                context.buffer.line(format_args!("{css_prop}: {value};"));
             }
         }
     }
-
-    Ok(())
 }
 
 #[derive(Debug)]
@@ -58,7 +55,7 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         padding_handle(&["padding"], context)
     }
 }
@@ -75,7 +72,7 @@ impl Plugin for PluginXDefinition {
         padding_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         padding_handle(&["padding-left", "padding-right"], context)
     }
 }
@@ -92,7 +89,7 @@ impl Plugin for PluginYDefinition {
         padding_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         padding_handle(&["padding-top", "padding-bottom"], context)
     }
 }
@@ -109,7 +106,7 @@ impl Plugin for PluginTopDefinition {
         padding_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         padding_handle(&["padding-top"], context)
     }
 }
@@ -126,7 +123,7 @@ impl Plugin for PluginBottomDefinition {
         padding_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         padding_handle(&["padding-bottom"], context)
     }
 }
@@ -143,7 +140,7 @@ impl Plugin for PluginLeftDefinition {
         padding_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         padding_handle(&["padding-left"], context)
     }
 }
@@ -160,7 +157,7 @@ impl Plugin for PluginRightDefinition {
         padding_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         padding_handle(&["padding-right"], context)
     }
 }

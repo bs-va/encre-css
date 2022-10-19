@@ -24,20 +24,22 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => {
                 if *value == "auto" {
-                    return writeln!(buffer, "{indentation}text-underline-offset: auto;");
+                    return context.buffer.line("text-underline-offset: auto;");
                 }
 
-                writeln!(buffer, "{indentation}text-underline-offset: {value}px;")?;
+                context
+                    .buffer
+                    .line(format_args!("text-underline-offset: {value}px;"));
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}text-underline-offset: {value};")?;
+                context
+                    .buffer
+                    .line(format_args!("text-underline-offset: {value};"));
             }
         }
-
-        Ok(())
     }
 }

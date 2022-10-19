@@ -16,11 +16,10 @@ fn translate_can_handle(context: &mut ContextCanHandle) -> bool {
     }
 }
 
-fn translate_handle(css_prop: &str, ContextHandle { modifier, indentation, buffer, .. }: &mut ContextHandle) -> fmt::Result {
-    match modifier {
-        Modifier::Builtin { is_negative, value } => writeln!(
-            buffer,
-            "{indentation}{}: {};",
+fn translate_handle(css_prop: &str, context: &mut ContextHandle) {
+    match context.modifier {
+        Modifier::Builtin { is_negative, value } => context.buffer.line(format_args!(
+            "{}: {};",
             css_prop,
             if *value == "auto" {
                 Cow::from("auto")
@@ -29,14 +28,13 @@ fn translate_handle(css_prop: &str, ContextHandle { modifier, indentation, buffe
             } else {
                 spacing::get(value, *is_negative).unwrap()
             },
-        )?,
+        )),
         Modifier::Arbitrary { value, .. } => {
-            writeln!(buffer, "{indentation}{css_prop}: {value};")?;
+            context.buffer.line(format_args!("{css_prop}: {value};"));
         }
     }
 
-    writeln!(buffer, "{indentation}{}", CSS_TRANSFORM)?;
-    Ok(())
+    context.buffer.line(CSS_TRANSFORM);
 }
 
 #[derive(Debug)]
@@ -51,7 +49,7 @@ impl Plugin for PluginXDefinition {
         translate_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         translate_handle("--en-translate-x", context)
     }
 }
@@ -68,7 +66,7 @@ impl Plugin for PluginYDefinition {
         translate_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         translate_handle("--en-translate-y", context)
     }
 }

@@ -25,28 +25,23 @@ impl Plugin for PluginDefinition {
         false
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         generate_at_rules(context, |context| {
             generate_class(
                 context,
-                |ContextHandle { modifier, indentation, buffer, config, .. }: &mut ContextHandle| {
-                    match modifier {
-                        Modifier::Builtin { value, .. } => {
-                            let color =
-                                color::get(config, value, Some("--en-divide-opacity"))
-                                    .unwrap();
-                            if color.contains("--en-divide-opacity") {
-                                writeln!(buffer, "{indentation}--en-divide-opacity: 1;")?;
-                            }
+                |context: &mut ContextHandle| match context.modifier {
+                    Modifier::Builtin { value, .. } => {
+                        let color =
+                            color::get(context.config, value, Some("--en-divide-opacity")).unwrap();
+                        if color.contains("--en-divide-opacity") {
+                            context.buffer.line("--en-divide-opacity: 1;");
+                        }
 
-                            writeln!(buffer, "{indentation}border-color: {color};")?;
-                        }
-                        Modifier::Arbitrary { value, .. } => {
-                            writeln!(buffer, "{indentation}border-color: {value};")?;
-                        }
+                        context.buffer.line(format_args!("border-color: {color};"));
                     }
-
-                    Ok(())
+                    Modifier::Arbitrary { value, .. } => {
+                        context.buffer.line(format_args!("border-color: {value};"));
+                    }
                 },
                 " > :not([hidden]) ~ :not([hidden])",
             )

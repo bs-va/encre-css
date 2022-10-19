@@ -12,18 +12,16 @@ impl Plugin for CssPropertyPlugin {
         unreachable!();
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { .. } => unreachable!(),
             Modifier::Arbitrary { value, .. } => {
                 for line in value.lines() {
                     if let Some((prop, value)) = line.split_once(':') {
-                        writeln!(buffer, "{indentation}{prop}: {value};")?;
+                        context.buffer.line(format_args!("{prop}: {value};"));
                     }
                 }
             }
         }
-
-        Ok(())
     }
 }

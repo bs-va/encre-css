@@ -19,18 +19,16 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "border" => writeln!(buffer, "{indentation}background-clip: border-box;")?,
-                "padding" => writeln!(buffer, "{indentation}background-clip: padding-box;")?,
-                "content" => writeln!(buffer, "{indentation}background-clip: content-box;")?,
-                "text" => writeln!(buffer, "{indentation}background-clip: text;")?,
+                "border" => context.buffer.line("background-clip: border-box;"),
+                "padding" => context.buffer.line("background-clip: padding-box;"),
+                "content" => context.buffer.line("background-clip: content-box;"),
+                "text" => context.buffer.line("background-clip: text;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

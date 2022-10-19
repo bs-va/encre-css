@@ -17,16 +17,17 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { .. } => {
-                writeln!(buffer, "{indentation}--en-content: none;\n{indentation}content: var(--en-content)")?;
+                context.buffer.lines([
+                    format_args!("--en-content: none;"),
+                    format_args!("content: var(--en-content);"),
+                ]);
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}--en-content: {value};")?;
+                context.buffer.line(format_args!("--en-content: {value};"));
             }
         }
-
-        Ok(())
     }
 }

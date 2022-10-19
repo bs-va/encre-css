@@ -17,20 +17,18 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "1" => writeln!(buffer, "{indentation}flex: 1 1 0%;")?,
-                "auto" => writeln!(buffer, "{indentation}flex: 1 1 auto;")?,
-                "initial" => writeln!(buffer, "{indentation}flex: 0 1 auto;")?,
-                "none" => writeln!(buffer, "{indentation}flex: none;")?,
+                "1" => context.buffer.line("flex: 1 1 0%;"),
+                "auto" => context.buffer.line("flex: 1 1 auto;"),
+                "initial" => context.buffer.line("flex: 0 1 auto;"),
+                "none" => context.buffer.line("flex: none;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}flex: {value};")?;
+                context.buffer.line(format_args!("flex: {value};"));
             }
         }
-
-        Ok(())
     }
 }

@@ -10,10 +10,7 @@ use encre_css::{
     selector::{Modifier, VariantType},
     Config,
 };
-use std::{
-    borrow::Cow,
-    fmt::{self, Write},
-};
+use std::borrow::Cow;
 
 const PROSE_DEFAULT_CSS: &str = r#".prose {
   color: var(--en-prose-body);
@@ -1086,139 +1083,103 @@ impl Plugin for Prose {
         false
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
                 "" => {
-                    generate_at_rules(context, |ContextHandle { indentation, buffer, .. }| {
-                        PROSE_DEFAULT_CSS.lines().try_for_each(|line| {
-                            writeln!(buffer, "{indentation}{line}")
-                        })
-                    })?;
+                    generate_at_rules(context, |context| {
+                        context.buffer.lines(PROSE_DEFAULT_CSS.lines());
+                    });
                 }
                 "sm" => {
                     generate_at_rules(context, |context| {
-                        PROSE_SM_CSS.iter().try_for_each(|rule| {
+                        PROSE_SM_CSS.iter().for_each(|rule| {
                             generate_class(
                                 context,
-                                |ContextHandle { indentation, buffer, .. }| {
-                                    rule.1.lines().try_for_each(|line| {
-                                        writeln!(buffer, "{indentation}{line}")
-                                    })
-                                },
+                                |context| context.buffer.lines(rule.1.lines()),
                                 rule.0,
                             )
                         })
-                    })?;
+                    });
                 }
                 "base" => {
                     generate_at_rules(context, |context| {
-                        PROSE_BASE_CSS.iter().try_for_each(|rule| {
+                        PROSE_BASE_CSS.iter().for_each(|rule| {
                             generate_class(
                                 context,
-                                |ContextHandle { indentation, buffer, .. }| {
-                                    rule.1.lines().try_for_each(|line| {
-                                        writeln!(buffer, "{indentation}{line}")
-                                    })
-                                },
+                                |context| context.buffer.lines(rule.1.lines()),
                                 rule.0,
                             )
                         })
-                    })?;
+                    });
                 }
                 "lg" => {
                     generate_at_rules(context, |context| {
-                        PROSE_LG_CSS.iter().try_for_each(|rule| {
+                        PROSE_LG_CSS.iter().for_each(|rule| {
                             generate_class(
                                 context,
-                                |ContextHandle { indentation, buffer, .. }| {
-                                    rule.1.lines().try_for_each(|line| {
-                                        writeln!(buffer, "{indentation}{line}")
-                                    })
-                                },
+                                |context| context.buffer.lines(rule.1.lines()),
                                 rule.0,
                             )
                         })
-                    })?;
+                    });
                 }
                 "xl" => {
                     generate_at_rules(context, |context| {
-                        PROSE_XL_CSS.iter().try_for_each(|rule| {
+                        PROSE_XL_CSS.iter().for_each(|rule| {
                             generate_class(
                                 context,
-                                |ContextHandle { indentation, buffer, .. }| {
-                                    rule.1.lines().try_for_each(|line| {
-                                        writeln!(buffer, "{indentation}{line}")
-                                    })
-                                },
+                                |context| context.buffer.lines(rule.1.lines()),
                                 rule.0,
                             )
                         })
-                    })?;
+                    });
                 }
                 "2xl" => {
                     generate_at_rules(context, |context| {
-                        PROSE_2XL_CSS.iter().try_for_each(|rule| {
+                        PROSE_2XL_CSS.iter().for_each(|rule| {
                             generate_class(
                                 context,
-                                |ContextHandle { indentation, buffer, .. }| {
-                                    rule.1.lines().try_for_each(|line| {
-                                        writeln!(buffer, "{indentation}{line}")
-                                    })
-                                },
+                                |context| context.buffer.lines(rule.1.lines()),
                                 rule.0,
                             )
                         })
-                    })?;
+                    });
                 }
                 "gray" => {
-                    generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
-                        PROSE_GRAY_CSS.lines().try_for_each(|line| {
-                            writeln!(buffer, "{indentation}{line}")
-                        })
-                    })?;
+                    generate_wrapper(context, |context| {
+                        context.buffer.lines(PROSE_GRAY_CSS.lines());
+                    });
                 }
                 "slate" => {
-                    generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
-                        PROSE_SLATE_CSS.lines().try_for_each(|line| {
-                            writeln!(buffer, "{indentation}{line}")
-                        })
-                    })?;
+                    generate_wrapper(context, |context| {
+                        context.buffer.lines(PROSE_SLATE_CSS.lines());
+                    });
                 }
                 "zinc" => {
-                    generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
-                        PROSE_ZINC_CSS.lines().try_for_each(|line| {
-                            writeln!(buffer, "{indentation}{line}")
-                        })
-                    })?;
+                    generate_wrapper(context, |context| {
+                        context.buffer.lines(PROSE_ZINC_CSS.lines());
+                    });
                 }
                 "neutral" => {
-                    generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
-                        PROSE_NEUTRAL_CSS.lines().try_for_each(|line| {
-                            writeln!(buffer, "{indentation}{line}")
-                        })
-                    })?;
+                    generate_wrapper(context, |context| {
+                        context.buffer.lines(PROSE_NEUTRAL_CSS.lines());
+                    });
                 }
                 "stone" => {
-                    generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
-                        PROSE_STONE_CSS.lines().try_for_each(|line| {
-                            writeln!(buffer, "{indentation}{line}")
-                        })
-                    })?;
+                    generate_wrapper(context, |context| {
+                        context.buffer.lines(PROSE_STONE_CSS.lines());
+                    });
                 }
                 "invert" => {
-                    generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
-                        PROSE_INVERT_CSS.lines().try_for_each(|line| {
-                            writeln!(buffer, "{indentation}{line}")
-                        })
-                    })?;
+                    generate_wrapper(context, |context| {
+                        context.buffer.lines(PROSE_INVERT_CSS.lines());
+                    });
                 }
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }
 

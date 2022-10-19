@@ -1,6 +1,6 @@
 #![doc = include_str!("README.md")]
 #![doc(alias = "filter")]
-use super::{CSS_BACKDROP_FILTER_1, CSS_BACKDROP_FILTER_2};
+use super::CSS_BACKDROP_FILTER;
 use crate::prelude::build_plugin::*;
 
 #[derive(Debug)]
@@ -18,19 +18,16 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             #[allow(clippy::cast_precision_loss)]
-            Modifier::Builtin { value, .. } => writeln!(
-                buffer,
-                "{indentation}--en-backdrop-saturate: saturate({});",
+            Modifier::Builtin { value, .. } => context.buffer.line(format_args!(
+                "--en-backdrop-saturate: saturate({});",
                 value.parse::<usize>().unwrap() as f32 / 100.,
-            )?,
+            )),
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
-        writeln!(buffer, "{indentation}{}\n{indentation}{}", CSS_BACKDROP_FILTER_1, CSS_BACKDROP_FILTER_2)?;
-
-        Ok(())
+        context.buffer.lines(CSS_BACKDROP_FILTER);
     }
 }

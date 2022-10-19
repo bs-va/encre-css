@@ -28,19 +28,19 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "auto" => writeln!(buffer, "{indentation}background-size: auto;")?,
-                "cover" => writeln!(buffer, "{indentation}background-size: cover;")?,
-                "contain" => writeln!(buffer, "{indentation}background-size: contain;")?,
+                "auto" => context.buffer.line("background-size: auto;"),
+                "cover" => context.buffer.line("background-size: cover;"),
+                "contain" => context.buffer.line("background-size: contain;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}background-size: {value};")?;
+                context
+                    .buffer
+                    .line(format_args!("background-size: {value};"));
             }
         }
-
-        Ok(())
     }
 }

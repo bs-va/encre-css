@@ -18,22 +18,19 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             #[allow(clippy::cast_precision_loss)]
             Modifier::Builtin { value, .. } => match *value {
-                "" => writeln!(buffer, "{indentation}--en-invert: invert(100%);")?,
-                _ => writeln!(
-                    buffer,
+                "" => context.buffer.line("--en-invert: invert(100%);"),
+                _ => context.buffer.line(format_args!(
                     "--en-invert: invert({});",
                     value.parse::<usize>().unwrap() as f32 / 100.
-                )?,
+                )),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
-        writeln!(buffer, "{indentation}{}", CSS_FILTER)?;
-
-        Ok(())
+        context.buffer.line(CSS_FILTER);
     }
 }

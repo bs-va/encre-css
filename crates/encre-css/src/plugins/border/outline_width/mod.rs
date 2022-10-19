@@ -24,16 +24,16 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => {
-                writeln!(buffer, "{indentation}outline-width: {value}px;")?;
+                context
+                    .buffer
+                    .line(format_args!("outline-width: {value}px;"));
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}outline-width: {value};")?;
+                context.buffer.line(format_args!("outline-width: {value};"));
             }
         }
-
-        Ok(())
     }
 }

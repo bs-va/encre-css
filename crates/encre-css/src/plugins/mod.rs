@@ -63,8 +63,9 @@ pub mod typography;
 /// The [`Plugin::handle`] method takes a [`ContextHandle`] structure containing the modifier,
 /// the current configuration, the current indentation (each `handle` needs to take account of the
 /// indentation using the [`utils::indent`] function) and a buffer containing the whole CSS
-/// currently generated. You can use the [`writeln!`] macro to push CSS declarations to it (the CSS
-/// pushed **should** end with a newline) and the [`fmt::Result`] can be discarded using `?`.
+/// currently generated. You can use the [`Buffer`] structure (especially the [`Buffer::line`]
+/// and [`Buffer::lines`] functions) to push CSS declarations to it, they will be automatically
+/// indented.
 ///
 /// It is common to use the [`unreachable!`] macro if the [`Plugin::handle`] method cannot be
 /// called because [`Plugin::can_handle`] returned `false`.
@@ -95,17 +96,15 @@ pub mod typography;
 ///         }
 ///     }
 ///
-///     fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-///         match modifier {
+///     fn handle(&self, context: &mut ContextHandle) {
+///         match context.modifier {
 ///             Modifier::Builtin { value, .. } => {
-///                 writeln!(buffer, "{indentation}stroke-width: {value}px;")?;
+///                 context.buffer.line(format_args!("stroke-width: {value}px;"));
 ///             }
 ///             Modifier::Arbitrary { value, .. } => {
-///                 writeln!(buffer, "{indentation}stroke-width: {value};")?;
+///                 context.buffer.line(format_args!("stroke-width: {value};"));
 ///             }
 ///         }
-///
-///         Ok(())
 ///     }
 /// }
 /// ```
@@ -154,37 +153,48 @@ pub mod typography;
 ///         }
 ///     }
 ///
-///     fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+///     fn handle(&self, context: &mut ContextHandle) {
 ///         match context.modifier {
 ///             Modifier::Builtin { value, .. } => {
-///                 let ContextHandle { modifier, buffer, indentation, .. } = context;
 ///                 let animation = match *value {
 ///                     "none" => "none",
 ///                     "spin" => {
-///                         writeln!(buffer, "{indentation}@keyframes spin...")?;
+///                         context.buffer.lines([
+///                             "@keyframes spin",
+///                             "...",
+///                         ]);
 ///                         "spin 1s linear infinite"
 ///                     }
 ///                     "ping" => {
-///                         writeln!(buffer, "{indentation}@keyframes ping...")?;
+///                         context.buffer.lines([
+///                             "@keyframes ping",
+///                             "...",
+///                         ]);
 ///                         "ping 1s cubic-bezier(0, 0, 0.2, 1) infinite"
 ///                     }
 ///                     "pulse" => {
-///                         writeln!(buffer, "{indentation}@keyframes pulse...")?;
+///                         context.buffer.lines([
+///                             "@keyframes pulse",
+///                             "...",
+///                         ]);
 ///                         "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite"
 ///                     }
 ///                     "bounce" => {
-///                         writeln!(buffer, "{indentation}@keyframes bounce...")?;
+///                         context.buffer.lines([
+///                             "@keyframes bounce",
+///                             "...",
+///                         ]);
 ///                         "bounce 1s infinite"
 ///                     }
 ///                     _ => unreachable!(),
 ///                 };
 ///
-///                 generate_wrapper(context, |ContextHandle { buffer, indentation, .. }| {
-///                     writeln!(buffer, "{indentation}animation: {animation};")
+///                 generate_wrapper(context, |context| {
+///                     context.buffer.line(format_args!("animation: {animation};"));
 ///                 })
 ///             }
-///             Modifier::Arbitrary { value, .. } => generate_wrapper(context, |ContextHandle { buffer, indentation, .. }| {
-///                 writeln!(buffer, "{indentation}animation: {value};")
+///             Modifier::Arbitrary { value, .. } => generate_wrapper(context, |context| {
+///                 context.buffer.line(format_args!("animation: {value};"));
 ///             }),
 ///         }
 ///     }
@@ -194,8 +204,9 @@ pub mod typography;
 /// Have a look at <https://gitlab.com/encre-org/encre-css/tree/main/crates/encre-css/src/plugins>
 /// for more examples.
 ///
-/// [`utils::indent`]: crate::utils::indent
-/// [`writeln!`]: std::writeln
+/// [`Buffer`]: crate::utils::Buffer
+/// [`Buffer::line`]: crate::utils::Buffer::line
+/// [`Buffer::lines`]: crate::utils::Buffer::lines
 /// [`Config::register_plugin`]: crate::Config::register_plugin
 /// [`Config`]: crate::Config
 /// [`needs_wrapping`]: Plugin::needs_wrapping
@@ -229,9 +240,5 @@ pub trait Plugin: fmt::Debug {
     /// - The CSS returned should end with a newline;
     /// - Arbitrary values are already normalized (e.g. underscores are replaced by spaces);
     /// - This function is guaranteed to be called only once per selector.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`fmt::Result`] if writing to the buffer failed.
-    fn handle(&self, _context: &mut ContextHandle) -> fmt::Result;
+    fn handle(&self, _context: &mut ContextHandle);
 }

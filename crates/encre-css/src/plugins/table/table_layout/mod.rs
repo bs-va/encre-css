@@ -17,16 +17,14 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "auto" => writeln!(buffer, "{indentation}table-layout: auto;")?,
-                "fixed" => writeln!(buffer, "{indentation}table-layout: fixed;")?,
+                "auto" => context.buffer.line("table-layout: auto;"),
+                "fixed" => context.buffer.line("table-layout: fixed;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

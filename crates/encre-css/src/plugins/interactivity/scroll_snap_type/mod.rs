@@ -19,37 +19,41 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
                 "none" => {
-                    writeln!(buffer, "{indentation}-ms-scroll-snap-type: none;\n{indentation}scroll-snap-type: none;")?;
+                    context
+                        .buffer
+                        .lines(["-ms-scroll-snap-type: none;", "scroll-snap-type: none;"]);
                 }
                 "x" => {
-                    writeln!(
-                        buffer,
-                        "{indentation}-ms-scroll-snap-type: x var(--en-scroll-snap-strictness);\n{indentation}scroll-snap-type: x var(--en-scroll-snap-strictness);"
-                    )?;
+                    context.buffer.lines([
+                        "-ms-scroll-snap-type: x var(--en-scroll-snap-strictness);",
+                        "scroll-snap-type: x var(--en-scroll-snap-strictness);",
+                    ]);
                 }
                 "y" => {
-                    writeln!(
-                        buffer,
-                        "{indentation}-ms-scroll-snap-type: y var(--en-scroll-snap-strictness);\n{indentation}scroll-snap-type: y var(--en-scroll-snap-strictness);"
-                    )?;
+                    context.buffer.lines([
+                        "-ms-scroll-snap-type: y var(--en-scroll-snap-strictness);",
+                        "scroll-snap-type: y var(--en-scroll-snap-strictness);",
+                    ]);
                 }
                 "both" => {
-                    writeln!(
-                        buffer,
-                        "{indentation}-ms-scroll-snap-type: both var(--en-scroll-snap-strictness);\n{indentation}scroll-snap-type: both var(--en-scroll-snap-strictness);"
-                    )?;
+                    context.buffer.lines([
+                        "-ms-scroll-snap-type: both var(--en-scroll-snap-strictness);",
+                        "scroll-snap-type: both var(--en-scroll-snap-strictness);",
+                    ]);
                 }
-                "mandatory" => writeln!(buffer, "{indentation}--en-scroll-snap-strictness: mandatory;")?,
-                "proximity" => writeln!(buffer, "{indentation}--en-scroll-snap-strictness: proximity;")?,
+                "mandatory" => context
+                    .buffer
+                    .line("--en-scroll-snap-strictness: mandatory;"),
+                "proximity" => context
+                    .buffer
+                    .line("--en-scroll-snap-strictness: proximity;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

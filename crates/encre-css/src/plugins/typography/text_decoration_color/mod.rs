@@ -21,16 +21,20 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, config, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => {
-                let value = color::get(config, value, None).unwrap();
-                writeln!(buffer, "{indentation}-webkit-text-decoration-color: {value};
-{indentation}text-decoration-color: {value};")
+                let value = color::get(context.config, value, None).unwrap();
+                context.buffer.lines([
+                    format_args!("-webkit-text-decoration-color: {value};"),
+                    format_args!("text-decoration-color: {value};"),
+                ]);
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}-webkit-text-decoration-color: {value};
-{indentation}text-decoration-color: {value};")
+                context.buffer.lines([
+                    format_args!("-webkit-text-decoration-color: {value}"),
+                    format_args!("text-decoration-color: {value};"),
+                ]);
             }
         }
     }

@@ -22,16 +22,15 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { is_negative, value } => {
                 if *value == "screen" {
-                    return writeln!(buffer, "{indentation}width: 100vw;");
+                    return context.buffer.line("width: 100vw;");
                 }
 
-                writeln!(
-                    buffer,
-                    "{indentation}width: {};",
+                context.buffer.line(format_args!(
+                    "width: {};",
                     match *value {
                         "auto" => Cow::from("auto"),
                         "full" => Cow::from("100%"),
@@ -41,13 +40,11 @@ impl Plugin for PluginDefinition {
                         "fit" => Cow::from("fit-content"),
                         _ => spacing::get(value, *is_negative).unwrap(),
                     },
-                )?;
+                ));
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}width: {value};")?;
+                context.buffer.line(format_args!("width: {value};"));
             }
         }
-
-        Ok(())
     }
 }

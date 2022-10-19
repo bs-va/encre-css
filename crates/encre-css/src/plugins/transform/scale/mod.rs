@@ -10,25 +10,23 @@ fn scale_can_handle(context: &mut ContextCanHandle) -> bool {
     }
 }
 
-fn scale_handle(css_properties: &[&str], ContextHandle { modifier, indentation, buffer, .. }: &mut ContextHandle) -> fmt::Result {
-    match modifier {
+fn scale_handle(css_properties: &[&str], context: &mut ContextHandle) {
+    match context.modifier {
         Modifier::Builtin { is_negative, value } => {
             for css_prop in css_properties {
                 #[allow(clippy::cast_precision_loss)]
-                writeln!(
-                    buffer,
-                    "{indentation}{}: {}{};",
+                context.buffer.line(format_args!(
+                    "{}: {}{};",
                     css_prop,
                     format_negative(is_negative),
                     value.parse::<usize>().unwrap() as f32 / 100.,
-                )?;
+                ));
             }
         }
         Modifier::Arbitrary { .. } => unreachable!(),
     }
 
-    writeln!(buffer, "{indentation}{}", CSS_TRANSFORM)?;
-    Ok(())
+    context.buffer.line(CSS_TRANSFORM);
 }
 
 #[derive(Debug)]
@@ -43,7 +41,7 @@ impl Plugin for PluginDefinition {
         scale_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         scale_handle(&["--en-scale-x", "--en-scale-y"], context)
     }
 }
@@ -60,7 +58,7 @@ impl Plugin for PluginXDefinition {
         scale_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         scale_handle(&["--en-scale-x"], context)
     }
 }
@@ -77,7 +75,7 @@ impl Plugin for PluginYDefinition {
         scale_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         scale_handle(&["--en-scale-y"], context)
     }
 }

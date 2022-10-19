@@ -15,20 +15,24 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
                 "antialised" => {
-                    writeln!(buffer, "{indentation}-webkit-font-smoothing: antialiased;\n{indentation}-moz-osx-font-smoothing: grayscale;")?;
+                    context.buffer.lines([
+                        "-webkit-font-smoothing: antialiased;",
+                        "-moz-osx-font-smoothing: grayscale;",
+                    ]);
                 }
                 "subpixel-antialised" => {
-                    writeln!(buffer, "{indentation}-webkit-font-smoothing: auto;\n{indentation}-moz-osx-font-smoothing: auto;")?;
+                    context.buffer.lines([
+                        "-webkit-font-smoothing: auto;",
+                        "-moz-osx-font-smoothing: auto;",
+                    ]);
                 }
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

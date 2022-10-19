@@ -12,26 +12,23 @@ fn width_can_handle(context: &mut ContextCanHandle) -> bool {
     }
 }
 
-fn width_handle(css_properties: &[&str], ContextHandle { modifier, indentation, buffer, .. }: &mut ContextHandle) -> fmt::Result {
-    match modifier {
+fn width_handle(css_properties: &[&str], context: &mut ContextHandle) {
+    match context.modifier {
         Modifier::Builtin { value, .. } => {
             for css_prop in css_properties {
-                writeln!(
-                    buffer,
-                    "{indentation}{}: {}px;",
+                context.buffer.line(format_args!(
+                    "{}: {}px;",
                     css_prop,
                     if value.is_empty() { "1" } else { value }
-                )?;
+                ));
             }
         }
         Modifier::Arbitrary { value, .. } => {
             for css_prop in css_properties {
-                writeln!(buffer, "{indentation}{css_prop}: {value};")?;
+                context.buffer.line(format_args!("{css_prop}: {value};"));
             }
         }
     }
-
-    Ok(())
 }
 
 #[derive(Debug)]
@@ -60,7 +57,7 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         width_handle(&["border-width"], context)
     }
 }
@@ -77,7 +74,7 @@ impl Plugin for PluginTopDefinition {
         width_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         width_handle(&["border-top-width"], context)
     }
 }
@@ -94,7 +91,7 @@ impl Plugin for PluginBottomDefinition {
         width_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         width_handle(&["border-bottom-width"], context)
     }
 }
@@ -111,7 +108,7 @@ impl Plugin for PluginLeftDefinition {
         width_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         width_handle(&["border-left-width"], context)
     }
 }
@@ -128,7 +125,7 @@ impl Plugin for PluginRightDefinition {
         width_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         width_handle(&["border-right-width"], context)
     }
 }
@@ -145,7 +142,7 @@ impl Plugin for PluginXDefinition {
         width_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         width_handle(&["border-left-width", "border-right-width"], context)
     }
 }
@@ -162,7 +159,7 @@ impl Plugin for PluginYDefinition {
         width_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         width_handle(&["border-top-width", "border-bottom-width"], context)
     }
 }

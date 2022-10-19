@@ -18,16 +18,14 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "" => writeln!(buffer, "{indentation}{}", CSS_FILTER)?,
-                "none" => writeln!(buffer, "{indentation}filter: none;")?,
+                "" => context.buffer.line(CSS_FILTER),
+                "none" => context.buffer.line("filter: none;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

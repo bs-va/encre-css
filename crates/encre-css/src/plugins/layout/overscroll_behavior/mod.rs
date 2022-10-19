@@ -28,23 +28,21 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "auto" => writeln!(buffer, "{indentation}overscroll-behavior: auto;")?,
-                "x-auto" => writeln!(buffer, "{indentation}overscroll-behavior-x: auto;")?,
-                "y-auto" => writeln!(buffer, "{indentation}overscroll-behavior-y: auto;")?,
-                "contain" => writeln!(buffer, "{indentation}overscroll-behavior: contain;")?,
-                "x-contain" => writeln!(buffer, "{indentation}overscroll-behavior-x: contain;")?,
-                "y-contain" => writeln!(buffer, "{indentation}overscroll-behavior-y: contain;")?,
-                "none" => writeln!(buffer, "{indentation}overscroll-behavior: none;")?,
-                "x-none" => writeln!(buffer, "{indentation}overscroll-behavior-x: none;")?,
-                "y-none" => writeln!(buffer, "{indentation}overscroll-behavior-y: none;")?,
+                "auto" => context.buffer.line("overscroll-behavior: auto;"),
+                "x-auto" => context.buffer.line("overscroll-behavior-x: auto;"),
+                "y-auto" => context.buffer.line("overscroll-behavior-y: auto;"),
+                "contain" => context.buffer.line("overscroll-behavior: contain;"),
+                "x-contain" => context.buffer.line("overscroll-behavior-x: contain;"),
+                "y-contain" => context.buffer.line("overscroll-behavior-y: contain;"),
+                "none" => context.buffer.line("overscroll-behavior: none;"),
+                "x-none" => context.buffer.line("overscroll-behavior-x: none;"),
+                "y-none" => context.buffer.line("overscroll-behavior-y: none;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

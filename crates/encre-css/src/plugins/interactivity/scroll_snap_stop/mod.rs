@@ -17,16 +17,14 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "normal" => writeln!(buffer, "{indentation}scroll-snap-stop: normal;")?,
-                "always" => writeln!(buffer, "{indentation}scroll-snap-stop: always;")?,
+                "normal" => context.buffer.line("scroll-snap-stop: normal;"),
+                "always" => context.buffer.line("scroll-snap-stop: always;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

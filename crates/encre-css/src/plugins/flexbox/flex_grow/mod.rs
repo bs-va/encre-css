@@ -17,16 +17,14 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             #[allow(clippy::cast_precision_loss)]
             Modifier::Builtin { value, .. } => match *value {
-                "" => writeln!(buffer, "{indentation}flex-grow: 1;")?,
-                _ => writeln!(buffer, "{indentation}flex-grow: {value};")?,
+                "" => context.buffer.line("flex-grow: 1;"),
+                _ => context.buffer.line(format_args!("flex-grow: {value};")),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

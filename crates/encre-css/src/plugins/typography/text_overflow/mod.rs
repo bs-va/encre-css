@@ -15,21 +15,21 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
                 "truncate" => {
-                    writeln!(buffer, "{indentation}overflow: hidden;
-{indentation}text-overflow: ellipsis;
-{indentation}white-space: nowrap;")?;
+                    context.buffer.lines([
+                        "overflow: hidden;",
+                        "text-overflow: ellipsis;",
+                        "white-space: nowrap;",
+                    ]);
                 }
-                "text-ellipsis" => writeln!(buffer, "{indentation}text-overflow: ellipsis;")?,
-                "text-clip" => writeln!(buffer, "{indentation}text-overflow: clip;")?,
+                "text-ellipsis" => context.buffer.line("text-overflow: ellipsis;"),
+                "text-clip" => context.buffer.line("text-overflow: clip;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

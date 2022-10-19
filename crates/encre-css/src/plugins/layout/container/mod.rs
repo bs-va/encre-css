@@ -1,15 +1,8 @@
 #![doc = include_str!("README.md")]
 #![doc(alias = "layout")]
-use crate::{
-    prelude::build_plugin::*,
-    config::BUILTIN_SCREENS,
-    utils::{indent, unindent},
-};
+use crate::{config::BUILTIN_SCREENS, prelude::build_plugin::*};
 
-use std::{
-    borrow::Cow,
-    cmp::Ordering,
-};
+use std::{borrow::Cow, cmp::Ordering};
 
 #[derive(Debug)]
 pub(crate) struct PluginDefinition;
@@ -30,18 +23,19 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         if let Modifier::Builtin { .. } = context.modifier {
-            generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
-                writeln!(buffer, "{indentation}width: 100%;")
-            })?;
+            generate_wrapper(context, |context| {
+                context.buffer.line("width: 100%;");
+            });
 
-            write!(context.buffer, "\n\n")?;
+            context.buffer.raw("\n\n");
 
             let mut first_child = true;
 
             generate_at_rules(context, |context| {
-                let mut screens = context.config
+                let mut screens = context
+                    .config
                     .theme
                     .screens
                     .iter()
@@ -85,48 +79,44 @@ impl Plugin for PluginDefinition {
                 for (_, screen) in &screens {
                     if first_child {
                         first_child = false;
-                    } else if context.indentation.is_empty() {
-                        write!(context.buffer, "\n\n")?;
+                    } else if context.buffer.is_unindented() {
+                        context.buffer.raw("\n\n");
                     } else {
-                        writeln!(context.buffer)?;
+                        context.buffer.raw("\n");
                     }
 
-                    writeln!(context.buffer, "{}@media (min-width: {screen}) {{", context.indentation)?;
-                    indent(&mut context.indentation);
+                    context
+                        .buffer
+                        .line(format_args!("@media (min-width: {screen}) {{"));
+                    context.buffer.indent();
 
                     generate_class(
                         context,
-                        |ContextHandle { indentation, buffer, .. }| {
-                            writeln!(buffer, "{indentation}max-width: {screen};")
+                        |context| {
+                            context.buffer.line(format_args!("max-width: {screen};"));
                         },
                         "",
-                    )?;
+                    );
 
-                    let ContextHandle { indentation, buffer, .. } = context;
-                    unindent(indentation);
-                    if indentation.is_empty() {
-                        write!(buffer, "}}")?;
+                    context.buffer.unindent();
+                    if context.buffer.is_unindented() {
+                        context.buffer.raw("}");
                     } else {
-                        writeln!(buffer, "{indentation}}}")?;
+                        context.buffer.line("}");
                     }
                 }
 
                 // After rule
-                let ContextHandle { indentation, buffer, .. } = context;
-                while !indentation.is_empty() {
-                    unindent(indentation);
+                while !context.buffer.is_unindented() {
+                    context.buffer.unindent();
 
-                    if indentation.is_empty() {
-                        write!(buffer, "}}")?;
+                    if context.buffer.is_unindented() {
+                        context.buffer.raw("}");
                     } else {
-                        writeln!(buffer, "{indentation}}}")?;
+                        context.buffer.line("}");
                     }
                 }
-
-                Ok(())
             })
-        } else {
-            Ok(())
         }
     }
 }

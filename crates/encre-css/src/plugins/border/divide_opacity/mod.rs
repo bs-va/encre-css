@@ -21,22 +21,17 @@ impl Plugin for PluginDefinition {
         false
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         generate_at_rules(context, |context| {
             generate_class(
                 context,
-                |ContextHandle { modifier, indentation, buffer, .. }| {
-                    match modifier {
-                        #[allow(clippy::cast_precision_loss)]
-                        Modifier::Builtin { value, .. } => writeln!(
-                            buffer,
-                            "{indentation}--en-divide-opacity: {};",
-                            value.parse::<usize>().unwrap() as f32 / 100.,
-                        )?,
-                        Modifier::Arbitrary { .. } => unreachable!(),
-                    }
-
-                    Ok(())
+                |context| match context.modifier {
+                    #[allow(clippy::cast_precision_loss)]
+                    Modifier::Builtin { value, .. } => context.buffer.line(format_args!(
+                        "--en-divide-opacity: {};",
+                        value.parse::<usize>().unwrap() as f32 / 100.,
+                    )),
+                    Modifier::Arbitrary { .. } => unreachable!(),
                 },
                 " > :not([hidden]) ~ :not([hidden])",
             )

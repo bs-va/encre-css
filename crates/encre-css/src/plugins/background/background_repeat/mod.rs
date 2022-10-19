@@ -25,20 +25,18 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "repeat" => writeln!(buffer, "{indentation}background-repeat: repeat;")?,
-                "no-repeat" => writeln!(buffer, "{indentation}background-repeat: no-repeat;")?,
-                "repeat-x" => writeln!(buffer, "{indentation}background-repeat: repeat-x;")?,
-                "repeat-y" => writeln!(buffer, "{indentation}background-repeat: repeat-y;")?,
-                "repeat-round" => writeln!(buffer, "{indentation}background-repeat: round;")?,
-                "repeat-space" => writeln!(buffer, "{indentation}background-repeat: space;")?,
+                "repeat" => context.buffer.line("background-repeat: repeat;"),
+                "no-repeat" => context.buffer.line("background-repeat: no-repeat;"),
+                "repeat-x" => context.buffer.line("background-repeat: repeat-x;"),
+                "repeat-y" => context.buffer.line("background-repeat: repeat-y;"),
+                "repeat-round" => context.buffer.line("background-repeat: round;"),
+                "repeat-space" => context.buffer.line("background-repeat: space;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

@@ -36,14 +36,14 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => {
-                writeln!(buffer, "{indentation}mix-blend-mode: {value};")?;
+                context
+                    .buffer
+                    .line(format_args!("mix-blend-mode: {value};"));
             }
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

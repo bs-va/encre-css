@@ -87,7 +87,6 @@ use std::{
     borrow::Cow,
     collections::BTreeMap,
     env,
-    fmt::{self, Write},
     fs::{self, File},
     io::BufReader,
     path::PathBuf,
@@ -437,8 +436,8 @@ impl Plugin for Icons {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => {
                 let (collection, rest) = COLLECTIONS
                     .iter()
@@ -452,29 +451,31 @@ impl Plugin for Icons {
                 ) {
                     if icon_data_uri.contains("currentColor") {
                         // From https://codepen.io/noahblon/post/coloring-svgs-in-css-background-images
-                        writeln!(buffer, r#"{indentation}--en-icon: url("{icon_data_uri}");
-{indentation}mask: var(--en-icon) no-repeat;
-{indentation}mask-size: 100% 100%;
-{indentation}-webkit-mask: var(--en-icon) no-repeat;
-{indentation}-webkit-mask-size: 100% 100%;
-{indentation}background-color: currentColor;"#)?;
+                        context.buffer.lines([
+                            format_args!(r#"--en-icon: url("{icon_data_uri}");"#),
+                            format_args!("mask: var(--en-icon) no-repeat;"),
+                            format_args!("mask-size: 100% 100%;"),
+                            format_args!("-webkit-mask: var(--en-icon) no-repeat;"),
+                            format_args!("-webkit-mask-size: 100% 100%;"),
+                            format_args!("background-color: currentColor;"),
+                        ]);
                     } else {
-                        writeln!(
-                            buffer,
-                            r#"{indentation}background: url("{icon_data_uri}") no-repeat center;
-{indentation}background-color: transparent;
-{indentation}background-size: 100% 100%;"#)?;
+                        context.buffer.lines([
+                            format_args!(r#"background: url("{icon_data_uri}") no-repeat center;"#),
+                            format_args!("background-color: transparent;"),
+                            format_args!("background-size: 100% 100%;"),
+                        ]);
                     }
 
-                    writeln!(buffer, "{indentation}display: inline-block;
-{indentation}width: {width};
-{indentation}height: {height};")?;
+                    context.buffer.lines([
+                        format_args!("display: inline-block;"),
+                        format_args!("width: {width};"),
+                        format_args!("height: {height};"),
+                    ]);
                 }
             }
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }
 

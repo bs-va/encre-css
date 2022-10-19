@@ -17,20 +17,20 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "auto" => writeln!(buffer, "{indentation}grid-auto-rows: auto;")?,
-                "min" => writeln!(buffer, "{indentation}grid-auto-rows: min-content;")?,
-                "max" => writeln!(buffer, "{indentation}grid-auto-rows: max-content;")?,
-                "fr" => writeln!(buffer, "{indentation}grid-auto-rows: minmax(0, 1fr);")?,
+                "auto" => context.buffer.line("grid-auto-rows: auto;"),
+                "min" => context.buffer.line("grid-auto-rows: min-content;"),
+                "max" => context.buffer.line("grid-auto-rows: max-content;"),
+                "fr" => context.buffer.line("grid-auto-rows: minmax(0, 1fr);"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}grid-auto-rows: {value};")?;
+                context
+                    .buffer
+                    .line(format_args!("grid-auto-rows: {value};"));
             }
         }
-
-        Ok(())
     }
 }

@@ -21,17 +21,18 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, config, .. }: &mut ContextHandle) -> fmt::Result {
-        writeln!(buffer, "{indentation}--en-ring-offset-shadow: var(--en-ring-inset) 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color);")?;
+    fn handle(&self, context: &mut ContextHandle) {
+        context.buffer.line("--en-ring-offset-shadow: var(--en-ring-inset) 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color);");
 
-        match modifier {
-            Modifier::Builtin { value, .. } => writeln!(
-                buffer,
-                "{indentation}--en-ring-offset-color: {};",
-                color::get(config, value, None).unwrap()
-            ),
+        match context.modifier {
+            Modifier::Builtin { value, .. } => context.buffer.line(format_args!(
+                "--en-ring-offset-color: {};",
+                color::get(context.config, value, None).unwrap()
+            )),
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}--en-ring-offset-color: {value};")
+                context
+                    .buffer
+                    .line(format_args!("--en-ring-offset-color: {value};"));
             }
         }
     }

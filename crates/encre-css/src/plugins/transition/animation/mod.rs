@@ -94,38 +94,44 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
-        let ContextHandle { modifier, buffer, .. } = context;
+    fn handle(&self, context: &mut ContextHandle) {
+        let context = context;
 
-        match modifier {
+        match context.modifier {
             Modifier::Builtin { value, .. } => {
                 let animation = match *value {
                     "none" => "none",
                     "spin" => {
-                        writeln!(buffer, "{}", SPIN_ANIMATION)?;
+                        context.buffer.line(SPIN_ANIMATION);
                         "spin 1s linear infinite"
                     }
                     "ping" => {
-                        writeln!(buffer, "{}", PING_ANIMATION)?;
+                        context.buffer.line(PING_ANIMATION);
                         "ping 1s cubic-bezier(0, 0, 0.2, 1) infinite"
                     }
                     "pulse" => {
-                        writeln!(buffer, "{}", PULSE_ANIMATION)?;
+                        context.buffer.line(PULSE_ANIMATION);
                         "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite"
                     }
                     "bounce" => {
-                        writeln!(buffer, "{}", BOUNCE_ANIMATION)?;
+                        context.buffer.line(BOUNCE_ANIMATION);
                         "bounce 1s infinite"
                     }
                     _ => unreachable!(),
                 };
 
-                generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
-                    writeln!(buffer, "{indentation}-webkit-animation: {animation};\n{indentation}animation: {animation};")
-                })
+                generate_wrapper(context, |context| {
+                    context.buffer.lines([
+                        format_args!("-webkit-animation: {animation};"),
+                        format_args!("animation: {animation};"),
+                    ]);
+                });
             }
-            Modifier::Arbitrary { value, .. } => generate_wrapper(context, |ContextHandle { indentation, buffer, .. }| {
-                writeln!(buffer, "{indentation}-webkit-animation: {value};\n{indentation}animation: {value};")
+            Modifier::Arbitrary { value, .. } => generate_wrapper(context, |context| {
+                context.buffer.lines([
+                    format_args!("-webkit-animation: {value};"),
+                    format_args!("animation: {value};"),
+                ]);
             }),
         }
     }

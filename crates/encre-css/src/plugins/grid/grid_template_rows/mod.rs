@@ -17,24 +17,24 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => {
                 if *value == "none" {
-                    return writeln!(buffer, "{indentation}grid-template-rows: none;");
+                    context.buffer.line("grid-template-rows: none;");
+                    return;
                 }
 
-                writeln!(
-                    buffer,
-                    "{indentation}grid-template-rows: repeat({}, minmax(0, 1fr));",
+                context.buffer.line(format_args!(
+                    "grid-template-rows: repeat({}, minmax(0, 1fr));",
                     value.parse::<usize>().unwrap(),
-                )?;
+                ));
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}grid-template-rows: {value};")?;
+                context
+                    .buffer
+                    .line(format_args!("grid-template-rows: {value};"));
             }
         }
-
-        Ok(())
     }
 }

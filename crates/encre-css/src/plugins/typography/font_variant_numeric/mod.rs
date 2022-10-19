@@ -24,31 +24,35 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "normal-nums" => return writeln!(buffer, "{indentation}font-variant-numeric: normal;"),
-                "ordinal" => writeln!(buffer, "{indentation}--en-ordinal: ordinal;")?,
-                "slashed-zero" => writeln!(buffer, "{indentation}--en-slashed-zero: slashed-zero;")?,
-                "lining-nums" => writeln!(buffer, "{indentation}--en-numeric-figure: lining-nums;")?,
-                "oldstyle-nums" => writeln!(buffer, "{indentation}--en-numeric-figure: oldstyle-nums;")?,
+                "normal-nums" => return context.buffer.line("font-variant-numeric: normal;"),
+                "ordinal" => context.buffer.line("--en-ordinal: ordinal;"),
+                "slashed-zero" => context.buffer.line("--en-slashed-zero: slashed-zero;"),
+                "lining-nums" => context.buffer.line("--en-numeric-figure: lining-nums;"),
+                "oldstyle-nums" => context.buffer.line("--en-numeric-figure: oldstyle-nums;"),
                 "proportional-nums" => {
-                    writeln!(buffer, "{indentation}--en-numeric-spacing: proportional-nums;")?;
+                    context
+                        .buffer
+                        .line("--en-numeric-spacing: proportional-nums;");
                 }
-                "tabular-nums" => writeln!(buffer, "{indentation}--en-numeric-spacing: tabular-nums;")?,
+                "tabular-nums" => context.buffer.line("--en-numeric-spacing: tabular-nums;"),
                 "diagonal-fractions" => {
-                    writeln!(buffer, "{indentation}--en-numeric-fraction: diagonal-fractions;")?;
+                    context
+                        .buffer
+                        .line("--en-numeric-fraction: diagonal-fractions;");
                 }
                 "stacked-fractions" => {
-                    writeln!(buffer, "{indentation}--en-numeric-fraction: stacked-fractions;")?;
+                    context
+                        .buffer
+                        .line("--en-numeric-fraction: stacked-fractions;");
                 }
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
 
-        writeln!(buffer, "{indentation}font-variant-numeric: var(--en-ordinal) var(--en-slashed-zero) var(--en-numeric-figure) var(--en-numeric-spacing) var(--en-numeric-fraction);")?;
-
-        Ok(())
+        context.buffer.line("font-variant-numeric: var(--en-ordinal) var(--en-slashed-zero) var(--en-numeric-figure) var(--en-numeric-spacing) var(--en-numeric-fraction);");
     }
 }

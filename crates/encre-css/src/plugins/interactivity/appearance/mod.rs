@@ -17,14 +17,16 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { .. } => {
-                writeln!(buffer, "{indentation}-webkit-appearance: none;\n{indentation}-moz-appearance: none;\n{indentation}appearance: none;")?;
+                context.buffer.lines([
+                    "-webkit-appearance: none;",
+                    "-moz-appearance: none;",
+                    "appearance: none;",
+                ]);
             }
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

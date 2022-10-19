@@ -17,16 +17,18 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => {
-                writeln!(buffer, "{indentation}list-style-type: {value};")?;
+                context
+                    .buffer
+                    .line(format_args!("list-style-type: {value};"));
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}list-style-type: {value};")?;
+                context
+                    .buffer
+                    .line(format_args!("list-style-type: {value};"));
             }
         }
-
-        Ok(())
     }
 }

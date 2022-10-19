@@ -31,44 +31,53 @@ impl Plugin for PluginXDefinition {
         false
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         generate_at_rules(context, |context| {
             generate_class(
                 context,
-                |ContextHandle { modifier, indentation, buffer, .. }| {
-                    match modifier {
-                        Modifier::Builtin { value, .. } => {
-                            if *value == "reverse" {
-                                return writeln!(buffer, "{indentation}--en-divide-x-reverse: 1;");
-                            }
-
-                            writeln!(buffer, "{indentation}--en-divide-x-reverse: 0;")?;
-
-                            if is_matching_line_width(value) {
-                                writeln!(buffer, "{indentation}border-right-width: {value};\n{indentation}border-left-width: {value};")?;
-                            } else {
-                                writeln!(
-                                    buffer,
-                                    "{indentation}border-right-width: calc({value}px * var(--en-divide-x-reverse));\n{indentation}border-left-width: calc({value}px * calc(1 - var(--en-divide-x-reverse)));",
-                                    value = if value.is_empty() { "1" } else { value }
-                                )?;
-                            }
+                |context| match context.modifier {
+                    Modifier::Builtin { value, .. } => {
+                        if *value == "reverse" {
+                            return context.buffer.line("--en-divide-x-reverse: 1;");
                         }
-                        Modifier::Arbitrary { value, .. } => {
-                            writeln!(buffer, "{indentation}--en-divide-x-reverse: 0;")?;
 
-                            if is_matching_line_width(value) {
-                                writeln!(buffer, "{indentation}border-right-width: {value};\n{indentation}border-left-width: {value};")?;
-                            } else {
-                                writeln!(
-                            buffer,
-                            "{indentation}border-right-width: calc({value} * var(--en-divide-x-reverse));\n{indentation}border-left-width: calc({value} * calc(1 - var(--en-divide-x-reverse)));"
-                        )?;
-                            }
+                        context.buffer.line("--en-divide-x-reverse: 0;");
+
+                        if is_matching_line_width(value) {
+                            context
+                                .buffer
+                                .line(format_args!("border-right-width: {value};",));
+                            context
+                                .buffer
+                                .line(format_args!("border-left-width: {value};",));
+                        } else {
+                            context.buffer.line(format_args!(
+                                "border-right-width: calc({value}px * var(--en-divide-x-reverse));",
+                                value = if value.is_empty() { "1" } else { value }
+                            ));
+                            context.buffer.line(
+                                format_args!(
+                                    "border-left-width: calc({value}px * calc(1 - var(--en-divide-x-reverse)));",
+                                    value = if value.is_empty() { "1" } else { value }
+                                ));
                         }
                     }
+                    Modifier::Arbitrary { value, .. } => {
+                        context.buffer.line("--en-divide-x-reverse: 0;");
 
-                    Ok(())
+                        if is_matching_line_width(value) {
+                            context.buffer.line("border-right-width: {value};");
+                            context.buffer.line("border-left-width: {value};");
+                        } else {
+                            context.buffer.line(format_args!(
+                                "border-right-width: calc({value} * var(--en-divide-x-reverse));"
+                            ));
+                            context.buffer.line(
+                                    format_args!(
+                                    "border-left-width: calc({value} * calc(1 - var(--en-divide-x-reverse)));"
+                                ));
+                        }
+                    }
                 },
                 " > :not([hidden]) ~ :not([hidden])",
             )
@@ -92,44 +101,62 @@ impl Plugin for PluginYDefinition {
         false
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         generate_at_rules(context, |context| {
             generate_class(
                 context,
-                |ContextHandle { modifier, indentation, buffer, .. }| {
-                    match modifier {
-                        Modifier::Builtin { value, .. } => {
-                            if *value == "reverse" {
-                                return writeln!(buffer, "{indentation}--en-divide-y-reverse: 1;");
-                            }
-
-                            writeln!(buffer, "{indentation}--en-divide-y-reverse: 0;")?;
-
-                            if is_matching_line_width(value) {
-                                writeln!(buffer, "{indentation}border-top-width: {value};\n{indentation}border-bottom-width: {value};")?;
-                            } else {
-                                writeln!(
-                            buffer,
-                            "{indentation}border-top-width: calc({value}px * calc(1 - var(--en-divide-y-reverse)));\n{indentation}border-bottom-width: calc({value}px * var(--en-divide-y-reverse));",
-                            value = if value.is_empty() { "1" } else { value }
-                        )?;
-                            }
+                |context| match context.modifier {
+                    Modifier::Builtin { value, .. } => {
+                        if *value == "reverse" {
+                            context.buffer.line("--en-divide-y-reverse: 1;");
+                            return;
                         }
-                        Modifier::Arbitrary { value, .. } => {
-                            writeln!(buffer, "{indentation}--en-divide-y-reverse: 0;")?;
 
-                            if is_matching_line_width(value) {
-                                writeln!(buffer, "{indentation}border-top-width: {value};\n{indentation}border-bottom-width: {value};")?;
-                            } else {
-                                writeln!(
-                            buffer,
-                            "{indentation}border-top-width: calc({value} * calc(1 - var(--en-divide-y-reverse)));\n{indentation}border-bottom-width: calc({value} * var(--en-divide-y-reverse));"
-                        )?;
-                            }
+                        context.buffer.line("--en-divide-y-reverse: 0;");
+
+                        if is_matching_line_width(value) {
+                            context
+                                .buffer
+                                .line(format_args!("border-top-width: {value};"));
+                            context
+                                .buffer
+                                .line(format_args!("border-bottom-width: {value};"));
+                        } else {
+                            context.buffer.line(
+                                    format_args!(
+                                        "border-top-width: calc({value}px * calc(1 - var(--en-divide-y-reverse)));",
+                                        value = if value.is_empty() { "1" } else { value }
+                                    )
+                                );
+                            context.buffer.line(
+                                    format_args!(
+                                        "border-bottom-width: calc({value}px * var(--en-divide-y-reverse));",
+                                        value = if value.is_empty() { "1" } else { value }
+                                    )
+                                );
                         }
                     }
+                    Modifier::Arbitrary { value, .. } => {
+                        context.buffer.line("--en-divide-y-reverse: 0;");
 
-                    Ok(())
+                        if is_matching_line_width(value) {
+                            context
+                                .buffer
+                                .line(format_args!("border-top-width: {value};"));
+                            context
+                                .buffer
+                                .line(format_args!("border-bottom-width: {value};"));
+                        } else {
+                            context.buffer.line(
+                                    format_args!(
+                                        "border-top-width: calc({value} * calc(1 - var(--en-divide-y-reverse)));"
+                                    )
+                                );
+                            context.buffer.line(format_args!(
+                                "border-bottom-width: calc({value} * var(--en-divide-y-reverse));"
+                            ));
+                        }
+                    }
                 },
                 " > :not([hidden]) ~ :not([hidden])",
             )

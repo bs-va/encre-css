@@ -20,25 +20,22 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { is_negative, value } => match *value {
-                "full" => writeln!(buffer, "{indentation}min-height: 100%;")?,
-                "min" => writeln!(buffer, "{indentation}min-height: min-content;")?,
-                "max" => writeln!(buffer, "{indentation}min-height: max-content;")?,
-                "fit" => writeln!(buffer, "{indentation}min-height: fit-content;")?,
-                "screen" => writeln!(buffer, "{indentation}min-height: 100vh;")?,
-                _ => writeln!(
-                    buffer,
-                    "{indentation}min-height: {};",
+                "full" => context.buffer.line("min-height: 100%;"),
+                "min" => context.buffer.line("min-height: min-content;"),
+                "max" => context.buffer.line("min-height: max-content;"),
+                "fit" => context.buffer.line("min-height: fit-content;"),
+                "screen" => context.buffer.line("min-height: 100vh;"),
+                _ => context.buffer.line(format_args!(
+                    "min-height: {};",
                     spacing::get(value, *is_negative).unwrap()
-                )?,
+                )),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}min-height: {value};")?;
+                context.buffer.line(format_args!("min-height: {value};"));
             }
         }
-
-        Ok(())
     }
 }

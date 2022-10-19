@@ -17,16 +17,14 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "collapse" => writeln!(buffer, "{indentation}border-collapse: collapse;")?,
-                "separate" => writeln!(buffer, "{indentation}border-collapse: separate;")?,
+                "collapse" => context.buffer.line("border-collapse: collapse;"),
+                "separate" => context.buffer.line("border-collapse: separate;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

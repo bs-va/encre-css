@@ -11,26 +11,24 @@ fn color_can_handle(context: &mut ContextCanHandle) -> bool {
     }
 }
 
-fn color_handle(css_props: &[&str], ContextHandle { config, modifier, indentation, buffer, .. }: &mut ContextHandle) -> fmt::Result {
-    match modifier {
+fn color_handle(css_props: &[&str], context: &mut ContextHandle) {
+    match context.modifier {
         Modifier::Builtin { value, .. } => {
-            let color = color::get(config, value, Some("--en-border-opacity")).unwrap();
+            let color = color::get(context.config, value, Some("--en-border-opacity")).unwrap();
             if color.contains("--en-border-opacity") {
-                writeln!(buffer, "{indentation}--en-border-opacity: 1;")?;
+                context.buffer.line("--en-border-opacity: 1;");
             }
 
             for css_prop in css_props {
-                writeln!(buffer, "{indentation}{css_prop}: {color};")?;
+                context.buffer.line(format_args!("{css_prop}: {color};"));
             }
         }
         Modifier::Arbitrary { value, .. } => {
             for css_prop in css_props {
-                writeln!(buffer, "{indentation}{css_prop}: {value};")?;
+                context.buffer.line(format_args!("{css_prop}: {value};"));
             }
         }
     }
-
-    Ok(())
 }
 
 #[derive(Debug)]
@@ -58,7 +56,7 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         color_handle(&["border-color"], context)
     }
 }
@@ -75,7 +73,7 @@ impl Plugin for PluginXDefinition {
         color_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         color_handle(&["border-left-color", "border-right-color"], context)
     }
 }
@@ -92,7 +90,7 @@ impl Plugin for PluginYDefinition {
         color_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         color_handle(&["border-top-color", "border-bottom-color"], context)
     }
 }
@@ -109,7 +107,7 @@ impl Plugin for PluginLeftDefinition {
         color_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         color_handle(&["border-left-color"], context)
     }
 }
@@ -126,7 +124,7 @@ impl Plugin for PluginRightDefinition {
         color_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         color_handle(&["border-right-color"], context)
     }
 }
@@ -143,7 +141,7 @@ impl Plugin for PluginTopDefinition {
         color_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         color_handle(&["border-top-color"], context)
     }
 }
@@ -160,7 +158,7 @@ impl Plugin for PluginBottomDefinition {
         color_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         color_handle(&["border-bottom-color"], context)
     }
 }

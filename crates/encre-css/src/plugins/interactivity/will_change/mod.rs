@@ -19,18 +19,18 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "auto" => writeln!(buffer, "{indentation}will-change: auto;")?,
-                "scroll" => writeln!(buffer, "{indentation}will-change: scroll-position;")?,
-                "contents" => writeln!(buffer, "{indentation}will-change: contents;")?,
-                "transform" => writeln!(buffer, "{indentation}will-change: transform;")?,
+                "auto" => context.buffer.line("will-change: auto;"),
+                "scroll" => context.buffer.line("will-change: scroll-position;"),
+                "contents" => context.buffer.line("will-change: contents;"),
+                "transform" => context.buffer.line("will-change: transform;"),
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "{indentation}will-change: {value};")?,
+            Modifier::Arbitrary { value, .. } => {
+                context.buffer.line(format_args!("will-change: {value};"))
+            }
         }
-
-        Ok(())
     }
 }

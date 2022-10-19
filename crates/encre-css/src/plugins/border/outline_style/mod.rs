@@ -19,22 +19,21 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "" => writeln!(buffer, "{indentation}outline-style: solid;")?,
+                "" => context.buffer.line("outline-style: solid;"),
                 "none" => {
-                    writeln!(buffer, "{indentation}outline: 2px solid transparent;\n{indentation}outline-offset: 2px;")?;
+                    context.buffer.line("outline: 2px solid transparent;");
+                    context.buffer.line("outline-offset: 2px;");
                 }
-                "dashed" => writeln!(buffer, "{indentation}outline-style: dashed;")?,
-                "dotted" => writeln!(buffer, "{indentation}outline-style: dotted;")?,
-                "double" => writeln!(buffer, "{indentation}outline-style: double;")?,
-                "hidden" => writeln!(buffer, "{indentation}outline-style: hidden;")?,
+                "dashed" => context.buffer.line("outline-style: dashed;"),
+                "dotted" => context.buffer.line("outline-style: dotted;"),
+                "double" => context.buffer.line("outline-style: double;"),
+                "hidden" => context.buffer.line("outline-style: hidden;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

@@ -9,30 +9,27 @@ fn border_spacing_can_handle(context: &mut ContextCanHandle) -> bool {
     }
 }
 
-fn border_spacing_handle(css_props: &[&str], ContextHandle { modifier, indentation, buffer, .. }: &mut ContextHandle) -> fmt::Result {
-    match modifier {
+fn border_spacing_handle(css_props: &[&str], context: &mut ContextHandle) {
+    match context.modifier {
         Modifier::Builtin { is_negative, value } => {
             for css_prop in css_props {
-                writeln!(
-                    buffer,
-                    "{indentation}{}: {};",
+                context.buffer.line(format_args!(
+                    "{}: {};",
                     css_prop,
                     spacing::get(value, *is_negative).unwrap(),
-                )?;
+                ));
             }
         }
         Modifier::Arbitrary { value, .. } => {
             for css_prop in css_props {
-                writeln!(buffer, "{indentation}{css_prop}: {value}")?;
+                context.buffer.line(format_args!("{css_prop}: {value}"));
             }
         }
     }
 
-    writeln!(
-        buffer,
-        "{indentation}border-spacing: var(--en-border-spacing-x) var(--en-border-spacing-y);"
-    )?;
-    Ok(())
+    context
+        .buffer
+        .line("border-spacing: var(--en-border-spacing-x) var(--en-border-spacing-y);");
 }
 
 #[derive(Debug)]
@@ -47,7 +44,7 @@ impl Plugin for PluginDefinition {
         border_spacing_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         border_spacing_handle(&["--en-border-spacing-x", "--en-border-spacing-y"], context)
     }
 }
@@ -64,7 +61,7 @@ impl Plugin for PluginXDefinition {
         border_spacing_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         border_spacing_handle(&["--en-border-spacing-x"], context)
     }
 }
@@ -81,7 +78,7 @@ impl Plugin for PluginYDefinition {
         border_spacing_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         border_spacing_handle(&["--en-border-spacing-y"], context)
     }
 }

@@ -23,24 +23,20 @@ impl Plugin for PluginDefinition {
         false
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         generate_at_rules(context, |context| {
             generate_class(
                 context,
-                |ContextHandle { modifier, indentation, buffer, .. }| {
-                    match modifier {
-                        Modifier::Builtin { value, .. } => match *value {
-                            "solid" => writeln!(buffer, "{indentation}border-style: solid;")?,
-                            "dashed" => writeln!(buffer, "{indentation}border-style: dashed;")?,
-                            "dotted" => writeln!(buffer, "{indentation}border-style: dotted;")?,
-                            "double" => writeln!(buffer, "{indentation}border-style: double;")?,
-                            "none" => writeln!(buffer, "{indentation}border-style: none;")?,
-                            _ => unreachable!(),
-                        },
-                        Modifier::Arbitrary { .. } => unreachable!(),
-                    }
-
-                    Ok(())
+                |context| match context.modifier {
+                    Modifier::Builtin { value, .. } => match *value {
+                        "solid" => context.buffer.line("border-style: solid;"),
+                        "dashed" => context.buffer.line("border-style: dashed;"),
+                        "dotted" => context.buffer.line("border-style: dotted;"),
+                        "double" => context.buffer.line("border-style: double;"),
+                        "none" => context.buffer.line("border-style: none;"),
+                        _ => unreachable!(),
+                    },
+                    Modifier::Arbitrary { .. } => unreachable!(),
                 },
                 " > :not([hidden]) ~ :not([hidden])",
             )

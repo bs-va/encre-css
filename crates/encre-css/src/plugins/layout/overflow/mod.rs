@@ -31,26 +31,24 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "auto" => writeln!(buffer, "{indentation}overflow: auto;")?,
-                "x-auto" => writeln!(buffer, "{indentation}overflow-x: auto;")?,
-                "y-auto" => writeln!(buffer, "{indentation}overflow-y: auto;")?,
-                "hidden" => writeln!(buffer, "{indentation}overflow: hidden;")?,
-                "x-hidden" => writeln!(buffer, "{indentation}overflow-x: hidden;")?,
-                "y-hidden" => writeln!(buffer, "{indentation}overflow-y: hidden;")?,
-                "visible" => writeln!(buffer, "{indentation}overflow: visible;")?,
-                "x-visible" => writeln!(buffer, "{indentation}overflow-x: visible;")?,
-                "y-visible" => writeln!(buffer, "{indentation}overflow-y: visible;")?,
-                "scroll" => writeln!(buffer, "{indentation}overflow: scroll;")?,
-                "x-scroll" => writeln!(buffer, "{indentation}overflow-x: scroll;")?,
-                "y-scroll" => writeln!(buffer, "{indentation}overflow-y: scroll;")?,
+                "auto" => context.buffer.line("overflow: auto;"),
+                "x-auto" => context.buffer.line("overflow-x: auto;"),
+                "y-auto" => context.buffer.line("overflow-y: auto;"),
+                "hidden" => context.buffer.line("overflow: hidden;"),
+                "x-hidden" => context.buffer.line("overflow-x: hidden;"),
+                "y-hidden" => context.buffer.line("overflow-y: hidden;"),
+                "visible" => context.buffer.line("overflow: visible;"),
+                "x-visible" => context.buffer.line("overflow-x: visible;"),
+                "y-visible" => context.buffer.line("overflow-y: visible;"),
+                "scroll" => context.buffer.line("overflow: scroll;"),
+                "x-scroll" => context.buffer.line("overflow-x: scroll;"),
+                "y-scroll" => context.buffer.line("overflow-y: scroll;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

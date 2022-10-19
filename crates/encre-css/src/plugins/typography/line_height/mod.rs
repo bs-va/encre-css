@@ -25,26 +25,23 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { is_negative, value } => match *value {
-                "none" => writeln!(buffer, "{indentation}line-height: 1;")?,
-                "tight" => writeln!(buffer, "{indentation}line-height: 1.25;")?,
-                "snug" => writeln!(buffer, "{indentation}line-height: 1.375;")?,
-                "normal" => writeln!(buffer, "{indentation}line-height: 1.5;")?,
-                "relaxed" => writeln!(buffer, "{indentation}line-height: 1.625;")?,
-                "loose" => writeln!(buffer, "{indentation}line-height: 2;")?,
-                _ => writeln!(
-                    buffer,
-                    "{indentation}line-height: {};",
+                "none" => context.buffer.line("line-height: 1;"),
+                "tight" => context.buffer.line("line-height: 1.25;"),
+                "snug" => context.buffer.line("line-height: 1.375;"),
+                "normal" => context.buffer.line("line-height: 1.5;"),
+                "relaxed" => context.buffer.line("line-height: 1.625;"),
+                "loose" => context.buffer.line("line-height: 2;"),
+                _ => context.buffer.line(format_args!(
+                    "line-height: {};",
                     spacing::get(value, *is_negative).unwrap()
-                )?,
+                )),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}line-height: {value};")?;
+                context.buffer.line(format_args!("line-height: {value};"));
             }
         }
-
-        Ok(())
     }
 }

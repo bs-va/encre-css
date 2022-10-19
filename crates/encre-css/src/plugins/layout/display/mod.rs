@@ -36,35 +36,33 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "hidden" => writeln!(buffer, "{indentation}display: none;")?,
-                "contents" => writeln!(buffer, "{indentation}display: contents;")?,
-                "list-item" => writeln!(buffer, "{indentation}display: list-item;")?,
-                "block" => writeln!(buffer, "{indentation}display: block;")?,
-                "inline-block" => writeln!(buffer, "{indentation}display: inline-block;")?,
-                "flex" => writeln!(buffer, "{indentation}display: flex;")?,
-                "inline-flex" => writeln!(buffer, "{indentation}display: inline-flex;")?,
-                "inline" => writeln!(buffer, "{indentation}display: inline;")?,
-                "table" => writeln!(buffer, "{indentation}display: table;")?,
-                "inline-table" => writeln!(buffer, "{indentation}display: inline-table;")?,
-                "table-cell" => writeln!(buffer, "{indentation}display: table-cell;")?,
-                "table-caption" => writeln!(buffer, "{indentation}display: table-caption;")?,
-                "table-column" => writeln!(buffer, "{indentation}display: table-column;")?,
-                "table-column-group" => writeln!(buffer, "{indentation}display: table-column-group;")?,
-                "table-footer-group" => writeln!(buffer, "{indentation}display: table-footer-group;")?,
-                "table-header-group" => writeln!(buffer, "{indentation}display: table-header-group;")?,
-                "table-row-group" => writeln!(buffer, "{indentation}display: table-row-group;")?,
-                "table-row" => writeln!(buffer, "{indentation}display: table-row;")?,
-                "flow-root" => writeln!(buffer, "{indentation}display: flow-root;")?,
-                "grid" => writeln!(buffer, "{indentation}display: grid;")?,
-                "inline-grid" => writeln!(buffer, "{indentation}display: inline-grid;")?,
+                "hidden" => context.buffer.line("display: none;"),
+                "contents" => context.buffer.line("display: contents;"),
+                "list-item" => context.buffer.line("display: list-item;"),
+                "block" => context.buffer.line("display: block;"),
+                "inline-block" => context.buffer.line("display: inline-block;"),
+                "flex" => context.buffer.line("display: flex;"),
+                "inline-flex" => context.buffer.line("display: inline-flex;"),
+                "inline" => context.buffer.line("display: inline;"),
+                "table" => context.buffer.line("display: table;"),
+                "inline-table" => context.buffer.line("display: inline-table;"),
+                "table-cell" => context.buffer.line("display: table-cell;"),
+                "table-caption" => context.buffer.line("display: table-caption;"),
+                "table-column" => context.buffer.line("display: table-column;"),
+                "table-column-group" => context.buffer.line("display: table-column-group;"),
+                "table-footer-group" => context.buffer.line("display: table-footer-group;"),
+                "table-header-group" => context.buffer.line("display: table-header-group;"),
+                "table-row-group" => context.buffer.line("display: table-row-group;"),
+                "table-row" => context.buffer.line("display: table-row;"),
+                "flow-root" => context.buffer.line("display: flow-root;"),
+                "grid" => context.buffer.line("display: grid;"),
+                "inline-grid" => context.buffer.line("display: inline-grid;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

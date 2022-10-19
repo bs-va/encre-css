@@ -18,22 +18,22 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "tighter" => writeln!(buffer, "{indentation}letter-spacing: -0.05em;")?,
-                "tight" => writeln!(buffer, "{indentation}letter-spacing: -0.025em;")?,
-                "normal" => writeln!(buffer, "{indentation}letter-spacing: 0;")?,
-                "wide" => writeln!(buffer, "{indentation}letter-spacing: 0.025em;")?,
-                "wider" => writeln!(buffer, "{indentation}letter-spacing: 0.05em;")?,
-                "widest" => writeln!(buffer, "{indentation}letter-spacing: 0.1em;")?,
+                "tighter" => context.buffer.line("letter-spacing: -0.05em;"),
+                "tight" => context.buffer.line("letter-spacing: -0.025em;"),
+                "normal" => context.buffer.line("letter-spacing: 0;"),
+                "wide" => context.buffer.line("letter-spacing: 0.025em;"),
+                "wider" => context.buffer.line("letter-spacing: 0.05em;"),
+                "widest" => context.buffer.line("letter-spacing: 0.1em;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}letter-spacing: {value};")?;
+                context
+                    .buffer
+                    .line(format_args!("letter-spacing: {value};"));
             }
         }
-
-        Ok(())
     }
 }

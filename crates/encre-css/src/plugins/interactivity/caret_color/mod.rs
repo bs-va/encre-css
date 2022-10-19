@@ -21,14 +21,15 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, config, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
-            Modifier::Builtin { value, .. } => writeln!(
-                buffer,
-                "{indentation}caret-color: {};",
-                color::get(config, value, None).unwrap()
-            ),
-            Modifier::Arbitrary { value, .. } => writeln!(buffer, "{indentation}caret-color: {value};"),
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
+            Modifier::Builtin { value, .. } => context.buffer.line(format_args!(
+                "caret-color: {};",
+                color::get(context.config, value, None).unwrap()
+            )),
+            Modifier::Arbitrary { value, .. } => {
+                context.buffer.line(format_args!("caret-color: {value};"));
+            }
         }
     }
 }

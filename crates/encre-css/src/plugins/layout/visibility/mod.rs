@@ -13,16 +13,14 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "visible" => writeln!(buffer, "{indentation}visibility: visible;")?,
-                "invisible" => writeln!(buffer, "{indentation}visibility: hidden;")?,
+                "visible" => context.buffer.line("visibility: visible;"),
+                "invisible" => context.buffer.line("visibility: hidden;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

@@ -23,30 +23,34 @@ impl Plugin for PluginXDefinition {
         false
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         generate_at_rules(context, |context| {
             generate_class(
                 context,
-                |ContextHandle { modifier, indentation, buffer, .. }| {
-                    match modifier {
-                        Modifier::Builtin { is_negative, value } => {
-                            if *value == "reverse" {
-                                return writeln!(buffer, "{indentation}--en-space-x-reverse: 1;");
-                            }
+                |context| match context.modifier {
+                    Modifier::Builtin { is_negative, value } => {
+                        if *value == "reverse" {
+                            return context.buffer.line("--en-space-x-reverse: 1;");
+                        }
 
-                            let length = spacing::get(value, *is_negative).unwrap();
-                            writeln!(buffer, "{indentation}--en-space-x-reverse: 0;
-{indentation}margin-right: calc({length} * var(--en-space-x-reverse));
-{indentation}margin-left: calc({length} * calc(1 - var(--en-space-x-reverse)));")?;
-                        }
-                        Modifier::Arbitrary { value, .. } => {
-                            writeln!(buffer, "{indentation}--en-space-x-reverse: 0;
-{indentation}margin-right: calc({value} * var(--en-space-x-reverse));
-{indentation}margin-left: calc({value} * calc(1 - var(--en-space-x-reverse)));")?;
-                        }
+                        let length = spacing::get(value, *is_negative).unwrap();
+                        context.buffer.lines([
+                                format_args!("--en-space-x-reverse: 0;"),
+                                format_args!("margin-right: calc({length} * var(--en-space-x-reverse));"),
+                                format_args!("margin-left: calc({length} * calc(1 - var(--en-space-x-reverse)));"),
+                            ]);
                     }
-
-                    Ok(())
+                    Modifier::Arbitrary { value, .. } => {
+                        context.buffer.lines([
+                            format_args!("--en-space-x-reverse: 0;"),
+                            format_args!(
+                                "margin-right: calc({value} * var(--en-space-x-reverse));"
+                            ),
+                            format_args!(
+                                "margin-left: calc({value} * calc(1 - var(--en-space-x-reverse)));"
+                            ),
+                        ]);
+                    }
                 },
                 " > :not([hidden]) ~ :not([hidden])",
             )
@@ -75,30 +79,38 @@ impl Plugin for PluginYDefinition {
         false
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         generate_at_rules(context, |context| {
             generate_class(
                 context,
-                |ContextHandle { modifier, indentation, buffer, .. }| {
-                    match modifier {
-                        Modifier::Builtin { is_negative, value } => {
-                            if *value == "reverse" {
-                                return writeln!(buffer, "{indentation}--en-space-y-reverse: 1;");
-                            }
+                |context| match context.modifier {
+                    Modifier::Builtin { is_negative, value } => {
+                        if *value == "reverse" {
+                            return context.buffer.line("--en-space-y-reverse: 1;");
+                        }
 
-                            let length = spacing::get(value, *is_negative).unwrap();
-                            writeln!(buffer, "{indentation}--en-space-y-reverse: 0;
-{indentation}margin-top: calc({length} * calc(1 - var(--en-space-y-reverse)));
-{indentation}margin-bottom: calc({length} * var(--en-space-y-reverse));")?;
-                        }
-                        Modifier::Arbitrary { value, .. } => {
-                            writeln!(buffer, "{indentation}--en-space-y-reverse: 0;
-{indentation}margin-top: calc({value} * calc(1 - var(--en-space-y-reverse)));
-{indentation}margin-bottom: calc({value} * var(--en-space-y-reverse));")?;
-                        }
+                        let length = spacing::get(value, *is_negative).unwrap();
+                        context.buffer.lines([
+                            format_args!("--en-space-y-reverse: 0;"),
+                            format_args!(
+                                "margin-top: calc({length} * calc(1 - var(--en-space-y-reverse)));"
+                            ),
+                            format_args!(
+                                "margin-bottom: calc({length} * var(--en-space-y-reverse));"
+                            ),
+                        ]);
                     }
-
-                    Ok(())
+                    Modifier::Arbitrary { value, .. } => {
+                        context.buffer.lines([
+                            format_args!("--en-space-y-reverse: 0;"),
+                            format_args!(
+                                "margin-top: calc({value} * calc(1 - var(--en-space-y-reverse)));"
+                            ),
+                            format_args!(
+                                "margin-bottom: calc({value} * var(--en-space-y-reverse));"
+                            ),
+                        ]);
+                    }
                 },
                 " > :not([hidden]) ~ :not([hidden])",
             )

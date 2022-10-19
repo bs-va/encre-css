@@ -1,6 +1,6 @@
 #![doc = include_str!("README.md")]
 #![doc(alias = "filter")]
-use super::{CSS_BACKDROP_FILTER_1, CSS_BACKDROP_FILTER_2};
+use super::CSS_BACKDROP_FILTER;
 use crate::prelude::build_plugin::*;
 
 #[derive(Debug)]
@@ -18,20 +18,20 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
                 "" => {
-                    writeln!(buffer, "{indentation}{}\n{indentation}{}", CSS_BACKDROP_FILTER_1, CSS_BACKDROP_FILTER_2)?;
+                    context.buffer.lines(CSS_BACKDROP_FILTER);
                 }
                 "none" => {
-                    writeln!(buffer, "{indentation}-webkit-backdrop-filter: none;\n{indentation}backdrop-filter: none;")?;
+                    context
+                        .buffer
+                        .lines(["-webkit-backdrop-filter: none;", "backdrop-filter: none;"]);
                 }
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

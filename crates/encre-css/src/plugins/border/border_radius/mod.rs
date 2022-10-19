@@ -14,13 +14,12 @@ fn radius_can_handle(context: &mut ContextCanHandle) -> bool {
     }
 }
 
-fn radius_handle(css_properties: &[&str], ContextHandle { modifier, indentation, buffer, .. }: &mut ContextHandle) -> fmt::Result {
-    match modifier {
+fn radius_handle(css_properties: &[&str], context: &mut ContextHandle) {
+    match context.modifier {
         Modifier::Builtin { value, .. } => {
             for css_prop in css_properties {
-                writeln!(
-                    buffer,
-                    "{indentation}{}: {};",
+                context.buffer.line(format_args!(
+                    "{}: {};",
                     css_prop,
                     match *value {
                         "" => "0.25rem",
@@ -34,17 +33,15 @@ fn radius_handle(css_properties: &[&str], ContextHandle { modifier, indentation,
                         "full" => "9999px",
                         _ => unreachable!(),
                     }
-                )?;
+                ));
             }
         }
         Modifier::Arbitrary { value, .. } => {
             for css_prop in css_properties {
-                writeln!(buffer, "{indentation}{css_prop}: {value};")?;
+                context.buffer.line(format_args!("{css_prop}: {value};"));
             }
         }
     }
-
-    Ok(())
 }
 
 #[derive(Debug)]
@@ -70,7 +67,7 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         radius_handle(&["border-radius"], context)
     }
 }
@@ -87,7 +84,7 @@ impl Plugin for PluginTopRightDefinition {
         radius_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         radius_handle(&["border-top-right-radius"], context)
     }
 }
@@ -104,7 +101,7 @@ impl Plugin for PluginTopLeftDefinition {
         radius_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         radius_handle(&["border-top-left-radius"], context)
     }
 }
@@ -121,7 +118,7 @@ impl Plugin for PluginBottomRightDefinition {
         radius_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         radius_handle(&["border-bottom-right-radius"], context)
     }
 }
@@ -138,7 +135,7 @@ impl Plugin for PluginBottomLeftDefinition {
         radius_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         radius_handle(&["border-bottom-left-radius"], context)
     }
 }
@@ -155,7 +152,7 @@ impl Plugin for PluginTopDefinition {
         radius_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         radius_handle(
             &["border-top-left-radius", "border-top-right-radius"],
             context,
@@ -175,7 +172,7 @@ impl Plugin for PluginBottomDefinition {
         radius_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         radius_handle(
             &["border-bottom-left-radius", "border-bottom-right-radius"],
             context,
@@ -195,7 +192,7 @@ impl Plugin for PluginLeftDefinition {
         radius_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         radius_handle(
             &["border-top-left-radius", "border-bottom-left-radius"],
             context,
@@ -215,7 +212,7 @@ impl Plugin for PluginRightDefinition {
         radius_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         radius_handle(
             &["border-top-right-radius", "border-bottom-right-radius"],
             context,

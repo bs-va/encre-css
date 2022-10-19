@@ -24,37 +24,34 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { is_negative, value } => match *value {
-                "none" => writeln!(buffer, "{indentation}max-height: none;")?,
-                "xs" => writeln!(buffer, "{indentation}max-height: 20rem;")?,
-                "sm" => writeln!(buffer, "{indentation}max-height: 24rem;")?,
-                "md" => writeln!(buffer, "{indentation}max-height: 28rem;")?,
-                "lg" => writeln!(buffer, "{indentation}max-height: 32rem;")?,
-                "xl" => writeln!(buffer, "{indentation}max-height: 36rem;")?,
-                "2xl" => writeln!(buffer, "{indentation}max-height: 42rem;")?,
-                "3xl" => writeln!(buffer, "{indentation}max-height: 48rem;")?,
-                "4xl" => writeln!(buffer, "{indentation}max-height: 56rem;")?,
-                "5xl" => writeln!(buffer, "{indentation}max-height: 64rem;")?,
-                "6xl" => writeln!(buffer, "{indentation}max-height: 72rem;")?,
-                "7xl" => writeln!(buffer, "{indentation}max-height: 80rem;")?,
-                "full" => writeln!(buffer, "{indentation}max-height: 100%;")?,
-                "min" => writeln!(buffer, "{indentation}max-height: min-content;")?,
-                "max" => writeln!(buffer, "{indentation}max-height: max-content;")?,
-                "screen" => writeln!(buffer, "{indentation}max-height: 100vh;")?,
-                "fit" => writeln!(buffer, "{indentation}max-height: fit-content;")?,
-                _ => writeln!(
-                    buffer,
-                    "{indentation}max-height: {};",
+                "none" => context.buffer.line("max-height: none;"),
+                "xs" => context.buffer.line("max-height: 20rem;"),
+                "sm" => context.buffer.line("max-height: 24rem;"),
+                "md" => context.buffer.line("max-height: 28rem;"),
+                "lg" => context.buffer.line("max-height: 32rem;"),
+                "xl" => context.buffer.line("max-height: 36rem;"),
+                "2xl" => context.buffer.line("max-height: 42rem;"),
+                "3xl" => context.buffer.line("max-height: 48rem;"),
+                "4xl" => context.buffer.line("max-height: 56rem;"),
+                "5xl" => context.buffer.line("max-height: 64rem;"),
+                "6xl" => context.buffer.line("max-height: 72rem;"),
+                "7xl" => context.buffer.line("max-height: 80rem;"),
+                "full" => context.buffer.line("max-height: 100%;"),
+                "min" => context.buffer.line("max-height: min-content;"),
+                "max" => context.buffer.line("max-height: max-content;"),
+                "screen" => context.buffer.line("max-height: 100vh;"),
+                "fit" => context.buffer.line("max-height: fit-content;"),
+                _ => context.buffer.line(format_args!(
+                    "max-height: {};",
                     spacing::get(value, *is_negative).unwrap()
-                )?,
+                )),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}max-height: {value};")?;
+                context.buffer.line(format_args!("max-height: {value};"));
             }
         }
-
-        Ok(())
     }
 }

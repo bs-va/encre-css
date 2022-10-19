@@ -34,25 +34,23 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "thin" => writeln!(buffer, "{indentation}font-weight: 100;")?,
-                "extralight" => writeln!(buffer, "{indentation}font-weight: 200;")?,
-                "light" => writeln!(buffer, "{indentation}font-weight: 300;")?,
-                "normal" => writeln!(buffer, "{indentation}font-weight: 400;")?,
-                "medium" => writeln!(buffer, "{indentation}font-weight: 500;")?,
-                "semibold" => writeln!(buffer, "{indentation}font-weight: 600;")?,
-                "bold" => writeln!(buffer, "{indentation}font-weight: 700;")?,
-                "extrabold" => writeln!(buffer, "{indentation}font-weight: 800;")?,
-                "black" => writeln!(buffer, "{indentation}font-weight: 900;")?,
+                "thin" => context.buffer.line("font-weight: 100;"),
+                "extralight" => context.buffer.line("font-weight: 200;"),
+                "light" => context.buffer.line("font-weight: 300;"),
+                "normal" => context.buffer.line("font-weight: 400;"),
+                "medium" => context.buffer.line("font-weight: 500;"),
+                "semibold" => context.buffer.line("font-weight: 600;"),
+                "bold" => context.buffer.line("font-weight: 700;"),
+                "extrabold" => context.buffer.line("font-weight: 800;"),
+                "black" => context.buffer.line("font-weight: 900;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}font-weight: {value};")?;
+                context.buffer.line(format_args!("font-weight: {value};"));
             }
         }
-
-        Ok(())
     }
 }

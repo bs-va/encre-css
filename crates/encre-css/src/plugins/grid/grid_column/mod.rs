@@ -28,35 +28,39 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => {
                 if *value == "auto" {
-                    return writeln!(buffer, "{indentation}grid-column: auto;");
+                    return context.buffer.line("grid-column: auto;");
                 }
 
                 if let Some(value) = value.strip_prefix("span-") {
                     if value == "full" {
-                        return writeln!(buffer, "{indentation}grid-column: 1 / -1;");
+                        return context.buffer.line("grid-column: 1 / -1;");
                     }
-                    writeln!(buffer, "{indentation}grid-column: span {value} / span {value};")?;
+                    context
+                        .buffer
+                        .line(format_args!("grid-column: span {value} / span {value};"));
                 } else if let Some(value) = value.strip_prefix("start-") {
                     if value == "auto" {
-                        return writeln!(buffer, "{indentation}grid-column-start: auto;");
+                        return context.buffer.line("grid-column-start: auto;");
                     }
-                    writeln!(buffer, "{indentation}grid-column-start: {value};")?;
+                    context
+                        .buffer
+                        .line(format_args!("grid-column-start: {value};"));
                 } else if let Some(value) = value.strip_prefix("end-") {
                     if value == "auto" {
-                        return writeln!(buffer, "{indentation}grid-column-end: auto;");
+                        return context.buffer.line("grid-column-end: auto;");
                     }
-                    writeln!(buffer, "{indentation}grid-column-end: {value};")?;
+                    context
+                        .buffer
+                        .line(format_args!("grid-column-end: {value};"));
                 }
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}grid-column: {value};")?;
+                context.buffer.line(format_args!("grid-column: {value};"));
             }
         }
-
-        Ok(())
     }
 }

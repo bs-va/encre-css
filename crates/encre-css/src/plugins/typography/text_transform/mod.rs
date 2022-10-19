@@ -15,18 +15,16 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "uppercase" => writeln!(buffer, "{indentation}text-transform: uppercase;")?,
-                "lowercase" => writeln!(buffer, "{indentation}text-transform: lowercase;")?,
-                "capitalize" => writeln!(buffer, "{indentation}text-transform: capitalize;")?,
-                "normal-case" => writeln!(buffer, "{indentation}text-transform: none;")?,
+                "uppercase" => context.buffer.line("text-transform: uppercase;"),
+                "lowercase" => context.buffer.line("text-transform: lowercase;"),
+                "capitalize" => context.buffer.line("text-transform: capitalize;"),
+                "normal-case" => context.buffer.line("text-transform: none;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

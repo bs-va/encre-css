@@ -19,17 +19,15 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "nowrap" => writeln!(buffer, "{indentation}flex-wrap: nowrap;")?,
-                "wrap" => writeln!(buffer, "{indentation}flex-wrap: wrap;")?,
-                "wrap-reverse" => writeln!(buffer, "{indentation}flex-wrap: wrap-reverse;")?,
+                "nowrap" => context.buffer.line("flex-wrap: nowrap;"),
+                "wrap" => context.buffer.line("flex-wrap: wrap;"),
+                "wrap-reverse" => context.buffer.line("flex-wrap: wrap-reverse;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

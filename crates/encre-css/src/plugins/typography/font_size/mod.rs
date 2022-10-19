@@ -31,55 +31,79 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
                 "xs" => {
-                    writeln!(buffer, "{indentation}font-size: 0.75rem;\n{indentation}line-height: 1rem;")?;
+                    context
+                        .buffer
+                        .lines(["font-size: 0.75rem;", "line-height: 1rem;"]);
                 }
                 "sm" => {
-                    writeln!(buffer, "{indentation}font-size: 0.875rem;\n{indentation}line-height: 1.25rem;")?;
+                    context
+                        .buffer
+                        .lines(["font-size: 0.875rem;", "line-height: 1.25rem;"]);
                 }
                 "base" => {
-                    writeln!(buffer, "{indentation}font-size: 1rem;\n{indentation}line-height: 1.5rem;")?;
+                    context
+                        .buffer
+                        .lines(["font-size: 1rem;", "line-height: 1.5rem;"]);
                 }
                 "lg" => {
-                    writeln!(buffer, "{indentation}font-size: 1.125rem;\n{indentation}line-height: 1.75rem;")?;
+                    context
+                        .buffer
+                        .lines(["font-size: 1.125rem;", "line-height: 1.75rem;"]);
                 }
                 "xl" => {
-                    writeln!(buffer, "{indentation}font-size: 1.25rem;\n{indentation}line-height: 1.75rem;")?;
+                    context
+                        .buffer
+                        .lines(["font-size: 1.25rem;", "line-height: 1.75rem;"]);
                 }
                 "2xl" => {
-                    writeln!(buffer, "{indentation}font-size: 1.5rem;\n{indentation}line-height: 2rem;")?;
+                    context
+                        .buffer
+                        .lines(["font-size: 1.5rem;", "line-height: 2rem;"]);
                 }
                 "3xl" => {
-                    writeln!(buffer, "{indentation}font-size: 1.875rem;\n{indentation}line-height: 2.25rem;")?;
+                    context
+                        .buffer
+                        .lines(["font-size: 1.875rem;", "line-height: 2.25rem;"]);
                 }
                 "4xl" => {
-                    writeln!(buffer, "{indentation}font-size: 2.25rem;\n{indentation}line-height: 2.5rem;")?;
+                    context
+                        .buffer
+                        .lines(["font-size: 2.25rem;", "line-height: 2.5rem;"]);
                 }
                 "5xl" => {
-                    writeln!(buffer, "{indentation}font-size: 3rem;\n{indentation}line-height: 1;")?;
+                    context
+                        .buffer
+                        .lines(["font-size: 3rem;", "line-height: 1;"]);
                 }
                 "6xl" => {
-                    writeln!(buffer, "{indentation}font-size: 3.75rem;\n{indentation}line-height: 1;")?;
+                    context
+                        .buffer
+                        .lines(["font-size: 3.75rem;", "line-height: 1;"]);
                 }
                 "7xl" => {
-                    writeln!(buffer, "{indentation}font-size: 4.5rem;\n{indentation}line-height: 1;")?;
+                    context
+                        .buffer
+                        .lines(["font-size: 4.5rem;", "line-height: 1;"]);
                 }
                 "8xl" => {
-                    writeln!(buffer, "{indentation}font-size: 6rem;\n{indentation}line-height: 1;")?;
+                    context
+                        .buffer
+                        .lines(["font-size: 6rem;", "line-height: 1;"]);
                 }
                 "9xl" => {
-                    writeln!(buffer, "{indentation}font-size: 8rem;\n{indentation}line-height: 1;")?;
+                    context
+                        .buffer
+                        .lines(["font-size: 8rem;", "line-height: 1;"]);
                 }
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}font-size: {value};")?;
+                context.buffer.line(format_args!("font-size: {value};"));
             }
         }
-
-        Ok(())
     }
 }

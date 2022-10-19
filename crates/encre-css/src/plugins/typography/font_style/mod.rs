@@ -13,16 +13,14 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "italic" => writeln!(buffer, "{indentation}font-style: italic;")?,
-                "not-italic" => writeln!(buffer, "{indentation}font-style: normal;")?,
+                "italic" => context.buffer.line("font-style: italic;"),
+                "not-italic" => context.buffer.line("font-style: normal;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

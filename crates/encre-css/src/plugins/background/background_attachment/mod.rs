@@ -17,17 +17,15 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "fixed" => writeln!(buffer, "{indentation}background-attachment: fixed;")?,
-                "local" => writeln!(buffer, "{indentation}background-attachment: local;")?,
-                "scroll" => writeln!(buffer, "{indentation}background-attachment: scroll;")?,
+                "fixed" => context.buffer.line("background-attachment: fixed;"),
+                "local" => context.buffer.line("background-attachment: local;"),
+                "scroll" => context.buffer.line("background-attachment: scroll;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

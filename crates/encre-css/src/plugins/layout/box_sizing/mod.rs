@@ -17,14 +17,14 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => {
-                writeln!(buffer, "{indentation}box-sizing: {value}-box;")?;
+                context
+                    .buffer
+                    .line(format_args!("box-sizing: {value}-box;"));
             }
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

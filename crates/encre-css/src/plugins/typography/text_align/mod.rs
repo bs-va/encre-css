@@ -19,12 +19,12 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
-            Modifier::Builtin { value, .. } => writeln!(buffer, "{indentation}text-align: {value};")?,
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
+            Modifier::Builtin { value, .. } => {
+                context.buffer.line(format_args!("text-align: {value};"))
+            }
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

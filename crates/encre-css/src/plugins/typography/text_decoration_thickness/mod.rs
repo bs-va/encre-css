@@ -25,20 +25,24 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => {
                 if ["auto", "from-font"].contains(&&**value) {
-                    return writeln!(buffer, "{indentation}text-decoration-thickness: {value};");
+                    return context
+                        .buffer
+                        .line(format_args!("text-decoration-thickness: {value};"));
                 }
 
-                writeln!(buffer, "{indentation}text-decoration-thickness: {value}px;")?;
+                context
+                    .buffer
+                    .line(format_args!("text-decoration-thickness: {value}px;"));
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}text-decoration-thickness: {value};")?;
+                context
+                    .buffer
+                    .line(format_args!("text-decoration-thickness: {value};"));
             }
         }
-
-        Ok(())
     }
 }

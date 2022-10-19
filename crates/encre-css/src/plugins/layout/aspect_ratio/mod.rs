@@ -17,21 +17,17 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "auto" => writeln!(buffer, "{indentation}aspect-ratio: auto;")?,
-                "square" => writeln!(buffer, "{indentation}aspect-ratio: 1 / 1;")?,
-                "video" => writeln!(buffer, "{indentation}aspect-ratio: 16 / 9;")?,
+                "auto" => context.buffer.line("aspect-ratio: auto;"),
+                "square" => context.buffer.line("aspect-ratio: 1 / 1;"),
+                "video" => context.buffer.line("aspect-ratio: 16 / 9;"),
                 _ => unreachable!(),
             },
-            Modifier::Arbitrary { value, .. } => writeln!(
-                buffer,
-                "{indentation}aspect-ratio: {};",
-                value.replace('/', " / "),
-            )?,
+            Modifier::Arbitrary { value, .. } => context
+                .buffer
+                .line(format_args!("aspect-ratio: {};", value.replace('/', " / "),)),
         }
-
-        Ok(())
     }
 }

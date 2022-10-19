@@ -28,25 +28,25 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "bottom" => writeln!(buffer, "{indentation}object-position: bottom;")?,
-                "center" => writeln!(buffer, "{indentation}object-position: center;")?,
-                "left" => writeln!(buffer, "{indentation}object-position: left;")?,
-                "left-bottom" => writeln!(buffer, "{indentation}object-position: left bottom;")?,
-                "left-top" => writeln!(buffer, "{indentation}object-position: left top;")?,
-                "right" => writeln!(buffer, "{indentation}object-position: right;")?,
-                "right-bottom" => writeln!(buffer, "{indentation}object-position: right bottom;")?,
-                "right-top" => writeln!(buffer, "{indentation}object-position: right top;")?,
-                "top" => writeln!(buffer, "{indentation}object-position: top;")?,
+                "bottom" => context.buffer.line("object-position: bottom;"),
+                "center" => context.buffer.line("object-position: center;"),
+                "left" => context.buffer.line("object-position: left;"),
+                "left-bottom" => context.buffer.line("object-position: left bottom;"),
+                "left-top" => context.buffer.line("object-position: left top;"),
+                "right" => context.buffer.line("object-position: right;"),
+                "right-bottom" => context.buffer.line("object-position: right bottom;"),
+                "right-top" => context.buffer.line("object-position: right top;"),
+                "top" => context.buffer.line("object-position: top;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}object-position: {value};")?;
+                context
+                    .buffer
+                    .line(format_args!("object-position: {value};"));
             }
         }
-
-        Ok(())
     }
 }

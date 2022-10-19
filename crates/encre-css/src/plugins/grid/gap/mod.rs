@@ -19,19 +19,16 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
-            Modifier::Builtin { is_negative, value } => writeln!(
-                buffer,
-                "{indentation}gap: {};",
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
+            Modifier::Builtin { is_negative, value } => context.buffer.line(format_args!(
+                "gap: {};",
                 spacing::get(value, *is_negative).unwrap()
-            )?,
+            )),
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}gap: {value};")?;
+                context.buffer.line(format_args!("gap: {value};"));
             }
         }
-
-        Ok(())
     }
 }
 
@@ -50,19 +47,16 @@ impl Plugin for PluginXDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
-            Modifier::Builtin { is_negative, value } => writeln!(
-                buffer,
-                "{indentation}column-gap: {};",
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
+            Modifier::Builtin { is_negative, value } => context.buffer.line(format_args!(
+                "column-gap: {};",
                 spacing::get(value, *is_negative).unwrap()
-            )?,
+            )),
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}column-gap: {value};")?;
+                context.buffer.line(format_args!("column-gap: {value};"));
             }
         }
-
-        Ok(())
     }
 }
 
@@ -81,18 +75,15 @@ impl Plugin for PluginYDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
-            Modifier::Builtin { is_negative, value } => writeln!(
-                buffer,
-                "{indentation}row-gap: {};",
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
+            Modifier::Builtin { is_negative, value } => context.buffer.line(format_args!(
+                "row-gap: {};",
                 spacing::get(value, *is_negative).unwrap()
-            )?,
+            )),
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}row-gap: {value};")?;
+                context.buffer.line(format_args!("row-gap: {value};"));
             }
         }
-
-        Ok(())
     }
 }

@@ -18,21 +18,20 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
-            Modifier::Builtin { is_negative, value } => writeln!(
-                buffer,
-                "{indentation}--en-hue-rotate: hue-rotate({}{}deg);",
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
+            Modifier::Builtin { is_negative, value } => context.buffer.line(format_args!(
+                "--en-hue-rotate: hue-rotate({}{}deg);",
                 format_negative(is_negative),
                 value
-            )?,
+            )),
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}--en-hue-rotate: hue-rotate({value});")?;
+                context
+                    .buffer
+                    .line(format_args!("--en-hue-rotate: hue-rotate({value});"));
             }
         }
 
-        writeln!(buffer, "{indentation}{}", CSS_FILTER)?;
-
-        Ok(())
+        context.buffer.line(CSS_FILTER);
     }
 }

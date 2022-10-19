@@ -23,9 +23,9 @@ impl Plugin for PluginFromDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, config, .. }: &mut ContextHandle) -> fmt::Result {
-        let value = match modifier {
-            Modifier::Builtin { value, .. } => color::get(config, value, None).unwrap(),
+    fn handle(&self, context: &mut ContextHandle) {
+        let value = match context.modifier {
+            Modifier::Builtin { value, .. } => color::get(context.config, value, None).unwrap(),
             Modifier::Arbitrary { value, .. } => value.clone(),
         };
 
@@ -38,13 +38,10 @@ impl Plugin for PluginFromDefinition {
             Cow::from(default)
         };
 
-        writeln!(buffer, "{indentation}--en-gradient-from: {value};")?;
-        writeln!(
-            buffer,
-            "{indentation}--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to, {default_to});"
-        )?;
-
-        Ok(())
+        context.buffer.line("--en-gradient-from: {value};");
+        context.buffer.line(format_args!(
+            "--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to, {default_to});"
+        ));
     }
 }
 
@@ -67,9 +64,9 @@ impl Plugin for PluginViaDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, config, .. }: &mut ContextHandle) -> fmt::Result {
-        let value = match modifier {
-            Modifier::Builtin { value, .. } => color::get(config, value, None).unwrap(),
+    fn handle(&self, context: &mut ContextHandle) {
+        let value = match context.modifier {
+            Modifier::Builtin { value, .. } => color::get(context.config, value, None).unwrap(),
             Modifier::Arbitrary { value, .. } => value.clone(),
         };
 
@@ -82,13 +79,10 @@ impl Plugin for PluginViaDefinition {
             Cow::from(default)
         };
 
-        writeln!(
-            buffer,
-            "{indentation}--en-gradient-stops: var(--en-gradient-from), {}, var(--en-gradient-to, {});",
+        context.buffer.line(format_args!(
+            "--en-gradient-stops: var(--en-gradient-from), {}, var(--en-gradient-to, {});",
             value, default_to
-        )?;
-
-        Ok(())
+        ));
     }
 }
 
@@ -111,15 +105,16 @@ impl Plugin for PluginToDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, config, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
-            Modifier::Builtin { value, .. } => writeln!(
-                buffer,
-                "{indentation}--en-gradient-to: {};",
-                color::get(config, value, None).unwrap()
-            ),
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
+            Modifier::Builtin { value, .. } => context.buffer.line(format_args!(
+                "--en-gradient-to: {};",
+                color::get(context.config, value, None).unwrap()
+            )),
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}--en-gradient-to: {value};")
+                context
+                    .buffer
+                    .line(format_args!("--en-gradient-to: {value};"));
             }
         }
     }

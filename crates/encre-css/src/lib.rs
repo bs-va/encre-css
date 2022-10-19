@@ -224,8 +224,20 @@ pub use scanner::Scanner;
 /// Various helper preludes.
 pub mod prelude {
     /// Prelude including all necessary structures, functions and modules used to build a new plugin.
+    ///
+    /// It should be included using:
+    ///
+    /// ```
+    /// use encre_css::prelude::build_plugin::*;
+    /// ```
     pub mod build_plugin {
-        pub use crate::{generator::{ContextCanHandle, ContextHandle}, plugins::Plugin, selector::Modifier, generator::{generate_class, generate_at_rules, generate_wrapper}, utils::{color, spacing, shadow, format_negative, value_matchers::*}};
+        pub use crate::{
+            generator::{generate_at_rules, generate_class, generate_wrapper},
+            generator::{ContextCanHandle, ContextHandle},
+            plugins::Plugin,
+            selector::Modifier,
+            utils::{buffer::Buffer, color, format_negative, shadow, spacing, value_matchers::*},
+        };
         pub use std::fmt::{self, Write};
     }
 }

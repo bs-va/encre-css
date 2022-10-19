@@ -15,13 +15,12 @@ fn placement_can_handle(context: &mut ContextCanHandle) -> bool {
     }
 }
 
-fn placement_handle(css_properties: &[&str], ContextHandle { modifier, indentation, buffer, .. }: &mut ContextHandle) -> fmt::Result {
-    match modifier {
+fn placement_handle(css_properties: &[&str], context: &mut ContextHandle) {
+    match context.modifier {
         Modifier::Builtin { is_negative, value } => {
             for css_prop in css_properties {
-                writeln!(
-                    buffer,
-                    "{indentation}{}: {};",
+                context.buffer.line(format_args!(
+                    "{}: {};",
                     css_prop,
                     if *value == "auto" {
                         Cow::from("auto")
@@ -30,17 +29,15 @@ fn placement_handle(css_properties: &[&str], ContextHandle { modifier, indentati
                     } else {
                         spacing::get(value, *is_negative).unwrap()
                     },
-                )?;
+                ));
             }
         }
         Modifier::Arbitrary { value, .. } => {
             for css_prop in css_properties {
-                writeln!(buffer, "{indentation}{css_prop}: {value};")?;
+                context.buffer.line(format_args!("{css_prop}: {value};"));
             }
         }
     }
-
-    Ok(())
 }
 
 #[derive(Debug)]
@@ -65,7 +62,7 @@ impl Plugin for PluginInsetDefinition {
         }
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         placement_handle(&["top", "bottom", "left", "right"], context)
     }
 }
@@ -82,7 +79,7 @@ impl Plugin for PluginInsetXDefinition {
         placement_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         placement_handle(&["left", "right"], context)
     }
 }
@@ -99,7 +96,7 @@ impl Plugin for PluginInsetYDefinition {
         placement_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         placement_handle(&["top", "bottom"], context)
     }
 }
@@ -116,7 +113,7 @@ impl Plugin for PluginTopDefinition {
         placement_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         placement_handle(&["top"], context)
     }
 }
@@ -133,7 +130,7 @@ impl Plugin for PluginBottomDefinition {
         placement_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         placement_handle(&["bottom"], context)
     }
 }
@@ -150,7 +147,7 @@ impl Plugin for PluginLeftDefinition {
         placement_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         placement_handle(&["left"], context)
     }
 }
@@ -167,7 +164,7 @@ impl Plugin for PluginRightDefinition {
         placement_can_handle(&mut context)
     }
 
-    fn handle(&self, context: &mut ContextHandle) -> fmt::Result {
+    fn handle(&self, context: &mut ContextHandle) {
         placement_handle(&["right"], context)
     }
 }

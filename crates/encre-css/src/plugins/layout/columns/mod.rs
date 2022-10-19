@@ -24,27 +24,25 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "3xs" => writeln!(buffer, "{indentation}columns: 16rem;")?,
-                "2xs" => writeln!(buffer, "{indentation}columns: 18rem;")?,
-                "xs" => writeln!(buffer, "{indentation}columns: 20rem;")?,
-                "sm" => writeln!(buffer, "{indentation}columns: 24rem;")?,
-                "md" => writeln!(buffer, "{indentation}columns: 28rem;")?,
-                "lg" => writeln!(buffer, "{indentation}columns: 32rem;")?,
-                "xl" => writeln!(buffer, "{indentation}columns: 36rem;")?,
-                "2xl" => writeln!(buffer, "{indentation}columns: 42rem;")?,
-                "3xl" => writeln!(buffer, "{indentation}columns: 48rem;")?,
-                "4xl" => writeln!(buffer, "{indentation}columns: 56rem;")?,
-                "5xl" => writeln!(buffer, "{indentation}columns: 64rem;")?,
-                "6xl" => writeln!(buffer, "{indentation}columns: 72rem;")?,
-                "7xl" => writeln!(buffer, "{indentation}columns: 80rem;")?,
-                _ => writeln!(buffer, "{indentation}columns: {value};")?,
+                "3xs" => context.buffer.line("columns: 16rem;"),
+                "2xs" => context.buffer.line("columns: 18rem;"),
+                "xs" => context.buffer.line("columns: 20rem;"),
+                "sm" => context.buffer.line("columns: 24rem;"),
+                "md" => context.buffer.line("columns: 28rem;"),
+                "lg" => context.buffer.line("columns: 32rem;"),
+                "xl" => context.buffer.line("columns: 36rem;"),
+                "2xl" => context.buffer.line("columns: 42rem;"),
+                "3xl" => context.buffer.line("columns: 48rem;"),
+                "4xl" => context.buffer.line("columns: 56rem;"),
+                "5xl" => context.buffer.line("columns: 64rem;"),
+                "6xl" => context.buffer.line("columns: 72rem;"),
+                "7xl" => context.buffer.line("columns: 80rem;"),
+                _ => context.buffer.line(format_args!("columns: {value};")),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

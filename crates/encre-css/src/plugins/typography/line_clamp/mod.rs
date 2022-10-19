@@ -17,16 +17,18 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => {
                 if *value == "none" {
-                    writeln!(buffer, "{indentation}-webkit-line-clamp: unset;")
+                    context.buffer.line("-webkit-line-clamp: unset;");
                 } else {
-                    writeln!(buffer, "{indentation}overflow: hidden;
-{indentation}display: -webkit-box;
-{indentation}-webkit-box-orient: vertical;
-{indentation}-webkit-line-clamp: {value};")
+                    context.buffer.lines([
+                        format_args!("overflow: hidden;"),
+                        format_args!("display: -webkit-box;"),
+                        format_args!("-webkit-box-orient: vertical;"),
+                        format_args!("-webkit-line-clamp: {value};"),
+                    ]);
                 }
             }
             Modifier::Arbitrary { .. } => unreachable!(),

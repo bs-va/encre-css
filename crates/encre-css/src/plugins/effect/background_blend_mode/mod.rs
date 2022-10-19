@@ -35,30 +35,28 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "normal" => writeln!(buffer, "{indentation}background-blend-mode: normal;")?,
-                "multiply" => writeln!(buffer, "{indentation}background-blend-mode: multiply;")?,
-                "screen" => writeln!(buffer, "{indentation}background-blend-mode: screen;")?,
-                "overlay" => writeln!(buffer, "{indentation}background-blend-mode: overlay;")?,
-                "darken" => writeln!(buffer, "{indentation}background-blend-mode: darken;")?,
-                "lighten" => writeln!(buffer, "{indentation}background-blend-mode: lighten;")?,
-                "color-dodge" => writeln!(buffer, "{indentation}background-blend-mode: color-dodge;")?,
-                "color-burn" => writeln!(buffer, "{indentation}background-blend-mode: color-burn;")?,
-                "hard-light" => writeln!(buffer, "{indentation}background-blend-mode: hard-light;")?,
-                "soft-light" => writeln!(buffer, "{indentation}background-blend-mode: soft-light;")?,
-                "difference" => writeln!(buffer, "{indentation}background-blend-mode: difference;")?,
-                "exclusion" => writeln!(buffer, "{indentation}background-blend-mode: exclusion;")?,
-                "hue" => writeln!(buffer, "{indentation}background-blend-mode: hue;")?,
-                "saturation" => writeln!(buffer, "{indentation}background-blend-mode: saturation;")?,
-                "color" => writeln!(buffer, "{indentation}background-blend-mode: color;")?,
-                "luminosity" => writeln!(buffer, "{indentation}background-blend-mode: luminosity;")?,
+                "normal" => context.buffer.line("background-blend-mode: normal;"),
+                "multiply" => context.buffer.line("background-blend-mode: multiply;"),
+                "screen" => context.buffer.line("background-blend-mode: screen;"),
+                "overlay" => context.buffer.line("background-blend-mode: overlay;"),
+                "darken" => context.buffer.line("background-blend-mode: darken;"),
+                "lighten" => context.buffer.line("background-blend-mode: lighten;"),
+                "color-dodge" => context.buffer.line("background-blend-mode: color-dodge;"),
+                "color-burn" => context.buffer.line("background-blend-mode: color-burn;"),
+                "hard-light" => context.buffer.line("background-blend-mode: hard-light;"),
+                "soft-light" => context.buffer.line("background-blend-mode: soft-light;"),
+                "difference" => context.buffer.line("background-blend-mode: difference;"),
+                "exclusion" => context.buffer.line("background-blend-mode: exclusion;"),
+                "hue" => context.buffer.line("background-blend-mode: hue;"),
+                "saturation" => context.buffer.line("background-blend-mode: saturation;"),
+                "color" => context.buffer.line("background-blend-mode: color;"),
+                "luminosity" => context.buffer.line("background-blend-mode: luminosity;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

@@ -22,12 +22,11 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { is_negative, value } => {
-                writeln!(
-                    buffer,
-                    "{indentation}height: {};",
+                context.buffer.line(format_args!(
+                    "height: {};",
                     match *value {
                         "auto" => Cow::from("auto"),
                         "full" => Cow::from("100%"),
@@ -37,13 +36,11 @@ impl Plugin for PluginDefinition {
                         "fit" => Cow::from("fit-content"),
                         _ => spacing::get(value, *is_negative).unwrap(),
                     },
-                )?;
+                ));
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}height: {value};")?;
+                context.buffer.line(format_args!("height: {value};"));
             }
         }
-
-        Ok(())
     }
 }

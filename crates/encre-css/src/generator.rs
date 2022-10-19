@@ -3,15 +3,10 @@ use crate::{
     config::Config,
     preflight::Preflight,
     selector::{parse, Modifier, Selector, Variant, VariantType},
-    utils::{indent, unindent},
+    utils::buffer::Buffer,
 };
 
-use std::{
-    collections::BTreeSet,
-    fmt::{self, Write},
-    path::Path,
-    sync::Arc,
-};
+use std::{collections::BTreeSet, fmt::Write, path::Path, sync::Arc};
 
 /// The context used in the [`Plugin::can_handle`] method.
 ///
@@ -36,13 +31,10 @@ pub struct ContextHandle<'a, 'b, 'c, 'd, 'e> {
     /// The modifier which will have its CSS generated.
     pub modifier: &'b Modifier<'c>,
 
-    /// The current indentation of the CSS rule.
-    pub indentation: String,
-
     /// The buffer containing the whole generated CSS.
-    pub buffer: &'d mut String,
+    pub buffer: &'d mut Buffer,
 
-    // Private fields used in `generate_rule`
+    // Private fields used in `generate_class` and `generate_at_rules`
     selector: &'e Selector<'e>,
 }
 
@@ -57,44 +49,40 @@ pub struct ContextHandle<'a, 'b, 'c, 'd, 'e> {
 /// Returns [`fmt::Error`] indicating whether writing to the buffer succeeded.
 ///
 /// [`fmt::Error`]: std::fmt::Error
-pub fn generate_at_rules<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
+pub fn generate_at_rules<T: FnOnce(&mut ContextHandle)>(
     context: &mut ContextHandle,
     rule_content_fn: T,
-) -> fmt::Result {
-    let ContextHandle { indentation, buffer, selector, .. } = context;
+) {
+    let ContextHandle {
+        buffer, selector, ..
+    } = context;
 
     if !selector.variants.is_empty() {
-        selector.variants.iter().try_for_each(|variant| {
-            match variant {
-                Variant::Builtin(_, VariantType::AtRule(variant)) => {
-                    writeln!(buffer, "{indentation}{} {{", variant)?;
-                    indent(indentation);
-                }
-                Variant::Arbitrary(variant) if variant.starts_with('@') => {
-                    writeln!(buffer, "{indentation}{} {{", variant)?;
-                    indent(indentation);
-                }
-                _ => (),
+        selector.variants.iter().for_each(|variant| match variant {
+            Variant::Builtin(_, VariantType::AtRule(variant)) => {
+                buffer.line(format_args!("{variant} {{"));
+                buffer.indent();
             }
-
-            Ok::<(), fmt::Error>(())
-        })?;
+            Variant::Arbitrary(variant) if variant.starts_with('@') => {
+                buffer.line(format_args!("{variant} {{"));
+                buffer.indent();
+            }
+            _ => (),
+        });
     }
 
-    rule_content_fn(context)?;
+    rule_content_fn(context);
 
-    let ContextHandle { indentation, buffer, .. } = context;
-    while !indentation.is_empty() {
-        unindent(indentation);
+    let ContextHandle { buffer, .. } = context;
+    while !buffer.is_unindented() {
+        buffer.unindent();
 
-        if indentation.is_empty() {
-            write!(buffer, "}}")?;
+        if buffer.is_unindented() {
+            buffer.raw("}");
         } else {
-            writeln!(buffer, "{indentation}}}")?;
+            buffer.line("}");
         }
     }
-
-    Ok(())
 }
 
 /// Generate a CSS rule with a class.
@@ -110,12 +98,14 @@ pub fn generate_at_rules<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
 ///
 /// [`fmt::Error`]: std::fmt::Error
 #[allow(clippy::too_many_lines)]
-pub fn generate_class<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
+pub fn generate_class<T: FnOnce(&mut ContextHandle)>(
     context: &mut ContextHandle,
     rule_content_fn: T,
     custom_after_class: &str,
-) -> fmt::Result {
-    let ContextHandle { indentation, buffer, selector, .. } = context;
+) {
+    let ContextHandle {
+        buffer, selector, ..
+    } = context;
 
     // Write the class
     let mut base_class = ".".to_string()
@@ -136,7 +126,7 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
             .collect::<String>();
 
     if !selector.variants.is_empty() {
-       selector
+        selector
             .variants
             .iter()
             .rev()
@@ -169,16 +159,18 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
                 Variant::Arbitrary(_) => (),
             });
     }
-    writeln!(buffer, "{indentation}{base_class}{} {{", custom_after_class)?;
+    buffer.line(format_args!("{base_class}{custom_after_class} {{"));
 
     // Store the index of the start of the class content (useful when the `important` flag is present)
     let content_start = buffer.len();
 
     // Rule content
-    indent(indentation);
-    rule_content_fn(context)?;
+    buffer.indent();
+    rule_content_fn(context);
 
-    let ContextHandle { indentation, buffer, selector, .. } = context;
+    let ContextHandle {
+        buffer, selector, ..
+    } = context;
 
     // If the rule is selecting the `::before` or `::after` pseudo elements, we need to generate a
     // default `content` property
@@ -190,7 +182,7 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
             false
         }
     }) {
-        writeln!(buffer, "{indentation}content: var(--en-content);")?;
+        buffer.line("content: var(--en-content);");
     }
 
     // If the `important` flag is present we need to replace all `;\n` or `;\r\n`
@@ -219,14 +211,12 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
         }
     }
 
-    unindent(indentation);
-    if indentation.is_empty() {
-        write!(buffer, "}}")?;
+    buffer.unindent();
+    if buffer.is_unindented() {
+        buffer.raw("}");
     } else {
-        writeln!(buffer, "{indentation}}}")?;
+        buffer.line("}");
     }
-
-    Ok(())
 }
 
 /// Generate the complete CSS wrapper needed for a single rule.
@@ -240,13 +230,13 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
 /// Returns [`fmt::Error`] indicating whether writing to the buffer succeeded.
 ///
 /// [`fmt::Error`]: std::fmt::Error
-pub fn generate_wrapper<T: FnOnce(&mut ContextHandle) -> fmt::Result>(
+pub fn generate_wrapper<T: FnOnce(&mut ContextHandle)>(
     context: &mut ContextHandle,
     rule_content_fn: T,
-) -> fmt::Result {
+) {
     generate_at_rules(context, |context| {
-        generate_class(context, rule_content_fn, "")
-    })
+        generate_class(context, rule_content_fn, "");
+    });
 }
 
 /// Main structure used to generate CSS from selectors.
@@ -343,31 +333,29 @@ impl<'a> EncreGenerator<'a> {
     /// [`scan`]: EncreGenerator::scan
     pub fn generate(&self) -> String {
         let preflight = self.config.preflight.build();
-        let mut buffer = String::with_capacity(10 * self.scanned_selectors.len()); // TODO: More accurate value
-        buffer.push_str(&preflight); // TODO: Push and reserve at the same time
+        let mut buffer = Buffer::with_capacity(10 * self.scanned_selectors.len()); // TODO: More accurate value
+        buffer.raw(&preflight);
 
         self.scanned_selectors.iter().for_each(|selector| {
             if buffer.len() != preflight.len() || self.config.preflight != Preflight::None {
-                write!(buffer, "\n\n").expect("writing to a String can't fail");
+                buffer.raw("\n\n");
             }
 
             let mut context = ContextHandle {
                 config: &self.config,
                 modifier: &selector.modifier,
-                indentation: String::new(),
                 buffer: &mut buffer,
                 selector,
             };
 
             if selector.plugin.needs_wrapping() {
-                generate_wrapper(&mut context, |context| selector.plugin.handle(context))
+                generate_wrapper(&mut context, |context| selector.plugin.handle(context));
             } else {
-                selector.plugin.handle(&mut context)
+                selector.plugin.handle(&mut context);
             }
-            .expect("writing to a String can't fail");
         });
 
-        buffer
+        buffer.into_inner()
     }
 }
 

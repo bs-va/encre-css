@@ -17,18 +17,16 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "" => writeln!(buffer, "{indentation}resize: both;")?,
-                "none" => writeln!(buffer, "{indentation}resize: none;")?,
-                "x" => writeln!(buffer, "{indentation}resize: horizontal;")?,
-                "y" => writeln!(buffer, "{indentation}resize: vertical;")?,
+                "" => context.buffer.line("resize: both;"),
+                "none" => context.buffer.line("resize: none;"),
+                "x" => context.buffer.line("resize: horizontal;"),
+                "y" => context.buffer.line("resize: vertical;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

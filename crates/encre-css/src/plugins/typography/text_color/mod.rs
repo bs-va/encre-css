@@ -21,21 +21,19 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, config, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => {
-                let color = color::get(config, value, Some("--en-text-opacity")).unwrap();
+                let color = color::get(context.config, value, Some("--en-text-opacity")).unwrap();
                 if color.contains("--en-text-opacity") {
-                    writeln!(buffer, "{indentation}--en-text-opacity: 1;")?;
+                    context.buffer.line("--en-text-opacity: 1;");
                 }
 
-                writeln!(buffer, "{indentation}color: {color};")?;
+                context.buffer.line(format_args!("color: {color};"));
             }
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}color: {value};")?;
+                context.buffer.line(format_args!("color: {value};"));
             }
         }
-
-        Ok(())
     }
 }

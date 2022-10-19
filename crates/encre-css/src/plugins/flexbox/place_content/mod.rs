@@ -19,20 +19,18 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "start" => writeln!(buffer, "{indentation}place-content: start;")?,
-                "center" => writeln!(buffer, "{indentation}place-content: center;")?,
-                "end" => writeln!(buffer, "{indentation}place-content: end;")?,
-                "between" => writeln!(buffer, "{indentation}place-content: space-between;")?,
-                "around" => writeln!(buffer, "{indentation}place-content: space-around;")?,
-                "evenly" => writeln!(buffer, "{indentation}place-content: space-evenly;")?,
+                "start" => context.buffer.line("place-content: start;"),
+                "center" => context.buffer.line("place-content: center;"),
+                "end" => context.buffer.line("place-content: end;"),
+                "between" => context.buffer.line("place-content: space-between;"),
+                "around" => context.buffer.line("place-content: space-around;"),
+                "evenly" => context.buffer.line("place-content: space-evenly;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

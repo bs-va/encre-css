@@ -16,19 +16,19 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
                 "normal" => {
-                    writeln!(buffer, "{indentation}overflow-wrap: normal;\n{indentation}word-break: normal;")?;
+                    context
+                        .buffer
+                        .lines(["overflow-wrap: normal;", "word-break: normal;"]);
                 }
-                "words" => writeln!(buffer, "{indentation}overflow-wrap: break-word;")?,
-                "all" => writeln!(buffer, "{indentation}word-break: break-all;")?,
+                "words" => context.buffer.line("overflow-wrap: break-word;"),
+                "all" => context.buffer.line("word-break: break-all;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

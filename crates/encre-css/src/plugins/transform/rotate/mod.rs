@@ -18,20 +18,18 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
-            Modifier::Builtin { is_negative, value } => writeln!(
-                buffer,
-                "{indentation}--en-rotate: {}{}deg;",
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
+            Modifier::Builtin { is_negative, value } => context.buffer.line(format_args!(
+                "--en-rotate: {}{}deg;",
                 format_negative(is_negative),
                 value.parse::<usize>().unwrap(),
-            )?,
+            )),
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}--en-rotate: {value};")?;
+                context.buffer.line(format_args!("--en-rotate: {value};"));
             }
         }
 
-        writeln!(buffer, "{indentation}{}", CSS_TRANSFORM)?;
-        Ok(())
+        context.buffer.line(CSS_TRANSFORM);
     }
 }

@@ -80,8 +80,11 @@ fn scan_path<T: AsRef<Path>>(glob_path: T, buffer: &mut String) {
     if prefix == glob_path.as_ref() {
         match fs::File::open(&glob_path) {
             Ok(mut file) => {
-                let file_len = file.seek(SeekFrom::End(0)).expect("failed to seek to the end of the file");
-                file.rewind().expect("failed to seek to the start of the file");
+                let file_len = file
+                    .seek(SeekFrom::End(0))
+                    .expect("failed to seek to the end of the file");
+                file.rewind()
+                    .expect("failed to seek to the start of the file");
 
                 #[allow(clippy::cast_possible_truncation)]
                 buffer.reserve(file_len as usize);
@@ -98,8 +101,12 @@ fn scan_path<T: AsRef<Path>>(glob_path: T, buffer: &mut String) {
                 match fs::File::open(entry.path()) {
                     Ok(file) => {
                         let mut reader = BufReader::new(file);
-                        let file_len = reader.seek(SeekFrom::End(0)).expect("failed to seek to the end of the file");
-                        reader.rewind().expect("failed to seek to the start of the file");
+                        let file_len = reader
+                            .seek(SeekFrom::End(0))
+                            .expect("failed to seek to the end of the file");
+                        reader
+                            .rewind()
+                            .expect("failed to seek to the start of the file");
 
                         #[allow(clippy::cast_possible_truncation)]
                         buffer.reserve(file_len as usize);

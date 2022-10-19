@@ -17,29 +17,26 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "linear" => writeln!(buffer, "{indentation}transition-timing-function: linear;")?,
-                "in" => writeln!(
-                    buffer,
-                    "{indentation}transition-timing-function: cubic-bezier(0.4, 0, 1, 1);"
-                )?,
-                "out" => writeln!(
-                    buffer,
-                    "{indentation}transition-timing-function: cubic-bezier(0, 0, 0.2, 1);"
-                )?,
-                "in-out" => writeln!(
-                    buffer,
-                    "{indentation}transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"
-                )?,
+                "linear" => context.buffer.line("transition-timing-function: linear;"),
+                "in" => context
+                    .buffer
+                    .line("transition-timing-function: cubic-bezier(0.4, 0, 1, 1);"),
+                "out" => context
+                    .buffer
+                    .line("transition-timing-function: cubic-bezier(0, 0, 0.2, 1);"),
+                "in-out" => context
+                    .buffer
+                    .line("transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}transition-timing-function: {value};")?;
+                context
+                    .buffer
+                    .line(format_args!("transition-timing-function: {value};"));
             }
         }
-
-        Ok(())
     }
 }

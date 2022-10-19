@@ -20,23 +20,20 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin {
                 is_negative, value, ..
             } => match *value {
-                "first" => return writeln!(buffer, "{indentation}order: -9999;"),
-                "last" => return writeln!(buffer, "{indentation}order: 9999;"),
-                "none" => return writeln!(buffer, "{indentation}order: 0;"),
-                _ => writeln!(
-                    buffer,
-                    "{indentation}order: {}{value};",
+                "first" => return context.buffer.line("order: -9999;"),
+                "last" => return context.buffer.line("order: 9999;"),
+                "none" => return context.buffer.line("order: 0;"),
+                _ => context.buffer.line(format_args!(
+                    "order: {}{value};",
                     format_negative(is_negative)
-                )?,
+                )),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

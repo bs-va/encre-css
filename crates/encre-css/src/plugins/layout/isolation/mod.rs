@@ -13,16 +13,14 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "isolate" => writeln!(buffer, "{indentation}isolation: isolate;")?,
-                "isolation-auto" => writeln!(buffer, "{indentation}isolation: auto;")?,
+                "isolate" => context.buffer.line("isolation: isolate;"),
+                "isolation-auto" => context.buffer.line("isolation: auto;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

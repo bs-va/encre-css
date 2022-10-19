@@ -8,27 +8,13 @@ use crate::{
     },
 };
 
-use std::{
-    cmp::Ordering,
-    fmt::Write,
-    iter,
-    str::CharIndices,
-};
+use std::{cmp::Ordering, iter, str::CharIndices};
 
+pub mod buffer;
 pub mod color;
 pub mod shadow;
 pub mod spacing;
 pub mod value_matchers;
-
-/// Indent a line using two spaces.
-pub fn indent(buffer: &mut String) {
-    let _ = write!(buffer, "  ");
-}
-
-/// Un-indent a line by two spaces.
-pub fn unindent(buffer: &mut String) {
-    buffer.truncate(buffer.len() - 2);
-}
 
 /// Quickly format a negative value (returns "-" if true or "" otherwise).
 pub fn format_negative(is_negative: &bool) -> &'static str {
@@ -133,7 +119,9 @@ impl<'a, P: Pattern> Iterator for SplitIgnoreArbitrary<'a, P> {
             if let Some(ch) = ch {
                 match ch.1 {
                     ESCAPE => self.is_next_escaped = true,
-                    GROUP_START if self.ignore_parenthesis && self.bracket_level == 0 => self.parenthesis_level += 1,
+                    GROUP_START if self.ignore_parenthesis && self.bracket_level == 0 => {
+                        self.parenthesis_level += 1
+                    }
                     GROUP_END if self.ignore_parenthesis && self.bracket_level == 0 => {
                         if self.parenthesis_level > 0 {
                             self.parenthesis_level -= 1;
@@ -237,13 +225,17 @@ fn sort_selectors_recursive<'a>(
 
             if selectors.len() > 1 {
                 // Sort variant groups
-                let start = split_ignore_arbitrary(v.trim(), "(", false).nth(1).unwrap().0;
+                let start = split_ignore_arbitrary(v.trim(), "(", false)
+                    .nth(1)
+                    .unwrap()
+                    .0;
 
                 Some(FoundSelector::Group(format!(
                     "{}{})",
                     &v[..start],
                     sort_selectors_recursive(
-                        split_ignore_arbitrary(v[start..v.len() - 1].trim(), ",", true).map(split_map_closure),
+                        split_ignore_arbitrary(v[start..v.len() - 1].trim(), ",", true)
+                            .map(split_map_closure),
                         ",",
                         config,
                     )

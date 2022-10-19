@@ -32,25 +32,25 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "bottom" => writeln!(buffer, "{indentation}background-position: bottom;")?,
-                "center" => writeln!(buffer, "{indentation}background-position: center;")?,
-                "left" => writeln!(buffer, "{indentation}background-position: left;")?,
-                "left-bottom" => writeln!(buffer, "{indentation}background-position: left-bottom;")?,
-                "left-top" => writeln!(buffer, "{indentation}background-position: left-top;")?,
-                "right" => writeln!(buffer, "{indentation}background-position: right;")?,
-                "right-bottom" => writeln!(buffer, "{indentation}background-position: right-bottom;")?,
-                "right-top" => writeln!(buffer, "{indentation}background-position: right-top;")?,
-                "top" => writeln!(buffer, "{indentation}background-position: top;")?,
+                "bottom" => context.buffer.line("background-position: bottom;"),
+                "center" => context.buffer.line("background-position: center;"),
+                "left" => context.buffer.line("background-position: left;"),
+                "left-bottom" => context.buffer.line("background-position: left-bottom;"),
+                "left-top" => context.buffer.line("background-position: left-top;"),
+                "right" => context.buffer.line("background-position: right;"),
+                "right-bottom" => context.buffer.line("background-position: right-bottom;"),
+                "right-top" => context.buffer.line("background-position: right-top;"),
+                "top" => context.buffer.line("background-position: top;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                writeln!(buffer, "{indentation}background-position: {value};")?;
+                context
+                    .buffer
+                    .line(format_args!("background-position: {value};"));
             }
         }
-
-        Ok(())
     }
 }

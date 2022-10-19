@@ -19,18 +19,16 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "start" => writeln!(buffer, "{indentation}scroll-snap-align: start;")?,
-                "end" => writeln!(buffer, "{indentation}scroll-snap-align: end;")?,
-                "center" => writeln!(buffer, "{indentation}scroll-snap-align: center;")?,
-                "align-none" => writeln!(buffer, "{indentation}scroll-snap-align: none;")?,
+                "start" => context.buffer.line("scroll-snap-align: start;"),
+                "end" => context.buffer.line("scroll-snap-align: end;"),
+                "center" => context.buffer.line("scroll-snap-align: center;"),
+                "align-none" => context.buffer.line("scroll-snap-align: none;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }

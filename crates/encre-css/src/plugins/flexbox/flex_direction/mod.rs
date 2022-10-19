@@ -19,18 +19,16 @@ impl Plugin for PluginDefinition {
         }
     }
 
-    fn handle(&self, ContextHandle { modifier, buffer, indentation, .. }: &mut ContextHandle) -> fmt::Result {
-        match modifier {
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "row" => writeln!(buffer, "{indentation}flex-direction: row;")?,
-                "row-reverse" => writeln!(buffer, "{indentation}flex-direction: row-reverse;")?,
-                "col" => writeln!(buffer, "{indentation}flex-direction: column;")?,
-                "col-reverse" => writeln!(buffer, "{indentation}flex-direction: column-reverse;")?,
+                "row" => context.buffer.line("flex-direction: row;"),
+                "row-reverse" => context.buffer.line("flex-direction: row-reverse;"),
+                "col" => context.buffer.line("flex-direction: column;"),
+                "col-reverse" => context.buffer.line("flex-direction: column-reverse;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),
         }
-
-        Ok(())
     }
 }
