@@ -4,14 +4,10 @@ use encre_css::{
     error::{Error, Result},
     Config as EncreConfig, EncreGenerator,
 };
-use notify::{
-    watcher,
-    DebouncedEvent::{Chmod, Create, Remove, Rename, Write},
-    RecursiveMode, Watcher,
-};
+use notify_debouncer_mini::{new_debouncer, notify::RecursiveMode, DebounceEventResult};
 use serde::Deserialize;
 use std::{
-    fs,
+    env, fs,
     io::{BufReader, Read, Seek, SeekFrom},
     iter,
     path::{Path, PathBuf},
@@ -152,11 +148,24 @@ fn build_single<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, outpu
 fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Option<String>) {
     let (tx, rx) = channel();
 
-    let mut watcher = watcher(tx, Duration::from_millis(500)).unwrap();
+    let mut debouncer = new_debouncer(
+        Duration::from_millis(500),
+        None,
+        move |result: DebounceEventResult| {
+            tx.send(result).ok();
+        },
+    )
+    .unwrap();
 
     // Due to https://github.com/notify-rs/notify/issues/247, the whole current directory is
     // watched
-    watcher.watch(".", RecursiveMode::Recursive).unwrap();
+    debouncer
+        .watcher()
+        .watch(
+            &env::current_dir().expect("failed to access the current directory"),
+            RecursiveMode::Recursive,
+        )
+        .unwrap();
 
     let (mut input, mut config) = {
         let config = match Config::from_file(config_file) {
@@ -172,8 +181,8 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
 
     let mut buffer = String::new();
 
-    // Initial generation
     {
+        // Initial generation
         let mut generator = EncreGenerator::from_config(Arc::clone(&config));
 
         if let Some(ref glob_path) = *extra_input {
@@ -192,13 +201,8 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
 
     loop {
         match rx.recv() {
-            Ok(event) => {
-                if let Create(ref path)
-                | Write(ref path)
-                | Remove(ref path)
-                | Chmod(ref path)
-                | Rename(_, ref path) = event
-                {
+            Ok(Ok(events)) => {
+                for event in events {
                     let mut need_reloading = false;
 
                     #[cfg(target_arch = "wasm32")]
@@ -255,19 +259,16 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
 
                     // Check that the changed file is watched
                     if files.any(|file_path| {
-                        result_equal(file_path.canonicalize(), PathBuf::from(path).canonicalize())
+                        result_equal(file_path.canonicalize(), event.path.canonicalize())
                     }) || (extra_input_files.is_some()
                         && extra_input_files.unwrap().iter().any(|file_path| {
-                            result_equal(
-                                file_path.canonicalize(),
-                                PathBuf::from(path).canonicalize(),
-                            )
+                            result_equal(file_path.canonicalize(), event.path.canonicalize())
                         }))
                     {
                         println!("Changes detected. Reloading\u{2026}");
                         need_reloading = true;
                     } else if result_equal(
-                        PathBuf::from(path).canonicalize(),
+                        event.path.canonicalize(),
                         PathBuf::from(DEFAULT_CONFIG_FILE).canonicalize(),
                     ) {
                         // Handle configuration changes
@@ -308,7 +309,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
                     }
                 }
             }
-            Err(e) => eprintln!("watch error: {:?}", e),
+            e => eprintln!("watch error: {:?}", e),
         }
     }
 }

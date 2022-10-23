@@ -12,8 +12,8 @@ path = "src/main.rs"
 
 [dependencies]
 encre-css = { path = "../encre-css" }
-clap = { version = "3.1.17", features = ["derive"] }
-notify = "4.0.17"
+clap = { version = "4.0.18", features = ["derive"] }
+notify-debouncer-mini = "0.2.1"
 rand = "0.8.5"
 wax = "0.5.0"
 rayon = "1.5.2"
