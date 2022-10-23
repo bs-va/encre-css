@@ -151,7 +151,7 @@ A command line interface is also available. Install it using:
 cargo install --git https://gitlab.com/encre-org/encre-css.git
 ```
 
-Then run `encre --help` for instructions on how to use it.
+Then run `encrecss --help` for instructions on how to use it.
 
 ## Plugins
 

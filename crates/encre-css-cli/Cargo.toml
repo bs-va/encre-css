@@ -7,7 +7,7 @@ license = "MIT"
 edition = "2021"
 
 [[bin]]
-name = "encre"
+name = "encrecss"
 path = "src/main.rs"
 
 [dependencies]

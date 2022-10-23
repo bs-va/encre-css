@@ -171,7 +171,7 @@
 //! cargo install --git https://gitlab.com/encre-org/encre-css.git
 //! ```
 //!
-//! Then run `encre --help` for instructions on how to use it.
+//! Then run `encrecss --help` for instructions on how to use it.
 #![doc(html_logo_url = "https://gitlab.com/encre-org/encre-css/raw/main/.assets/logo.png")]
 #![forbid(unsafe_code)]
 #![warn(

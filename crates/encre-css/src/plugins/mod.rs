@@ -61,8 +61,7 @@ pub mod typography;
 /// modifier and the current configuration.
 ///
 /// The [`Plugin::handle`] method takes a [`ContextHandle`] structure containing the modifier,
-/// the current configuration, the current indentation (each `handle` needs to take account of the
-/// indentation using the [`utils::indent`] function) and a buffer containing the whole CSS
+/// the current configuration and a buffer containing the whole CSS
 /// currently generated. You can use the [`Buffer`] structure (especially the [`Buffer::line`]
 /// and [`Buffer::lines`] functions) to push CSS declarations to it, they will be automatically
 /// indented.
@@ -204,9 +203,9 @@ pub mod typography;
 /// Have a look at <https://gitlab.com/encre-org/encre-css/tree/main/crates/encre-css/src/plugins>
 /// for more examples.
 ///
-/// [`Buffer`]: crate::utils::Buffer
-/// [`Buffer::line`]: crate::utils::Buffer::line
-/// [`Buffer::lines`]: crate::utils::Buffer::lines
+/// [`Buffer`]: crate::utils::buffer::Buffer
+/// [`Buffer::line`]: crate::utils::buffer::Buffer::line
+/// [`Buffer::lines`]: crate::utils::buffer::Buffer::lines
 /// [`Config::register_plugin`]: crate::Config::register_plugin
 /// [`Config`]: crate::Config
 /// [`needs_wrapping`]: Plugin::needs_wrapping
