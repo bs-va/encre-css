@@ -432,7 +432,6 @@ dependencies = [
  "encre-css",
  "notify-debouncer-mini",
  "rand",
- "rayon",
  "serde",
  "toml",
  "wax",

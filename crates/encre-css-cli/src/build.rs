@@ -17,9 +17,6 @@ use std::{
 };
 use wax::Glob;
 
-#[cfg(not(target_arch = "wasm32"))]
-use rayon::prelude::*;
-
 #[derive(Default, PartialEq, Debug, Deserialize)]
 struct Config {
     /// Specify which files should be scanned using globs.
@@ -205,13 +202,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
                 for event in events {
                     let mut need_reloading = false;
 
-                    #[cfg(target_arch = "wasm32")]
-                    let iter = input.iter();
-
-                    #[cfg(not(target_arch = "wasm32"))]
-                    let iter = input.par_iter();
-
-                    let files = iter.flat_map(|glob_path| {
+                    let mut files = input.iter().flat_map(|glob_path| {
                         let (prefix, glob) = match Glob::new(
                             glob_path
                                 .to_str()
