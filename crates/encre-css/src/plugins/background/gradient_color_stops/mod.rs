@@ -38,7 +38,7 @@ impl Plugin for PluginFromDefinition {
             Cow::from(default)
         };
 
-        context.buffer.line("--en-gradient-from: {value};");
+        context.buffer.line(format_args!("--en-gradient-from: {value};"));
         context.buffer.line(format_args!(
             "--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to, {default_to});"
         ));
