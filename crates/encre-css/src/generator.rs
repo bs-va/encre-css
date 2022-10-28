@@ -331,7 +331,7 @@ impl<'a> EncreGenerator<'a> {
     /// [`add_selector`]: EncreGenerator::add_selector
     /// [`add_selectors`]: EncreGenerator::add_selectors
     /// [`scan`]: EncreGenerator::scan
-    pub fn generate(&self) -> String {
+    pub fn generate(self) -> String {
         let preflight = self.config.preflight.build();
         let mut buffer = Buffer::with_capacity(10 * self.scanned_selectors.len()); // TODO: More accurate value
         buffer.raw(&preflight);

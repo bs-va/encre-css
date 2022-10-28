@@ -32,11 +32,11 @@ fn matchers(c: &mut Criterion) {
 }
 
 fn generation(c: &mut Criterion) {
-    let mut generator = EncreGenerator::from_config(Config::default());
-    generator.scan(r#"<div class="w-full h-full absolute bg-blue-500 foo-bar sm:focus:ring hover:bg-black border-[#333] text-[color:var(--hello)]"></div>"#);
+    c.bench_function("scan and generate", move |b| {
+        b.iter(move || {
+            let mut generator = EncreGenerator::from_config(Config::default());
+            generator.scan(r#"<div class="w-full h-full absolute bg-blue-500 foo-bar sm:focus:ring hover:bg-black border-[#333] text-[color:var(--hello)]"></div>"#);
 
-    c.bench_function("generate", |b| {
-        b.iter(|| {
             generator.generate();
         })
     });

@@ -43,7 +43,7 @@ fn result_equal<T: PartialEq, E>(res1: result::Result<T, E>, res2: result::Resul
     }
 }
 
-fn gen_css<T: AsRef<Path>>(generator: &EncreGenerator, output: Option<T>) {
+fn gen_css<T: AsRef<Path>>(generator: EncreGenerator, output: Option<T>) {
     let css = generator.generate();
 
     if let Some(file) = output {
@@ -138,7 +138,7 @@ fn build_single<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, outpu
     });
 
     generator.scan(&buffer);
-    gen_css(&generator, output);
+    gen_css(generator, output);
 }
 
 #[allow(clippy::too_many_lines)]
@@ -191,7 +191,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
         });
 
         generator.scan(&buffer);
-        gen_css(&generator, output.as_ref());
+        gen_css(generator, output.as_ref());
     }
 
     println!("`encre-css` successfully launched in watch mode");
@@ -295,8 +295,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
                         });
 
                         generator.scan(&buffer);
-                        gen_css(&generator, output.as_ref());
-                        drop(generator);
+                        gen_css(generator, output.as_ref());
                     }
                 }
             }
