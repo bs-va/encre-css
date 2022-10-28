@@ -30,58 +30,31 @@ pub fn format_negative(is_negative: &bool) -> &'static str {
 ///
 /// | Pattern type             | Match condition                           |
 /// |--------------------------|-------------------------------------------|
-/// | `&str`                   | is substring                              |
 /// | `char`                   | is contained in string                    |
 /// | `&[char]`                | any char in slice is contained in string  |
 /// | `F: FnMut(char) -> bool` | `F` returns `true` for a char in string   |
-/// | `&&str`                  | is substring                              |
-/// | `&String`                | is substring                              |
 ///
 /// [`Pattern`]: std::str::pattern::Pattern
 pub trait Pattern {
-    /// Returns whether the value is matching the pattern.
-    fn is_matching(&self, val: &str) -> bool;
+    /// Returns whether the character is matching the pattern.
+    fn is_matching(&self, val: char) -> bool;
 }
 
 impl Pattern for char {
-    fn is_matching(&self, val: &str) -> bool {
-        val.contains(*self)
-    }
-}
-
-impl Pattern for &str {
-    fn is_matching(&self, val: &str) -> bool {
-        val.contains(self)
-    }
-}
-
-impl Pattern for &String {
-    fn is_matching(&self, val: &str) -> bool {
-        val.contains(*self)
-    }
-}
-
-impl Pattern for String {
-    fn is_matching(&self, val: &str) -> bool {
-        val.contains(self)
+    fn is_matching(&self, val: char) -> bool {
+        val == *self
     }
 }
 
 impl Pattern for &[char] {
-    fn is_matching(&self, val: &str) -> bool {
-        self.iter().any(|ch| val.contains(*ch))
-    }
-}
-
-impl Pattern for &&str {
-    fn is_matching(&self, val: &str) -> bool {
-        val.contains(*self)
+    fn is_matching(&self, val: char) -> bool {
+        self.iter().any(|ch| val == *ch)
     }
 }
 
 impl<F: Fn(char) -> bool> Pattern for F {
-    fn is_matching(&self, val: &str) -> bool {
-        val.chars().any(self)
+    fn is_matching(&self, val: char) -> bool {
+        self(val)
     }
 }
 
@@ -120,7 +93,7 @@ impl<'a, P: Pattern> Iterator for SplitIgnoreArbitrary<'a, P> {
                 match ch.1 {
                     ESCAPE => self.is_next_escaped = true,
                     GROUP_START if self.ignore_parenthesis && self.bracket_level == 0 => {
-                        self.parenthesis_level += 1
+                        self.parenthesis_level += 1;
                     }
                     GROUP_END if self.ignore_parenthesis && self.bracket_level == 0 => {
                         if self.parenthesis_level > 0 {
@@ -136,9 +109,7 @@ impl<'a, P: Pattern> Iterator for SplitIgnoreArbitrary<'a, P> {
                         }
                     }
                     _ => {
-                        if self
-                            .searched_pattern
-                            .is_matching(&self.val[self.seek_index..ch.0 + ch.1.len_utf8()])
+                        if self.searched_pattern.is_matching(ch.1)
                             && self.bracket_level == 0
                             && !(self.ignore_parenthesis && self.parenthesis_level > 0)
                         {
@@ -225,7 +196,7 @@ fn sort_selectors_recursive<'a>(
 
             if selectors.len() > 1 {
                 // Sort variant groups
-                let start = split_ignore_arbitrary(v.trim(), "(", false)
+                let start = split_ignore_arbitrary(v.trim(), '(', false)
                     .nth(1)
                     .unwrap()
                     .0;
@@ -234,7 +205,7 @@ fn sort_selectors_recursive<'a>(
                     "{}{})",
                     &v[..start],
                     sort_selectors_recursive(
-                        split_ignore_arbitrary(v[start..v.len() - 1].trim(), ",", true)
+                        split_ignore_arbitrary(v[start..v.len() - 1].trim(), ',', true)
                             .map(split_map_closure),
                         ",",
                         config,
