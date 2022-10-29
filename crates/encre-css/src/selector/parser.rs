@@ -74,25 +74,25 @@ pub fn unescape(mut val: Cow<str>) -> Cow<str> {
 /// Replace all underscores with spaces (not in `url()` or if the underscore is prefixed by a backslash).
 pub fn underscores_to_spaces(mut val: Cow<str>) -> Cow<str> {
     // Don't replace `_` if it is a URL
-    if val.contains("url") {
+    if val.contains("url(") {
         // For the `CursorPlugin`, `ContentPlugin` and `ImagePlugin` plugins, we need to keep underscores in URLs
-        val = Cow::from(val.replace('_', WILL_BE_REPLACED_BY_UNDERSCORE));
-    }
+        val
+    } else {
+        // Replace `_` with ` ` (spaces) if not prefixed by a backslash
+        if val.contains('_') {
+            if val.contains("\\_") {
+                val = Cow::from(val.replace("\\_", WILL_BE_REPLACED_BY_UNDERSCORE));
+            }
 
-    // Replace `_` with ` ` (spaces) (if not prefixed by a backslash)
-    if val.contains("\\_") {
-        val = Cow::from(val.replace("\\_", WILL_BE_REPLACED_BY_UNDERSCORE));
-    }
+            val = Cow::from(val.replace('_', " "));
 
-    if val.contains('_') {
-        val = Cow::from(val.replace('_', " "));
-    }
+            if val.contains(WILL_BE_REPLACED_BY_UNDERSCORE) {
+                val = Cow::from(val.replace(WILL_BE_REPLACED_BY_UNDERSCORE, "_"));
+            }
+        }
 
-    if val.contains(WILL_BE_REPLACED_BY_UNDERSCORE) {
-        val = Cow::from(val.replace(WILL_BE_REPLACED_BY_UNDERSCORE, "_"));
+        val
     }
-
-    val
 }
 
 /// Convert an arbitrary value into a CSS value.
