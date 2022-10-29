@@ -36,10 +36,6 @@ fn border_spacing_handle(css_props: &[&str], context: &mut ContextHandle) {
 pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
-    fn namespace(&self) -> &'static str {
-        "border-spacing"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         border_spacing_can_handle(&mut context)
     }
@@ -53,10 +49,6 @@ impl Plugin for PluginDefinition {
 pub(crate) struct PluginXDefinition;
 
 impl Plugin for PluginXDefinition {
-    fn namespace(&self) -> &'static str {
-        "border-spacing-x"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         border_spacing_can_handle(&mut context)
     }
@@ -70,10 +62,6 @@ impl Plugin for PluginXDefinition {
 pub(crate) struct PluginYDefinition;
 
 impl Plugin for PluginYDefinition {
-    fn namespace(&self) -> &'static str {
-        "border-spacing-y"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         border_spacing_can_handle(&mut context)
     }

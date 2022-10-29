@@ -52,8 +52,7 @@ pub mod typography;
 /// A plugin is a structure capable of generating CSS styles from a modifier (contained in a
 /// context structure).
 ///
-/// Each plugin consists of three methods:
-/// - [`Plugin::namespace`] (optional) to give a prefix to all modifiers;
+/// Each plugin consists of two methods:
 /// - [`Plugin::can_handle`] to check if it will be able to generate CSS for a specific modifier;
 /// - [`Plugin::handle`] to generate the CSS needed.
 ///
@@ -78,10 +77,6 @@ pub mod typography;
 /// struct StrokeWidth;
 ///
 /// impl Plugin for StrokeWidth {
-///     fn namespace(&self) -> &str {
-///         "stroke"
-///     }
-///
 ///     fn can_handle(&self, context: ContextCanHandle) -> bool {
 ///         match context.modifier {
 ///             Modifier::Builtin { value, .. } => value.parse::<usize>().is_ok(),
@@ -112,11 +107,12 @@ pub mod typography;
 ///
 /// If you want to release your custom plugins as a crate, you can export a `register` function
 /// taking a mutable reference to a [`Config`] structure and use the [`Config::register_plugin`]
-/// function to register them.
+/// function to register them. The first argument is the namespace prefixing all the
+/// utility classes handled by the plugin.
 ///
 /// ```rust,ignore
 /// pub fn register(config: &mut Config) {
-///     config.register_plugin(&StrokeWidth);
+///     config.register_plugin("stroke", &StrokeWidth);
 /// }
 /// ```
 ///
@@ -135,10 +131,6 @@ pub mod typography;
 /// struct PluginDefinition;
 ///
 /// impl Plugin for PluginDefinition {
-///     fn namespace(&self) -> &str {
-///         "animate"
-///     }
-///
 ///     fn needs_wrapping(&self) -> bool {
 ///         false
 ///     }
@@ -213,13 +205,6 @@ pub mod typography;
 /// [`generator::generate_class`]: crate::generator::generate_class
 /// [`generator::generate_wrapper`]: crate::generator::generate_wrapper
 pub trait Plugin: fmt::Debug {
-    /// Returns the namespace containing the plugin.
-    ///
-    /// By default, the plugin does not belong to a namespace.
-    fn namespace(&self) -> &str {
-        ""
-    }
-
     /// Returns whether the plugin can handle a specific modifier.
     fn can_handle(&self, _context: ContextCanHandle) -> bool;
 

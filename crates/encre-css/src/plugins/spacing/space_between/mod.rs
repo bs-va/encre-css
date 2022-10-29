@@ -6,10 +6,6 @@ use crate::prelude::build_plugin::*;
 pub(crate) struct PluginXDefinition;
 
 impl Plugin for PluginXDefinition {
-    fn namespace(&self) -> &str {
-        "space-x"
-    }
-
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         match context.modifier {
             Modifier::Builtin { value, .. } => {
@@ -62,10 +58,6 @@ impl Plugin for PluginXDefinition {
 pub(crate) struct PluginYDefinition;
 
 impl Plugin for PluginYDefinition {
-    fn namespace(&self) -> &str {
-        "space-y"
-    }
-
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         match context.modifier {
             Modifier::Builtin { value, .. } => {

@@ -229,7 +229,6 @@ const DEFAULT_CDN: &str = "https://esm.sh";
 
 const CACHE_SUB_DIR_NAME: &str = "encre-css-icons-cache";
 
-static PREFIX: Lazy<Mutex<&'static str>> = Lazy::new(|| Mutex::new(""));
 static CUSTOM_CDN: Lazy<Mutex<&'static str>> = Lazy::new(|| Mutex::new(DEFAULT_CDN));
 static SCALE: Lazy<Mutex<f32>> = Lazy::new(|| Mutex::new(1.));
 static MEM_CACHE: Lazy<Mutex<BTreeMap<&'static str, Collection>>> =
@@ -425,10 +424,6 @@ fn fetch_or_cache_collection(collection: &'static str) {
 struct Icons;
 
 impl Plugin for Icons {
-    fn namespace(&self) -> &'static str {
-        *PREFIX.lock().unwrap()
-    }
-
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         match context.modifier {
             Modifier::Builtin { value, .. } => COLLECTIONS.iter().any(|c| value.starts_with(c)),
@@ -486,11 +481,11 @@ pub fn register(
     scale: Option<f32>,
 ) {
     // Reset variables
-    *PREFIX.lock().unwrap() = prefix.unwrap_or("").trim_end_matches('-');
+    let prefix = prefix.unwrap_or("").trim_end_matches('-');
     *CUSTOM_CDN.lock().unwrap() = custom_cdn.unwrap_or(DEFAULT_CDN).trim_end_matches('/');
     *SCALE.lock().unwrap() = scale.unwrap_or(1.);
 
-    config.register_plugin(&Icons);
+    config.register_plugin(prefix, &Icons);
 }
 
 #[cfg(test)]

@@ -77,10 +77,6 @@ const BOUNCE_ANIMATION: &str = "@-webkit-keyframes bounce {
 pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
-    fn namespace(&self) -> &str {
-        "animate"
-    }
-
     fn needs_wrapping(&self) -> bool {
         false
     }

@@ -19,10 +19,6 @@ fn divide_width_can_handle(context: &mut ContextCanHandle) -> bool {
 pub(crate) struct PluginXDefinition;
 
 impl Plugin for PluginXDefinition {
-    fn namespace(&self) -> &str {
-        "divide-x"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         divide_width_can_handle(&mut context)
     }
@@ -89,10 +85,6 @@ impl Plugin for PluginXDefinition {
 pub(crate) struct PluginYDefinition;
 
 impl Plugin for PluginYDefinition {
-    fn namespace(&self) -> &str {
-        "divide-y"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         divide_width_can_handle(&mut context)
     }

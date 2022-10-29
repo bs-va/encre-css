@@ -313,9 +313,12 @@ fn parse_recursive<'a>(
             })]
         } else {
             // Find the right plugin for handling this selector
-            let find = move |(order, plugin): (usize, &&'static (dyn Plugin + Send + Sync))| {
+            let find = move |(order, (namespace, plugin)): (
+                usize,
+                &(Cow<'static, str>, &'static (dyn Plugin + Send + Sync)),
+            )| {
                 // Find the modifier
-                if let Some(modifier_part) = remaining.1.strip_prefix(&plugin.namespace()) {
+                if let Some(modifier_part) = remaining.1.strip_prefix(&**namespace) {
                     let modifier_part = modifier_part
                         .strip_prefix(MODIFIER_SEPARATOR)
                         .unwrap_or(modifier_part);

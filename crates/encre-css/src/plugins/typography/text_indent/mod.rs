@@ -6,10 +6,6 @@ use crate::prelude::build_plugin::*;
 pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
-    fn namespace(&self) -> &str {
-        "indent"
-    }
-
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         match context.modifier {
             Modifier::Builtin { value, .. } => spacing::is_matching_builtin_spacing(value),

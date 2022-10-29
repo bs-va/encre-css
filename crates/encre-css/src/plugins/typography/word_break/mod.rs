@@ -5,10 +5,6 @@ use crate::prelude::build_plugin::*;
 pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
-    fn namespace(&self) -> &str {
-        "break"
-    }
-
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         match context.modifier {
             Modifier::Builtin { value, .. } => ["normal", "words", "all"].contains(&&**value),

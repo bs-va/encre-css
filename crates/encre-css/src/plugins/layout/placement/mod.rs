@@ -44,10 +44,6 @@ fn placement_handle(css_properties: &[&str], context: &mut ContextHandle) {
 pub(crate) struct PluginInsetDefinition;
 
 impl Plugin for PluginInsetDefinition {
-    fn namespace(&self) -> &str {
-        "inset"
-    }
-
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         match context.modifier {
             Modifier::Builtin { value, .. } => {
@@ -71,10 +67,6 @@ impl Plugin for PluginInsetDefinition {
 pub(crate) struct PluginInsetXDefinition;
 
 impl Plugin for PluginInsetXDefinition {
-    fn namespace(&self) -> &str {
-        "inset-x"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         placement_can_handle(&mut context)
     }
@@ -88,10 +80,6 @@ impl Plugin for PluginInsetXDefinition {
 pub(crate) struct PluginInsetYDefinition;
 
 impl Plugin for PluginInsetYDefinition {
-    fn namespace(&self) -> &str {
-        "inset-y"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         placement_can_handle(&mut context)
     }
@@ -105,10 +93,6 @@ impl Plugin for PluginInsetYDefinition {
 pub(crate) struct PluginTopDefinition;
 
 impl Plugin for PluginTopDefinition {
-    fn namespace(&self) -> &str {
-        "top"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         placement_can_handle(&mut context)
     }
@@ -122,10 +106,6 @@ impl Plugin for PluginTopDefinition {
 pub(crate) struct PluginBottomDefinition;
 
 impl Plugin for PluginBottomDefinition {
-    fn namespace(&self) -> &str {
-        "bottom"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         placement_can_handle(&mut context)
     }
@@ -139,10 +119,6 @@ impl Plugin for PluginBottomDefinition {
 pub(crate) struct PluginLeftDefinition;
 
 impl Plugin for PluginLeftDefinition {
-    fn namespace(&self) -> &str {
-        "left"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         placement_can_handle(&mut context)
     }
@@ -156,10 +132,6 @@ impl Plugin for PluginLeftDefinition {
 pub(crate) struct PluginRightDefinition;
 
 impl Plugin for PluginRightDefinition {
-    fn namespace(&self) -> &str {
-        "right"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         placement_can_handle(&mut context)
     }

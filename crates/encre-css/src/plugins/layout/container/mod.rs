@@ -8,10 +8,6 @@ use std::{borrow::Cow, cmp::Ordering};
 pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
-    fn namespace(&self) -> &str {
-        "container"
-    }
-
     fn needs_wrapping(&self) -> bool {
         false
     }

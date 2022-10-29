@@ -29,10 +29,6 @@ fn skew_handle(css_prop: &str, context: &mut ContextHandle) {
 pub(crate) struct PluginXDefinition;
 
 impl Plugin for PluginXDefinition {
-    fn namespace(&self) -> &'static str {
-        "skew-x"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         skew_can_handle(&mut context)
     }
@@ -46,10 +42,6 @@ impl Plugin for PluginXDefinition {
 pub(crate) struct PluginYDefinition;
 
 impl Plugin for PluginYDefinition {
-    fn namespace(&self) -> &'static str {
-        "skew-y"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         skew_can_handle(&mut context)
     }

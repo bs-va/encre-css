@@ -7,10 +7,6 @@ use crate::prelude::build_plugin::*;
 pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
-    fn namespace(&self) -> &str {
-        "backdrop-invert"
-    }
-
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         match context.modifier {
             Modifier::Builtin { value, .. } => value.is_empty() || value.parse::<usize>().is_ok(),

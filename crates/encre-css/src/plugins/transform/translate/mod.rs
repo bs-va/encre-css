@@ -41,10 +41,6 @@ fn translate_handle(css_prop: &str, context: &mut ContextHandle) {
 pub(crate) struct PluginXDefinition;
 
 impl Plugin for PluginXDefinition {
-    fn namespace(&self) -> &'static str {
-        "translate-x"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         translate_can_handle(&mut context)
     }
@@ -58,10 +54,6 @@ impl Plugin for PluginXDefinition {
 pub(crate) struct PluginYDefinition;
 
 impl Plugin for PluginYDefinition {
-    fn namespace(&self) -> &'static str {
-        "translate-y"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         translate_can_handle(&mut context)
     }

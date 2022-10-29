@@ -48,10 +48,6 @@ fn radius_handle(css_properties: &[&str], context: &mut ContextHandle) {
 pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
-    fn namespace(&self) -> &str {
-        "rounded"
-    }
-
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         match context.modifier {
             Modifier::Builtin { value, .. } => {
@@ -76,10 +72,6 @@ impl Plugin for PluginDefinition {
 pub(crate) struct PluginTopRightDefinition;
 
 impl Plugin for PluginTopRightDefinition {
-    fn namespace(&self) -> &str {
-        "rounded-tr"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         radius_can_handle(&mut context)
     }
@@ -93,10 +85,6 @@ impl Plugin for PluginTopRightDefinition {
 pub(crate) struct PluginTopLeftDefinition;
 
 impl Plugin for PluginTopLeftDefinition {
-    fn namespace(&self) -> &str {
-        "rounded-tl"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         radius_can_handle(&mut context)
     }
@@ -110,10 +98,6 @@ impl Plugin for PluginTopLeftDefinition {
 pub(crate) struct PluginBottomRightDefinition;
 
 impl Plugin for PluginBottomRightDefinition {
-    fn namespace(&self) -> &str {
-        "rounded-br"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         radius_can_handle(&mut context)
     }
@@ -127,10 +111,6 @@ impl Plugin for PluginBottomRightDefinition {
 pub(crate) struct PluginBottomLeftDefinition;
 
 impl Plugin for PluginBottomLeftDefinition {
-    fn namespace(&self) -> &str {
-        "rounded-bl"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         radius_can_handle(&mut context)
     }
@@ -144,10 +124,6 @@ impl Plugin for PluginBottomLeftDefinition {
 pub(crate) struct PluginTopDefinition;
 
 impl Plugin for PluginTopDefinition {
-    fn namespace(&self) -> &str {
-        "rounded-t"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         radius_can_handle(&mut context)
     }
@@ -164,10 +140,6 @@ impl Plugin for PluginTopDefinition {
 pub(crate) struct PluginBottomDefinition;
 
 impl Plugin for PluginBottomDefinition {
-    fn namespace(&self) -> &str {
-        "rounded-b"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         radius_can_handle(&mut context)
     }
@@ -184,10 +156,6 @@ impl Plugin for PluginBottomDefinition {
 pub(crate) struct PluginLeftDefinition;
 
 impl Plugin for PluginLeftDefinition {
-    fn namespace(&self) -> &str {
-        "rounded-l"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         radius_can_handle(&mut context)
     }
@@ -204,10 +172,6 @@ impl Plugin for PluginLeftDefinition {
 pub(crate) struct PluginRightDefinition;
 
 impl Plugin for PluginRightDefinition {
-    fn namespace(&self) -> &str {
-        "rounded-r"
-    }
-
     fn can_handle(&self, mut context: ContextCanHandle) -> bool {
         radius_can_handle(&mut context)
     }

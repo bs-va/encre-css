@@ -8,10 +8,6 @@ use std::borrow::Cow;
 pub(crate) struct PluginFromDefinition;
 
 impl Plugin for PluginFromDefinition {
-    fn namespace(&self) -> &str {
-        "from"
-    }
-
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         match context.modifier {
             Modifier::Builtin { value, .. } => {
@@ -38,7 +34,9 @@ impl Plugin for PluginFromDefinition {
             Cow::from(default)
         };
 
-        context.buffer.line(format_args!("--en-gradient-from: {value};"));
+        context
+            .buffer
+            .line(format_args!("--en-gradient-from: {value};"));
         context.buffer.line(format_args!(
             "--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to, {default_to});"
         ));
@@ -49,10 +47,6 @@ impl Plugin for PluginFromDefinition {
 pub(crate) struct PluginViaDefinition;
 
 impl Plugin for PluginViaDefinition {
-    fn namespace(&self) -> &str {
-        "via"
-    }
-
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         match context.modifier {
             Modifier::Builtin { value, .. } => {
@@ -90,10 +84,6 @@ impl Plugin for PluginViaDefinition {
 pub(crate) struct PluginToDefinition;
 
 impl Plugin for PluginToDefinition {
-    fn namespace(&self) -> &str {
-        "to"
-    }
-
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         match context.modifier {
             Modifier::Builtin { value, .. } => {

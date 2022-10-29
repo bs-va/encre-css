@@ -1064,10 +1064,6 @@ const PROSE_INVERT_CSS: &str = "--en-prose-body: var(--en-prose-invert-body);
 pub struct Prose;
 
 impl Plugin for Prose {
-    fn namespace(&self) -> &'static str {
-        "prose"
-    }
-
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         match context.modifier {
             Modifier::Builtin { value, .. } => [
@@ -1228,7 +1224,7 @@ pub fn register(config: &mut Config) {
         );
     }
 
-    config.register_plugin(&Prose);
+    config.register_plugin("prose", &Prose);
 }
 
 #[cfg(test)]
