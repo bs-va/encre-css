@@ -49,8 +49,8 @@ impl Plugin for PluginXDefinition {
                     }
                 },
                 " > :not([hidden]) ~ :not([hidden])",
-            )
-        })
+            );
+        });
     }
 }
 
@@ -105,7 +105,7 @@ impl Plugin for PluginYDefinition {
                     }
                 },
                 " > :not([hidden]) ~ :not([hidden])",
-            )
-        })
+            );
+        });
     }
 }

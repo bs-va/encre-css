@@ -7,20 +7,20 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => ["collapse", "separate"].contains(&&**value),
-            Modifier::Arbitrary { .. } => false,
-        }
+        matches!(
+            context.modifier,
+            Modifier::Builtin {
+                value: "collapse" | "separate",
+                ..
+            }
+        )
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => match *value {
-                "collapse" => context.buffer.line("border-collapse: collapse;"),
-                "separate" => context.buffer.line("border-collapse: separate;"),
-                _ => unreachable!(),
-            },
-            Modifier::Arbitrary { .. } => unreachable!(),
+        if let Modifier::Builtin { value, .. } = context.modifier {
+            context
+                .buffer
+                .line(format_args!("border-collapse: {value};"));
         }
     }
 }

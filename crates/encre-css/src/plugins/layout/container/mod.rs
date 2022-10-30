@@ -13,10 +13,7 @@ impl Plugin for PluginDefinition {
     }
 
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => value.is_empty(),
-            Modifier::Arbitrary { .. } => false,
-        }
+        matches!(context.modifier, Modifier::Builtin { value: "", .. })
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -112,7 +109,7 @@ impl Plugin for PluginDefinition {
                         context.buffer.line("}");
                     }
                 }
-            })
+            });
         }
     }
 }

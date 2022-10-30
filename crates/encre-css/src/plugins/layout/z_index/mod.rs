@@ -7,19 +7,15 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => value.parse::<usize>().is_ok() || *value == "auto",
-            Modifier::Arbitrary { .. } => false,
-        }
+        matches!(context.modifier, Modifier::Builtin { value, .. } if value.parse::<usize>().is_ok() || *value == "auto")
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        match context.modifier {
-            Modifier::Builtin { is_negative, value } => context.buffer.line(format_args!(
+        if let Modifier::Builtin { value, is_negative } = context.modifier {
+            context.buffer.line(format_args!(
                 "z-index: {}{value};",
                 format_negative(is_negative)
-            )),
-            Modifier::Arbitrary { .. } => unreachable!(),
+            ));
         }
     }
 }

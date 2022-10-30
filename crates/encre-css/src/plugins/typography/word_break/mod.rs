@@ -6,15 +6,18 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => ["normal", "words", "all"].contains(&&**value),
-            Modifier::Arbitrary { .. } => false,
-        }
+        matches!(
+            context.modifier,
+            Modifier::Builtin {
+                value: "normal" | "words" | "all",
+                ..
+            }
+        )
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => match *value {
+        if let Modifier::Builtin { value, .. } = context.modifier {
+            match *value {
                 "normal" => {
                     context
                         .buffer
@@ -23,8 +26,7 @@ impl Plugin for PluginDefinition {
                 "words" => context.buffer.line("overflow-wrap: break-word;"),
                 "all" => context.buffer.line("word-break: break-all;"),
                 _ => unreachable!(),
-            },
-            Modifier::Arbitrary { .. } => unreachable!(),
+            }
         }
     }
 }

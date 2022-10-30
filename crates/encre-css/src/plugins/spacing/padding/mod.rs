@@ -52,7 +52,7 @@ impl Plugin for PluginDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        padding_handle(&["padding"], context)
+        padding_handle(&["padding"], context);
     }
 }
 
@@ -65,7 +65,7 @@ impl Plugin for PluginXDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        padding_handle(&["padding-left", "padding-right"], context)
+        padding_handle(&["padding-left", "padding-right"], context);
     }
 }
 
@@ -78,7 +78,7 @@ impl Plugin for PluginYDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        padding_handle(&["padding-top", "padding-bottom"], context)
+        padding_handle(&["padding-top", "padding-bottom"], context);
     }
 }
 
@@ -91,7 +91,7 @@ impl Plugin for PluginTopDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        padding_handle(&["padding-top"], context)
+        padding_handle(&["padding-top"], context);
     }
 }
 
@@ -104,7 +104,7 @@ impl Plugin for PluginBottomDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        padding_handle(&["padding-bottom"], context)
+        padding_handle(&["padding-bottom"], context);
     }
 }
 
@@ -117,7 +117,7 @@ impl Plugin for PluginLeftDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        padding_handle(&["padding-left"], context)
+        padding_handle(&["padding-left"], context);
     }
 }
 
@@ -130,6 +130,6 @@ impl Plugin for PluginRightDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        padding_handle(&["padding-right"], context)
+        padding_handle(&["padding-right"], context);
     }
 }

@@ -24,7 +24,7 @@ impl Plugin for PluginDefinition {
                 color::get(context.config, value, None).unwrap()
             )),
             Modifier::Arbitrary { value, .. } => {
-                context.buffer.line(format_args!("accent-color: {value};"))
+                context.buffer.line(format_args!("accent-color: {value};"));
             }
         }
     }

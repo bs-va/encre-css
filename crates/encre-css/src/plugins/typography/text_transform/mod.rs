@@ -7,24 +7,24 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => {
-                ["uppercase", "lowercase", "capitalize", "normal-case"].contains(&&**value)
+        matches!(
+            context.modifier,
+            Modifier::Builtin {
+                value: "uppercase" | "lowercase" | "capitalize" | "normal-case",
+                ..
             }
-            Modifier::Arbitrary { .. } => false,
-        }
+        )
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => match *value {
+        if let Modifier::Builtin { value, .. } = context.modifier {
+            match *value {
                 "uppercase" => context.buffer.line("text-transform: uppercase;"),
                 "lowercase" => context.buffer.line("text-transform: lowercase;"),
                 "capitalize" => context.buffer.line("text-transform: capitalize;"),
                 "normal-case" => context.buffer.line("text-transform: none;"),
                 _ => unreachable!(),
-            },
-            Modifier::Arbitrary { .. } => unreachable!(),
+            }
         }
     }
 }

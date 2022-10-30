@@ -7,21 +7,20 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => ["fixed", "local", "scroll"].contains(value),
-            Modifier::Arbitrary { .. } => false,
-        }
+        matches!(
+            context.modifier,
+            Modifier::Builtin {
+                value: "fixed" | "local" | "scroll",
+                ..
+            }
+        )
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => match *value {
-                "fixed" => context.buffer.line("background-attachment: fixed;"),
-                "local" => context.buffer.line("background-attachment: local;"),
-                "scroll" => context.buffer.line("background-attachment: scroll;"),
-                _ => unreachable!(),
-            },
-            Modifier::Arbitrary { .. } => unreachable!(),
+        if let Modifier::Builtin { value, .. } = context.modifier {
+            context
+                .buffer
+                .line(format_args!("background-attachment: {value};"));
         }
     }
 }

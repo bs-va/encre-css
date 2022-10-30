@@ -7,21 +7,21 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => [
-                "normal-nums",
-                "ordinal",
-                "slashed-zero",
-                "lining-nums",
-                "oldstyle-nums",
-                "proportional-nums",
-                "tabular-nums",
-                "diagonal-fractions",
-                "stacked-fractions",
-            ]
-            .contains(&&**value),
-            Modifier::Arbitrary { .. } => false,
-        }
+        matches!(
+            context.modifier,
+            Modifier::Builtin {
+                value: "normal-nums"
+                    | "ordinal"
+                    | "slashed-zero"
+                    | "lining-nums"
+                    | "oldstyle-nums"
+                    | "proportional-nums"
+                    | "tabular-nums"
+                    | "diagonal-fractions"
+                    | "stacked-fractions",
+                ..
+            }
+        )
     }
 
     fn handle(&self, context: &mut ContextHandle) {

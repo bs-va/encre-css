@@ -41,7 +41,7 @@ impl Plugin for PluginDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        border_spacing_handle(&["--en-border-spacing-x", "--en-border-spacing-y"], context)
+        border_spacing_handle(&["--en-border-spacing-x", "--en-border-spacing-y"], context);
     }
 }
 
@@ -54,7 +54,7 @@ impl Plugin for PluginXDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        border_spacing_handle(&["--en-border-spacing-x"], context)
+        border_spacing_handle(&["--en-border-spacing-x"], context);
     }
 }
 
@@ -67,6 +67,6 @@ impl Plugin for PluginYDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        border_spacing_handle(&["--en-border-spacing-y"], context)
+        border_spacing_handle(&["--en-border-spacing-y"], context);
     }
 }

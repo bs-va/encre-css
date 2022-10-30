@@ -46,7 +46,7 @@ impl Plugin for PluginXDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        translate_handle("--en-translate-x", context)
+        translate_handle("--en-translate-x", context);
     }
 }
 
@@ -59,6 +59,6 @@ impl Plugin for PluginYDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        translate_handle("--en-translate-y", context)
+        translate_handle("--en-translate-y", context);
     }
 }

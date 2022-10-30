@@ -1080,20 +1080,16 @@ impl Config {
     ///
     /// impl Plugin for Prose {
     ///     fn can_handle(&self, context: ContextCanHandle) -> bool {
-    ///         match context.modifier {
-    ///             Modifier::Builtin { value, .. } => *value == "" || *value == "invert",
-    ///             Modifier::Arbitrary { .. } => false,
-    ///         }
+    ///         matches!(context.modifier, Modifier::Builtin { value: "" | "invert", .. })
     ///     }
     ///
     ///     fn handle(&self, context: &mut ContextHandle) {
-    ///         match context.modifier {
-    ///             Modifier::Builtin { value, .. } => match *value {
+    ///         if let Modifier::Builtin { value, .. } = context.modifier {
+    ///             match *value {
     ///                 "" => context.buffer.line("color: #333;"),
     ///                 "invert" => context.buffer.line("color: #eee;"),
     ///                 _ => unreachable!(),
-    ///             },
-    ///             Modifier::Arbitrary { .. } => unreachable!(),
+    ///             }
     ///         }
     ///     }
     /// }

@@ -7,29 +7,29 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => [
-                "normal",
-                "multiply",
-                "screen",
-                "overlay",
-                "darken",
-                "lighten",
-                "color-dodge",
-                "color-burn",
-                "hard-light",
-                "soft-light",
-                "difference",
-                "exclusion",
-                "hue",
-                "saturation",
-                "color",
-                "luminosity",
-                "plus-lighter",
-            ]
-            .contains(&&**value),
-            Modifier::Arbitrary { .. } => false,
-        }
+        matches!(
+            context.modifier,
+            Modifier::Builtin {
+                value: "normal"
+                    | "multiply"
+                    | "screen"
+                    | "overlay"
+                    | "darken"
+                    | "lighten"
+                    | "color-dodge"
+                    | "color-burn"
+                    | "hard-light"
+                    | "soft-light"
+                    | "difference"
+                    | "exclusion"
+                    | "hue"
+                    | "saturation"
+                    | "color"
+                    | "luminosity"
+                    | "plus-lighter",
+                ..
+            }
+        )
     }
 
     fn handle(&self, context: &mut ContextHandle) {

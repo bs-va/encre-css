@@ -37,7 +37,7 @@ impl Plugin for PluginDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        scroll_padding_handle(&["scroll-padding"], context)
+        scroll_padding_handle(&["scroll-padding"], context);
     }
 }
 
@@ -50,7 +50,7 @@ impl Plugin for PluginXDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        scroll_padding_handle(&["scroll-padding-left", "scroll-padding-right"], context)
+        scroll_padding_handle(&["scroll-padding-left", "scroll-padding-right"], context);
     }
 }
 
@@ -63,7 +63,7 @@ impl Plugin for PluginYDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        scroll_padding_handle(&["scroll-padding-top", "scroll-padding-bottom"], context)
+        scroll_padding_handle(&["scroll-padding-top", "scroll-padding-bottom"], context);
     }
 }
 
@@ -76,7 +76,7 @@ impl Plugin for PluginLeftDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        scroll_padding_handle(&["scroll-padding-left"], context)
+        scroll_padding_handle(&["scroll-padding-left"], context);
     }
 }
 
@@ -89,7 +89,7 @@ impl Plugin for PluginRightDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        scroll_padding_handle(&["scroll-padding-right"], context)
+        scroll_padding_handle(&["scroll-padding-right"], context);
     }
 }
 
@@ -102,7 +102,7 @@ impl Plugin for PluginTopDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        scroll_padding_handle(&["scroll-padding-top"], context)
+        scroll_padding_handle(&["scroll-padding-top"], context);
     }
 }
 
@@ -115,6 +115,6 @@ impl Plugin for PluginBottomDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        scroll_padding_handle(&["scroll-padding-bottom"], context)
+        scroll_padding_handle(&["scroll-padding-bottom"], context);
     }
 }

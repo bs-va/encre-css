@@ -7,20 +7,18 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => ["auto", "fixed"].contains(&&**value),
-            Modifier::Arbitrary { .. } => false,
-        }
+        matches!(
+            context.modifier,
+            Modifier::Builtin {
+                value: "auto" | "fixed",
+                ..
+            }
+        )
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => match *value {
-                "auto" => context.buffer.line("table-layout: auto;"),
-                "fixed" => context.buffer.line("table-layout: fixed;"),
-                _ => unreachable!(),
-            },
-            Modifier::Arbitrary { .. } => unreachable!(),
+        if let Modifier::Builtin { value, .. } = context.modifier {
+            context.buffer.line(format_args!("table-layout: {value};"));
         }
     }
 }

@@ -25,7 +25,7 @@ impl Plugin for PluginDefinition {
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                context.buffer.line(format_args!("will-change: {value};"))
+                context.buffer.line(format_args!("will-change: {value};"));
             }
         }
     }

@@ -64,7 +64,7 @@ impl Plugin for PluginDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        radius_handle(&["border-radius"], context)
+        radius_handle(&["border-radius"], context);
     }
 }
 
@@ -77,7 +77,7 @@ impl Plugin for PluginTopRightDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        radius_handle(&["border-top-right-radius"], context)
+        radius_handle(&["border-top-right-radius"], context);
     }
 }
 
@@ -90,7 +90,7 @@ impl Plugin for PluginTopLeftDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        radius_handle(&["border-top-left-radius"], context)
+        radius_handle(&["border-top-left-radius"], context);
     }
 }
 
@@ -103,7 +103,7 @@ impl Plugin for PluginBottomRightDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        radius_handle(&["border-bottom-right-radius"], context)
+        radius_handle(&["border-bottom-right-radius"], context);
     }
 }
 
@@ -116,7 +116,7 @@ impl Plugin for PluginBottomLeftDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        radius_handle(&["border-bottom-left-radius"], context)
+        radius_handle(&["border-bottom-left-radius"], context);
     }
 }
 
@@ -132,7 +132,7 @@ impl Plugin for PluginTopDefinition {
         radius_handle(
             &["border-top-left-radius", "border-top-right-radius"],
             context,
-        )
+        );
     }
 }
 
@@ -148,7 +148,7 @@ impl Plugin for PluginBottomDefinition {
         radius_handle(
             &["border-bottom-left-radius", "border-bottom-right-radius"],
             context,
-        )
+        );
     }
 }
 
@@ -164,7 +164,7 @@ impl Plugin for PluginLeftDefinition {
         radius_handle(
             &["border-top-left-radius", "border-bottom-left-radius"],
             context,
-        )
+        );
     }
 }
 
@@ -180,6 +180,6 @@ impl Plugin for PluginRightDefinition {
         radius_handle(
             &["border-top-right-radius", "border-bottom-right-radius"],
             context,
-        )
+        );
     }
 }

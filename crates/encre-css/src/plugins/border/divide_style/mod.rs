@@ -35,7 +35,7 @@ impl Plugin for PluginDefinition {
                     Modifier::Arbitrary { .. } => unreachable!(),
                 },
                 " > :not([hidden]) ~ :not([hidden])",
-            )
-        })
+            );
+        });
     }
 }

@@ -7,22 +7,17 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => {
-                value.parse::<usize>().map_or(false, |v| v <= 12)
-                    || [
-                        "auto", "3xs", "2xs", "xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl",
-                        "5xl", "6xl", "7xl",
-                    ]
-                    .contains(value)
-            }
-            Modifier::Arbitrary { .. } => false,
-        }
+        matches!(context.modifier, Modifier::Builtin { value, .. } if value.parse::<usize>().map_or(false, |v| v <= 12)
+            || [
+                "auto", "3xs", "2xs", "xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl",
+                "5xl", "6xl", "7xl",
+            ]
+            .contains(value))
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => match *value {
+        if let Modifier::Builtin { value, .. } = context.modifier {
+            match *value {
                 "3xs" => context.buffer.line("columns: 16rem;"),
                 "2xs" => context.buffer.line("columns: 18rem;"),
                 "xs" => context.buffer.line("columns: 20rem;"),
@@ -37,8 +32,7 @@ impl Plugin for PluginDefinition {
                 "6xl" => context.buffer.line("columns: 72rem;"),
                 "7xl" => context.buffer.line("columns: 80rem;"),
                 _ => context.buffer.line(format_args!("columns: {value};")),
-            },
-            Modifier::Arbitrary { .. } => unreachable!(),
+            }
         }
     }
 }

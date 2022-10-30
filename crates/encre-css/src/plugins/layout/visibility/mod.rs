@@ -7,20 +7,26 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => ["visible", "invisible"].contains(&&**value),
-            Modifier::Arbitrary { .. } => false,
-        }
+        matches!(
+            context.modifier,
+            Modifier::Builtin {
+                value: "visible" | "invisible",
+                ..
+            }
+        )
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => match *value {
-                "visible" => context.buffer.line("visibility: visible;"),
-                "invisible" => context.buffer.line("visibility: hidden;"),
-                _ => unreachable!(),
-            },
-            Modifier::Arbitrary { .. } => unreachable!(),
+        if let Modifier::Builtin {
+            value: "visible", ..
+        } = context.modifier
+        {
+            context.buffer.line("visibility: visible;");
+        } else if let Modifier::Builtin {
+            value: "invisible", ..
+        } = context.modifier
+        {
+            context.buffer.line("visibility: hidden;");
         }
     }
 }

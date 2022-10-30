@@ -7,18 +7,18 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => [
-                "repeat",
-                "no-repeat",
-                "repeat-x",
-                "repeat-y",
-                "repeat-round",
-                "repeat-space",
-            ]
-            .contains(value),
-            Modifier::Arbitrary { .. } => false,
-        }
+        matches!(
+            context.modifier,
+            Modifier::Builtin {
+                value: "repeat"
+                    | "not-repeat"
+                    | "repeat-x"
+                    | "repeat-y"
+                    | "repeat-round"
+                    | "repeat-space",
+                ..
+            }
+        )
     }
 
     fn handle(&self, context: &mut ContextHandle) {

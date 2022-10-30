@@ -7,22 +7,14 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => *value == "none",
-            Modifier::Arbitrary { .. } => false,
-        }
+        matches!(context.modifier, Modifier::Builtin { value: "none", .. })
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        match context.modifier {
-            Modifier::Builtin { .. } => {
-                context.buffer.lines([
-                    "-webkit-appearance: none;",
-                    "-moz-appearance: none;",
-                    "appearance: none;",
-                ]);
-            }
-            Modifier::Arbitrary { .. } => unreachable!(),
-        }
+        context.buffer.lines([
+            "-webkit-appearance: none;",
+            "-moz-appearance: none;",
+            "appearance: none;",
+        ]);
     }
 }

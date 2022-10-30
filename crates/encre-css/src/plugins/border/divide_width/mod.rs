@@ -68,16 +68,15 @@ impl Plugin for PluginXDefinition {
                             context.buffer.line(format_args!(
                                 "border-right-width: calc({value} * var(--en-divide-x-reverse));"
                             ));
-                            context.buffer.line(
-                                    format_args!(
-                                    "border-left-width: calc({value} * calc(1 - var(--en-divide-x-reverse)));"
-                                ));
+                            context.buffer.line(format_args!(
+                                "border-left-width: calc({value} * calc(1 - var(--en-divide-x-reverse)));"
+                            ));
                         }
                     }
                 },
                 " > :not([hidden]) ~ :not([hidden])",
-            )
-        })
+            );
+        });
     }
 }
 
@@ -151,7 +150,7 @@ impl Plugin for PluginYDefinition {
                     }
                 },
                 " > :not([hidden]) ~ :not([hidden])",
-            )
-        })
+            );
+        });
     }
 }

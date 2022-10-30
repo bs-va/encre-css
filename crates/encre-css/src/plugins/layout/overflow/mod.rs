@@ -7,24 +7,24 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => [
-                "auto",
-                "x-auto",
-                "y-auto",
-                "hidden",
-                "x-hidden",
-                "y-hidden",
-                "visible",
-                "x-visible",
-                "y-visible",
-                "scroll",
-                "x-scroll",
-                "y-scroll",
-            ]
-            .contains(&&**value),
-            Modifier::Arbitrary { .. } => false,
-        }
+        matches!(
+            context.modifier,
+            Modifier::Builtin {
+                value: "auto"
+                    | "x-auto"
+                    | "y-auto"
+                    | "hidden"
+                    | "x-hidden"
+                    | "y-hidden"
+                    | "visible"
+                    | "x-visible"
+                    | "y-visible"
+                    | "scroll"
+                    | "x-scroll"
+                    | "y-scroll",
+                ..
+            }
+        )
     }
 
     fn handle(&self, context: &mut ContextHandle) {

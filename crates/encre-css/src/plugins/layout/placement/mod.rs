@@ -59,7 +59,7 @@ impl Plugin for PluginInsetDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        placement_handle(&["top", "bottom", "left", "right"], context)
+        placement_handle(&["top", "bottom", "left", "right"], context);
     }
 }
 
@@ -72,7 +72,7 @@ impl Plugin for PluginInsetXDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        placement_handle(&["left", "right"], context)
+        placement_handle(&["left", "right"], context);
     }
 }
 
@@ -85,7 +85,7 @@ impl Plugin for PluginInsetYDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        placement_handle(&["top", "bottom"], context)
+        placement_handle(&["top", "bottom"], context);
     }
 }
 
@@ -98,7 +98,7 @@ impl Plugin for PluginTopDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        placement_handle(&["top"], context)
+        placement_handle(&["top"], context);
     }
 }
 
@@ -111,7 +111,7 @@ impl Plugin for PluginBottomDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        placement_handle(&["bottom"], context)
+        placement_handle(&["bottom"], context);
     }
 }
 
@@ -124,7 +124,7 @@ impl Plugin for PluginLeftDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        placement_handle(&["left"], context)
+        placement_handle(&["left"], context);
     }
 }
 
@@ -137,6 +137,6 @@ impl Plugin for PluginRightDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        placement_handle(&["right"], context)
+        placement_handle(&["right"], context);
     }
 }

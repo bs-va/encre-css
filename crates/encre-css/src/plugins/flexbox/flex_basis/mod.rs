@@ -22,7 +22,7 @@ impl Plugin for PluginDefinition {
                 spacing::get(value, *is_negative).unwrap()
             )),
             Modifier::Arbitrary { value, .. } => {
-                context.buffer.line(format_args!("flex-basis: {value};"))
+                context.buffer.line(format_args!("flex-basis: {value};"));
             }
         }
     }

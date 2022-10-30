@@ -7,22 +7,20 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => {
-                ["solid", "double", "dotted", "dashed", "wavy"].contains(&&**value)
+        matches!(
+            context.modifier,
+            Modifier::Builtin {
+                value: "solid" | "double" | "dotted" | "dashed" | "wavy",
+                ..
             }
-            Modifier::Arbitrary { .. } => false,
-        }
+        )
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => {
-                context
-                    .buffer
-                    .line(format_args!("text-decoration-style: {value};"));
-            }
-            Modifier::Arbitrary { .. } => unreachable!(),
+        if let Modifier::Builtin { value, .. } = context.modifier {
+            context
+                .buffer
+                .line(format_args!("text-decoration-style: {value};"));
         }
     }
 }

@@ -34,7 +34,7 @@ impl Plugin for PluginXDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        skew_handle("--en-skew-x", context)
+        skew_handle("--en-skew-x", context);
     }
 }
 
@@ -47,6 +47,6 @@ impl Plugin for PluginYDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        skew_handle("--en-skew-y", context)
+        skew_handle("--en-skew-y", context);
     }
 }

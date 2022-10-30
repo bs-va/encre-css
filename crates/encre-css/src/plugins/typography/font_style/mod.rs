@@ -7,20 +7,22 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => ["italic", "not-italic"].contains(&&**value),
-            Modifier::Arbitrary { .. } => false,
-        }
+        matches!(
+            context.modifier,
+            Modifier::Builtin {
+                value: "italic" | "not-italic",
+                ..
+            }
+        )
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => match *value {
+        if let Modifier::Builtin { value, .. } = context.modifier {
+            match *value {
                 "italic" => context.buffer.line("font-style: italic;"),
                 "not-italic" => context.buffer.line("font-style: normal;"),
                 _ => unreachable!(),
-            },
-            Modifier::Arbitrary { .. } => unreachable!(),
+            }
         }
     }
 }

@@ -7,13 +7,8 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => {
-                ["first", "last", "none"].contains(&&**value)
-                    || value.parse::<usize>().map_or(false, |v| v != 0)
-            }
-            Modifier::Arbitrary { .. } => false,
-        }
+        matches!(context.modifier, Modifier::Builtin { value, .. } if ["first", "last", "none"].contains(&&**value)
+                    || value.parse::<usize>().map_or(false, |v| v != 0))
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -21,9 +16,9 @@ impl Plugin for PluginDefinition {
             Modifier::Builtin {
                 is_negative, value, ..
             } => match *value {
-                "first" => return context.buffer.line("order: -9999;"),
-                "last" => return context.buffer.line("order: 9999;"),
-                "none" => return context.buffer.line("order: 0;"),
+                "first" => context.buffer.line("order: -9999;"),
+                "last" => context.buffer.line("order: 9999;"),
+                "none" => context.buffer.line("order: 0;"),
                 _ => context.buffer.line(format_args!(
                     "order: {}{value};",
                     format_negative(is_negative)

@@ -7,27 +7,21 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => *value == "none" || value.parse::<usize>().is_ok(),
-            Modifier::Arbitrary { .. } => false,
-        }
+        matches!(context.modifier, Modifier::Builtin { value, .. } if *value == "none" || value.parse::<usize>().is_ok())
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => {
-                if *value == "none" {
-                    context.buffer.line("-webkit-line-clamp: unset;");
-                } else {
-                    context.buffer.lines([
-                        format_args!("overflow: hidden;"),
-                        format_args!("display: -webkit-box;"),
-                        format_args!("-webkit-box-orient: vertical;"),
-                        format_args!("-webkit-line-clamp: {value};"),
-                    ]);
-                }
+        if let Modifier::Builtin { value, .. } = context.modifier {
+            if *value == "none" {
+                context.buffer.line("-webkit-line-clamp: unset;");
+            } else {
+                context.buffer.lines([
+                    format_args!("overflow: hidden;"),
+                    format_args!("display: -webkit-box;"),
+                    format_args!("-webkit-box-orient: vertical;"),
+                    format_args!("-webkit-line-clamp: {value};"),
+                ]);
             }
-            Modifier::Arbitrary { .. } => unreachable!(),
         }
     }
 }

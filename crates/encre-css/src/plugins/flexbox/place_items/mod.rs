@@ -7,24 +7,18 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => {
-                ["stretch", "start", "center", "end"].contains(value)
+        matches!(
+            context.modifier,
+            Modifier::Builtin {
+                value: "stretch" | "start" | "center" | "end",
+                ..
             }
-            Modifier::Arbitrary { .. } => false,
-        }
+        )
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => match *value {
-                "stretch" => context.buffer.line("place-items: stretch;"),
-                "start" => context.buffer.line("place-items: start;"),
-                "center" => context.buffer.line("place-items: center;"),
-                "end" => context.buffer.line("place-items: end;"),
-                _ => unreachable!(),
-            },
-            Modifier::Arbitrary { .. } => unreachable!(),
+        if let Modifier::Builtin { value, .. } = context.modifier {
+            context.buffer.line(format_args!("place-items: {value};"));
         }
     }
 }

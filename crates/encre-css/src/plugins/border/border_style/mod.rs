@@ -16,7 +16,7 @@ impl Plugin for PluginDefinition {
     fn handle(&self, context: &mut ContextHandle) {
         match context.modifier {
             Modifier::Builtin { value, .. } => {
-                context.buffer.line(format_args!("border-style: {value};"))
+                context.buffer.line(format_args!("border-style: {value};"));
             }
             Modifier::Arbitrary { value, .. } => {
                 context.buffer.line(format_args!("border-style: {value};"));

@@ -37,7 +37,7 @@ impl Plugin for PluginDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        scroll_margin_handle(&["scroll-margin"], context)
+        scroll_margin_handle(&["scroll-margin"], context);
     }
 }
 
@@ -50,7 +50,7 @@ impl Plugin for PluginXDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        scroll_margin_handle(&["scroll-margin-left", "scroll-margin-right"], context)
+        scroll_margin_handle(&["scroll-margin-left", "scroll-margin-right"], context);
     }
 }
 
@@ -63,7 +63,7 @@ impl Plugin for PluginYDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        scroll_margin_handle(&["scroll-margin-top", "scroll-margin-bottom"], context)
+        scroll_margin_handle(&["scroll-margin-top", "scroll-margin-bottom"], context);
     }
 }
 
@@ -76,7 +76,7 @@ impl Plugin for PluginLeftDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        scroll_margin_handle(&["scroll-margin-left"], context)
+        scroll_margin_handle(&["scroll-margin-left"], context);
     }
 }
 
@@ -89,7 +89,7 @@ impl Plugin for PluginRightDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        scroll_margin_handle(&["scroll-margin-right"], context)
+        scroll_margin_handle(&["scroll-margin-right"], context);
     }
 }
 
@@ -102,7 +102,7 @@ impl Plugin for PluginTopDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        scroll_margin_handle(&["scroll-margin-top"], context)
+        scroll_margin_handle(&["scroll-margin-top"], context);
     }
 }
 
@@ -115,6 +115,6 @@ impl Plugin for PluginBottomDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        scroll_margin_handle(&["scroll-margin-bottom"], context)
+        scroll_margin_handle(&["scroll-margin-bottom"], context);
     }
 }

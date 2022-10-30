@@ -7,12 +7,13 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => {
-                ["auto", "start", "center", "end", "stretch"].contains(value)
+        matches!(
+            context.modifier,
+            Modifier::Builtin {
+                value: "auto" | "start" | "center" | "end" | "stretch",
+                ..
             }
-            Modifier::Arbitrary { .. } => false,
-        }
+        )
     }
 
     fn handle(&self, context: &mut ContextHandle) {

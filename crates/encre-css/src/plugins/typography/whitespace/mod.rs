@@ -7,20 +7,18 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => {
-                ["normal", "nowrap", "pre", "pre-line", "pre-wrap"].contains(&&**value)
+        matches!(
+            context.modifier,
+            Modifier::Builtin {
+                value: "normal" | "nowrap" | "pre" | "pre-line" | "pre-wrap",
+                ..
             }
-            Modifier::Arbitrary { .. } => false,
-        }
+        )
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => {
-                context.buffer.line(format_args!("white-space: {value};"))
-            }
-            Modifier::Arbitrary { .. } => unreachable!(),
+        if let Modifier::Builtin { value, .. } = context.modifier {
+            context.buffer.line(format_args!("white-space: {value};"));
         }
     }
 }

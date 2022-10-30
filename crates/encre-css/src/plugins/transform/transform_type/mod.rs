@@ -8,10 +8,13 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => ["", "gpu", "cpu", "none"].contains(&&**value),
-            Modifier::Arbitrary { .. } => false,
-        }
+        matches!(
+            context.modifier,
+            Modifier::Builtin {
+                value: "" | "gpu" | "cpu" | "none",
+                ..
+            }
+        )
     }
 
     fn handle(&self, context: &mut ContextHandle) {

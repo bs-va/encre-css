@@ -7,17 +7,18 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => {
-                ["antialised", "subpixel-antialised"].contains(&&**value)
+        matches!(
+            context.modifier,
+            Modifier::Builtin {
+                value: "antialised" | "subpixel-antialised",
+                ..
             }
-            Modifier::Arbitrary { .. } => false,
-        }
+        )
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => match *value {
+        if let Modifier::Builtin { value, .. } = context.modifier {
+            match *value {
                 "antialised" => {
                     context.buffer.lines([
                         "-webkit-font-smoothing: antialiased;",
@@ -31,8 +32,7 @@ impl Plugin for PluginDefinition {
                     ]);
                 }
                 _ => unreachable!(),
-            },
-            Modifier::Arbitrary { .. } => unreachable!(),
+            }
         }
     }
 }

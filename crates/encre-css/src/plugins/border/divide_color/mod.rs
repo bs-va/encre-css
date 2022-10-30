@@ -40,7 +40,7 @@ impl Plugin for PluginDefinition {
                     }
                 },
                 " > :not([hidden]) ~ :not([hidden])",
-            )
-        })
+            );
+        });
     }
 }

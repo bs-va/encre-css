@@ -52,7 +52,7 @@ impl Plugin for PluginDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        margin_handle(&["margin"], context)
+        margin_handle(&["margin"], context);
     }
 }
 
@@ -65,7 +65,7 @@ impl Plugin for PluginXDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        margin_handle(&["margin-left", "margin-right"], context)
+        margin_handle(&["margin-left", "margin-right"], context);
     }
 }
 
@@ -78,7 +78,7 @@ impl Plugin for PluginYDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        margin_handle(&["margin-top", "margin-bottom"], context)
+        margin_handle(&["margin-top", "margin-bottom"], context);
     }
 }
 
@@ -91,7 +91,7 @@ impl Plugin for PluginTopDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        margin_handle(&["margin-top"], context)
+        margin_handle(&["margin-top"], context);
     }
 }
 
@@ -104,7 +104,7 @@ impl Plugin for PluginBottomDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        margin_handle(&["margin-bottom"], context)
+        margin_handle(&["margin-bottom"], context);
     }
 }
 
@@ -117,7 +117,7 @@ impl Plugin for PluginLeftDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        margin_handle(&["margin-left"], context)
+        margin_handle(&["margin-left"], context);
     }
 }
 
@@ -130,6 +130,6 @@ impl Plugin for PluginRightDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        margin_handle(&["margin-right"], context)
+        margin_handle(&["margin-right"], context);
     }
 }

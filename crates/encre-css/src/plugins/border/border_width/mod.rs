@@ -54,7 +54,7 @@ impl Plugin for PluginDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        width_handle(&["border-width"], context)
+        width_handle(&["border-width"], context);
     }
 }
 
@@ -67,7 +67,7 @@ impl Plugin for PluginTopDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        width_handle(&["border-top-width"], context)
+        width_handle(&["border-top-width"], context);
     }
 }
 
@@ -80,7 +80,7 @@ impl Plugin for PluginBottomDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        width_handle(&["border-bottom-width"], context)
+        width_handle(&["border-bottom-width"], context);
     }
 }
 
@@ -93,7 +93,7 @@ impl Plugin for PluginLeftDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        width_handle(&["border-left-width"], context)
+        width_handle(&["border-left-width"], context);
     }
 }
 
@@ -106,7 +106,7 @@ impl Plugin for PluginRightDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        width_handle(&["border-right-width"], context)
+        width_handle(&["border-right-width"], context);
     }
 }
 
@@ -119,7 +119,7 @@ impl Plugin for PluginXDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        width_handle(&["border-left-width", "border-right-width"], context)
+        width_handle(&["border-left-width", "border-right-width"], context);
     }
 }
 
@@ -132,6 +132,6 @@ impl Plugin for PluginYDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        width_handle(&["border-top-width", "border-bottom-width"], context)
+        width_handle(&["border-top-width", "border-bottom-width"], context);
     }
 }

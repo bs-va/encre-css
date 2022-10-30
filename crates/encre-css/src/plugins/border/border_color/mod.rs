@@ -53,7 +53,7 @@ impl Plugin for PluginDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        color_handle(&["border-color"], context)
+        color_handle(&["border-color"], context);
     }
 }
 
@@ -66,7 +66,7 @@ impl Plugin for PluginXDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        color_handle(&["border-left-color", "border-right-color"], context)
+        color_handle(&["border-left-color", "border-right-color"], context);
     }
 }
 
@@ -79,7 +79,7 @@ impl Plugin for PluginYDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        color_handle(&["border-top-color", "border-bottom-color"], context)
+        color_handle(&["border-top-color", "border-bottom-color"], context);
     }
 }
 
@@ -92,7 +92,7 @@ impl Plugin for PluginLeftDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        color_handle(&["border-left-color"], context)
+        color_handle(&["border-left-color"], context);
     }
 }
 
@@ -105,7 +105,7 @@ impl Plugin for PluginRightDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        color_handle(&["border-right-color"], context)
+        color_handle(&["border-right-color"], context);
     }
 }
 
@@ -118,7 +118,7 @@ impl Plugin for PluginTopDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        color_handle(&["border-top-color"], context)
+        color_handle(&["border-top-color"], context);
     }
 }
 
@@ -131,6 +131,6 @@ impl Plugin for PluginBottomDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        color_handle(&["border-bottom-color"], context)
+        color_handle(&["border-bottom-color"], context);
     }
 }
