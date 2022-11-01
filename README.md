@@ -111,9 +111,8 @@ encre-css = { git = "https://gitlab.com/encre-org/encre-css.git", tag = "v0.7.0"
 
 Generating styles takes three steps:
 - First, you need to _configure_ the main `EncreGenerator` structure
-either by manually making a `Config` structure and calling
-`EncreGenerator::from_config` or by reading a [TOML](https://toml.io) file using
-`EncreGenerator::new`;
+by making a `Config` structure. It can be created by reading a [TOML](https://toml.io) file using
+`Config::from_file` or by using the default values with `Config::default`;
 - Then, you need to _scan content_ to extract and collect all useful atomic classes using
 `EncreGenerator::scan` or `EncreGenerator::add_selector` to manually add **a
 single** previously scanned selector or `EncreGenerator::add_selectors` to manually add
@@ -125,7 +124,8 @@ single** previously scanned selector or `EncreGenerator::add_selectors` to manua
 ```rust
 use encre_css::{EncreGenerator, Config};
 
-let mut generator = EncreGenerator::from_config(Config::default());
+let config = Config::default();
+let mut generator = EncreGenerator::new(&config);
 generator.scan(r#"<p class="w-auto bg-red-200 rounded-md">Hello world!</p>"#);
 
 assert!(generator.generate().expect("failed to generate the CSS").contains(r#"

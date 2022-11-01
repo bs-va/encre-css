@@ -10,7 +10,7 @@ use std::borrow::Cow;
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::utils::color::hex_to_rgb;
 /// assert_eq!(hex_to_rgb("#333").unwrap(), (51, 51, 51));
 /// assert_eq!(hex_to_rgb("#f1f1f1").unwrap(), (241, 241, 241));

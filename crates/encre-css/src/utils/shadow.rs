@@ -179,7 +179,7 @@ impl<'a> ShadowList<'a> {
     ///
     /// # Example
     ///
-    /// ```rust
+    /// ```
     /// use encre_css::utils::shadow::ShadowList;
     /// assert_eq!(ShadowList::parse("10px 20px 30px 40px rgb(12 12 12)").unwrap().to_string(), "10px 20px 30px 40px rgb(12 12 12)".to_string());
     /// assert_eq!(ShadowList::parse("1px 2px 3px 4px"), None);

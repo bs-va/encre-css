@@ -127,7 +127,7 @@ fn build_single<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, outpu
     };
 
     let mut buffer = String::new();
-    let mut generator = EncreGenerator::from_config(config.encre_config);
+    let mut generator = EncreGenerator::new(&config.encre_config);
 
     if let Some(glob_path) = extra_input {
         scan_path(glob_path, &mut buffer);
@@ -180,7 +180,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
 
     {
         // Initial generation
-        let mut generator = EncreGenerator::from_config(Arc::clone(&config));
+        let mut generator = EncreGenerator::new(&config);
 
         if let Some(ref glob_path) = *extra_input {
             scan_path(glob_path, &mut buffer);
@@ -283,7 +283,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
                     }
 
                     if need_reloading {
-                        let mut generator = EncreGenerator::from_config(Arc::clone(&config));
+                        let mut generator = EncreGenerator::new(&config);
                         buffer.clear();
 
                         if let Some(ref glob_path) = *extra_input {

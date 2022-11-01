@@ -141,7 +141,7 @@ impl<'a, P: Pattern> Iterator for SplitIgnoreArbitrary<'a, P> {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::utils::split_ignore_arbitrary;
 ///
 /// let value = "bg-red-500 content-[wrapped in `[]`, will not be split] (words wrapped in parenthesis are not split too)";
@@ -259,7 +259,7 @@ fn sort_selectors_recursive<'a>(
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::{Config, utils::sort_selectors};
 ///
 /// let value = "foo text-white px-4 sm:px-8 py-2 qux:(bg-green-500,dark:bar:foo) sm:py-3 bar bg-sky-700 foo focus:(md:text-white,lg:text-gray-500) hover:bg-sky-800";
@@ -273,7 +273,7 @@ pub fn sort_selectors(val: &str, config: &Config) -> String {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::{Config, error::{ParseError, ParseErrorKind}, utils::check_selectors};
 ///
 /// let value = "bg text-red hover:a lg: focus:() dark:(md:,shadow-8xl) bar:text-black md:foo:flex";

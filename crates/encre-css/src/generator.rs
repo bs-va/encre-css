@@ -6,7 +6,7 @@ use crate::{
     utils::buffer::Buffer,
 };
 
-use std::{collections::BTreeSet, fmt::Write, path::Path, sync::Arc};
+use std::{collections::BTreeSet, fmt::Write};
 
 /// The context used in the [`Plugin::can_handle`] method.
 ///
@@ -247,32 +247,57 @@ pub fn generate_wrapper<T: FnOnce(&mut ContextHandle)>(
 /// to pass an `Arc<Config>` to it (to avoid cloning the configuration).
 #[derive(Debug, Clone)]
 pub struct EncreGenerator<'a> {
-    config: Arc<Config>,
+    config: &'a Config,
     pub(crate) scanned_selectors: BTreeSet<Selector<'a>>,
 }
 
 impl<'a> EncreGenerator<'a> {
-    /// Create a new [`EncreGenerator`] by trying to read a configuration file.
-    ///
-    /// If the file does not exist, a warning will be emitted and the default configuration will be
-    /// used.
-    pub fn new<T: AsRef<Path>>(path: T) -> Self {
-        let config = match Config::from_file(path) {
-            Ok(config) => config,
-            Err(e) => {
-                eprintln!("{}", e);
-                Config::default()
-            }
-        };
-
-        Self::from_config(config)
-    }
-
     /// Create a new [`EncreGenerator`] using a given configuration.
     ///
-    /// The configuration can either be a [`Config`] structure or an [`Arc<Config>`].
-    pub fn from_config<T: Into<Arc<Config>>>(config: T) -> Self {
-        let config = config.into();
+    /// The configuration **must live as long as the values** given to
+    /// [`EncreGenerator::add_selector`], [`EncreGenerator::add_selectors`] and
+    /// [`EncreGenerator::scan`].
+    ///
+    /// It can be the default one:
+    ///
+    /// ```
+    /// use encre_css::{EncreGenerator, Config};
+    ///
+    /// let config = Config::default();
+    /// let _generator = EncreGenerator::new(&config);
+    /// ```
+    ///
+    /// It can be a customized one:
+    ///
+    /// ```
+    /// use encre_css::{EncreGenerator, Config};
+    ///
+    /// let mut config = Config::default();
+    /// config.theme.colors.add("flashy", "#ff2d20");
+    ///
+    /// let _generator = EncreGenerator::new(&config);
+    /// ```
+    ///
+    /// Or it can be loaded from a [TOML](https://toml.io) file:
+    ///
+    /// <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment"># encre-css.toml</span>
+    /// <span class="kw">[theme]</span>
+    /// dark_mode = { class = <span class="string">".dark"</span> }
+    /// screens = { 3xl = <span class="string">"1600px"</span>, lg = <span class="string">"2000px"</span> }<br>
+    /// <span class="kw">[theme.colors]</span>
+    /// primary = <span class="string">"#e5186a"</span>
+    /// yellow-400 = <span class="string">"#ffef0e"</span></code></pre></div>
+    ///
+    /// ```no_run
+    /// use encre_css::{EncreGenerator, Config};
+    ///
+    /// # fn main() -> encre_css::Result<()> {
+    /// let config = Config::from_file("encre-css.toml")?;
+    /// let _generator = EncreGenerator::new(&config);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn new(config: &'a Config) -> Self {
         Self {
             config,
             scanned_selectors: BTreeSet::new(),
@@ -289,7 +314,7 @@ impl<'a> EncreGenerator<'a> {
     /// [scan]: EncreGenerator::scan
     pub fn add_selector(&mut self, val: &'a str) {
         self.scanned_selectors.extend(
-            parse(val, None, &self.config)
+            parse(val, None, self.config)
                 .into_iter()
                 .filter_map(Result::ok),
         );
@@ -306,7 +331,7 @@ impl<'a> EncreGenerator<'a> {
     pub fn add_selectors<T: IntoIterator<Item = &'a str>>(&mut self, val: T) {
         self.scanned_selectors.extend(
             val.into_iter()
-                .flat_map(|v| parse(v.trim(), None, &self.config))
+                .flat_map(|v| parse(v.trim(), None, self.config))
                 .filter_map(Result::ok),
         );
     }
@@ -342,7 +367,7 @@ impl<'a> EncreGenerator<'a> {
             }
 
             let mut context = ContextHandle {
-                config: &self.config,
+                config: self.config,
                 modifier: &selector.modifier,
                 buffer: &mut buffer,
                 selector,
@@ -407,7 +432,8 @@ mod tests {
                 .clone(),
         ]);
 
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.scan(
             r#"<div class="flex w-full h-full absolute bg-blue-500 foo-bar sm:focus:ring hover:bg-black border-[#333] text-[color:var(--hello)]"></div>"#
         );
@@ -429,7 +455,8 @@ mod tests {
                 .clone(),
         ]);
 
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.scan(
             "<div class=\"before:content-[J\u{e4}s\u{f8}n_Doe] content-[\u{2192}]\">\u{306}</div>",
         );
@@ -451,7 +478,8 @@ mod tests {
                 .clone(),
         ]);
 
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.scan(r#"<div class="bg-red-300 content-['hello']"></div>"#);
 
         assert_eq!(expected, generator.scanned_selectors);
@@ -459,7 +487,8 @@ mod tests {
 
     #[test]
     fn divide_and_space_between_special_class() {
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("hover:space-x-1");
         generator.add_selector("space-x-2");
         generator.add_selector("[&:has(.class)_>_*]:space-y-3");
@@ -517,7 +546,8 @@ mod tests {
 
     #[test]
     fn negative_values() {
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("-top-2");
         generator.add_selector("-z-2");
         generator.add_selector("-order-2");
@@ -608,7 +638,8 @@ mod tests {
 
     #[test]
     fn gen_css_for_simple_selector() {
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("w-full");
 
         assert_eq!(
@@ -623,7 +654,8 @@ mod tests {
 
     #[test]
     fn gen_css_with_important_flag() {
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("!w-full");
         generator.add_selector("!-mb-8");
         generator.add_selector("!shadow");
@@ -666,7 +698,8 @@ mod tests {
 
     #[test]
     fn gen_css_for_selector_needing_custom_css() {
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("animate-pulse");
         generator.add_selector("animate-pulse");
 
@@ -698,7 +731,8 @@ mod tests {
 
     #[test]
     fn gen_css_for_arbitrary_value() {
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("w[12px]");
         generator.add_selector("bg-[red]");
         generator.add_selector("bg-[url('../img/image_with_underscores.png')]");
@@ -735,7 +769,8 @@ mod tests {
 
     #[test]
     fn gen_css_for_arbitrary_value_with_hint() {
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("bg-[color:red]");
         generator.add_selector("hover:bg-[color:red]");
 
@@ -755,7 +790,8 @@ mod tests {
 
     #[test]
     fn gen_css_for_selector_with_simple_variant() {
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("focus:w-full");
 
         assert_eq!(
@@ -770,7 +806,8 @@ mod tests {
 
     #[test]
     fn gen_selector_css_variants_test() {
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("sm:hover:bg-red-400");
         generator.add_selector("focus:hover:bg-red-600");
         generator.add_selector("active:rtl:bg-red-800");
@@ -888,7 +925,8 @@ mod tests {
 
     #[test]
     fn gen_css_for_duplicated_selectors() {
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("bg-red-500");
         generator.add_selector("bg-red-500");
         generator.add_selector("bg-red-500");
@@ -906,7 +944,8 @@ mod tests {
 
     #[test]
     fn gen_css_for_selector_with_arbitrary_property() {
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("hover:[mask-type:luminance]");
 
         assert_eq!(
@@ -921,7 +960,8 @@ mod tests {
 
     #[test]
     fn gen_css_for_selector_with_arbitrary_variant() {
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("[&_>_*]:before:content-['hello-']");
         generator.add_selector("[&:has(.active)]:bg-blue-500");
         generator.add_selector("[@supports_(display:grid)]:grid");
@@ -957,7 +997,8 @@ mod tests {
 
     #[test]
     fn gen_css_for_variant_group() {
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("xl:(focus:(outline,outline-red-200),dark:(bg-black,text-white))");
 
         assert_eq!(
@@ -998,7 +1039,8 @@ mod tests {
 
     #[test]
     fn default_modifier_values_for_rounded() {
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.scan("rounded-tr rounded-tr-md rounded rounded-md rounded-t-sm rounded-bl-xl border-x border border-4 border-t-2");
 
         assert_eq!(
@@ -1051,7 +1093,8 @@ mod tests {
 
     #[test]
     fn gen_css_for_font_with_spaces() {
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("font-['Times_New_Roman',Helvetica,serif]");
         generator.add_selector("font-[Roboto,'Open_Sans',sans-serif]");
 
@@ -1071,7 +1114,8 @@ mod tests {
 
     #[test]
     fn gen_css_for_container() {
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("container");
 
         assert_eq!(
@@ -1113,7 +1157,7 @@ mod tests {
             )
         );
 
-        let mut generator = EncreGenerator::from_config(base_config());
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("md:container");
         generator.add_selector("md:mx-auto");
 
@@ -1170,7 +1214,8 @@ mod tests {
 
     #[test]
     fn gen_css_for_selector_with_before_after_variant() {
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("before:bg-red-500");
         generator.add_selector("before:content-['Hello_world!']");
         generator.add_selector("after:rounded-full");
@@ -1205,7 +1250,8 @@ mod tests {
 
     #[test]
     fn gen_css_for_selector_with_dark_variant() {
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("dark:mt-px");
 
         assert_eq!(
@@ -1222,7 +1268,7 @@ mod tests {
         let mut config = base_config();
         config.theme.dark_mode = DarkMode::new_class(".dark");
 
-        let mut generator = EncreGenerator::from_config(config);
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("dark:mt-px");
 
         assert_eq!(
@@ -1240,7 +1286,8 @@ mod tests {
         use std::fs;
 
         let file_content = fs::read_to_string("tests/fixtures/arbitrary-values.html").unwrap();
-        let mut generator = EncreGenerator::from_config(base_config());
+        let config = base_config();
+        let mut generator = EncreGenerator::new(&config);
         generator.scan(&file_content);
         generator.generate();
     }

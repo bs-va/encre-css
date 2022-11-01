@@ -3,7 +3,7 @@
 //!
 //! # Example
 //!
-//! ```rust
+//! ```
 //! use encre_css::{EncreGenerator, Config, config::DarkMode};
 //!
 //! let mut config = Config::default();
@@ -21,7 +21,7 @@
 //! config.theme.screens.add("laptop", "1024px");
 //! config.theme.screens.add("desktop", "1280px");
 //!
-//! let mut generator = EncreGenerator::from_config(config);
+//! let mut generator = EncreGenerator::new(&config);
 //! generator.add_selector("tablet:dark:bg-primary");
 //!
 //! assert!(generator.generate().ends_with(r#"@media (min-width: 640px) {
@@ -847,13 +847,13 @@ pub enum DarkMode {
     ///
     /// # Example
     ///
-    /// ```rust
+    /// ```
     /// use encre_css::{EncreGenerator, Config, config::DarkMode};
     ///
     /// let mut config = Config::default();
     /// config.theme.dark_mode = DarkMode::new_class("body.dark");
     ///
-    /// let mut generator = EncreGenerator::from_config(config);
+    /// let mut generator = EncreGenerator::new(&config);
     /// generator.add_selector("dark:text-white");
     ///
     /// assert!(generator.generate().ends_with(r#"body.dark .dark\:text-white {
@@ -868,13 +868,13 @@ pub enum DarkMode {
     ///
     /// # Example
     ///
-    /// ```rust
+    /// ```
     /// use encre_css::{EncreGenerator, Config, config::DarkMode};
     ///
     /// let mut config = Config::default();
     /// config.theme.dark_mode = DarkMode::Media;
     ///
-    /// let mut generator = EncreGenerator::from_config(config);
+    /// let mut generator = EncreGenerator::new(&config);
     /// generator.add_selector("dark:text-white");
     ///
     /// assert!(generator.generate().ends_with(r#"@media (prefers-color-scheme: dark) {
@@ -1072,7 +1072,7 @@ impl Config {
     ///
     /// # Example
     ///
-    /// ```rust
+    /// ```
     /// use encre_css::{Config, EncreGenerator, prelude::build_plugin::*};
     ///
     /// #[derive(Debug)]
@@ -1097,7 +1097,7 @@ impl Config {
     /// let mut config = Config::default();
     /// config.register_plugin("prose", &Prose);
     ///
-    /// let mut generator = EncreGenerator::from_config(config);
+    /// let mut generator = EncreGenerator::new(&config);
     /// generator.add_selector("prose");
     /// generator.add_selector("prose-invert");
     ///
@@ -1124,14 +1124,14 @@ impl Config {
     ///
     /// # Example
     ///
-    /// ```rust
+    /// ```
     /// use encre_css::{Config, EncreGenerator, selector::VariantType};
     /// use std::borrow::Cow;
     ///
     /// let mut config = Config::default();
     /// config.register_variant("headings", VariantType::WrapClass(Cow::Borrowed("& :where(h1, h2, h3, h4, h5, h6)")));
     ///
-    /// let mut generator = EncreGenerator::from_config(config);
+    /// let mut generator = EncreGenerator::new(&config);
     /// generator.add_selector("headings:text-gray-700");
     ///
     /// assert!(generator.generate().ends_with(".headings\\:text-gray-700 :where(h1, h2, h3, h4, h5, h6) {
@@ -1154,28 +1154,29 @@ impl Config {
     ///
     /// # Example
     ///
-    /// In a `encre-css.toml` file:
-    ///
-    /// <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">[theme]</span>
+    /// <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment"># encre-css.toml</span>
+    /// <span class="kw">[theme]</span>
     /// dark_mode = { class = <span class="string">".dark"</span> }
     /// screens = { 3xl = <span class="string">"1600px"</span>, lg = <span class="string">"2000px"</span> }<br>
     /// <span class="kw">[theme.colors]</span>
     /// primary = <span class="string">"#e5186a"</span>
     /// yellow-400 = <span class="string">"#ffef0e"</span></code></pre></div>
     ///
-    /// Then parse the configuration in Rust:
-    ///
-    /// ```rust,ignore
+    /// ```no_run
     /// use encre_css::Config;
-    /// let config = Config::from_file("encre-css.toml").expect("failed to parse the configuration file");
+    ///
+    /// # fn main() -> encre_css::Result<()> {
+    /// let _config = Config::from_file("encre-css.toml")?;
+    /// # Ok(())
+    /// # }
     /// ```
     ///
-    /// Note that if you don't change the config after parsing it, you can just use
-    /// [`EncreGenerator::new`].
+    /// See [`EncreGenerator::new`] for other ways of creating a configuration.
     ///
     /// # Errors
     ///
     /// Returns [`Error::ConfigFileNotFound`] if the given file does not exist.
+    /// Returns [`Error::ConfigParsing`] if the given file could not be parsed.
     ///
     /// [`EncreGenerator::new`]: crate::EncreGenerator::new
     pub fn from_file<T: AsRef<Path>>(path: T) -> Result<Self> {
@@ -1220,7 +1221,7 @@ mod tests {
         config.theme.colors.add("rosa-500", "#e5186a");
         config.theme.screens.add("3xl", "1600px");
 
-        let mut generator = EncreGenerator::from_config(config);
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("3xl:text-rosa-500");
 
         assert_eq!(
@@ -1255,7 +1256,7 @@ mod tests {
     fn config_is_extended_and_overridden() {
         let config = Config::from_file("tests/fixtures/custom_config.toml").unwrap();
 
-        let mut generator = EncreGenerator::from_config(config);
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("bg-rosa-500");
         generator.add_selector("bg-yellow-400");
         generator.add_selector("bg-yellow-100");

@@ -1240,7 +1240,7 @@ mod tests {
         let mut config = Config::default();
         super::register(&mut config);
 
-        let mut generator = EncreGenerator::from_config(config);
+        let mut generator = EncreGenerator::new(&config);
         generator.scan(&content);
 
         assert_eq!(generator.generate(), expected);

@@ -6,14 +6,14 @@
 //! [`Preflight::placeholder_color`], [`Preflight::font_family_sans`]
 //! or [`Preflight::font_family_mono`].
 //!
-//! ```rust
+//! ```
 //! use encre_css::{Preflight, Config, EncreGenerator};
 //!
 //! let mut config = Config::default();
 //! config.preflight = Preflight::new_full()
 //!     .border_color("#444");
 //!
-//! let mut generator = EncreGenerator::from_config(config);
+//! let mut generator = EncreGenerator::new(&config);
 //! assert!(generator.generate().contains("*, ::before, ::after {
 //!   box-sizing: border-box;
 //!   border-width: 0;
@@ -24,7 +24,7 @@
 //!
 //! You can also use your own default CSS using [`Preflight::new_custom`].
 //!
-//! ```rust
+//! ```
 //! use encre_css::{Preflight, Config, EncreGenerator};
 //!
 //! let mut config = Config::default();
@@ -34,7 +34,7 @@
 //!   margin: 0;
 //! }");
 //!
-//! let mut generator = EncreGenerator::from_config(config);
+//! let mut generator = EncreGenerator::new(&config);
 //! assert_eq!(generator.generate(), "html, body {
 //!   width: 100vw;
 //!   height: 100vh;
@@ -44,13 +44,13 @@
 //!
 //! Finally you can disable it using [`Preflight::new_none`].
 //!
-//! ```rust
+//! ```
 //! use encre_css::{Preflight, Config, EncreGenerator};
 //!
 //! let mut config = Config::default();
 //! config.preflight = Preflight::new_none();
 //!
-//! let mut generator = EncreGenerator::from_config(config);
+//! let mut generator = EncreGenerator::new(&config);
 //! assert_eq!(generator.generate(), "");
 //! ```
 //!
@@ -672,7 +672,7 @@ mod tests {
         let mut config = Config::default();
         config.preflight = Preflight::new_full().border_color("#f00");
 
-        let mut generator = EncreGenerator::from_config(config);
+        let mut generator = EncreGenerator::new(&config);
         generator.add_selector("w-full");
 
         assert_eq!(

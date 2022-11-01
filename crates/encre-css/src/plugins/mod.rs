@@ -6,14 +6,15 @@
 //!
 //! # Example (with `encre-css-typography`)
 //!
-//! ```rust,ignore
+//! ```ignore
 //! use encre_css::{Config, EncreGenerator};
 //!
-//! let mut config = Config::from_file("encre-css.toml");
+//! let mut config = Config::from_file("encre-css.toml")?;
 //! // Or let mut config = Config::default();
+//!
 //! encre_css_typography::register(&mut config);
 //!
-//! let mut generator = EncreGenerator::from_config(config);
+//! let mut generator = EncreGenerator::new(&config);
 //! generator.scan(r#"<div class="prose prose-headings:text-blue-500 prose-slate lg:prose-lg dark:prose-invert"></div>"#);
 //! let css = generator.generate();
 //! // Do something with the CSS
@@ -70,7 +71,7 @@ pub mod typography;
 ///
 /// # Example (defines the `stroke-width` plugin)
 ///
-/// ```rust
+/// ```
 /// use encre_css::prelude::build_plugin::*;
 ///
 /// #[derive(Debug)]
@@ -110,7 +111,7 @@ pub mod typography;
 /// function to register them. The first argument is the namespace prefixing all the
 /// utility classes handled by the plugin.
 ///
-/// ```rust,ignore
+/// ```ignore
 /// pub fn register(config: &mut Config) {
 ///     config.register_plugin("stroke", &StrokeWidth);
 /// }
@@ -124,7 +125,7 @@ pub mod typography;
 ///
 /// ### Example (roughly defines the `animation` plugin)
 ///
-/// ```rust
+/// ```
 /// use encre_css::prelude::build_plugin::*;
 ///
 /// #[derive(Debug)]

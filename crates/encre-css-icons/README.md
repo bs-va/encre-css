@@ -30,7 +30,7 @@ to use the default value):
 ```rust
 use encre_css::{Config, EncreGenerator};
 
-let mut config = Config::from_file("encre-css.toml").expect("failed to parse the configuration file");
+let mut config = Config::from_file("encre-css.toml")?;
 // Or let mut config = Config::default();
 
 encre_css_icons::register(&mut config, Some("i-"), None, Some(1.2));
@@ -38,7 +38,7 @@ encre_css_icons::register(&mut config, Some("i-"), None, Some(1.2));
 // Second parameter (Option<&str>): a custom CDN used to fetch icons (default is "https://esm.sh")
 // Third parameter (Option<f32>): the scale of icons (default is 1)
 
-let mut generator = EncreGenerator::from_config(config);
+let mut generator = EncreGenerator::new(&config);
 generator.scan(r#"<h1 class="text-xl text-gray-600">Hello <span class="i-subway-world-1"></span>!</h1><div class="i-mdi-alarm block"></div><span class="i-fa-solid-home"></span><span class="i-openmoji-automobile hover:i-openmoji-autonomous-car"></span>"#);
 // The convention is <prefix><collection>-<icon>
 

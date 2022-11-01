@@ -23,10 +23,11 @@
 //! structure and some parameters (all parameters are optional, you can use `None`
 //! to use the default value):
 //!
-//! ```rust,ignore
+//! ```no_run
 //! use encre_css::{Config, EncreGenerator};
 //!
-//! let mut config = Config::from_file("encre-css.toml").expect("failed to parse the configuration file");
+//! # fn main() -> encre_css::Result<()> {
+//! let mut config = Config::from_file("encre-css.toml")?;
 //! // Or let mut config = Config::default();
 //!
 //! encre_css_icons::register(&mut config, Some("i-"), None, Some(1.2));
@@ -34,11 +35,13 @@
 //! // Second parameter (Option<&str>): a custom CDN used to fetch icons (default is "https://esm.sh")
 //! // Third parameter (Option<f32>): the scale of icons (default is 1)
 //!
-//! let mut generator = EncreGenerator::from_config(config);
+//! let mut generator = EncreGenerator::new(&config);
 //! generator.scan(r#"<h1 class="text-xl text-gray-600">Hello <span class="i-subway-world-1"></span>!</h1><div class="i-mdi-alarm block"></div><span class="i-fa-solid-home"></span><span class="i-openmoji-automobile hover:i-openmoji-autonomous-car"></span>"#);
 //! // The convention is <prefix><collection>-<icon>
 //!
 //! let css = generator.generate();
+//! # Ok(())
+//! # }
 //! // Do something with the CSS
 //! ```
 //!
@@ -501,7 +504,7 @@ mod tests {
         let mut config = Config::default();
         super::register(&mut config, Some("i-"), None, None);
 
-        let mut generator = EncreGenerator::from_config(config);
+        let mut generator = EncreGenerator::new(&config);
         generator.scan(&content);
 
         assert_eq!(generator.generate(), expected);

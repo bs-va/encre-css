@@ -207,7 +207,7 @@ pub fn is_matching_all(_value: &str) -> bool {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::utils::value_matchers::is_matching_url;
 /// assert!(is_matching_url("url('/hello/world.png')"));
 /// ```
@@ -219,7 +219,7 @@ pub fn is_matching_url(value: &str) -> bool {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::utils::value_matchers::is_matching_var;
 /// assert!(is_matching_var("var(--bg-blue)"));
 /// ```
@@ -231,7 +231,7 @@ pub fn is_matching_var(value: &str) -> bool {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::utils::value_matchers::is_matching_shadow;
 /// assert!(is_matching_shadow("1px_2rem_10px_10px_rgb(12,12,12)"));
 /// ```
@@ -243,7 +243,7 @@ pub fn is_matching_shadow(value: &str) -> bool {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::utils::value_matchers::is_matching_absolute_size;
 /// assert!(is_matching_absolute_size("xx-small"));
 /// ```
@@ -255,7 +255,7 @@ pub fn is_matching_absolute_size(value: &str) -> bool {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::utils::value_matchers::is_matching_relative_size;
 /// assert!(is_matching_relative_size("larger"));
 /// ```
@@ -267,7 +267,7 @@ pub fn is_matching_relative_size(value: &str) -> bool {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::utils::value_matchers::is_matching_line_width;
 /// assert!(is_matching_line_width("thin"));
 /// ```
@@ -279,7 +279,7 @@ pub fn is_matching_line_width(value: &str) -> bool {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::utils::value_matchers::is_matching_line_style;
 /// assert!(is_matching_line_style("solid"));
 /// ```
@@ -296,7 +296,7 @@ pub fn is_matching_line_style(value: &str) -> bool {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::utils::value_matchers::is_matching_computational_css_function;
 /// assert!(is_matching_computational_css_function("min(12px,10%)"));
 /// ```
@@ -311,7 +311,7 @@ pub fn is_matching_computational_css_function(value: &str) -> bool {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::utils::value_matchers::is_matching_color;
 /// assert!(is_matching_color("blue"));
 /// assert!(is_matching_color("#333"));
@@ -329,7 +329,7 @@ pub fn is_matching_color(value: &str) -> bool {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::utils::value_matchers::is_matching_length;
 /// assert!(is_matching_length("300px"));
 /// ```
@@ -345,7 +345,7 @@ pub fn is_matching_length(value: &str) -> bool {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::utils::value_matchers::is_matching_integer;
 /// assert!(is_matching_integer("12"));
 /// assert!(!is_matching_integer("42.12"));
@@ -360,7 +360,7 @@ pub fn is_matching_integer(value: &str) -> bool {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::utils::value_matchers::is_matching_number;
 /// assert!(is_matching_number("42.12"));
 /// ```
@@ -374,7 +374,7 @@ pub fn is_matching_number(value: &str) -> bool {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::utils::value_matchers::is_matching_percentage;
 /// assert!(is_matching_percentage("10%"));
 /// ```
@@ -386,7 +386,7 @@ pub fn is_matching_percentage(value: &str) -> bool {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::utils::value_matchers::is_matching_time;
 /// assert!(is_matching_time("0.5s"));
 /// assert!(is_matching_time("10ms"));
@@ -402,7 +402,7 @@ pub fn is_matching_time(value: &str) -> bool {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::utils::value_matchers::is_matching_gradient;
 /// assert!(is_matching_gradient("linear-gradient(45deg, blue, red);"));
 /// ```
@@ -414,7 +414,7 @@ pub fn is_matching_gradient(value: &str) -> bool {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::utils::value_matchers::is_matching_position;
 /// assert!(is_matching_position("right"));
 /// assert!(is_matching_position("12px"));
@@ -431,7 +431,7 @@ pub fn is_matching_position(value: &str) -> bool {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::utils::value_matchers::is_matching_angle;
 /// assert!(is_matching_angle("0.2turn"));
 /// ```
@@ -445,7 +445,7 @@ pub fn is_matching_angle(value: &str) -> bool {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```
 /// use encre_css::utils::value_matchers::is_matching_image;
 /// assert!(is_matching_image("linear-gradient(to_right,red,orange,yellow,green,blue,indigo,violet)"));
 /// ```

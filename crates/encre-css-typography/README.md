@@ -17,11 +17,11 @@ structure:
 ```rust
 use encre_css::{Config, EncreGenerator};
 
-let mut config = Config::from_file("encre-css.toml");
+let mut config = Config::from_file("encre-css.toml")?;
 // Or let mut config = Config::default();
 encre_css_typography::register(&mut config);
 
-let mut generator = EncreGenerator::from_config(config);
+let mut generator = EncreGenerator::new(&config);
 generator.scan(r#"<div class="prose prose-headings:text-blue-500 prose-slate lg:prose-lg dark:prose-invert"></div>"#);
 
 let css = generator.generate();

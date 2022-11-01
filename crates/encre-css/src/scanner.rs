@@ -15,7 +15,7 @@ use crate::utils::split_ignore_arbitrary;
 /// The following code snippet defines a scanner for extracting classes listed in the `data-en`
 /// HTML attribute.
 ///
-/// ```rust
+/// ```
 /// use encre_css::{EncreGenerator, Config, Scanner, utils::split_ignore_arbitrary};
 /// use std::collections::BTreeSet;
 ///
@@ -25,7 +25,7 @@ use crate::utils::split_ignore_arbitrary;
 ///     .flatten()
 ///     .collect::<BTreeSet<&str>>());
 ///
-/// let mut generator = EncreGenerator::from_config(config);
+/// let mut generator = EncreGenerator::new(&config);
 /// generator.scan(r#"<h1 data-en="underline"></h1><p data-en="bg-red-200 text-blue-300"></p>"#);
 ///
 /// assert!(generator.generate().contains(".bg-red-200 {
