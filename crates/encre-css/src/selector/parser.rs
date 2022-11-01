@@ -47,11 +47,11 @@ pub(crate) fn unwrap_string(val: &mut &str) {
 
 /// Remove escape characters from an arbitrary values.
 ///
-/// - `\[` are replaced with `[`
-/// - `\]` are replaced with `]`
-/// - `\(` are replaced with `(`
-/// - `\)` are replaced with `)`
-pub fn unescape(mut val: Cow<str>) -> Cow<str> {
+/// - `\[` is replaced with `[`
+/// - `\]` is replaced with `]`
+/// - `\(` is replaced with `(`
+/// - `\)` is replaced with `)`
+pub(crate) fn unescape(mut val: Cow<str>) -> Cow<str> {
     if val.contains("\\[") {
         val = Cow::from(val.replace("\\[", "["));
     }
@@ -72,7 +72,7 @@ pub fn unescape(mut val: Cow<str>) -> Cow<str> {
 }
 
 /// Replace all underscores with spaces (not in `url()` or if the underscore is prefixed by a backslash).
-pub fn underscores_to_spaces(mut val: Cow<str>) -> Cow<str> {
+pub(crate) fn underscores_to_spaces(mut val: Cow<str>) -> Cow<str> {
     // Don't replace `_` if it is a URL
     if val.contains("url(") {
         // For the `CursorPlugin`, `ContentPlugin` and `ImagePlugin` plugins, we need to keep underscores in URLs

@@ -182,6 +182,7 @@
     unstable_features,
     unused_import_braces,
     unused_qualifications,
+    unreachable_pub,
     rustdoc::private_doc_tests,
     rustdoc::broken_intra_doc_links,
     rustdoc::private_intra_doc_links,
