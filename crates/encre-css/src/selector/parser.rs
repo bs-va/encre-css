@@ -130,6 +130,7 @@ pub(crate) fn to_css_value(val: &str) -> Cow<str> {
 pub(crate) fn parse<'a>(
     val: &'a str,
     span: Option<Range<usize>>,
+    full_class: Option<&'a str>,
     config: &Config,
 ) -> Vec<Result<Selector<'a>, ParseError<'a>>> {
     // The shortest selector is `m1`
@@ -140,7 +141,7 @@ pub(crate) fn parse<'a>(
         ))];
     }
 
-    parse_recursive(val, span, None, config)
+    parse_recursive(val, span, full_class, config)
 }
 
 #[allow(clippy::too_many_lines)]
@@ -411,7 +412,7 @@ mod tests {
     #[test]
     fn basic_single() {
         assert_eq!(
-            parse("absolute", None, &Config::default())[0]
+            parse("absolute", None, None, &Config::default())[0]
                 .as_ref()
                 .unwrap(),
             &Selector {
@@ -431,7 +432,7 @@ mod tests {
     #[test]
     fn basic_multiple() {
         assert_eq!(
-            parse("text-center", None, &Config::default())[0]
+            parse("text-center", None, None, &Config::default())[0]
                 .as_ref()
                 .unwrap(),
             &Selector {
@@ -451,7 +452,7 @@ mod tests {
     #[test]
     fn basic_opacity() {
         assert_eq!(
-            parse("bg-red-500/25", None, &Config::default())[0]
+            parse("bg-red-500/25", None, None, &Config::default())[0]
                 .as_ref()
                 .unwrap(),
             &Selector {
@@ -471,7 +472,7 @@ mod tests {
     #[test]
     fn basic_important() {
         assert_eq!(
-            parse("!px-4", None, &Config::default())[0]
+            parse("!px-4", None, None, &Config::default())[0]
                 .as_ref()
                 .unwrap(),
             &Selector {
@@ -491,7 +492,7 @@ mod tests {
     #[test]
     fn basic_negative() {
         assert_eq!(
-            parse("-px-4", None, &Config::default())[0]
+            parse("-px-4", None, None, &Config::default())[0]
                 .as_ref()
                 .unwrap(),
             &Selector {
@@ -511,7 +512,7 @@ mod tests {
     #[test]
     fn basic_important_and_negative() {
         assert_eq!(
-            parse("!-px-4", None, &Config::default())[0]
+            parse("!-px-4", None, None, &Config::default())[0]
                 .as_ref()
                 .unwrap(),
             &Selector {
@@ -531,7 +532,9 @@ mod tests {
     #[test]
     fn basic_integer() {
         assert_eq!(
-            parse("px-4", None, &Config::default())[0].as_ref().unwrap(),
+            parse("px-4", None, None, &Config::default())[0]
+                .as_ref()
+                .unwrap(),
             &Selector {
                 full: "px-4",
                 order: 159,
@@ -549,7 +552,7 @@ mod tests {
     #[test]
     fn basic_float() {
         assert_eq!(
-            parse("px-1.5", None, &Config::default())[0]
+            parse("px-1.5", None, None, &Config::default())[0]
                 .as_ref()
                 .unwrap(),
             &Selector {
@@ -569,7 +572,7 @@ mod tests {
     #[test]
     fn variants_single() {
         assert_eq!(
-            parse("hover:text-center", None, &Config::default())[0]
+            parse("hover:text-center", None, None, &Config::default())[0]
                 .as_ref()
                 .unwrap(),
             &Selector {
@@ -589,9 +592,14 @@ mod tests {
     #[test]
     fn variants_multiple() {
         assert_eq!(
-            parse("marker:xl:hover:text-center", None, &Config::default())[0]
-                .as_ref()
-                .unwrap(),
+            parse(
+                "marker:xl:hover:text-center",
+                None,
+                None,
+                &Config::default()
+            )[0]
+            .as_ref()
+            .unwrap(),
             &Selector {
                 full: "marker:xl:hover:text-center",
                 order: 165,
@@ -619,7 +627,7 @@ mod tests {
     #[test]
     fn variants_negative() {
         assert_eq!(
-            parse("marker:xl:hover:-mx-4", None, &Config::default())[0]
+            parse("marker:xl:hover:-mx-4", None, None, &Config::default())[0]
                 .as_ref()
                 .unwrap(),
             &Selector {
@@ -649,7 +657,7 @@ mod tests {
     #[test]
     fn arbitrary_variant() {
         assert_eq!(
-            parse("[&>*]:text-center", None, &Config::default())[0]
+            parse("[&>*]:text-center", None, None, &Config::default())[0]
                 .as_ref()
                 .unwrap(),
             &Selector {
@@ -671,6 +679,7 @@ mod tests {
         assert_eq!(
             parse(
                 "[@supports_not_(display:grid)]:grid",
+                None,
                 None,
                 &Config::default()
             )[0]
@@ -695,7 +704,7 @@ mod tests {
     #[test]
     fn arbitrary_variant_multiple() {
         assert_eq!(
-            parse("xl:[&>*]:focus:text-center", None, &Config::default())[0]
+            parse("xl:[&>*]:focus:text-center", None, None, &Config::default())[0]
                 .as_ref()
                 .unwrap(),
             &Selector {
@@ -722,7 +731,7 @@ mod tests {
     #[test]
     fn arbitrary_variant_negative() {
         assert_eq!(
-            parse("xl:[&>*]:focus:-m-4", None, &Config::default())[0]
+            parse("xl:[&>*]:focus:-m-4", None, None, &Config::default())[0]
                 .as_ref()
                 .unwrap(),
             &Selector {
@@ -749,7 +758,7 @@ mod tests {
     #[test]
     fn arbitrary_value() {
         assert_eq!(
-            parse("mx-[12px]", None, &Config::default())[0]
+            parse("mx-[12px]", None, None, &Config::default())[0]
                 .as_ref()
                 .unwrap(),
             &Selector {
@@ -770,9 +779,14 @@ mod tests {
     #[test]
     fn complex_arbitrary_value() {
         assert_eq!(
-            parse("bg-[url('/hello_world.png')]", None, &Config::default())[0]
-                .as_ref()
-                .unwrap(),
+            parse(
+                "bg-[url('/hello_world.png')]",
+                None,
+                None,
+                &Config::default()
+            )[0]
+            .as_ref()
+            .unwrap(),
             &Selector {
                 full: "bg-[url('/hello_world.png')]",
                 order: 142,
@@ -791,7 +805,7 @@ mod tests {
     #[test]
     fn arbitrary_value_hint() {
         assert_eq!(
-            parse("bg-[color:#fff]", None, &Config::default())[0]
+            parse("bg-[color:#fff]", None, None, &Config::default())[0]
                 .as_ref()
                 .unwrap(),
             &Selector {
@@ -812,7 +826,7 @@ mod tests {
     #[test]
     fn arbitrary_value_with_variants() {
         assert_eq!(
-            parse("xl:marker:bg-[#fff]", None, &Config::default())[0]
+            parse("xl:marker:bg-[#fff]", None, None, &Config::default())[0]
                 .as_ref()
                 .unwrap(),
             &Selector {
@@ -842,7 +856,7 @@ mod tests {
     #[test]
     fn arbitrary_value_with_variants_and_hint() {
         assert_eq!(
-            parse("xl:marker:bg-[color:#fff]", None, &Config::default())[0]
+            parse("xl:marker:bg-[color:#fff]", None, None, &Config::default())[0]
                 .as_ref()
                 .unwrap(),
             &Selector {
@@ -872,7 +886,7 @@ mod tests {
     #[test]
     fn arbitrary_value_with_arbitrary_variant() {
         assert_eq!(
-            parse("[&>*]:bg-[#fff]", None, &Config::default())[0]
+            parse("[&>*]:bg-[#fff]", None, None, &Config::default())[0]
                 .as_ref()
                 .unwrap(),
             &Selector {
@@ -896,6 +910,7 @@ mod tests {
             parse(
                 r"[\[type='input'\]_&>:*]:bg-red-300",
                 None,
+                None,
                 &Config::default()
             )[0]
             .as_ref()
@@ -917,7 +932,7 @@ mod tests {
     #[test]
     fn arbitrary_value_with_arbitrary_variant_mixed() {
         assert_eq!(
-            parse("xl:[&>*]:hover:bg-[#fff]", None, &Config::default())[0]
+            parse("xl:[&>*]:hover:bg-[#fff]", None, None, &Config::default())[0]
                 .as_ref()
                 .unwrap(),
             &Selector {
@@ -945,9 +960,14 @@ mod tests {
     #[test]
     fn arbitrary_value_with_arbitrary_variant_and_hint() {
         assert_eq!(
-            parse("xl:[&>*]:hover:bg-[color:#fff]", None, &Config::default())[0]
-                .as_ref()
-                .unwrap(),
+            parse(
+                "xl:[&>*]:hover:bg-[color:#fff]",
+                None,
+                None,
+                &Config::default()
+            )[0]
+            .as_ref()
+            .unwrap(),
             &Selector {
                 full: "xl:[&>*]:hover:bg-[color:#fff]",
                 order: 140,
@@ -976,6 +996,7 @@ mod tests {
             parse(
                 r"bg-[url('/url_with_\]\)\'.png')]",
                 None,
+                None,
                 &Config::default()
             )[0]
             .as_ref()
@@ -998,9 +1019,14 @@ mod tests {
     #[test]
     fn arbitrary_css_property() {
         assert_eq!(
-            parse("hover:[mask-type:luminance]", None, &Config::default())[0]
-                .as_ref()
-                .unwrap(),
+            parse(
+                "hover:[mask-type:luminance]",
+                None,
+                None,
+                &Config::default()
+            )[0]
+            .as_ref()
+            .unwrap(),
             &Selector {
                 full: "hover:[mask-type:luminance]",
                 order: BUILTIN_PLUGINS.len(),
@@ -1021,6 +1047,7 @@ mod tests {
         assert_eq!(
             parse(
                 "hover:(focus:bg-gray-500,text-[color:black,])",
+                None,
                 None,
                 &Config::default(),
             ),
@@ -1058,7 +1085,7 @@ mod tests {
     #[test]
     fn variant_grouping_single() {
         assert_eq!(
-            parse("hover:(bg-gray-500)", None, &Config::default()),
+            parse("hover:(bg-gray-500)", None, None, &Config::default()),
             vec![Ok(Selector {
                 full: "hover:(bg-gray-500)",
                 order: 140,
@@ -1078,6 +1105,7 @@ mod tests {
         assert_eq!(
             parse(
                 "focus:([&>*]:-m-4,xl:dark:(bg-red-100,rtl:text-[color:black]))",
+                None,
                 None,
                 &Config::default(),
             ),
@@ -1150,6 +1178,7 @@ mod tests {
             parse(
                 r"focus:([&>*]:-m-4,xl:dark:([\[type='text'\].light_&,.foo]:bg-red-100,text-[color:black,]))",
                 None,
+                None,
                 &Config::default(),
             ),
             vec![
@@ -1220,6 +1249,7 @@ mod tests {
         assert_eq!(
             parse(
                 r"xl:(focus:(outline,outline-red-200),dark:(bg-black,text-white))",
+                None,
                 None,
                 &Config::default(),
             ),

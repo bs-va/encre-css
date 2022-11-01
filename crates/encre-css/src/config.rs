@@ -956,6 +956,57 @@ impl Colors {
     }
 }
 
+/// Configuration for the [`Config::shortcuts`] field.
+///
+/// It defines a list of shortcuts used to combine several utility classes into one.
+///
+/// # Example
+///
+/// ```
+/// use encre_css::{EncreGenerator, Config};
+///
+/// let mut config = Config::default();
+/// config.shortcuts.add("btn", "border-1 rounded-xl bg-red-500");
+///
+/// let mut generator = EncreGenerator::new(&config);
+/// generator.scan(r#"<button class="btn">Click me</button>"#);
+///
+/// assert!(generator.generate().ends_with(r#".btn {
+///   border-radius: 0.75rem;
+/// }
+///
+/// .btn {
+///   border-width: 1px;
+/// }
+///
+/// .btn {
+///   --en-bg-opacity: 1;
+///   background-color: rgb(239 68 68 / var(--en-bg-opacity));
+/// }"#));
+/// ```
+#[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+pub struct Shortcuts(BTreeMap<Cow<'static, str>, Cow<'static, str>>);
+
+impl Shortcuts {
+    /// Add a shortcut to the list.
+    pub fn add<T1: Into<Cow<'static, str>>, T2: Into<Cow<'static, str>>>(
+        &mut self,
+        key: T1,
+        val: T2,
+    ) {
+        self.0.insert(key.into(), val.into());
+    }
+
+    /// Remove a shortcut from the list.
+    pub fn remove<T: Into<Cow<'static, str>>>(&mut self, key: T) {
+        self.0.remove(&key.into());
+    }
+
+    pub(crate) fn get<'a, T: Into<Cow<'a, str>>>(&self, key: T) -> Option<&Cow<'a, str>> {
+        self.0.get(&key.into())
+    }
+}
+
 /// Configuration for the [`Config::theme`] field.
 ///
 /// It defines some design system specific values like custom colors or screen breakpoints.
@@ -997,6 +1048,10 @@ pub struct Config {
     /// Preflight configuration.
     #[serde(default)]
     pub preflight: Preflight,
+
+    /// Shortcuts configuration.
+    #[serde(default)]
+    pub shortcuts: Shortcuts,
 
     /// A custom scanner used to scan content.
     ///
@@ -1232,6 +1287,42 @@ mod tests {
     --en-text-opacity: 1;
     color: rgb(229 24 106 / var(--en-text-opacity));
   }
+}"#
+            )
+        );
+    }
+
+    #[test]
+    fn gen_css_with_shortcuts() {
+        let mut config = base_config();
+        config
+            .shortcuts
+            .add("btn", "bg-red-500 border-1 rounded-xl");
+        config.shortcuts.add("bg", "bg-blue-100");
+
+        let mut generator = EncreGenerator::new(&config);
+        generator.add_selector("btn");
+        generator.add_selector("bg-yellow-500");
+
+        assert_eq!(
+            generator.generate(),
+            String::from(
+                r#".btn {
+  border-radius: 0.75rem;
+}
+
+.btn {
+  border-width: 1px;
+}
+
+.bg-yellow-500 {
+  --en-bg-opacity: 1;
+  background-color: rgb(234 179 8 / var(--en-bg-opacity));
+}
+
+.btn {
+  --en-bg-opacity: 1;
+  background-color: rgb(239 68 68 / var(--en-bg-opacity));
 }"#
             )
         );

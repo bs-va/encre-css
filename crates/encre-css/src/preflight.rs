@@ -14,7 +14,7 @@
 //!     .border_color("#444");
 //!
 //! let mut generator = EncreGenerator::new(&config);
-//! assert!(generator.generate().contains("*, ::before, ::after {
+//! assert!(generator.generate().starts_with("*, ::before, ::after {
 //!   box-sizing: border-box;
 //!   border-width: 0;
 //!   border-style: solid;

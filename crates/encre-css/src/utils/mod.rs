@@ -192,7 +192,7 @@ fn sort_selectors_recursive<'a>(
 
     let mut selectors = val
         .filter_map(|v| {
-            let selectors = parse(v.trim(), None, config);
+            let selectors = parse(v.trim(), None, None, config);
 
             if selectors.len() > 1 {
                 // Sort variant groups
@@ -299,7 +299,7 @@ pub fn check_selectors<'a>(val: &'a str, config: &Config) -> Vec<ParseError<'a>>
             Some((old_i..i, &val[old_i..i]))
         })
         .filter(|(_, v)| !v.is_empty())
-        .flat_map(|(span, v)| parse(v.trim(), Some(span), config))
+        .flat_map(|(span, v)| parse(v.trim(), Some(span), None, config))
         .filter_map(|s| if let Err(e) = s { Some(e) } else { None })
         .collect::<Vec<ParseError>>()
 }

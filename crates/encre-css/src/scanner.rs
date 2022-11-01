@@ -28,7 +28,7 @@ use crate::utils::split_ignore_arbitrary;
 /// let mut generator = EncreGenerator::new(&config);
 /// generator.scan(r#"<h1 data-en="underline"></h1><p data-en="bg-red-200 text-blue-300"></p>"#);
 ///
-/// assert!(generator.generate().contains(".bg-red-200 {
+/// assert!(generator.generate().ends_with(".bg-red-200 {
 ///   --en-bg-opacity: 1;
 ///   background-color: rgb(254 202 202 / var(--en-bg-opacity));
 /// }

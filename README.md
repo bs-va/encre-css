@@ -128,7 +128,7 @@ let config = Config::default();
 let mut generator = EncreGenerator::new(&config);
 generator.scan(r#"<p class="w-auto bg-red-200 rounded-md">Hello world!</p>"#);
 
-assert!(generator.generate().expect("failed to generate the CSS").contains(r#"
+assert!(generator.generate().expect("failed to generate the CSS").ends_with(r#"
 .w-auto {
   width: auto;
 }

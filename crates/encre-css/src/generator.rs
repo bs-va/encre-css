@@ -313,11 +313,21 @@ impl<'a> EncreGenerator<'a> {
     ///
     /// [scan]: EncreGenerator::scan
     pub fn add_selector(&mut self, val: &'a str) {
-        self.scanned_selectors.extend(
-            parse(val, None, self.config)
-                .into_iter()
-                .filter_map(Result::ok),
-        );
+        if let Some(expanded) = self.config.shortcuts.get(val) {
+            expanded.split(' ').for_each(|selector_val| {
+                self.scanned_selectors.extend(
+                    parse(selector_val, None, Some(val), self.config)
+                        .into_iter()
+                        .filter_map(Result::ok),
+                );
+            });
+        } else {
+            self.scanned_selectors.extend(
+                parse(val, None, None, self.config)
+                    .into_iter()
+                    .filter_map(Result::ok),
+            );
+        }
     }
 
     /// Add several selectors which will have their CSS generated.
@@ -329,11 +339,7 @@ impl<'a> EncreGenerator<'a> {
     ///
     /// [scan]: EncreGenerator::scan
     pub fn add_selectors<T: IntoIterator<Item = &'a str>>(&mut self, val: T) {
-        self.scanned_selectors.extend(
-            val.into_iter()
-                .flat_map(|v| parse(v.trim(), None, self.config))
-                .filter_map(Result::ok),
-        );
+        val.into_iter().for_each(|v| self.add_selector(v.trim()));
     }
 
     /// Scan the contents of a file and store all the selectors found.
@@ -403,30 +409,39 @@ mod tests {
     fn simple_scan() {
         let config = base_config();
         let expected = BTreeSet::from([
-            parse("flex", None, &config)[0].as_ref().unwrap().clone(),
-            parse("w-full", None, &config)[0].as_ref().unwrap().clone(),
-            parse("h-full", None, &config)[0].as_ref().unwrap().clone(),
-            parse("absolute", None, &config)[0]
+            parse("flex", None, None, &config)[0]
                 .as_ref()
                 .unwrap()
                 .clone(),
-            parse("bg-blue-500", None, &config)[0]
+            parse("w-full", None, None, &config)[0]
                 .as_ref()
                 .unwrap()
                 .clone(),
-            parse("border-[#333]", None, &config)[0]
+            parse("h-full", None, None, &config)[0]
                 .as_ref()
                 .unwrap()
                 .clone(),
-            parse("text-[color:var(--hello)]", None, &config)[0]
+            parse("absolute", None, None, &config)[0]
                 .as_ref()
                 .unwrap()
                 .clone(),
-            parse("sm:focus:ring", None, &config)[0]
+            parse("bg-blue-500", None, None, &config)[0]
                 .as_ref()
                 .unwrap()
                 .clone(),
-            parse("hover:bg-black", None, &config)[0]
+            parse("border-[#333]", None, None, &config)[0]
+                .as_ref()
+                .unwrap()
+                .clone(),
+            parse("text-[color:var(--hello)]", None, None, &config)[0]
+                .as_ref()
+                .unwrap()
+                .clone(),
+            parse("sm:focus:ring", None, None, &config)[0]
+                .as_ref()
+                .unwrap()
+                .clone(),
+            parse("hover:bg-black", None, None, &config)[0]
                 .as_ref()
                 .unwrap()
                 .clone(),
@@ -445,11 +460,11 @@ mod tests {
     fn utf8_scan() {
         let config = base_config();
         let expected = BTreeSet::from([
-            parse("before:content-[J\u{e4}s\u{f8}n_Doe]", None, &config)[0]
+            parse("before:content-[J\u{e4}s\u{f8}n_Doe]", None, None, &config)[0]
                 .as_ref()
                 .unwrap()
                 .clone(),
-            parse("content-[\u{2192}]", None, &config)[0]
+            parse("content-[\u{2192}]", None, None, &config)[0]
                 .as_ref()
                 .unwrap()
                 .clone(),
@@ -468,11 +483,11 @@ mod tests {
     fn scan_prevent_splitting_arbitrary_values() {
         let config = base_config();
         let expected = BTreeSet::from([
-            parse("bg-red-300", None, &config)[0]
+            parse("bg-red-300", None, None, &config)[0]
                 .as_ref()
                 .unwrap()
                 .clone(),
-            parse("content-['hello']", None, &config)[0]
+            parse("content-['hello']", None, None, &config)[0]
                 .as_ref()
                 .unwrap()
                 .clone(),
