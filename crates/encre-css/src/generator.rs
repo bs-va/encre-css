@@ -248,7 +248,7 @@ pub fn generate_wrapper<T: FnOnce(&mut ContextHandle)>(
 #[derive(Debug, Clone)]
 pub struct EncreGenerator<'a> {
     config: &'a Config,
-    pub(crate) scanned_selectors: BTreeSet<Selector<'a>>,
+    scanned_selectors: BTreeSet<Selector<'a>>,
 }
 
 impl<'a> EncreGenerator<'a> {
@@ -298,10 +298,12 @@ impl<'a> EncreGenerator<'a> {
     /// # }
     /// ```
     pub fn new(config: &'a Config) -> Self {
-        Self {
+        let mut generator = Self {
             config,
             scanned_selectors: BTreeSet::new(),
-        }
+        };
+        generator.add_selectors(config.safelist.iter().map(|s| &**s));
+        generator
     }
 
     /// Add a single selector which will have its CSS generated.

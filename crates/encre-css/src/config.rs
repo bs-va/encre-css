@@ -54,7 +54,7 @@ use crate::plugins::*;
 use serde::{Deserialize, Serialize};
 use std::{
     borrow::Cow,
-    collections::BTreeMap,
+    collections::{BTreeMap, BTreeSet},
     fmt, fs, iter,
     path::Path,
     sync::{Mutex, MutexGuard},
@@ -908,6 +908,7 @@ pub struct Screens(BTreeMap<Cow<'static, str>, Cow<'static, str>>);
 
 impl Screens {
     /// Add a custom screen breakpoint to the list.
+    #[inline]
     pub fn add<T1: Into<Cow<'static, str>>, T2: Into<Cow<'static, str>>>(
         &mut self,
         key: T1,
@@ -917,10 +918,12 @@ impl Screens {
     }
 
     /// Remove a custom screen breakpoint from the list.
+    #[inline]
     pub fn remove<T: Into<Cow<'static, str>>>(&mut self, key: T) {
         self.0.remove(&key.into());
     }
 
+    #[inline]
     pub(crate) fn iter(&self) -> impl Iterator<Item = (&Cow<'static, str>, &Cow<'static, str>)> {
         self.0.iter()
     }
@@ -934,6 +937,7 @@ pub struct Colors(BTreeMap<Cow<'static, str>, Cow<'static, str>>);
 
 impl Colors {
     /// Add a custom color to the list.
+    #[inline]
     pub fn add<T1: Into<Cow<'static, str>>, T2: Into<Cow<'static, str>>>(
         &mut self,
         key: T1,
@@ -943,14 +947,17 @@ impl Colors {
     }
 
     /// Remove a custom color from the list.
+    #[inline]
     pub fn remove<T: Into<Cow<'static, str>>>(&mut self, key: T) {
         self.0.remove(&key.into());
     }
 
+    #[inline]
     pub(crate) fn get<'a, T: Into<Cow<'a, str>>>(&self, key: T) -> Option<&Cow<'a, str>> {
         self.0.get(&key.into())
     }
 
+    #[inline]
     pub(crate) fn contains<'a, T: Into<Cow<'a, str>>>(&self, key: T) -> bool {
         self.0.contains_key(&key.into())
     }
@@ -989,6 +996,7 @@ pub struct Shortcuts(BTreeMap<Cow<'static, str>, Cow<'static, str>>);
 
 impl Shortcuts {
     /// Add a shortcut to the list.
+    #[inline]
     pub fn add<T1: Into<Cow<'static, str>>, T2: Into<Cow<'static, str>>>(
         &mut self,
         key: T1,
@@ -998,12 +1006,42 @@ impl Shortcuts {
     }
 
     /// Remove a shortcut from the list.
+    #[inline]
     pub fn remove<T: Into<Cow<'static, str>>>(&mut self, key: T) {
         self.0.remove(&key.into());
     }
 
+    #[inline]
     pub(crate) fn get<'a, T: Into<Cow<'a, str>>>(&self, key: T) -> Option<&Cow<'a, str>> {
         self.0.get(&key.into())
+    }
+}
+
+/// Configuration for the [`Config::safelist`] field.
+///
+/// It defines a list of selectors that are manually forced to be present in the generated CSS.
+/// It should be used when you dynamically create selectors (for example, in Javascript
+/// `text-${ active ? "blue" : "gray" }-400`, in this case, `text-blue-400` and `text-gray-400`
+/// should be added to the safelist).
+#[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+pub struct Safelist(BTreeSet<Cow<'static, str>>);
+
+impl Safelist {
+    /// Add a selector to the safelist.
+    #[inline]
+    pub fn add<T: Into<Cow<'static, str>>>(&mut self, val: T) {
+        self.0.insert(val.into());
+    }
+
+    /// Remove a selector from the safelist.
+    #[inline]
+    pub fn remove<T: Into<Cow<'static, str>>>(&mut self, val: T) {
+        self.0.remove(&val.into());
+    }
+
+    #[inline]
+    pub(crate) fn iter(&self) -> impl Iterator<Item = &Cow<'static, str>> {
+        self.0.iter()
     }
 }
 
@@ -1053,6 +1091,10 @@ pub struct Config {
     #[serde(default)]
     pub shortcuts: Shortcuts,
 
+    /// Safelist configuration.
+    #[serde(default)]
+    pub safelist: Safelist,
+
     /// A custom scanner used to scan content.
     ///
     /// This field is skipped when deserializing from a [TOML](https://toml.io) file.
@@ -1070,7 +1112,7 @@ pub struct Config {
     /// This field is skipped when deserializing from a [TOML](https://toml.io) file.
     #[serde(skip)]
     custom_variants: Mutex<Vec<(Cow<'static, str>, VariantType)>>,
-    // TODO: Prefix (en-), safelist, separator for {variants, arbitrary values}
+    // TODO: Prefix (en-)
 }
 
 impl Config {
@@ -1323,6 +1365,37 @@ mod tests {
 .btn {
   --en-bg-opacity: 1;
   background-color: rgb(239 68 68 / var(--en-bg-opacity));
+}"#
+            )
+        );
+    }
+
+    #[test]
+    fn gen_css_with_safelist() {
+        let mut config = base_config();
+        config.safelist.add("text-red-500");
+        config.safelist.add("btn");
+        config.shortcuts.add("btn", "text-red-400");
+
+        let mut generator = EncreGenerator::new(&config);
+        generator.add_selector("bg-red-300");
+
+        assert_eq!(
+            generator.generate(),
+            String::from(
+                r#".bg-red-300 {
+  --en-bg-opacity: 1;
+  background-color: rgb(252 165 165 / var(--en-bg-opacity));
+}
+
+.btn {
+  --en-text-opacity: 1;
+  color: rgb(248 113 113 / var(--en-text-opacity));
+}
+
+.text-red-500 {
+  --en-text-opacity: 1;
+  color: rgb(239 68 68 / var(--en-text-opacity));
 }"#
             )
         );
