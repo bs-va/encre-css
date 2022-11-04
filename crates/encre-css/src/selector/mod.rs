@@ -47,24 +47,28 @@
 //! 3. The **[modifier](crate::selector::Modifier)** (used to clarify the CSS needed to be generated), in this case the
 //!       background color will become `rgb(239 68 68)` (see [`BUILTIN_COLORS`]).
 //!
-//! <p class="with-hints" style="margin-top: 3rem;"><b><span style="counter-set: hints 3;">[&>*]</span><span>:</span><span style="counter-set: hints 1;">bg</span><span>-</span><span style="counter-set: hints 4;">[rgb(12_12_12)]</span></b></p>
+//! <p class="with-hints" style="margin-top: 3rem;"><b><span style="counter-set: hints 3;">[&>*]</span><span>:</span><span style="counter-set: hints 4;">[@supports_font-tech(color-COLRv1)]</span><span>:</span><span style="counter-set: hints 1;">bg</span><span>-</span><span style="counter-set: hints 5;">[rgb(12_12_12)]</span></b></p>
 //!
 //! 4. The **arbitrary variant** (used to modify the class generated), in this case the class
 //!    will be `.\[\&\>\*]\:bg-\[rgb\(12_12_12\)\]>*`.
 //!
-//! 5. The **[arbitrary value](crate::selector::Modifier::Arbitrary)**
+//! 5. Another **arbitrary variant** (with another syntax used to add [at rules](https://developer.mozilla.org/en-US/docs/Web/CSS/At-rule)),
+//!    in this case the rule will become `@supports font-tech(color-COLRv1) { <rule content> }` (spaces need to be replaced with underscores in arbitrary
+//!    variants).
+//!
+//! 6. The **[arbitrary value](crate::selector::Modifier::Arbitrary)**
 //!    (used to specify a value not included in your design system), in this case the background
 //!    color will become `rgb(12 12 12)` (spaces need to be replaced with underscores in arbitrary
 //!    values).
 //!
 //! <p class="with-hints" style="margin-top: 3rem;"><b><span>[mask-type:luminance]</span></b></p>
 //!
-//! 6. The **arbitrary CSS property** (used to use a CSS property not supported by `encre-css`), in
+//! 7. The **arbitrary CSS property** (used to use a CSS property not supported by `encre-css`), in
 //! this case the rule content will be `.\[mask-type\:luminance\] { mask-type: luminance; }`.
 //!
 //! <p class="with-hints" style="margin-top: 3rem;"><b><span>dark:(text-white,bg-gray-500)</span></b></p>
 //!
-//! 7. The **variant group** (used to group together several classes conditionally enabled by the
+//! 8. The **variant group** (used to group together several classes conditionally enabled by the
 //!    same variant), in this case the class will be expanded to `dark:text-white` and
 //!    `dark:bg-gray-500`.
 //!
