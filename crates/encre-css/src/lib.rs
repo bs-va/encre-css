@@ -221,6 +221,7 @@ pub use error::{Error, Result};
 pub use generator::EncreGenerator;
 pub use preflight::Preflight;
 pub use scanner::Scanner;
+pub use toml::toml;
 
 /// Various helper preludes.
 pub mod prelude {

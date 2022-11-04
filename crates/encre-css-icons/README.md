@@ -33,13 +33,10 @@ use encre_css::{Config, EncreGenerator};
 let mut config = Config::from_file("encre-css.toml")?;
 // Or let mut config = Config::default();
 
-encre_css_icons::register(&mut config, Some("i-"), None, Some(1.2));
-// First parameter (Option<&str>): a prefix applied to all icons (default is "")
-// Second parameter (Option<&str>): a custom CDN used to fetch icons (default is "https://esm.sh")
-// Third parameter (Option<f32>): the scale of icons (default is 1)
+encre_css_icons::register(&mut config);
 
 let mut generator = EncreGenerator::new(&config);
-generator.scan(r#"<h1 class="text-xl text-gray-600">Hello <span class="i-subway-world-1"></span>!</h1><div class="i-mdi-alarm block"></div><span class="i-fa-solid-home"></span><span class="i-openmoji-automobile hover:i-openmoji-autonomous-car"></span>"#);
+generator.scan(r#"<h1 class="text-xl text-gray-600">Hello <span class="subway-world-1"></span>!</h1><div class="mdi-alarm block"></div><span class="fa-solid-home"></span><span class="openmoji-automobile hover:openmoji-autonomous-car"></span>"#);
 // The convention is <prefix><collection>-<icon>
 
 let css = generator.generate();
@@ -48,13 +45,45 @@ let css = generator.generate();
 
 Note that this plugin **does not support WebAssembly**.
 
+### Configuration
+
+This plugin has some configuration options, to set them simply add an extra field `icons` in
+the configuration with the fields you want to change. For example in TOML:
+
+```toml
+[extra.icons]
+prefix = "i-"
+custom-cdn = "https://cdn.skypack.dev"
+scale = 1.2
+```
+
+Or in Rust:
+
+```rust
+use encre_css::{Config, toml};
+
+let mut config = Config::default();
+config.extra.add("icons", toml! {
+    prefix = "i-"
+    custom-cdn = "https://cdn.skypack.dev"
+    scale = 1.2
+});
+```
+
+Configuration fields:
+
+- `prefix` (default: `""`): a static prefix added to all icons
+- `custom-cdn` (default: `https://esm.sh`): the CDN used to get the SVG definition of icons (see the section below)
+- `scale` (default: `1.0`): the scale of icons used to change their size
+
 ### Network requests and caching
 
 Please note that, in order to get the SVG definition of icons, this crate will make
-requests to a (of course configurable) third-party CDN and will cache them in
-the system's configured cache directory (`$XDG_CACHE_HOME` or `$HOME/.cache` on
-GNU/Linux, `{FOLDERID_LocalAppData}` on Windows, `$HOME/Library/Caches` on MacOS),
-in a directory named `encre-css-icons-cache`.
+requests to a (of course configurable) third-party CDN (the default CDN is
+`https://esm.sh`) and will cache them in the system's configured cache directory
+(`$XDG_CACHE_HOME` or `$HOME/.cache` on GNU/Linux, `{FOLDERID_LocalAppData}` on
+Windows, `$HOME/Library/Caches` on MacOS), in a directory named
+`encre-css-icons-cache`.
 
 ### Various tips and tricks
 
@@ -70,7 +99,7 @@ opt-level = 3
 By default, each icon has the `display: inline-block;` CSS property applied
 (even on `div` elements) otherwise they would be unsized when used in `span`
 elements. If you need to turn them into block elements, you can use the `block`
-utility class on each icon, e.g. `<div class="i-fa-pencil block"></div>`.
+utility class on each icon, e.g. `<div class="fa-pencil block"></div>`.
 
 ### License
 

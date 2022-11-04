@@ -30,13 +30,10 @@
 //! let mut config = Config::from_file("encre-css.toml")?;
 //! // Or let mut config = Config::default();
 //!
-//! encre_css_icons::register(&mut config, Some("i-"), None, Some(1.2));
-//! // First parameter (Option<&str>): a prefix applied to all icons (default is "")
-//! // Second parameter (Option<&str>): a custom CDN used to fetch icons (default is "https://esm.sh")
-//! // Third parameter (Option<f32>): the scale of icons (default is 1)
+//! encre_css_icons::register(&mut config);
 //!
 //! let mut generator = EncreGenerator::new(&config);
-//! generator.scan(r#"<h1 class="text-xl text-gray-600">Hello <span class="i-subway-world-1"></span>!</h1><div class="i-mdi-alarm block"></div><span class="i-fa-solid-home"></span><span class="i-openmoji-automobile hover:i-openmoji-autonomous-car"></span>"#);
+//! generator.scan(r#"<h1 class="text-xl text-gray-600">Hello <span class="subway-world-1"></span>!</h1><div class="mdi-alarm block"></div><span class="fa-solid-home"></span><span class="openmoji-automobile hover:openmoji-autonomous-car"></span>"#);
 //! // The convention is <prefix><collection>-<icon>
 //!
 //! let css = generator.generate();
@@ -47,13 +44,42 @@
 //!
 //! Note that this plugin **does not support WebAssembly**.
 //!
+//! ### Configuration
+//!
+//! This plugin has some configuration options, to set them simply add an extra field `icons` in
+//! the configuration with the fields you want to change. For example in TOML:
+//!
+//! <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">[extra.icons]</span>
+//! prefix = <span class="string">"i-"</span>
+//! custom-cdn = <span class="string">"https://cdn.skypack.dev"</span>
+//! scale = <span class="number">1.2</span></code></pre></div>
+//!
+//! Or in Rust:
+//!
+//! ```
+//! use encre_css::{Config, toml};
+//!
+//! let mut config = Config::default();
+//! config.extra.add("icons", toml! {
+//!     prefix = "i-"
+//!     custom-cdn = "https://cdn.skypack.dev"
+//!     scale = 1.2
+//! });
+//! ```
+//!
+//! Configuration fields:
+//!
+//! - `prefix` (default: `""`): a static prefix added to all icons
+//! - `custom-cdn` (default: `"https://esm.sh"`): the CDN used to get the SVG definition of icons (see the section below)
+//! - `scale` (default: `1.0`): the scale of icons used to change their size
+//!
 //! ### Network requests and caching
 //!
 //! Please note that, in order to get the SVG definition of icons, this crate will make
-//! requests to a (of course configurable) third-party CDN and will cache them in
-//! the system's configured cache directory (`$XDG_CACHE_HOME` or `$HOME/.cache` on
-//! GNU/Linux, `{FOLDERID_LocalAppData}` on Windows, `$HOME/Library/Caches` on MacOS),
-//! in a directory named `encre-css-icons-cache`.
+//! requests to a (of course configurable) third-party CDN (the default CDN is `https://esm.sh`)
+//! and will cache them in the system's configured cache directory (`$XDG_CACHE_HOME`
+//! or `$HOME/.cache` on GNU/Linux, `{FOLDERID_LocalAppData}` on Windows, `$HOME/Library/Caches`
+//! on MacOS), in a directory named `encre-css-icons-cache`.
 //!
 //! ### Various tips and tricks
 //!
@@ -61,15 +87,13 @@
 //! in memory), it is recommended to optimize the `encre-css-icons` crate even in
 //! development, by adding the following in your `Cargo.toml` file:
 //!
-//! ```toml
-//! [profile.dev.package.encre-css-icons]
-//! opt-level = 3
-//! ```
+//! <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">[profile.dev.package.encre-css-icons]</span>
+//! opt-level = <span class="number">3</span></code></pre></div>
 //!
 //! By default, each icon has the `display: inline-block;` CSS property applied
 //! (even on `div` elements) otherwise they would be unsized when used in `span`
 //! elements. If you need to turn them into block elements, you can use the `block`
-//! utility class on each icon, e.g. `<div class="i-fa-pencil block"></div>`.
+//! utility class on each icon, e.g. `<div class="fa-pencil block"></div>`.
 //!
 //! ### License
 //!
@@ -229,15 +253,15 @@ const COLLECTIONS: &[&str] = &[
     "mono-icons",
 ];
 const DEFAULT_CDN: &str = "https://esm.sh";
-
 const CACHE_SUB_DIR_NAME: &str = "encre-css-icons-cache";
-
-static CUSTOM_CDN: Lazy<Mutex<&'static str>> = Lazy::new(|| Mutex::new(DEFAULT_CDN));
-static SCALE: Lazy<Mutex<f32>> = Lazy::new(|| Mutex::new(1.));
 static MEM_CACHE: Lazy<Mutex<BTreeMap<&'static str, Collection>>> =
     Lazy::new(|| Mutex::new(BTreeMap::new()));
 
-fn get_icon(collection: &Collection, icon_name: &str) -> Option<((String, String), String)> {
+fn get_icon(
+    config: &Config,
+    collection: &Collection,
+    icon_name: &str,
+) -> Option<((String, String), String)> {
     let icon = if let Some(icon) = collection.icons.get(icon_name) {
         Cow::Borrowed(icon)
     } else if let Some(alias) = collection.aliases.get(icon_name) {
@@ -334,8 +358,27 @@ fn get_icon(collection: &Collection, icon_name: &str) -> Option<((String, String
         }
     }
 
-    let formatted_width = format!("{}em", (width / height) * *SCALE.lock().unwrap());
-    let formatted_height = format!("{}em", SCALE.lock().unwrap());
+    let scale = if let Some(icons_config) = config.extra.get("icons") {
+        if let Some(table) = icons_config.as_table() {
+            if let Some(scale_value) = table.get("scale") {
+                if let Some(scale) = scale_value.as_float() {
+                    scale
+                } else {
+                    println!("Bad type for the `scale` extra field (in the `icons` field): expected `Float`, found `{}`. Using the default scale instead.", scale_value.type_str());
+                    1.
+                }
+            } else {
+                1.
+            }
+        } else {
+            println!("Bad type for the `icons` extra field: expected `Table`, found `{}`. Using the default scale instead.", icons_config.type_str());
+            1.
+        }
+    } else {
+        1.
+    };
+    let formatted_width = format!("{}em", (width / height) * scale as f32);
+    let formatted_height = format!("{}em", scale);
 
     let svg = {
         let body = if !before_transforms.is_empty() || !after_transforms.is_empty() {
@@ -369,7 +412,7 @@ fn get_icon(collection: &Collection, icon_name: &str) -> Option<((String, String
     Some(((formatted_width, formatted_height), svg))
 }
 
-fn fetch_or_cache_collection(collection: &'static str) {
+fn fetch_or_cache_collection(config: &Config, collection: &'static str) {
     if MEM_CACHE.lock().unwrap().get(collection).is_some() {
         // Collection already in the memory cache, use it
         return;
@@ -399,11 +442,27 @@ fn fetch_or_cache_collection(collection: &'static str) {
         );
     } else {
         // Fetch the file
-        let url = format!(
-            "{}/@iconify-json/{}/icons.json",
-            CUSTOM_CDN.lock().unwrap(),
-            collection
-        );
+        let custom_cdn = if let Some(icons_config) = config.extra.get("icons") {
+            if let Some(table) = icons_config.as_table() {
+                if let Some(cdn_value) = table.get("custom-cdn") {
+                    if let Some(cdn) = cdn_value.as_str() {
+                        Cow::Owned(cdn.trim_end_matches('/').to_string())
+                    } else {
+                        println!("Bad type for the `custom-cdn` extra field (in the `icons` field): expected `String`, found `{}`. Using the default CDN instead.", cdn_value.type_str());
+                        Cow::Borrowed(DEFAULT_CDN)
+                    }
+                } else {
+                    Cow::Borrowed(DEFAULT_CDN)
+                }
+            } else {
+                println!("Bad type for the `icons` extra field: expected `Table`, found `{}`. Using the default CDN instead.", icons_config.type_str());
+                Cow::Borrowed(DEFAULT_CDN)
+            }
+        } else {
+            Cow::Borrowed(DEFAULT_CDN)
+        };
+
+        let url = format!("{}/@iconify-json/{}/icons.json", custom_cdn, collection);
 
         let content = reqwest::blocking::get(&url)
             .unwrap_or_else(|_| panic!("failed to get the response from `{url}`"))
@@ -441,9 +500,10 @@ impl Plugin for Icons {
                     .iter()
                     .find_map(|c| value.strip_prefix(c).map(|r| (c, r)))
                     .unwrap();
-                fetch_or_cache_collection(collection);
+                fetch_or_cache_collection(context.config, collection);
 
                 if let Some(((width, height), icon_data_uri)) = get_icon(
+                    context.config,
                     MEM_CACHE.lock().unwrap().get(collection).unwrap(),
                     rest.strip_prefix('-').unwrap_or(rest),
                 ) {
@@ -477,23 +537,33 @@ impl Plugin for Icons {
     }
 }
 
-pub fn register(
-    config: &mut Config,
-    prefix: Option<&'static str>,
-    custom_cdn: Option<&'static str>,
-    scale: Option<f32>,
-) {
-    // Reset variables
-    let prefix = prefix.unwrap_or("").trim_end_matches('-');
-    *CUSTOM_CDN.lock().unwrap() = custom_cdn.unwrap_or(DEFAULT_CDN).trim_end_matches('/');
-    *SCALE.lock().unwrap() = scale.unwrap_or(1.);
+pub fn register(config: &mut Config) {
+    let prefix = if let Some(icons_config) = config.extra.get("icons") {
+        if let Some(table) = icons_config.as_table() {
+            if let Some(prefix_value) = table.get("prefix") {
+                if let Some(prefix) = prefix_value.as_str() {
+                    Cow::Owned(prefix.trim_end_matches('-').to_string())
+                } else {
+                    println!("Bad type for the `prefix` extra field (in the `icons` field): expected `String`, found `{}`. Using the default prefix instead.", prefix_value.type_str());
+                    Cow::Borrowed("")
+                }
+            } else {
+                Cow::Borrowed("")
+            }
+        } else {
+            println!("Bad type for the `icons` extra field: expected `Table`, found `{}`. Using the default prefix instead.", icons_config.type_str());
+            Cow::Borrowed("")
+        }
+    } else {
+        Cow::Borrowed("")
+    };
 
     config.register_plugin(prefix, &Icons);
 }
 
 #[cfg(test)]
 mod tests {
-    use encre_css::{Config, EncreGenerator};
+    use encre_css::{toml, Config, EncreGenerator};
     use std::fs;
 
     #[test]
@@ -502,7 +572,13 @@ mod tests {
         let expected = fs::read_to_string("tests/fixtures/icons.css").unwrap();
 
         let mut config = Config::default();
-        super::register(&mut config, Some("i-"), None, None);
+        config.extra.add(
+            "icons",
+            toml! {
+                prefix = "i-"
+            },
+        );
+        super::register(&mut config);
 
         let mut generator = EncreGenerator::new(&config);
         generator.scan(&content);

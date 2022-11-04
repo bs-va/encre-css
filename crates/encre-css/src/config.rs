@@ -1045,6 +1045,35 @@ impl Safelist {
     }
 }
 
+/// Configuration for the [`Config::extra`] field.
+///
+/// It defines some extra fields that can be used to store arbitrary values usable in plugins.
+/// The fields are represented as [`toml::Value`] to allow all types to be serialized.
+/// It is recommended to use a table by plugin (e.g. the `encre-css-icons`'s plugin uses the
+/// `icons` key containing a table grouping all configuration fields).
+#[derive(Debug, PartialEq, Default, Serialize, Deserialize)]
+pub struct Extra(BTreeMap<Cow<'static, str>, toml::Value>);
+
+impl Extra {
+    /// Add an extra field.
+    #[inline]
+    pub fn add<T1: Into<Cow<'static, str>>, T2: Into<toml::Value>>(&mut self, key: T1, val: T2) {
+        self.0.insert(key.into(), val.into());
+    }
+
+    /// Remove an extra field.
+    #[inline]
+    pub fn remove<T: Into<Cow<'static, str>>>(&mut self, key: T) {
+        self.0.remove(&key.into());
+    }
+
+    /// Get the value of an extra field.
+    #[inline]
+    pub fn get<'a, T: Into<Cow<'a, str>>>(&'a self, key: T) -> Option<&'a toml::Value> {
+        self.0.get(&key.into())
+    }
+}
+
 /// Configuration for the [`Config::theme`] field.
 ///
 /// It defines some design system specific values like custom colors or screen breakpoints.
@@ -1094,6 +1123,10 @@ pub struct Config {
     /// Safelist configuration.
     #[serde(default)]
     pub safelist: Safelist,
+
+    /// Extra fields configuration.
+    #[serde(default)]
+    pub extra: Extra,
 
     /// A custom scanner used to scan content.
     ///
@@ -1402,6 +1435,57 @@ mod tests {
     }
 
     #[test]
+    fn gen_css_with_custom_plugin_and_extra_fields() {
+        use crate::prelude::build_plugin::*;
+        use std::collections::HashMap;
+
+        #[derive(Debug)]
+        struct EmojiPlugin;
+
+        impl Plugin for EmojiPlugin {
+            fn can_handle(&self, context: ContextCanHandle) -> bool {
+                matches!(context.modifier, Modifier::Builtin { value, .. } if context.config.extra.get("emojis").map_or(false, |val| val.as_table().map_or(false, |table| table.contains_key(*value))))
+            }
+
+            fn handle(&self, context: &mut ContextHandle) {
+                if let Modifier::Builtin { value, .. } = context.modifier {
+                    context.buffer.line(format_args!(
+                        r#"content: {};"#,
+                        context
+                            .config
+                            .extra
+                            .get("emojis")
+                            .unwrap()
+                            .as_table()
+                            .unwrap()
+                            .get(*value)
+                            .unwrap()
+                    ));
+                }
+            }
+        }
+
+        let mut config = base_config();
+        config.register_plugin("emoji", &EmojiPlugin);
+        config.extra.add(
+            "emojis",
+            HashMap::from_iter([("tada", "\u{1f389}"), ("rocket", "\u{1f680}")]),
+        );
+
+        let mut generator = EncreGenerator::new(&config);
+        generator.add_selector("emoji-tada");
+
+        assert_eq!(
+            generator.generate(),
+            String::from(
+                ".emoji-tada {
+  content: \"\u{1f389}\";
+}"
+            )
+        );
+    }
+
+    #[test]
     fn parse_config_file() {
         let mut config = base_config();
         config.theme.colors.add("rosa-500", "#e5186a");
@@ -1411,14 +1495,60 @@ mod tests {
         config.theme.dark_mode = DarkMode::new_class(".dark");
 
         assert_eq!(
-            Config::from_file("tests/fixtures/custom_config.toml").unwrap(),
+            Config::from_file("tests/fixtures/custom-config.toml").unwrap(),
             config
         );
     }
 
     #[test]
+    fn gen_css_with_custom_plugin_extra_fields_and_parsed_config() {
+        use crate::prelude::build_plugin::*;
+
+        #[derive(Debug)]
+        struct EmojiPlugin;
+
+        impl Plugin for EmojiPlugin {
+            fn can_handle(&self, context: ContextCanHandle) -> bool {
+                matches!(context.modifier, Modifier::Builtin { value, .. } if context.config.extra.get("emojis").map_or(false, |val| val.as_table().map_or(false, |table| table.contains_key(*value))))
+            }
+
+            fn handle(&self, context: &mut ContextHandle) {
+                if let Modifier::Builtin { value, .. } = context.modifier {
+                    context.buffer.line(format_args!(
+                        r#"content: {};"#,
+                        context
+                            .config
+                            .extra
+                            .get("emojis")
+                            .unwrap()
+                            .as_table()
+                            .unwrap()
+                            .get(*value)
+                            .unwrap()
+                    ));
+                }
+            }
+        }
+
+        let mut config = Config::from_file("tests/fixtures/extra-fields-config.toml").unwrap();
+        config.register_plugin("emoji", &EmojiPlugin);
+
+        let mut generator = EncreGenerator::new(&config);
+        generator.add_selector("emoji-tada");
+
+        assert_eq!(
+            generator.generate(),
+            String::from(
+                ".emoji-tada {
+  content: \"\u{1f389}\";
+}"
+            )
+        );
+    }
+
+    #[test]
     fn config_is_extended_and_overridden() {
-        let config = Config::from_file("tests/fixtures/custom_config.toml").unwrap();
+        let config = Config::from_file("tests/fixtures/custom-config.toml").unwrap();
 
         let mut generator = EncreGenerator::new(&config);
         generator.add_selector("bg-rosa-500");
