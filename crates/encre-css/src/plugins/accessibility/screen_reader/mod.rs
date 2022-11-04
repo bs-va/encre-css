@@ -7,7 +7,13 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        matches!(context.modifier, Modifier::Builtin { value: "sr-only" | "not-sr-only", .. })
+        matches!(
+            context.modifier,
+            Modifier::Builtin {
+                value: "sr-only" | "not-sr-only",
+                ..
+            }
+        )
     }
 
     fn handle(&self, context: &mut ContextHandle) {
