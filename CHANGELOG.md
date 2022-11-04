@@ -2,38 +2,44 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [0.8.0] - 2022-11-05
 
 ### Bug Fixes
 
-- Avoid losing classes when sorting them + deduplicate variant groups
-- Improve sorting of selectors
-- Ignore newlines and whitespaces in the `check_selectors` function
-- [**breaking**] Use the config as the first argument of the `register` function
-- Fix Clippy warnings
+- `from-` utility classes
 
 ### Documentation
 
-- Fix some typos
-- Use another instance of tokei
-- Fix vocabulary mistake
-- Improve documentation + add `display: inline-block;` to all icons by default
-- Add keywork aliases to all plugins
-- Handle errors when calling `Config::from_file`
-- Update the links
-- Improve the use of Flexbox in the notification footer example
+- Explain arbitrary variants used to generated CSS at rules, add a link to a benchmark
 
 ### Features
 
-- Implement `Serialize` for `Config`
-- Support omitting the dash after the first modifier, run `cargo fmt`, fix clippy warnings
-- Sort selectors in variant groups in `sort_selectors` (+ fix splitting when parenthesis are wrapped in brackets)
+- [**breaking**] Define a `Buffer` structure handling the CSS generated and the indentation
+- Support shortcuts
+- Support the safelist configuration + inline some configuration functions
+- [**breaking**] Add a configuration field `extra`, `encre-css-icons` now uses the `extra` field for configuration, improve documentation
 
 ### Miscellaneous Tasks
 
-- Commit `Cargo.lock` and fix links in `Cargo.toml`
-- Clean up documentation, update dependencies
-- Remove TODOs about better matching arbitrary values
+- Update dependencies
+- Remove `rayon`
+- Rename the `encre` binary to `encre-css` and update the documentation
+
+### Performance
+
+- [**breaking**] Improve indentation (~5% speedup)
+- [**breaking**] Simplify the `Pattern` trait: its method `is_matching` takes a `char` instead of an `&str` (~17% speedup)
+- Optimize if-else blocks of the `selector::parser::underscores_to_spaces` function (~5% speedup)
+- [**breaking**] Use a static namespace: remove the `Plugin::namespace` method, add a `namespace` argument to the `Config::register_plugin` method (~20% speedup)
+
+### Refactor
+
+- Remove `ANIMATIONS_ALREADY_DEFINED` and `encre_css_typography::ALREADY_DEFINED` which were actually useless
+- Add a prelude used to build new plugins
+- [**breaking**] `EncreGenerator::generate` consumes the `EncreGenerator` structure
+- Rewrite some plugins using the `matches!` macro + simplify some `match` blocks
+- [**breaking**] New way of creating an `EncreGenerator` + improve documentation tests
+- [**breaking**] Privatize the `selector::parser::{unescape, underscores_to_spaces}` functions
 
 ## [0.7.0] - 2022-08-12
 
