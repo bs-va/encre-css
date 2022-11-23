@@ -282,7 +282,7 @@ impl<'a> EncreGenerator<'a> {
     ///
     /// <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment"># encre-css.toml</span>
     /// <span class="kw">[theme]</span>
-    /// dark_mode = { class = <span class="string">".dark"</span> }
+    /// dark_mode = { type = <span class="string">"class"</span>, class = <span class="string">".dark"</span> }
     /// screens = { 3xl = <span class="string">"1600px"</span>, lg = <span class="string">"2000px"</span> }<br>
     /// <span class="kw">[theme.colors]</span>
     /// primary = <span class="string">"#e5186a"</span>

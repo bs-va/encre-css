@@ -1,4 +1,4 @@
-preflight = "none"
+preflight = { type = "none" }
 
 [extra.emojis]
 tada = "🎉"

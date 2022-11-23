@@ -35,7 +35,7 @@
 //! The previous example is equivalent to the following TOML configuration file:
 //!
 //! <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">[theme]</span>
-//! dark_mode = { class = <span class="string">".dark"</span> }
+//! dark_mode = { type = <span class="string">"class"</span>, class = <span class="string">".dark"</span> }
 //! colors = { primary = <span class="string">"#d3198c"</span>, secondary = <span class="string">"#fff"</span> }
 //! screens = { tablet = <span class="string">"640px"</span>, laptop = <span class="string">"1024px"</span>, desktop = <span class="string">"1280px"</span> }
 //! </code></pre></div>
@@ -841,6 +841,7 @@ pub const BUILTIN_PLUGINS: [(Cow<'static, str>, &'static (dyn Plugin + Send + Sy
 /// It defines how the `dark:` variant should behave.
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
+#[serde(tag = "type", content = "class")]
 pub enum DarkMode {
     /// The `dark:` variant will modify the class of the selector. You'll then need to toggle this
     /// class to enable the dark theme.
@@ -1108,6 +1109,10 @@ pub struct Theme {
 /// [`EncreGenerator`]: crate::EncreGenerator
 #[derive(Default, Serialize, Deserialize)]
 pub struct Config {
+    /// Safelist configuration.
+    #[serde(default)]
+    pub safelist: Safelist,
+
     /// Theme configuration.
     #[serde(default)]
     pub theme: Theme,
@@ -1119,10 +1124,6 @@ pub struct Config {
     /// Shortcuts configuration.
     #[serde(default)]
     pub shortcuts: Shortcuts,
-
-    /// Safelist configuration.
-    #[serde(default)]
-    pub safelist: Safelist,
 
     /// Extra fields configuration.
     #[serde(default)]
@@ -1286,7 +1287,7 @@ impl Config {
     ///
     /// <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment"># encre-css.toml</span>
     /// <span class="kw">[theme]</span>
-    /// dark_mode = { class = <span class="string">".dark"</span> }
+    /// dark_mode = { type = <span class="string">"class"</span>, class = <span class="string">".dark"</span> }
     /// screens = { 3xl = <span class="string">"1600px"</span>, lg = <span class="string">"2000px"</span> }<br>
     /// <span class="kw">[theme.colors]</span>
     /// primary = <span class="string">"#e5186a"</span>
@@ -1486,21 +1487,6 @@ mod tests {
     }
 
     #[test]
-    fn parse_config_file() {
-        let mut config = base_config();
-        config.theme.colors.add("rosa-500", "#e5186a");
-        config.theme.colors.add("yellow-400", "#ffef0e");
-        config.theme.screens.add("lg", "2000px");
-        config.theme.screens.add("3xl", "1600px");
-        config.theme.dark_mode = DarkMode::new_class(".dark");
-
-        assert_eq!(
-            Config::from_file("tests/fixtures/custom-config.toml").unwrap(),
-            config
-        );
-    }
-
-    #[test]
     fn gen_css_with_custom_plugin_extra_fields_and_parsed_config() {
         use crate::prelude::build_plugin::*;
 
@@ -1590,5 +1576,38 @@ mod tests {
 }"#
             )
         );
+    }
+
+    #[test]
+    fn deserialize_config() {
+        let mut config = base_config();
+        config.theme.colors.add("rosa-500", "#e5186a");
+        config.theme.colors.add("yellow-400", "#ffef0e");
+        config.theme.screens.add("lg", "2000px");
+        config.theme.screens.add("3xl", "1600px");
+        config.theme.dark_mode = DarkMode::new_class(".dark");
+
+        assert_eq!(
+            Config::from_file("tests/fixtures/custom-config.toml").unwrap(),
+            config
+        );
+    }
+
+    #[test]
+    fn serialize_config() {
+        let mut config = Config {
+            preflight: Preflight::None,
+            ..Default::default()
+        };
+        config.theme.dark_mode = DarkMode::new_class(".dark");
+        config.theme.screens.add("3xl", "1600px");
+        config.theme.screens.add("lg", "2000px");
+        config.theme.colors.add("rosa-500", "#e5186a");
+        config.theme.colors.add("yellow-400", "#ffef0e");
+
+        let result = toml::to_string(&config).unwrap();
+
+        let expected_config = fs::read_to_string("tests/fixtures/custom-config.toml").unwrap();
+        assert_eq!(expected_config, result);
     }
 }

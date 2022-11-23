@@ -471,6 +471,7 @@ ol, ul, menu {
 /// See [`crate::preflight`].
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
+#[serde(tag = "type", content = "css")]
 pub enum Preflight {
     /// No preflight will be generated.
     None,

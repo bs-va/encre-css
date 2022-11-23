@@ -1,9 +1,19 @@
-preflight = "none"
+safelist = []
+[theme.dark_mode]
+type = "class"
+class = ".dark"
 
-[theme]
-dark_mode = { class = ".dark" }
-screens = { 3xl = "1600px", lg = "2000px" }
+[theme.screens]
+3xl = "1600px"
+lg = "2000px"
 
 [theme.colors]
 rosa-500 = "#e5186a"
 yellow-400 = "#ffef0e"
+
+[preflight]
+type = "none"
+
+[shortcuts]
+
+[extra]
