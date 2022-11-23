@@ -838,7 +838,7 @@ pub const BUILTIN_PLUGINS: [(Cow<'static, str>, &'static (dyn Plugin + Send + Sy
 
 /// Configuration for the [`Theme::dark_mode`] field.
 ///
-/// It defines how the `dark:` variant should behaves.
+/// It defines how the `dark:` variant should behave.
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum DarkMode {
