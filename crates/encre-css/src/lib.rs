@@ -10,10 +10,10 @@
 //! <div class="notification">
 //!   <div class="notification-header">
 //!     <div class="app-icon"></div>
-//!     A new Javascript library was released!
+//!     A new Javascript library has been released!
 //!   </div>
 //!   <div class="notification-body">
-//!     The library <code>react</code> was just released, did you know it?
+//!     The library <code>react</code> has just been released, did you know it?
 //!     It is <i>a JavaScript library for creating user interfaces</i>.
 //!   </div>
 //!   <div class="notification-footer">
@@ -73,10 +73,10 @@
 //! <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">&lt;div</span> class=<span class="string">"notification"</span><span class="kw">&gt;
 //!   &lt;div</span> class=<span class="string">"notification-header"</span><span class="kw">&gt;</span>
 //!     <span class="kw">&lt;div</span> class=<span class="string">"app-icon"</span><span class="kw">&gt;&lt;/div&gt;</span>
-//!     A new Javascript library was released!
+//!     A new Javascript library has been released!
 //!   <span class="kw">&lt;/div&gt;</span>
 //!   <span class="kw">&lt;div</span> class=<span class="string">"notification-body"</span><span class="kw">&gt;</span>
-//!     The library <span class="kw">&lt;code&gt;</span>react<span class="kw">&lt;/code&gt;</span> was just released, did you know it?
+//!     The library <span class="kw">&lt;code&gt;</span>react<span class="kw">&lt;/code&gt;</span> has just been released, did you know it?
 //!     It is <span class="kw">&lt;i&gt;</span>a JavaScript library for creating user interfaces<span class="kw">&lt;/i&gt;</span>.
 //!   <span class="kw">&lt;/div&gt;</span>
 //!   <span class="kw">&lt;div</span> class=<span class="string">"notification-footer"</span><span class="kw">&gt;</span>
@@ -99,10 +99,10 @@
 //! <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">&lt;div</span> class=<span class="string">"w-128 text-md shadow-[1px_1px_10px_2px_#e5e7eb] rounded-xl"</span><span class="kw">&gt;
 //!   &lt;div</span> class=<span class="string">"p-3 flex items-center"</span><span class="kw">&gt;</span>
 //!     <span class="kw">&lt;div</span> class=<span class="string">"bg-blue-500 rounded-full w-5 h-5 mr-3"</span><span class="kw">&gt;&lt;/div&gt;</span>
-//!     A new Javascript library was released!
+//!     A new Javascript library has been released!
 //!   <span class="kw">&lt;/div&gt;</span>
 //!   <span class="kw">&lt;div</span> class=<span class="string">"p-6 pt-4"</span><span class="kw">&gt;</span>
-//!     The library <span class="kw">&lt;code&gt;</span>react<span class="kw">&lt;/code&gt;</span> was just released, did you know it?
+//!     The library <span class="kw">&lt;code&gt;</span>react<span class="kw">&lt;/code&gt;</span> has just been released, did you know it?
 //!     It is <span class="kw">&lt;i&gt;</span>a JavaScript library for creating user interfaces<span class="kw">&lt;/i&gt;</span>.
 //!   <span class="kw">&lt;/div&gt;</span>
 //!   <span class="kw">&lt;div</span> class=<span class="string">"flex justify-between"</span><span class="kw">&gt;</span>

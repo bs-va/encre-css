@@ -55,10 +55,10 @@ file and apply the rules using classes in your HTML, like that:
 <div class="notification">
   <div class="notification-header">
     <div class="app-icon"></div>
-    A new Javascript library was released!
+    A new Javascript library has been released!
   </div>
   <div class="notification-body">
-    The library <code>react</code> was just released, did you know it?
+    The library <code>react</code> has just been released, did you know it?
     It is <i>a JavaScript library for creating user interfaces</i>.
   </div>
   <div class="notification-footer">
@@ -82,10 +82,10 @@ system (if you have one):
 <div class="w-128 text-md shadow-[1px_1px_10px_2px_#e5e7eb] rounded-xl">
   <div class="p-3 flex items-center">
     <div class="bg-blue-500 rounded-full w-5 h-5 mr-3"></div>
-    A new Javascript library was released!
+    A new Javascript library has been released!
   </div>
   <div class="p-6 pt-4">
-    The library <code>react</code> was just released, did you know it?
+    The library <code>react</code> has just been released, did you know it?
     It is <i>a JavaScript library for creating user interfaces</i>.
   </div>
   <div class="flex justify-between">
