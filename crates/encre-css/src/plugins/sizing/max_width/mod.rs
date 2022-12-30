@@ -69,7 +69,7 @@ impl Plugin for PluginDefinition {
                 "screen-xl" => context.buffer.line("max-width: 1280px;"),
                 "screen-2xl" => context.buffer.line("max-width: 1536px;"),
                 _ => context.buffer.line(format_args!(
-                    "min-width: {};",
+                    "max-width: {};",
                     spacing::get(value, *is_negative).unwrap()
                 )),
             },
