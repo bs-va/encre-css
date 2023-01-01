@@ -82,7 +82,7 @@ Please note that, in order to get the SVG definition of icons, this crate will m
 requests to a (of course configurable) third-party CDN (the default CDN is
 `https://esm.sh`) and will cache them in the system's configured cache directory
 (`$XDG_CACHE_HOME` or `$HOME/.cache` on GNU/Linux, `{FOLDERID_LocalAppData}` on
-Windows, `$HOME/Library/Caches` on MacOS), in a directory named
+Windows, `$HOME/Library/Caches` on macOS), in a directory named
 `encre-css-icons-cache`.
 
 ### Various tips and tricks
