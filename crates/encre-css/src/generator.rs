@@ -104,7 +104,9 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle)>(
     custom_after_class: &str,
 ) {
     let ContextHandle {
-        buffer, selector, ..
+        buffer,
+        selector,
+        ..
     } = context;
 
     // Write the class
@@ -115,7 +117,7 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle)>(
             .enumerate()
             .map(|(i, ch)| {
                 if !ch.is_alphanumeric() && ch != '-' && ch != '_' {
-                    format!("\\{}", ch)
+                    format!("\\{ch}")
                 } else if i == 0 && ch.is_numeric() {
                     // CSS classes must not start with a number, we need to escape it
                     "\\3".to_string() + &ch.to_string()
@@ -133,11 +135,11 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle)>(
             .for_each(|variant| match variant {
                 Variant::Builtin(_, variant) => match variant {
                     VariantType::PseudoElement(element) => {
-                        write!(base_class, "::{}", element)
+                        write!(base_class, "::{element}")
                             .expect("writing to a String can't fail");
                     }
                     VariantType::PseudoClass(class) => {
-                        write!(base_class, ":{}", class).expect("writing to a String can't fail");
+                        write!(base_class, ":{class}").expect("writing to a String can't fail");
                     }
                     VariantType::WrapClass(template) => {
                         base_class = template.replace('&', &base_class);

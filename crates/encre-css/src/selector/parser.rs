@@ -3,7 +3,7 @@ use crate::{
     config::{Config, BUILTIN_PLUGINS, BUILTIN_VARIANTS},
     error::{ParseError, ParseErrorKind},
     generator::ContextCanHandle,
-    plugins::{css_property::CssPropertyPlugin, Plugin},
+    plugins::css_property::CssPropertyPlugin,
     utils::split_ignore_arbitrary,
 };
 
@@ -183,16 +183,13 @@ fn parse_recursive<'a>(
             } else if let Some((order, variant)) = BUILTIN_VARIANTS
                 .iter()
                 .enumerate()
+                .chain(
+                    custom_variants
+                        .iter()
+                        .enumerate()
+                        .map(|v| (v.0 + BUILTIN_VARIANTS.len(), v.1)),
+                )
                 .find(|(_, v)| v.0 == variant)
-                .or_else(|| {
-                    custom_variants.iter().enumerate().find_map(|(order, v)| {
-                        if v.0 == variant {
-                            Some((order + BUILTIN_VARIANTS.len(), v))
-                        } else {
-                            None
-                        }
-                    })
-                })
             {
                 variants.push(Variant::Builtin(order, variant.1.clone()));
             } else {
@@ -314,52 +311,28 @@ fn parse_recursive<'a>(
             })]
         } else {
             // Find the right plugin for handling this selector
-            let find = move |(order, (namespace, plugin)): (
-                usize,
-                &(Cow<'static, str>, &'static (dyn Plugin + Send + Sync)),
-            )| {
+            for (order, (namespace, plugin)) in BUILTIN_PLUGINS
+                .iter()
+                .enumerate()
+                .map(|p| (p.0 + config.custom_plugins.len(), p.1))
+                .chain(config.custom_plugins.iter().enumerate())
+            {
                 // Find the modifier
-                if let Some(modifier_part) = remaining.1.strip_prefix(&**namespace) {
-                    let modifier_part = modifier_part
-                        .strip_prefix(MODIFIER_SEPARATOR)
-                        .unwrap_or(modifier_part);
-
-                    let modifier = if let Some((mut prefix, mut value)) =
-                        modifier_part.split_once(ARBITRARY_START)
-                    {
-                        prefix = prefix.strip_prefix(MODIFIER_SEPARATOR).unwrap_or(prefix);
-                        value = value.strip_suffix(ARBITRARY_END)?;
-
-                        let (hint, value) =
-                            if let Some((maybe_hint, rest)) = value.split_once(HINT_SEPARATOR) {
-                                if VALID_PLUGIN_HINT.contains(&maybe_hint) {
-                                    (maybe_hint, to_css_value(rest))
-                                } else {
-                                    ("", to_css_value(value))
-                                }
-                            } else {
-                                ("", to_css_value(value))
-                            };
-
-                        Modifier::Arbitrary {
-                            prefix,
-                            hint,
-                            value,
-                        }
-                    } else {
-                        Modifier::Builtin {
-                            is_negative,
-                            value: modifier_part,
-                        }
-                    };
-
+                if let Some(modifier) = remaining
+                    .1
+                    .strip_prefix(&**namespace)
+                    .and_then(|modifier| parse_modifier(modifier, is_negative))
+                {
                     let context = ContextCanHandle {
                         config,
                         modifier: &modifier,
                     };
 
                     if plugin.can_handle(context) {
-                        Some(Selector {
+                        return vec![Ok(Selector {
+                            // Selectors generated using custom plugins are placed first to be easily
+                            // overridden, so we need to shift the order of builtin plugins to take that
+                            // into account
                             order,
                             full: if let Some(full_class) = full_class {
                                 full_class
@@ -367,38 +340,61 @@ fn parse_recursive<'a>(
                                 val
                             },
                             modifier,
-                            variants: variants.clone(),
+                            variants,
                             is_important,
                             plugin: *plugin,
-                        })
-                    } else {
-                        None
+                        })];
                     }
-                } else {
-                    None
                 }
-            };
-
-            match BUILTIN_PLUGINS
-                .iter()
-                .enumerate()
-                .find_map(&find)
-                .map(|mut selector| {
-                    // Selectors generated using custom plugins are placed first to be easily
-                    // overridden, so we need to shift the order of builtin plugins to take that
-                    // into account
-                    selector.order += config.custom_plugins.len();
-                    selector
-                })
-                .or_else(|| config.custom_plugins.iter().enumerate().find_map(find))
-            {
-                Some(s) => vec![Ok(s)],
-                None => vec![Err(ParseError::new(
-                    span,
-                    ParseErrorKind::UnknownPlugin(val),
-                ))],
             }
+
+            vec![Err(ParseError::new(
+                span,
+                ParseErrorKind::UnknownPlugin(val),
+            ))]
         }
+    }
+}
+
+fn parse_modifier(mut modifier: &str, is_negative: bool) -> Option<Modifier> {
+    if modifier.is_empty() {
+        return Some(Modifier::Builtin {
+            is_negative: false,
+            value: "",
+        });
+    }
+
+    if modifier.chars().next().unwrap() == MODIFIER_SEPARATOR {
+        modifier = &modifier[1..];
+    }
+
+    if let Some((prefix, mut value)) = modifier.split_once(ARBITRARY_START) {
+        if value.chars().last().unwrap() == ARBITRARY_END {
+            value = &value[..value.len() - 1];
+        } else {
+            return None;
+        }
+
+        let (hint, value) = if let Some((maybe_hint, rest)) = value.split_once(HINT_SEPARATOR) {
+            if VALID_PLUGIN_HINT.contains(&maybe_hint) {
+                (maybe_hint, to_css_value(rest))
+            } else {
+                ("", to_css_value(value))
+            }
+        } else {
+            ("", to_css_value(value))
+        };
+
+        Some(Modifier::Arbitrary {
+            prefix,
+            hint,
+            value,
+        })
+    } else {
+        Some(Modifier::Builtin {
+            is_negative,
+            value: modifier,
+        })
     }
 }
 
