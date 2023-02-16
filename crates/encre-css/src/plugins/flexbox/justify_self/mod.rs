@@ -18,14 +18,9 @@ impl Plugin for PluginDefinition {
 
     fn handle(&self, context: &mut ContextHandle) {
         match context.modifier {
-            Modifier::Builtin { value, .. } => match *value {
-                "stretch" => context.buffer.line("justify-self: stretch;"),
-                "start" => context.buffer.line("justify-self: start;"),
-                "center" => context.buffer.line("justify-self: center;"),
-                "end" => context.buffer.line("justify-self: end;"),
-                "auto" => context.buffer.line("justify-self: auto;"),
-                _ => unreachable!(),
-            },
+            Modifier::Builtin { value, .. } => {
+                context.buffer.line(format_args!("justify-self: {value};"));
+            }
             Modifier::Arbitrary { .. } => unreachable!(),
         }
     }

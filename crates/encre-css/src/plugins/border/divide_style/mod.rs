@@ -24,14 +24,9 @@ impl Plugin for PluginDefinition {
             generate_class(
                 context,
                 |context| match context.modifier {
-                    Modifier::Builtin { value, .. } => match *value {
-                        "solid" => context.buffer.line("border-style: solid;"),
-                        "dashed" => context.buffer.line("border-style: dashed;"),
-                        "dotted" => context.buffer.line("border-style: dotted;"),
-                        "double" => context.buffer.line("border-style: double;"),
-                        "none" => context.buffer.line("border-style: none;"),
-                        _ => unreachable!(),
-                    },
+                    Modifier::Builtin { value, .. } => {
+                        context.buffer.line(format_args!("border-style: {value};"));
+                    }
                     Modifier::Arbitrary { .. } => unreachable!(),
                 },
                 " > :not([hidden]) ~ :not([hidden])",

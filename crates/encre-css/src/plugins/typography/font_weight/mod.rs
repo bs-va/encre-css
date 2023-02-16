@@ -24,7 +24,7 @@ impl Plugin for PluginDefinition {
                 *hint == "number"
                     && (hint.is_empty()
                         && (["normal", "bold", "lighter", "bolder"].contains(&&**value)
-                            || is_matching_integer(value)
+                            || is_matching_number(value)
                             || is_matching_var(value)))
             }
         }

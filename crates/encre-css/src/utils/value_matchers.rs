@@ -341,21 +341,6 @@ pub fn is_matching_length(value: &str) -> bool {
     }) || is_matching_base(value)
 }
 
-/// Returns whether the CSS value has the [`<integer>`](https://developer.mozilla.org/en-US/docs/Web/CSS/integer) type.
-///
-/// # Example
-///
-/// ```
-/// use encre_css::utils::value_matchers::is_matching_integer;
-/// assert!(is_matching_integer("12"));
-/// assert!(!is_matching_integer("42.12"));
-/// ```
-pub fn is_matching_integer(value: &str) -> bool {
-    value.parse::<isize>().is_ok()
-        || is_matching_computational_css_function(value)
-        || is_matching_base(value)
-}
-
 /// Returns whether the CSS value has the [`<number>`](https://developer.mozilla.org/en-US/docs/Web/CSS/number) type.
 ///
 /// # Example

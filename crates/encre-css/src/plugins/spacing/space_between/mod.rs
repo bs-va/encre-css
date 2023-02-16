@@ -11,7 +11,9 @@ impl Plugin for PluginXDefinition {
             Modifier::Builtin { value, .. } => {
                 *value == "reverse" || spacing::is_matching_builtin_spacing(value)
             }
-            Modifier::Arbitrary { value, .. } => is_matching_length(value),
+            Modifier::Arbitrary { value, .. } => {
+                is_matching_length(value) || is_matching_percentage(value)
+            }
         }
     }
 
@@ -63,7 +65,9 @@ impl Plugin for PluginYDefinition {
             Modifier::Builtin { value, .. } => {
                 *value == "reverse" || spacing::is_matching_builtin_spacing(value)
             }
-            Modifier::Arbitrary { value, .. } => is_matching_length(value),
+            Modifier::Arbitrary { value, .. } => {
+                is_matching_length(value) || is_matching_percentage(value)
+            }
         }
     }
 

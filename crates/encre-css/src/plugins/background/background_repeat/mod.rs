@@ -11,7 +11,7 @@ impl Plugin for PluginDefinition {
             context.modifier,
             Modifier::Builtin {
                 value: "repeat"
-                    | "not-repeat"
+                    | "no-repeat"
                     | "repeat-x"
                     | "repeat-y"
                     | "repeat-round"

@@ -7,6 +7,7 @@ fn width_can_handle(context: &mut ContextCanHandle) -> bool {
         Modifier::Builtin { value, .. } => value.is_empty() || value.parse::<usize>().is_ok(),
         Modifier::Arbitrary { hint, value, .. } => {
             *hint == "length"
+                || *hint == "line-width"
                 || (hint.is_empty() && (is_matching_length(value) || is_matching_line_width(value)))
         }
     }

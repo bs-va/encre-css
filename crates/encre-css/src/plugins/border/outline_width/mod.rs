@@ -15,6 +15,8 @@ impl Plugin for PluginDefinition {
                     || *hint == "percentage"
                     || (hint.is_empty()
                         && (is_matching_length(value)
+                            || is_matching_number(value)
+                            || is_matching_percentage(value)
                             || ["thin", "medium", "thick"].contains(&&**value)))
             }
         }

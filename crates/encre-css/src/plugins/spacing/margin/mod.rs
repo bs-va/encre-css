@@ -9,7 +9,9 @@ fn margin_can_handle(context: &mut ContextCanHandle) -> bool {
         Modifier::Builtin { value, .. } => {
             *value == "auto" || spacing::is_matching_builtin_spacing(value)
         }
-        Modifier::Arbitrary { value, .. } => is_matching_length(value),
+        Modifier::Arbitrary { value, .. } => {
+            is_matching_length(value) || is_matching_percentage(value)
+        }
     }
 }
 
@@ -46,7 +48,7 @@ impl Plugin for PluginDefinition {
                 *value == "auto" || spacing::is_matching_builtin_spacing(value)
             }
             Modifier::Arbitrary { prefix, value, .. } => {
-                prefix.is_empty() && is_matching_length(value)
+                prefix.is_empty() && (is_matching_length(value) || is_matching_percentage(value))
             }
         }
     }
