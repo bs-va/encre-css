@@ -1,4 +1,5 @@
 safelist = []
+
 [theme.dark_mode]
 type = "class"
 class = ".dark"

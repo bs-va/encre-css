@@ -13,7 +13,7 @@ name = "benchmark"
 harness = false
 
 [dependencies]
-toml = "0.5.9"
+toml = "0.7.2"
 serde = { version = "1.0.144", features = ["derive"] }
 thiserror = "1.0.34"
 
