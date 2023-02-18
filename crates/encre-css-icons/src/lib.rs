@@ -329,7 +329,7 @@ fn get_icon(
     };
 
     if rotation < 0. {
-        rotation -= f32::floor(rotation as f32 / 4.) * 4.;
+        rotation -= f32::floor(rotation / 4.) * 4.;
     }
 
     let rotation = (rotation % 4.) as usize;

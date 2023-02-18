@@ -18,7 +18,9 @@ impl Plugin for PluginDefinition {
 
     fn handle(&self, context: &mut ContextHandle) {
         if let Modifier::Builtin { value, .. } = context.modifier {
-            context.buffer.line(format_args!("grid-auto-flow: {};", value.replace('-', " ")));
+            context
+                .buffer
+                .line(format_args!("grid-auto-flow: {};", value.replace('-', " ")));
         }
     }
 }

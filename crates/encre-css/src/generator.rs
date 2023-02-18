@@ -104,9 +104,7 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle)>(
     custom_after_class: &str,
 ) {
     let ContextHandle {
-        buffer,
-        selector,
-        ..
+        buffer, selector, ..
     } = context;
 
     // Write the class
@@ -135,8 +133,7 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle)>(
             .for_each(|variant| match variant {
                 Variant::Builtin(_, variant) => match variant {
                     VariantType::PseudoElement(element) => {
-                        write!(base_class, "::{element}")
-                            .expect("writing to a String can't fail");
+                        write!(base_class, "::{element}").expect("writing to a String can't fail");
                     }
                     VariantType::PseudoClass(class) => {
                         write!(base_class, ":{class}").expect("writing to a String can't fail");

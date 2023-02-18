@@ -198,9 +198,7 @@ impl<'a> ShadowList<'a> {
                     parenthesis_level -= 1;
                 }
                 ' ' if parenthesis_level == 0 => {
-                    let shadow = if let Shadow::Raw(shadow) = shadows.last_mut()? {
-                        shadow
-                    } else {
+                    let Shadow::Raw(shadow) = shadows.last_mut()? else {
                         // Shadow already parsed but a space was encountered
                         return None;
                     };
@@ -218,9 +216,7 @@ impl<'a> ShadowList<'a> {
                 }
                 ',' if parenthesis_level == 0 => {
                     // Add the last part (not suffixed by `_`)
-                    let shadow = if let Shadow::Raw(shadow) = shadows.last_mut()? {
-                        shadow
-                    } else {
+                    let Shadow::Raw(shadow) = shadows.last_mut()? else {
                         // Shadow already parsed but a space was encountered
                         return None;
                     };
@@ -251,9 +247,7 @@ impl<'a> ShadowList<'a> {
         // Add the last part (not suffixed by `,`)
         if last_index != value.len() - 1 {
             // Find the index of the first free part
-            let shadow = if let Shadow::Raw(shadow) = shadows.last_mut()? {
-                shadow
-            } else {
+            let Shadow::Raw(shadow) = shadows.last_mut()? else {
                 return None;
             };
             let index = shadow.iter().position(|p| p.is_empty()).unwrap_or(5);

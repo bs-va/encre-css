@@ -47,6 +47,6 @@ pub fn get(value: &str, is_negative: bool) -> Option<Cow<str>> {
             value.parse::<f32>().ok()? / 4.
         };
 
-        Some(Cow::from(format!("{}rem", value)))
+        Some(Cow::from(format!("{value}rem")))
     }
 }

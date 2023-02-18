@@ -74,8 +74,7 @@ impl Plugin for PluginViaDefinition {
         };
 
         context.buffer.line(format_args!(
-            "--en-gradient-stops: var(--en-gradient-from), {}, var(--en-gradient-to, {});",
-            value, default_to
+            "--en-gradient-stops: var(--en-gradient-from), {value}, var(--en-gradient-to, {default_to});",
         ));
     }
 }

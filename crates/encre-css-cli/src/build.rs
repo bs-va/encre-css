@@ -55,7 +55,7 @@ fn gen_css<T: AsRef<Path>>(generator: EncreGenerator, output: Option<T>) {
         fs::write(file, css).expect("failed to write to the file");
     } else {
         // If no file is specified, the CSS generated is written to the standard output
-        println!("{}", css);
+        println!("{css}");
     }
 }
 
@@ -83,10 +83,18 @@ fn scan_path<T: AsRef<Path>>(glob_path: T, buffer: &mut String) {
                 buffer.reserve(file_len as usize);
 
                 if let Err(e) = file.read_to_string(buffer) {
-                    eprintln!("Failed to read the file {:?}: {:?}", glob_path.as_ref(), e);
+                    eprintln!(
+                        "Failed to read the file {}: {}",
+                        glob_path.as_ref().display(),
+                        e
+                    );
                 }
             }
-            Err(e) => eprintln!("Failed to open the file {:?}: {:?}", glob_path.as_ref(), e),
+            Err(e) => eprintln!(
+                "Failed to open the file {}: {}",
+                glob_path.as_ref().display(),
+                e
+            ),
         }
     } else {
         glob.walk(prefix).for_each(|entry| {
@@ -105,11 +113,19 @@ fn scan_path<T: AsRef<Path>>(glob_path: T, buffer: &mut String) {
                         buffer.reserve(file_len as usize);
 
                         if let Err(e) = reader.read_to_string(buffer) {
-                            eprintln!("Failed to read the file {:?}: {:?}", glob_path.as_ref(), e);
+                            eprintln!(
+                                "Failed to read the file {}: {}",
+                                glob_path.as_ref().display(),
+                                e
+                            );
                         }
                     }
                     Err(e) => {
-                        eprintln!("Failed to open the file {:?}: {:?}", glob_path.as_ref(), e);
+                        eprintln!(
+                            "Failed to open the file {}: {}",
+                            glob_path.as_ref().display(),
+                            e
+                        );
                     }
                 }
             }
@@ -121,7 +137,7 @@ fn build_single<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, outpu
     let config = match Config::from_file(config_file) {
         Ok(config) => config,
         Err(e) => {
-            eprintln!("{}", e);
+            eprintln!("{e}");
             Config::default()
         }
     };
@@ -168,7 +184,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
         let config = match Config::from_file(config_file) {
             Ok(config) => config,
             Err(e) => {
-                eprintln!("{}", e);
+                eprintln!("{e}");
                 Config::default()
             }
         };
@@ -269,7 +285,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
                             let config = match Config::from_file(config_file) {
                                 Ok(config) => config,
                                 Err(e) => {
-                                    eprintln!("{}", e);
+                                    eprintln!("{e}");
                                     Config::default()
                                 }
                             };
@@ -299,7 +315,15 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
                     }
                 }
             }
-            e => eprintln!("watch error: {:?}", e),
+            Ok(Err(errors)) => eprintln!(
+                "Watch error: {}",
+                errors
+                    .iter()
+                    .map(|e| format!("{e}"))
+                    .collect::<Vec<String>>()
+                    .join(", ")
+            ),
+            Err(e) => eprintln!("MPSC channel error: {e}"),
         }
     }
 }
