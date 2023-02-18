@@ -90,7 +90,7 @@
 //! you have to repeatedly switch between several files, it could be better. Utility-first CSS
 //! frameworks takes a new approach by using minimal and pre-defined class names directly linked to
 //! its CSS rule content. The CSS file will then be generated
-//! [On-demand](https://antfu.me/posts/reimagine-atomic-css#on-demand-way) allowing the classes
+//! [on-demand](https://antfu.me/posts/reimagine-atomic-css#on-demand-way) allowing the classes
 //! to be very flexible and customizable. This approach lets you quickly prototype visual HTML
 //! elements and encourages you to turn them later into components using your favorite web framework.
 //! It also makes building a responsive website easier and forces it to be closer to your design
