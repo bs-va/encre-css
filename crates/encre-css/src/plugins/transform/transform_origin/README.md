@@ -15,7 +15,7 @@ Utilities for specifying the origin for an element's transformations.
     <tr><td>origin-bottom</td><td>transform-origin: bottom;</td></tr>
     <tr><td>origin-bottom-left</td><td>transform-origin: bottom left;</td></tr>
     <tr><td>origin-left</td><td>transform-origin: left;</td></tr>
-    <tr><td>origin-top-left</td><td>transform-origin: top left;-duration: <i>&lt;integer&gt;</i>ms;</td></tr></td></tr>
+    <tr><td>origin-top-left</td><td>transform-origin: top left;-duration: <i>&lt;integer&gt;</i>ms;</td></tr>
   </tbody>
 </table>
 
