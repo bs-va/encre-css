@@ -47,18 +47,18 @@
 //! 3. The **[modifier](crate::selector::Modifier)** (used to clarify the CSS needed to be generated), in this case the
 //!       background color will become `rgb(239 68 68)` (see [`BUILTIN_COLORS`]).
 //!
-//! <p class="with-hints" style="margin-top: 3rem;"><b><span style="counter-set: hints 3;">[&>*]</span><span>:</span><span style="counter-set: hints 4;">[@supports_font-tech(color-COLRv1)]</span><span>:</span><span style="counter-set: hints 1;">bg</span><span>-</span><span style="counter-set: hints 5;">[rgb(12_12_12)]</span></b></p>
+//! <p class="with-hints" style="margin-top: 3rem;"><b><span style="counter-set: hints 3;">[&>*]</span><span>:</span><span style="counter-set: hints 4;">[@supports_(display:flex)]</span><span>:</span><span style="counter-set: hints 1;">flex</span><span>-</span><span style="counter-set: hints 5;">[2_2_10%]</span></b></p>
 //!
 //! 4. The **arbitrary variant** (used to modify the class generated), in this case the class
-//!    will be `.\[\&\>\*]\:bg-\[rgb\(12_12_12\)\]>*`.
+//!    will be `.\[\&\>\*]\:flex-\[2_2_10\%\]>*`.
 //!
 //! 5. Another **arbitrary variant** (with another syntax used to add [at rules](https://developer.mozilla.org/en-US/docs/Web/CSS/At-rule)),
-//!    in this case the rule will become `@supports font-tech(color-COLRv1) { <rule content> }` (spaces need to be replaced with underscores in arbitrary
+//!    in this case the rule will become `@supports (display:flex) { <rule content> }` (spaces need to be replaced with underscores in arbitrary
 //!    variants).
 //!
 //! 6. The **[arbitrary value](crate::selector::Modifier::Arbitrary)**
 //!    (used to specify a value not included in your design system), in this case the background
-//!    color will become `rgb(12 12 12)` (spaces need to be replaced with underscores in arbitrary
+//!    color will become `2 2 10%` (spaces need to be replaced with underscores in arbitrary
 //!    values).
 //!
 //! <p class="with-hints" style="margin-top: 3rem;"><b><span>[mask-type:luminance]</span></b></p>
