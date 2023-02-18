@@ -9,7 +9,7 @@ fn radius_can_handle(context: &mut ContextCanHandle) -> bool {
                 || ["sm", "md", "lg", "xl", "2xl", "3xl", "full", "none"].contains(&&**value)
         }
         Modifier::Arbitrary { value, .. } => value
-            .split('_')
+            .split(' ')
             .all(|v| is_matching_length(v) || is_matching_percentage(v)),
     }
 }
@@ -57,7 +57,7 @@ impl Plugin for PluginDefinition {
             Modifier::Arbitrary { prefix, value, .. } => {
                 prefix.is_empty()
                     && value
-                        .split('_')
+                        .split(' ')
                         .all(|v| is_matching_length(v) || is_matching_percentage(v))
             }
         }

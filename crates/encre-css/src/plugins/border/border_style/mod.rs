@@ -9,7 +9,7 @@ impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         match context.modifier {
             Modifier::Builtin { value, .. } => is_matching_line_style(value),
-            Modifier::Arbitrary { value, .. } => value.split('_').all(is_matching_line_style),
+            Modifier::Arbitrary { value, .. } => value.split(' ').all(is_matching_line_style),
         }
     }
 

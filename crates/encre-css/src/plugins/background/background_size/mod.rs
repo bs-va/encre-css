@@ -14,7 +14,7 @@ impl Plugin for PluginDefinition {
                     || *hint == "percentage"
                     || (hint.is_empty()
                         && value.split(',').all(|v| {
-                            v.split('_').all(|v| {
+                            v.split(' ').all(|v| {
                                 is_matching_length(v)
                                     || is_matching_percentage(v)
                                     || ["contain", "cover", "auto"].contains(&v)
