@@ -671,7 +671,12 @@ mod tests {
     #[test]
     fn full_preflight() {
         let mut config = Config::default();
-        config.preflight = Preflight::new_full().border_color("#f00");
+        config.preflight = Preflight::new_full()
+            .ring_color("#f00")
+            .border_color("#0f0")
+            .placeholder_color("#00f")
+            .font_family_sans("sans-serif")
+            .font_family_mono("monospace");
 
         let mut generator = EncreGenerator::new(&config);
         generator.add_selector("w-full");
@@ -683,7 +688,7 @@ mod tests {
   box-sizing: border-box;
   border-width: 0;
   border-style: solid;
-  border-color: #f00;
+  border-color: #0f0;
 }
 
 ::before, ::after {
@@ -695,7 +700,7 @@ html {
   -webkit-text-size-adjust: 100%;
   -moz-tab-size: 4;
   tab-size: 4;
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: sans-serif;
 }
 
 body {
@@ -728,7 +733,7 @@ b, strong {
 }
 
 code, kbd, samp, pre {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family: monospace;
   font-size: 1em;
 }
 
@@ -836,7 +841,7 @@ textarea {
 
 input::placeholder, textarea::placeholder {
   opacity: 1;
-  color: #9ca3af;
+  color: #00f;
 }
 
 button, [role="button"] {
@@ -879,7 +884,7 @@ img, video {
   --en-ring-inset: ;
   --en-ring-offset-width: 0px;
   --en-ring-offset-color: #fff;
-  --en-ring-color: rgb(59 130 246 / 0.5);
+  --en-ring-color: #f00;
   --en-ring-offset-shadow: 0 0 #0000;
   --en-ring-shadow: 0 0 #0000;
   --en-shadow: 0 0 #0000;
@@ -926,7 +931,7 @@ img, video {
   --en-ring-inset: ;
   --en-ring-offset-width: 0px;
   --en-ring-offset-color: #fff;
-  --en-ring-color: rgb(59 130 246 / 0.5);
+  --en-ring-color: #f00;
   --en-ring-offset-shadow: 0 0 #0000;
   --en-ring-shadow: 0 0 #0000;
   --en-shadow: 0 0 #0000;
@@ -973,7 +978,7 @@ img, video {
   --en-ring-inset: ;
   --en-ring-offset-width: 0px;
   --en-ring-offset-color: #fff;
-  --en-ring-color: rgb(59 130 246 / 0.5);
+  --en-ring-color: #f00;
   --en-ring-offset-shadow: 0 0 #0000;
   --en-ring-shadow: 0 0 #0000;
   --en-shadow: 0 0 #0000;
@@ -1002,6 +1007,38 @@ img, video {
   width: 100%;
 }"#
             )
+        );
+    }
+
+    #[test]
+    fn custom_preflight() {
+        let mut config = Config::default();
+        config.preflight = Preflight::new_custom(
+            "html, body {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  overflow-x: hidden;
+}",
+        );
+
+        let mut generator = EncreGenerator::new(&config);
+        generator.add_selector("w-full");
+
+        assert_eq!(
+            generator.generate(),
+            "html, body {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+.w-full {
+  width: 100%;
+}"
         );
     }
 }
