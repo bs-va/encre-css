@@ -76,7 +76,23 @@ pub(crate) fn underscores_to_spaces(mut val: Cow<str>) -> Cow<str> {
     // Don't replace `_` if it is a URL
     if val.contains("url(") {
         // For the `CursorPlugin`, `ContentPlugin` and `ImagePlugin` plugins, we need to keep underscores in URLs
-        val
+        val.split("url(")
+            .map(|p| {
+                let result = if let Some(sub) = p.strip_prefix('\'') {
+                    sub.find('\'').map(|index| p.split_at(index + 3))
+                } else if let Some(sub) = p.strip_prefix('"') {
+                    sub.find('"').map(|index| p.split_at(index + 3))
+                } else {
+                    p.find(')').map(|index| p.split_at(index + 1))
+                };
+
+                if let Some((before, after)) = result {
+                    format!("url({}{}", before, after.replace('_', " "))
+                } else {
+                    p.replace('_', " ")
+                }
+            })
+            .collect()
     } else {
         // Replace `_` with ` ` (spaces) if not prefixed by a backslash
         if val.contains('_') {
