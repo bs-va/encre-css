@@ -22,7 +22,7 @@ numbers are supported. They are however perfectly compatible with Tailwind's val
 
 ### Arbitrary values
 
-Any [`<length>`](crate::utils::value_matchers::is_matching_length) or [`line width`](crate::utils::value_matchers::is_matching_line_width) property is allowed as arbitrary value.
-For example, `divide-[1%]`.
+Any [`<length>`](crate::utils::value_matchers::is_matching_length) property is allowed as arbitrary value.
+For example, `divide-y-[0.1rem]`.
 
 [Tailwind reference](https://tailwindcss.com/docs/divide-width)
