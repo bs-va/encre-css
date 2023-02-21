@@ -43,28 +43,28 @@ impl Plugin for PluginDefinition {
                 "colors" => {
                     context.buffer.lines([
                         "transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;",
-                        "transition-timing-function: cubic-bezier(0.4, 0, 0);",
+                        "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);",
                         "transition-duration: 150ms;",
                     ]);
                 }
                 "opacity" => {
                     context.buffer.lines([
                         "transition-property: opacity;",
-                        "transition-timing-function: cubic-bezier(0.4, 0, 0);",
+                        "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);",
                         "transition-duration: 150ms;",
                     ]);
                 }
                 "shadow" => {
                     context.buffer.lines([
                         "transition-property: box-shadow;",
-                        "transition-timing-function: cubic-bezier(0.4, 0, 0);",
+                        "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);",
                         "transition-duration: 150ms;",
                     ]);
                 }
                 "transform" => {
                     context.buffer.lines([
                         "transition-property: transform;",
-                        "transition-timing-function: cubic-bezier(0.4, 0, 0);",
+                        "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);",
                         "transition-duration: 150ms;",
                     ]);
                 }

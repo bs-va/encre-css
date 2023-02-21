@@ -2,6 +2,8 @@
 #![doc(alias = "typography")]
 use crate::prelude::build_plugin::*;
 
+use std::borrow::Cow;
+
 #[derive(Debug)]
 pub(crate) struct PluginDefinition;
 
@@ -12,7 +14,6 @@ impl Plugin for PluginDefinition {
                 ["none", "tight", "snug", "normal", "relaxed", "loose"].contains(&&**value)
                     || spacing::is_matching_builtin_spacing(value)
             }
-            // https://developer.mozilla.org/en-US/docs/Web/CSS/line-height#values
             Modifier::Arbitrary { value, .. } => {
                 *value == "normal"
                     || is_matching_number(value)
@@ -24,18 +25,18 @@ impl Plugin for PluginDefinition {
 
     fn handle(&self, context: &mut ContextHandle) {
         match context.modifier {
-            Modifier::Builtin { is_negative, value } => match *value {
-                "none" => context.buffer.line("line-height: 1;"),
-                "tight" => context.buffer.line("line-height: 1.25;"),
-                "snug" => context.buffer.line("line-height: 1.375;"),
-                "normal" => context.buffer.line("line-height: 1.5;"),
-                "relaxed" => context.buffer.line("line-height: 1.625;"),
-                "loose" => context.buffer.line("line-height: 2;"),
-                _ => context.buffer.line(format_args!(
-                    "line-height: {};",
-                    spacing::get(value, *is_negative).unwrap()
-                )),
-            },
+            Modifier::Builtin { is_negative, value } => context.buffer.line(format_args!(
+                "line-height: {};",
+                match *value {
+                    "none" => Cow::Borrowed("1"),
+                    "tight" => Cow::Borrowed("1.25"),
+                    "snug" => Cow::Borrowed("1.375"),
+                    "normal" => Cow::Borrowed("1.5"),
+                    "relaxed" => Cow::Borrowed("1.625"),
+                    "loose" => Cow::Borrowed("2"),
+                    _ => spacing::get(value, *is_negative).unwrap(),
+                }
+            )),
             Modifier::Arbitrary { value, .. } => {
                 context.buffer.line(format_args!("line-height: {value};"));
             }

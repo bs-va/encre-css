@@ -8,7 +8,7 @@ use std::borrow::Cow;
 /// - Any fraction (e.g `9/12`) consisting of a [`usize`], a slash and another [`usize`].
 pub fn is_matching_builtin_spacing(value: &str) -> bool {
     value == "px"
-        || value.parse::<f32>().is_ok()
+        || value.parse::<f64>().is_ok()
         || value.split_once('/').map_or(false, |(a, b)| {
             a.parse::<usize>().is_ok() && b.parse::<usize>().is_ok()
         })
@@ -35,16 +35,22 @@ pub fn get(value: &str, is_negative: bool) -> Option<Cow<str>> {
 
         #[allow(clippy::cast_precision_loss)]
         if is_negative {
-            Some(Cow::from(format!("{}%", 100. * (-(a as f32) / b as f32))))
+            Some(Cow::from(format!(
+                "{}%",
+                (1_000_000. * 100. * (-(a as f64) / b as f64)).round() / 1_000_000.
+            )))
         } else {
-            Some(Cow::from(format!("{}%", 100. * (a as f32 / b as f32))))
+            Some(Cow::from(format!(
+                "{}%",
+                (1_000_000. * 100. * (a as f64 / b as f64)).round() / 1_000_000.
+            )))
         }
     } else {
         // Floats
         let value = if is_negative {
-            -value.parse::<f32>().ok()? / 4.
+            -value.parse::<f64>().ok()? / 4.
         } else {
-            value.parse::<f32>().ok()? / 4.
+            value.parse::<f64>().ok()? / 4.
         };
 
         Some(Cow::from(format!("{value}rem")))

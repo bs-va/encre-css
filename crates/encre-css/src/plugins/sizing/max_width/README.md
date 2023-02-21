@@ -45,7 +45,7 @@ Tailwind's values.
 
 ### Arbitrary values
 
-Any [`<length>`](crate::utils::value_matchers::is_matching_length) property is allowed as arbitrary value.
+Any [`<length>`](crate::utils::value_matchers::is_matching_length) or [`<percentage>`](crate::utils::value_matchers::is_matching_percentage) property is allowed as arbitrary value.
 For example, `max-w-[1.2rem]`.
 
 [Tailwind reference](https://tailwindcss.com/docs/max-width)

@@ -23,15 +23,14 @@ impl Plugin for PluginDefinition {
 
     fn handle(&self, context: &mut ContextHandle) {
         match context.modifier {
-            Modifier::Builtin { value, .. } => match *value {
-                "repeat" => context.buffer.line("background-repeat: repeat;"),
-                "no-repeat" => context.buffer.line("background-repeat: no-repeat;"),
-                "repeat-x" => context.buffer.line("background-repeat: repeat-x;"),
-                "repeat-y" => context.buffer.line("background-repeat: repeat-y;"),
-                "repeat-round" => context.buffer.line("background-repeat: round;"),
-                "repeat-space" => context.buffer.line("background-repeat: space;"),
-                _ => unreachable!(),
-            },
+            Modifier::Builtin { value, .. } => context.buffer.line(format_args!(
+                "background-repeat: {};",
+                match *value {
+                    "repeat-round" => "round",
+                    "repeat-space" => "space",
+                    _ => value,
+                }
+            )),
             Modifier::Arbitrary { .. } => unreachable!(),
         }
     }

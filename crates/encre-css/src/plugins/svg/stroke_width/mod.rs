@@ -11,12 +11,9 @@ impl Plugin for PluginDefinition {
             Modifier::Builtin { value, .. } => value.parse::<usize>().is_ok(),
             Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "length"
-                    || *hint == "number"
                     || *hint == "percentage"
                     || (hint.is_empty()
-                        && (is_matching_length(value)
-                            || is_matching_number(value)
-                            || is_matching_percentage(value)))
+                        && (is_matching_length(value) || is_matching_percentage(value)))
             }
         }
     }

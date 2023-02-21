@@ -18,7 +18,13 @@ impl Plugin for PluginDefinition {
 
     fn handle(&self, context: &mut ContextHandle) {
         if let Modifier::Builtin { value, .. } = context.modifier {
-            context.buffer.line(format_args!("isolation: {value};"));
+            context.buffer.line(format_args!(
+                "isolation: {};",
+                match *value {
+                    "isolation-auto" => "auto",
+                    _ => value,
+                }
+            ));
         }
     }
 }

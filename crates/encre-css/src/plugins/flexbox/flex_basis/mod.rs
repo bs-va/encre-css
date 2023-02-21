@@ -2,6 +2,8 @@
 #![doc(alias = "flexbox")]
 use crate::prelude::build_plugin::*;
 
+use std::borrow::Cow;
+
 #[derive(Debug)]
 pub(crate) struct PluginDefinition;
 
@@ -19,7 +21,13 @@ impl Plugin for PluginDefinition {
         match context.modifier {
             Modifier::Builtin { is_negative, value } => context.buffer.line(format_args!(
                 "flex-basis: {};",
-                spacing::get(value, *is_negative).unwrap()
+                if *value == "auto" {
+                    Cow::from("auto")
+                } else if *value == "full" {
+                    Cow::from("100%")
+                } else {
+                    spacing::get(value, *is_negative).unwrap()
+                },
             )),
             Modifier::Arbitrary { value, .. } => {
                 context.buffer.line(format_args!("flex-basis: {value};"));

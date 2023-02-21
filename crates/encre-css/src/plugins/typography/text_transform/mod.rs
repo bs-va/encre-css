@@ -18,13 +18,15 @@ impl Plugin for PluginDefinition {
 
     fn handle(&self, context: &mut ContextHandle) {
         if let Modifier::Builtin { value, .. } = context.modifier {
-            match *value {
-                "uppercase" => context.buffer.line("text-transform: uppercase;"),
-                "lowercase" => context.buffer.line("text-transform: lowercase;"),
-                "capitalize" => context.buffer.line("text-transform: capitalize;"),
-                "normal-case" => context.buffer.line("text-transform: none;"),
-                _ => unreachable!(),
-            }
+            let value = if *value == "normal-case" {
+                "none"
+            } else {
+                value
+            };
+
+            context
+                .buffer
+                .line(format_args!("text-transform: {value};"));
         }
     }
 }

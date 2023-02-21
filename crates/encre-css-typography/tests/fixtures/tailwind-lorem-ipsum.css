@@ -985,9 +985,9 @@ img, video {
 
 .inset-0 {
   top: 0px;
+  right: 0px;
   bottom: 0px;
   left: 0px;
-  right: 0px;
 }
 
 .top-48 {
@@ -1044,7 +1044,7 @@ img, video {
 }
 
 .-translate-x-2\/3 {
-  --en-translate-x: -66.66667%;
+  --en-translate-x: -66.666667%;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
 }
 

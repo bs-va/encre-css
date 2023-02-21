@@ -23,6 +23,12 @@ Utilities for controlling the position of an element's background image.
 ### Arbitrary values
 
 Any [`<position>`](crate::utils::value_matchers::is_matching_position) property is allowed as arbitrary value.
-For example, `bg-[0px_0px,bottom_12vmin_right_-6px]`.
+For example, `bg-[position:0px_0px,bottom_12cm_right_-6px]`.
+
+### Tailwind compatibility
+
+When using arbitrary values, you **must specify the `position` hint**
+to disambiguate between this plugin and the [`background_size`](crate::plugins::background::background_size) plugin.
+That's not the case in Tailwind: `background-position` is preferred over `background-size`.
 
 [Tailwind reference](https://tailwindcss.com/docs/background-position)

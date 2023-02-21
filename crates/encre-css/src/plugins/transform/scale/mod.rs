@@ -3,11 +3,8 @@
 use super::CSS_TRANSFORM;
 use crate::prelude::build_plugin::*;
 
-fn scale_can_handle(context: &mut ContextCanHandle) -> bool {
-    match context.modifier {
-        Modifier::Builtin { value, .. } => value.parse::<usize>().is_ok(),
-        Modifier::Arbitrary { .. } => false,
-    }
+fn scale_can_handle(context: &ContextCanHandle) -> bool {
+    matches!(context.modifier, Modifier::Builtin { value, .. } if value.parse::<usize>().is_ok())
 }
 
 fn scale_handle(css_properties: &[&str], context: &mut ContextHandle) {
@@ -30,8 +27,8 @@ fn scale_handle(css_properties: &[&str], context: &mut ContextHandle) {
 pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        scale_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scale_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -43,8 +40,8 @@ impl Plugin for PluginDefinition {
 pub(crate) struct PluginXDefinition;
 
 impl Plugin for PluginXDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        scale_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scale_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -56,8 +53,8 @@ impl Plugin for PluginXDefinition {
 pub(crate) struct PluginYDefinition;
 
 impl Plugin for PluginYDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        scale_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scale_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {

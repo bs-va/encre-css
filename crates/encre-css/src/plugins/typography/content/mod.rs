@@ -16,10 +16,7 @@ impl Plugin for PluginDefinition {
     fn handle(&self, context: &mut ContextHandle) {
         match context.modifier {
             Modifier::Builtin { .. } => {
-                context.buffer.lines([
-                    format_args!("--en-content: none;"),
-                    format_args!("content: var(--en-content);"),
-                ]);
+                context.buffer.line(format_args!("--en-content: none;"));
             }
             Modifier::Arbitrary { value, .. } => {
                 context.buffer.line(format_args!("--en-content: {value};"));

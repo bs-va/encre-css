@@ -19,7 +19,7 @@ numbers are supported. They are however perfectly compatible with Tailwind's val
 
 ### Arbitrary values
 
-Any [`<length>`](crate::utils::value_matchers::is_matching_length) property or a keyword among `thin`, `medium` and `thick` is allowed as arbitrary value.
+Any [`<length>`](crate::utils::value_matchers::is_matching_length) or [`line width`](crate::utils::value_matchers::is_matching_line_width) property is allowed as arbitrary value.
 For example, `outline-[2em]`.
 
 [Tailwind reference](https://tailwindcss.com/docs/outline-width)

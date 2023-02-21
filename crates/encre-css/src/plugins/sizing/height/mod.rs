@@ -14,7 +14,9 @@ impl Plugin for PluginDefinition {
                 spacing::is_matching_builtin_spacing(value)
                     || ["full", "screen", "min", "max", "fit", "auto"].contains(value)
             }
-            Modifier::Arbitrary { value, .. } => is_matching_length(value),
+            Modifier::Arbitrary { value, .. } => {
+                is_matching_length(value) || is_matching_percentage(value)
+            }
         }
     }
 
@@ -24,12 +26,12 @@ impl Plugin for PluginDefinition {
                 context.buffer.line(format_args!(
                     "height: {};",
                     match *value {
-                        "auto" => Cow::from("auto"),
-                        "full" => Cow::from("100%"),
-                        "screen" => Cow::from("100vh"),
-                        "min" => Cow::from("min-content"),
-                        "max" => Cow::from("max-content"),
-                        "fit" => Cow::from("fit-content"),
+                        "auto" => Cow::Borrowed("auto"),
+                        "full" => Cow::Borrowed("100%"),
+                        "screen" => Cow::Borrowed("100vh"),
+                        "min" => Cow::Borrowed("min-content"),
+                        "max" => Cow::Borrowed("max-content"),
+                        "fit" => Cow::Borrowed("fit-content"),
                         _ => spacing::get(value, *is_negative).unwrap(),
                     },
                 ));

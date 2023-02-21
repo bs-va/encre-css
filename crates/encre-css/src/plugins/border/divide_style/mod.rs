@@ -7,12 +7,7 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => {
-                ["solid", "dashed", "dotted", "double", "none"].contains(value)
-            }
-            Modifier::Arbitrary { .. } => false,
-        }
+        matches!(context.modifier, Modifier::Builtin { value, .. } if ["solid", "dashed", "dotted", "double", "none"].contains(value))
     }
 
     fn needs_wrapping(&self) -> bool {

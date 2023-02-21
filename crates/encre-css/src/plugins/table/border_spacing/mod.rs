@@ -2,10 +2,10 @@
 #![doc(alias = "table")]
 use crate::prelude::build_plugin::*;
 
-fn border_spacing_can_handle(context: &mut ContextCanHandle) -> bool {
+fn border_spacing_can_handle(context: &ContextCanHandle) -> bool {
     match context.modifier {
         Modifier::Builtin { value, .. } => spacing::is_matching_builtin_spacing(value),
-        Modifier::Arbitrary { value, .. } => is_matching_length(value),
+        Modifier::Arbitrary { value, prefix, .. } => prefix.is_empty() && is_matching_length(value),
     }
 }
 
@@ -22,7 +22,7 @@ fn border_spacing_handle(css_props: &[&str], context: &mut ContextHandle) {
         }
         Modifier::Arbitrary { value, .. } => {
             for css_prop in css_props {
-                context.buffer.line(format_args!("{css_prop}: {value}"));
+                context.buffer.line(format_args!("{css_prop}: {value};"));
             }
         }
     }
@@ -36,8 +36,8 @@ fn border_spacing_handle(css_props: &[&str], context: &mut ContextHandle) {
 pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        border_spacing_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        border_spacing_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -49,8 +49,8 @@ impl Plugin for PluginDefinition {
 pub(crate) struct PluginXDefinition;
 
 impl Plugin for PluginXDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        border_spacing_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        border_spacing_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -62,8 +62,8 @@ impl Plugin for PluginXDefinition {
 pub(crate) struct PluginYDefinition;
 
 impl Plugin for PluginYDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        border_spacing_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        border_spacing_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {

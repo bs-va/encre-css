@@ -18,13 +18,15 @@ impl Plugin for PluginDefinition {
 
     fn handle(&self, context: &mut ContextHandle) {
         match context.modifier {
-            Modifier::Builtin { value, .. } => match *value {
-                "border" => context.buffer.line("background-clip: border-box;"),
-                "padding" => context.buffer.line("background-clip: padding-box;"),
-                "content" => context.buffer.line("background-clip: content-box;"),
-                "text" => context.buffer.line("background-clip: text;"),
-                _ => unreachable!(),
-            },
+            Modifier::Builtin { value, .. } => context.buffer.line(format_args!(
+                "background-clip: {};",
+                match *value {
+                    "border" => "border-box",
+                    "padding" => "padding-box",
+                    "content" => "content-box",
+                    _ => value,
+                }
+            )),
             Modifier::Arbitrary { .. } => unreachable!(),
         }
     }

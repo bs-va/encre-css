@@ -2,6 +2,8 @@
 #![doc(alias("sizing", "size"))]
 use crate::prelude::build_plugin::*;
 
+use std::borrow::Cow;
+
 #[derive(Debug)]
 pub(crate) struct PluginDefinition;
 
@@ -9,26 +11,31 @@ impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         match context.modifier {
             Modifier::Builtin { value, .. } => {
-                ["full", "min", "max", "fit", "screen"].contains(&&**value)
-                    || spacing::is_matching_builtin_spacing(value)
+                spacing::is_matching_builtin_spacing(value)
+                    || ["full", "screen", "min", "max", "fit", "auto"].contains(value)
             }
-            Modifier::Arbitrary { value, .. } => is_matching_length(value),
+            Modifier::Arbitrary { value, .. } => {
+                is_matching_length(value) || is_matching_percentage(value)
+            }
         }
     }
 
     fn handle(&self, context: &mut ContextHandle) {
         match context.modifier {
-            Modifier::Builtin { is_negative, value } => match *value {
-                "full" => context.buffer.line("min-width: 100%;"),
-                "min" => context.buffer.line("min-width: min-content;"),
-                "max" => context.buffer.line("min-width: max-content;"),
-                "fit" => context.buffer.line("min-width: fit-content;"),
-                "screen" => context.buffer.line("min-width: 100vw;"),
-                _ => context.buffer.line(format_args!(
+            Modifier::Builtin { is_negative, value } => {
+                context.buffer.line(format_args!(
                     "min-width: {};",
-                    spacing::get(value, *is_negative).unwrap()
-                )),
-            },
+                    match *value {
+                        "auto" => Cow::Borrowed("auto"),
+                        "full" => Cow::Borrowed("100%"),
+                        "screen" => Cow::Borrowed("100vw"),
+                        "min" => Cow::Borrowed("min-content"),
+                        "max" => Cow::Borrowed("max-content"),
+                        "fit" => Cow::Borrowed("fit-content"),
+                        _ => spacing::get(value, *is_negative).unwrap(),
+                    },
+                ));
+            }
             Modifier::Arbitrary { value, .. } => {
                 context.buffer.line(format_args!("min-width: {value};"));
             }

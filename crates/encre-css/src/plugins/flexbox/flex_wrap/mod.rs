@@ -18,12 +18,9 @@ impl Plugin for PluginDefinition {
 
     fn handle(&self, context: &mut ContextHandle) {
         match context.modifier {
-            Modifier::Builtin { value, .. } => match *value {
-                "nowrap" => context.buffer.line("flex-wrap: nowrap;"),
-                "wrap" => context.buffer.line("flex-wrap: wrap;"),
-                "wrap-reverse" => context.buffer.line("flex-wrap: wrap-reverse;"),
-                _ => unreachable!(),
-            },
+            Modifier::Builtin { value, .. } => {
+                context.buffer.line(format_args!("flex-wrap: {value};"))
+            }
             Modifier::Arbitrary { .. } => unreachable!(),
         }
     }

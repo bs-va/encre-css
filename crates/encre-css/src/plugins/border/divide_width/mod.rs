@@ -35,27 +35,27 @@ impl Plugin for PluginXDefinition {
                             return context.buffer.line("--en-divide-x-reverse: 1;");
                         }
 
-                        context.buffer.line("--en-divide-x-reverse: 0;");
-
-                        context.buffer.line(format_args!(
-                            "border-right-width: calc({value}px * var(--en-divide-x-reverse));",
-                            value = if value.is_empty() { "1" } else { value }
-                        ));
-                        context.buffer.line(
-                                format_args!(
-                                    "border-left-width: calc({value}px * calc(1 - var(--en-divide-x-reverse)));",
-                                    value = if value.is_empty() { "1" } else { value }
-                                ));
+                        let value = if value.is_empty() { "1" } else { value };
+                        context.buffer.lines([
+                            format_args!("--en-divide-x-reverse: 0;"),
+                            format_args!(
+                                "border-right-width: calc({value}px * var(--en-divide-x-reverse));",
+                            ),
+                            format_args!(
+                                "border-left-width: calc({value}px * calc(1 - var(--en-divide-x-reverse)));",
+                            ),
+                        ]);
                     }
                     Modifier::Arbitrary { value, .. } => {
-                        context.buffer.line("--en-divide-x-reverse: 0;");
-
-                        context.buffer.line(format_args!(
-                            "border-right-width: calc({value} * var(--en-divide-x-reverse));"
-                        ));
-                        context.buffer.line(format_args!(
-                            "border-left-width: calc({value} * calc(1 - var(--en-divide-x-reverse)));"
-                        ));
+                        context.buffer.lines([
+                            format_args!("--en-divide-x-reverse: 0;"),
+                            format_args!(
+                                "border-right-width: calc({value} * var(--en-divide-x-reverse));"
+                            ),
+                            format_args!(
+                                "border-left-width: calc({value} * calc(1 - var(--en-divide-x-reverse)));"
+                            ),
+                        ]);
                     }
                 },
                 " > :not([hidden]) ~ :not([hidden])",
@@ -83,33 +83,30 @@ impl Plugin for PluginYDefinition {
                 |context| match context.modifier {
                     Modifier::Builtin { value, .. } => {
                         if *value == "reverse" {
-                            context.buffer.line("--en-divide-y-reverse: 1;");
-                            return;
+                            return context.buffer.line("--en-divide-y-reverse: 1;");
                         }
 
-                        context.buffer.line("--en-divide-y-reverse: 0;");
-
-                        context.buffer.line(
+                        let value = if value.is_empty() { "1" } else { value };
+                        context.buffer.lines([
+                            format_args!("--en-divide-y-reverse: 0;"),
                             format_args!(
                                 "border-top-width: calc({value}px * calc(1 - var(--en-divide-y-reverse)));",
-                                value = if value.is_empty() { "1" } else { value }
-                            )
-                        );
-                        context.buffer.line(format_args!(
-                            "border-bottom-width: calc({value}px * var(--en-divide-y-reverse));",
-                            value = if value.is_empty() { "1" } else { value }
-                        ));
+                            ),
+                            format_args!(
+                                "border-bottom-width: calc({value}px * var(--en-divide-y-reverse));",
+                            ),
+                        ]);
                     }
                     Modifier::Arbitrary { value, .. } => {
-                        context.buffer.line("--en-divide-y-reverse: 0;");
-                        context.buffer.line(
-                                    format_args!(
-                                        "border-top-width: calc({value} * calc(1 - var(--en-divide-y-reverse)));"
-                                    )
-                                );
-                        context.buffer.line(format_args!(
-                            "border-bottom-width: calc({value} * var(--en-divide-y-reverse));"
-                        ));
+                        context.buffer.lines([
+                            format_args!("--en-divide-y-reverse: 0;"),
+                            format_args!(
+                                "border-top-width: calc({value} * calc(1 - var(--en-divide-y-reverse)));"
+                            ),
+                            format_args!(
+                                "border-bottom-width: calc({value} * var(--en-divide-y-reverse));"
+                            ),
+                        ]);
                     }
                 },
                 " > :not([hidden]) ~ :not([hidden])",

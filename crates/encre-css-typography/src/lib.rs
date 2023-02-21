@@ -1065,14 +1065,11 @@ pub struct Prose;
 
 impl Plugin for Prose {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => [
+        matches!(context.modifier, Modifier::Builtin { value, .. } if [
                 "", "sm", "base", "lg", "xl", "2xl", "gray", "slate", "zinc", "neutral", "stone",
                 "invert",
             ]
-            .contains(value),
-            Modifier::Arbitrary { .. } => false,
-        }
+            .contains(value))
     }
 
     fn needs_wrapping(&self) -> bool {
@@ -1230,6 +1227,7 @@ pub fn register(config: &mut Config) {
 #[cfg(test)]
 mod tests {
     use encre_css::{Config, EncreGenerator};
+
     use std::fs;
 
     #[test]
@@ -1243,6 +1241,6 @@ mod tests {
         let mut generator = EncreGenerator::new(&config);
         generator.scan(&content);
 
-        assert_eq!(generator.generate(), expected);
+        assert_eq!(generator.generate(), expected.trim_end());
     }
 }

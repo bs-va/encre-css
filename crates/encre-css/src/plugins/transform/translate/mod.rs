@@ -5,7 +5,7 @@ use crate::prelude::build_plugin::*;
 
 use std::borrow::Cow;
 
-fn translate_can_handle(context: &mut ContextCanHandle) -> bool {
+fn translate_can_handle(context: &ContextCanHandle) -> bool {
     match context.modifier {
         Modifier::Builtin { value, .. } => {
             spacing::is_matching_builtin_spacing(value) || *value == "auto" || *value == "full"
@@ -41,8 +41,8 @@ fn translate_handle(css_prop: &str, context: &mut ContextHandle) {
 pub(crate) struct PluginXDefinition;
 
 impl Plugin for PluginXDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        translate_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        translate_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -54,8 +54,8 @@ impl Plugin for PluginXDefinition {
 pub(crate) struct PluginYDefinition;
 
 impl Plugin for PluginYDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        translate_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        translate_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {

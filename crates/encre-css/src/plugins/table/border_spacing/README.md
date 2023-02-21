@@ -27,7 +27,7 @@ spacing values are supported. They are however perfectly compatible with Tailwin
 
 ### Arbitrary values
 
-Any [`<length>`](crate::utils::value_matchers::is_matching_length) property is allowed as arbitrary value.
-For example, `border-spacing-[1.3em]`.
+Any [`<length>`](crate::utils::value_matchers::is_matching_length) or `<length>_<length>` property is allowed as arbitrary value.
+For example, `border-spacing-[1.3em]` or `border-spacing-[12px_25px]`.
 
 [Tailwind reference](https://tailwindcss.com/docs/border-spacing)

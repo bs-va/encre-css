@@ -27,7 +27,7 @@ are supported. They are however perfectly compatible with Tailwind's values.
 
 ### Arbitrary values
 
-Any [`<length>`](crate::utils::value_matchers::is_matching_length) property is allowed as arbitrary value.
+Any [`<length>`](crate::utils::value_matchers::is_matching_length) or [`<percentage>`](crate::utils::value_matchers::is_matching_percentage) property is allowed as arbitrary value.
 For example, `w-[42mm]`.
 
 [Tailwind reference](https://tailwindcss.com/docs/width)

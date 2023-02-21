@@ -11,8 +11,13 @@ impl Plugin for PluginDefinition {
             Modifier::Builtin { value, .. } => {
                 value.is_empty() || *value == "inset" || value.parse::<usize>().is_ok()
             }
-            Modifier::Arbitrary { hint, value, .. } => {
-                *hint == "length" || (hint.is_empty() && is_matching_length(value))
+            Modifier::Arbitrary {
+                hint,
+                value,
+                prefix,
+            } => {
+                prefix.is_empty()
+                    && (*hint == "length" || (hint.is_empty() && is_matching_length(value)))
             }
         }
     }

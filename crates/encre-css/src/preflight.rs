@@ -1041,4 +1041,20 @@ img, video {
 }"
         );
     }
+
+    #[test]
+    fn no_preflight() {
+        let mut config = Config::default();
+        config.preflight = Preflight::new_none();
+
+        let mut generator = EncreGenerator::new(&config);
+        generator.add_selector("w-full");
+
+        assert_eq!(
+            generator.generate(),
+            ".w-full {
+  width: 100%;
+}"
+        );
+    }
 }

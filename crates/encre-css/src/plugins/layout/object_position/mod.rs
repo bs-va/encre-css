@@ -7,21 +7,23 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        matches!(
-            context.modifier,
-            Modifier::Builtin {
-                value: "bottom"
-                    | "center"
-                    | "left"
-                    | "left-bottom"
-                    | "left-top"
-                    | "right"
-                    | "right-bottom"
-                    | "right-top"
-                    | "top",
-                ..
+        match context.modifier {
+            Modifier::Builtin { value, .. } => [
+                "bottom",
+                "center",
+                "left",
+                "left-bottom",
+                "left-top",
+                "right",
+                "right-bottom",
+                "right-top",
+                "top",
+            ]
+            .contains(value),
+            Modifier::Arbitrary { hint, value, .. } => {
+                *hint == "position" || (hint.is_empty() && is_matching_position(value))
             }
-        )
+        }
     }
 
     fn handle(&self, context: &mut ContextHandle) {

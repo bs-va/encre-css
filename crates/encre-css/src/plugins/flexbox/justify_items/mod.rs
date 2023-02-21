@@ -10,7 +10,7 @@ impl Plugin for PluginDefinition {
         matches!(
             context.modifier,
             Modifier::Builtin {
-                value: "stretch" | "start" | "center" | "end" | "auto",
+                value: "stretch" | "start" | "center" | "end",
                 ..
             }
         )

@@ -9,15 +9,16 @@ impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         match context.modifier {
             Modifier::Builtin { value, .. } => value.parse::<usize>().is_ok(),
-            Modifier::Arbitrary { hint, value, .. } => {
-                *hint == "length"
-                    || *hint == "number"
-                    || *hint == "percentage"
-                    || (hint.is_empty()
-                        && (is_matching_length(value)
-                            || is_matching_number(value)
-                            || is_matching_percentage(value)
-                            || ["thin", "medium", "thick"].contains(&&**value)))
+            Modifier::Arbitrary {
+                hint,
+                value,
+                prefix,
+            } => {
+                prefix.is_empty()
+                    && (*hint == "length"
+                        || *hint == "line-width"
+                        || (hint.is_empty()
+                            && (is_matching_length(value) || is_matching_line_width(value))))
             }
         }
     }

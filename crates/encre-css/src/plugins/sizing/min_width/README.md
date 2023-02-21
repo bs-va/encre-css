@@ -11,6 +11,7 @@ Utilities for setting the minimum width of an element.
     <tr><td>min-w-<i>&lt;float&gt;</i></td><td>min-width: <i>&lt;float / 4&gt;</i>rem;</td></tr>
     <tr><td>min-w-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>min-width: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
     <tr><td>min-w-px</td><td>min-width: 1px;</td></tr>
+    <tr><td>min-w-auto</td><td>min-width: auto;</td></tr>
     <tr><td>min-w-full</td><td>min-width: 100%;</td></tr>
     <tr><td>min-w-screen</td><td>min-width: 100vw;</td></tr>
     <tr><td>min-w-min</td><td>min-width: min-content;</td></tr>
@@ -27,7 +28,7 @@ Tailwind's values.
 
 ### Arbitrary values
 
-Any [`<length>`](crate::utils::value_matchers::is_matching_length) property is allowed as arbitrary value.
+Any [`<length>`](crate::utils::value_matchers::is_matching_length) or [`<percentage>`](crate::utils::value_matchers::is_matching_percentage) property is allowed as arbitrary value.
 For example, `min-w-[4.2in]`.
 
 [Tailwind reference](https://tailwindcss.com/docs/min-width)

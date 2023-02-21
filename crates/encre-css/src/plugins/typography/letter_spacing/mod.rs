@@ -17,15 +17,18 @@ impl Plugin for PluginDefinition {
 
     fn handle(&self, context: &mut ContextHandle) {
         match context.modifier {
-            Modifier::Builtin { value, .. } => match *value {
-                "tighter" => context.buffer.line("letter-spacing: -0.05em;"),
-                "tight" => context.buffer.line("letter-spacing: -0.025em;"),
-                "normal" => context.buffer.line("letter-spacing: 0;"),
-                "wide" => context.buffer.line("letter-spacing: 0.025em;"),
-                "wider" => context.buffer.line("letter-spacing: 0.05em;"),
-                "widest" => context.buffer.line("letter-spacing: 0.1em;"),
-                _ => unreachable!(),
-            },
+            Modifier::Builtin { value, .. } => context.buffer.line(format_args!(
+                "letter-spacing: {};",
+                match *value {
+                    "tighter" => "-0.05em",
+                    "tight" => "-0.025em",
+                    "normal" => "0",
+                    "wide" => "0.025em",
+                    "wider" => "0.05em",
+                    "widest" => "0.1em",
+                    _ => unreachable!(),
+                }
+            )),
             Modifier::Arbitrary { value, .. } => {
                 context
                     .buffer

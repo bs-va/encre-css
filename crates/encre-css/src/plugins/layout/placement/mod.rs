@@ -4,13 +4,14 @@ use crate::prelude::build_plugin::*;
 
 use std::borrow::Cow;
 
-fn placement_can_handle(context: &mut ContextCanHandle) -> bool {
+fn placement_can_handle(context: &ContextCanHandle) -> bool {
     match context.modifier {
         Modifier::Builtin { value, .. } => {
             spacing::is_matching_builtin_spacing(value) || *value == "auto" || *value == "full"
         }
-        Modifier::Arbitrary { value, .. } => {
-            is_matching_length(value) || is_matching_percentage(value) || *value == "auto"
+        Modifier::Arbitrary { value, prefix, .. } => {
+            prefix.is_empty()
+                && (is_matching_length(value) || is_matching_percentage(value) || *value == "auto")
         }
     }
 }
@@ -45,21 +46,11 @@ pub(crate) struct PluginInsetDefinition;
 
 impl Plugin for PluginInsetDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => {
-                spacing::is_matching_builtin_spacing(value) || *value == "auto" || *value == "full"
-            }
-            Modifier::Arbitrary { prefix, value, .. } => {
-                prefix.is_empty()
-                    && (is_matching_length(value)
-                        || is_matching_percentage(value)
-                        || *value == "auto")
-            }
-        }
+        placement_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        placement_handle(&["top", "bottom", "left", "right"], context);
+        placement_handle(&["top", "right", "bottom", "left"], context);
     }
 }
 
@@ -67,8 +58,8 @@ impl Plugin for PluginInsetDefinition {
 pub(crate) struct PluginInsetXDefinition;
 
 impl Plugin for PluginInsetXDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        placement_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        placement_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -80,8 +71,8 @@ impl Plugin for PluginInsetXDefinition {
 pub(crate) struct PluginInsetYDefinition;
 
 impl Plugin for PluginInsetYDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        placement_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        placement_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -93,8 +84,8 @@ impl Plugin for PluginInsetYDefinition {
 pub(crate) struct PluginTopDefinition;
 
 impl Plugin for PluginTopDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        placement_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        placement_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -106,8 +97,8 @@ impl Plugin for PluginTopDefinition {
 pub(crate) struct PluginBottomDefinition;
 
 impl Plugin for PluginBottomDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        placement_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        placement_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -119,8 +110,8 @@ impl Plugin for PluginBottomDefinition {
 pub(crate) struct PluginLeftDefinition;
 
 impl Plugin for PluginLeftDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        placement_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        placement_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -132,8 +123,8 @@ impl Plugin for PluginLeftDefinition {
 pub(crate) struct PluginRightDefinition;
 
 impl Plugin for PluginRightDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        placement_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        placement_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {

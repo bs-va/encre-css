@@ -21,7 +21,10 @@ impl Plugin for PluginDefinition {
             ]
             .contains(value),
             Modifier::Arbitrary { hint, value, .. } => {
-                // https://developer.mozilla.org/en-US/docs/Web/CSS/background-position
+                // TailwindCSS uses a dedicated `preferOnConflict` variable for choosing this
+                // plugin instead of the `background_size` plugin (https://github.com/tailwindlabs/tailwindcss/blob/master/src/corePlugins.js#L1816)
+                // We can't and won't reproduce this behavior, so the `bg-size` will be chosen when
+                // the `position` hint is not specified
                 *hint == "position"
                     || (hint.is_empty() && value.split(',').all(is_matching_position))
             }
@@ -30,18 +33,10 @@ impl Plugin for PluginDefinition {
 
     fn handle(&self, context: &mut ContextHandle) {
         match context.modifier {
-            Modifier::Builtin { value, .. } => match *value {
-                "bottom" => context.buffer.line("background-position: bottom;"),
-                "center" => context.buffer.line("background-position: center;"),
-                "left" => context.buffer.line("background-position: left;"),
-                "left-bottom" => context.buffer.line("background-position: left-bottom;"),
-                "left-top" => context.buffer.line("background-position: left-top;"),
-                "right" => context.buffer.line("background-position: right;"),
-                "right-bottom" => context.buffer.line("background-position: right-bottom;"),
-                "right-top" => context.buffer.line("background-position: right-top;"),
-                "top" => context.buffer.line("background-position: top;"),
-                _ => unreachable!(),
-            },
+            Modifier::Builtin { value, .. } => context.buffer.line(format_args!(
+                "background-position: {};",
+                value.replace('-', " ")
+            )),
             Modifier::Arbitrary { value, .. } => {
                 context
                     .buffer

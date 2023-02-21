@@ -11,8 +11,13 @@ impl Plugin for PluginDefinition {
             Modifier::Builtin { value, .. } => {
                 color::is_matching_builtin_color(context.config, value)
             }
-            Modifier::Arbitrary { hint, value, .. } => {
-                *hint == "color" || (hint.is_empty() && is_matching_color(value))
+            Modifier::Arbitrary {
+                hint,
+                value,
+                prefix,
+            } => {
+                prefix.is_empty()
+                    && (*hint == "color" || (hint.is_empty() && is_matching_color(value)))
             }
         }
     }

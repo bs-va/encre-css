@@ -8,7 +8,7 @@ pub(crate) struct PluginDefinition;
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         match context.modifier {
-            Modifier::Builtin { value, .. } => value.parse::<usize>().is_ok(),
+            Modifier::Builtin { value, .. } => ["linear", "in", "out", "in-out"].contains(value),
             Modifier::Arbitrary { value, .. } => is_matching_all(value),
         }
     }

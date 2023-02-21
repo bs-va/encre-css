@@ -2,15 +2,18 @@
 #![doc(alias("border", "rounded"))]
 use crate::prelude::build_plugin::*;
 
-fn radius_can_handle(context: &mut ContextCanHandle) -> bool {
+fn radius_can_handle(context: &ContextCanHandle) -> bool {
     match context.modifier {
         Modifier::Builtin { value, .. } => {
             value.is_empty()
                 || ["sm", "md", "lg", "xl", "2xl", "3xl", "full", "none"].contains(&&**value)
         }
-        Modifier::Arbitrary { value, .. } => value
-            .split(' ')
-            .all(|v| is_matching_length(v) || is_matching_percentage(v)),
+        Modifier::Arbitrary { value, prefix, .. } => {
+            prefix.is_empty()
+                && value
+                    .split(' ')
+                    .all(|v| is_matching_length(v) || is_matching_percentage(v))
+        }
     }
 }
 
@@ -49,18 +52,7 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => {
-                value.is_empty()
-                    || ["sm", "md", "lg", "xl", "2xl", "3xl", "full", "none"].contains(&&**value)
-            }
-            Modifier::Arbitrary { prefix, value, .. } => {
-                prefix.is_empty()
-                    && value
-                        .split(' ')
-                        .all(|v| is_matching_length(v) || is_matching_percentage(v))
-            }
-        }
+        radius_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -72,8 +64,8 @@ impl Plugin for PluginDefinition {
 pub(crate) struct PluginTopRightDefinition;
 
 impl Plugin for PluginTopRightDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        radius_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -85,8 +77,8 @@ impl Plugin for PluginTopRightDefinition {
 pub(crate) struct PluginTopLeftDefinition;
 
 impl Plugin for PluginTopLeftDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        radius_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -98,8 +90,8 @@ impl Plugin for PluginTopLeftDefinition {
 pub(crate) struct PluginBottomRightDefinition;
 
 impl Plugin for PluginBottomRightDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        radius_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -111,8 +103,8 @@ impl Plugin for PluginBottomRightDefinition {
 pub(crate) struct PluginBottomLeftDefinition;
 
 impl Plugin for PluginBottomLeftDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        radius_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -124,8 +116,8 @@ impl Plugin for PluginBottomLeftDefinition {
 pub(crate) struct PluginTopDefinition;
 
 impl Plugin for PluginTopDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        radius_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -140,8 +132,8 @@ impl Plugin for PluginTopDefinition {
 pub(crate) struct PluginBottomDefinition;
 
 impl Plugin for PluginBottomDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        radius_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -156,8 +148,8 @@ impl Plugin for PluginBottomDefinition {
 pub(crate) struct PluginLeftDefinition;
 
 impl Plugin for PluginLeftDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        radius_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -172,8 +164,8 @@ impl Plugin for PluginLeftDefinition {
 pub(crate) struct PluginRightDefinition;
 
 impl Plugin for PluginRightDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        radius_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {

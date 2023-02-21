@@ -62,7 +62,7 @@ impl Plugin for PluginDefinition {
                         "--en-shadow-colored: inset 0 2px 4px 0 var(--en-shadow-color);",
                     ]);
                 }
-                "none" => context.buffer.line("box-shadow: none;"),
+                "none" => return context.buffer.line("box-shadow: none;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {

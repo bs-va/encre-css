@@ -33,10 +33,10 @@ impl Plugin for PluginXDefinition {
 
                         let length = spacing::get(value, *is_negative).unwrap();
                         context.buffer.lines([
-                                format_args!("--en-space-x-reverse: 0;"),
-                                format_args!("margin-right: calc({length} * var(--en-space-x-reverse));"),
-                                format_args!("margin-left: calc({length} * calc(1 - var(--en-space-x-reverse)));"),
-                            ]);
+                            format_args!("--en-space-x-reverse: 0;"),
+                            format_args!("margin-right: calc({length} * var(--en-space-x-reverse));"),
+                            format_args!("margin-left: calc({length} * calc(1 - var(--en-space-x-reverse)));"),
+                        ]);
                     }
                     Modifier::Arbitrary { value, .. } => {
                         context.buffer.lines([

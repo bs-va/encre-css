@@ -9,7 +9,7 @@ impl Plugin for PluginDefinition {
         matches!(
             context.modifier,
             Modifier::Builtin {
-                value: "normal" | "words" | "all",
+                value: "normal" | "words" | "all" | "keep",
                 ..
             }
         )
@@ -25,6 +25,7 @@ impl Plugin for PluginDefinition {
                 }
                 "words" => context.buffer.line("overflow-wrap: break-word;"),
                 "all" => context.buffer.line("word-break: break-all;"),
+                "keep" => context.buffer.line("word-break: keep-all;"),
                 _ => unreachable!(),
             }
         }

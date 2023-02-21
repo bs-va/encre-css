@@ -22,7 +22,7 @@ impl Plugin for PluginDefinition {
             .contains(&&**value),
             Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "number"
-                    && (hint.is_empty()
+                    || (hint.is_empty()
                         && (["normal", "bold", "lighter", "bolder"].contains(&&**value)
                             || is_matching_number(value)
                             || is_matching_var(value)))

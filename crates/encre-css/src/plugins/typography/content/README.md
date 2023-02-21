@@ -12,10 +12,15 @@ Utilities for controlling the content of the before and after pseudo-elements.
   </tbody>
 </table>
 
+### Note
+
+The `content` utility must be used in combination with either the `before` or
+the `after` variant to work.
+
 ### Arbitrary values
 
 Any property is allowed as arbitrary value. It is more over the only way of
 setting the content.
-For example, `content-['Hello_world!']`.
+For example, `before:content-['Hello_world!']` or `after:content-[url('foobar.png')]`.
 
 [Tailwind reference](https://tailwindcss.com/docs/content)

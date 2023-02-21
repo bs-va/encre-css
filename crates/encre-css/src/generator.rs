@@ -394,17 +394,10 @@ impl<'a> EncreGenerator<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::config::DarkMode;
+    use crate::{config::DarkMode, utils::testing::base_config};
 
     use pretty_assertions::assert_eq;
     use std::collections::BTreeSet;
-
-    fn base_config() -> Config {
-        // Disable the preflight to simplify test assertions
-        let mut config = Config::default();
-        config.preflight = Preflight::None;
-        config
-    }
 
     #[test]
     fn simple_scan() {
@@ -656,13 +649,13 @@ mod tests {
     fn gen_css_for_simple_selector() {
         let config = base_config();
         let mut generator = EncreGenerator::new(&config);
-        generator.add_selector("w-full");
+        generator.add_selector("text-current");
 
         assert_eq!(
             generator.generate(),
             String::from(
-                r#".w-full {
-  width: 100%;
+                r#".text-current {
+  color: currentColor;
 }"#,
             )
         );

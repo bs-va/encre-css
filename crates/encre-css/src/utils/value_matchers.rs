@@ -25,7 +25,7 @@ const ABSOLUTE_SIZES: [&str; 8] = [
     "medium",
     "large",
     "x-large",
-    "x-large",
+    "xx-large",
     "xxx-large",
 ];
 const RELATIVE_SIZES: [&str; 2] = ["larger", "smaller"];
@@ -233,10 +233,10 @@ pub fn is_matching_var(value: &str) -> bool {
 ///
 /// ```
 /// use encre_css::utils::value_matchers::is_matching_shadow;
-/// assert!(is_matching_shadow("1px_2rem_10px_10px_rgb(12,12,12)"));
+/// assert!(is_matching_shadow("1px 2rem 10px 10px rgb(12,12,12)"));
 /// ```
 pub fn is_matching_shadow(value: &str) -> bool {
-    ShadowList::parse(&value.replace('_', " ")).is_some()
+    ShadowList::parse(value).is_some()
 }
 
 /// Returns whether the CSS value is an [`absolute size`](https://developer.mozilla.org/en-US/docs/Web/CSS/font-size#values).
@@ -334,7 +334,7 @@ pub fn is_matching_color(value: &str) -> bool {
 /// assert!(is_matching_length("300px"));
 /// ```
 pub fn is_matching_length(value: &str) -> bool {
-    value.split('_').all(|v| {
+    value.split(' ').all(|v| {
         v == "0"
             || LENGTH_UNITS.iter().any(|u| v.ends_with(u))
             || is_matching_computational_css_function(value)
@@ -407,7 +407,7 @@ pub fn is_matching_gradient(value: &str) -> bool {
 /// ```
 pub fn is_matching_position(value: &str) -> bool {
     value
-        .split('_')
+        .split(' ')
         .all(|v| VALID_POSITIONS.contains(&v) || is_matching_length(v) || is_matching_percentage(v))
         || is_matching_base(value)
 }
@@ -453,16 +453,16 @@ mod tests {
         assert!(is_matching_color("#333"));
         assert!(is_matching_color("#121212"));
         assert!(is_matching_color("rgb(12.12,12,12)"));
-        assert!(is_matching_color("rgb(12_12_12)"));
-        assert!(is_matching_color("rgb(12_12_12/0.1)"));
-        assert!(is_matching_color("rgb(12_12_12_/_0.1)"));
+        assert!(is_matching_color("rgb(12 12 12)"));
+        assert!(is_matching_color("rgb(12 12 12/0.1)"));
+        assert!(is_matching_color("rgb(12 12 12 / 0.1)"));
         assert!(is_matching_color("rgb(var(--blue),12,12)"));
-        assert!(is_matching_color("rgb(12_12_12_/_var(--opacity))"));
+        assert!(is_matching_color("rgb(12 12 12 / var(--opacity))"));
         assert!(is_matching_color("rgba(12,12,12,0.12)"));
         assert!(is_matching_color("hsl(360,100%,50%)"));
         assert!(is_matching_color("hsl(3.14rad,100%,50%)"));
-        assert!(is_matching_color("hsl(3.14rad_100%_50%/0.42)"));
-        assert!(is_matching_color("hsl(var(--hue)_12%_42%/var(--opacity))"));
+        assert!(is_matching_color("hsl(3.14rad 100% 50%/0.42)"));
+        assert!(is_matching_color("hsl(var(--hue) 12% 42%/var(--opacity))"));
         assert!(is_matching_color("hsla(360,100%,50%,0.12)"));
     }
 
@@ -477,10 +477,10 @@ mod tests {
 
     #[test]
     fn is_matching_shadow_with_functions_test() {
-        assert!(is_matching_shadow("10px_10px_min(1px,2px)_10px_rgb(1,1,1)"));
-        assert!(is_matching_shadow("inset_0_-3em_3em_rgba(0,0,0,0.1),0_0_0_2px_rgb(255,255,255),0.3em_0.3em_1em_rgba(0,0,0,0.3)"));
+        assert!(is_matching_shadow("10px 10px min(1px,2px) 10px rgb(1,1,1)"));
+        assert!(is_matching_shadow("inset 0 -3em 3em rgba(0,0,0,0.1),0 0 0 2px rgb(255,255,255),0.3em 0.3em 1em rgba(0,0,0,0.3)"));
         assert!(is_matching_shadow(
-            "var(--a,_0_0_1px_rgb(0,_0,_0)),_0_0_1px_rgb(0,_0,_0)"
+            "var(--a, 0 0 1px rgb(0, 0, 0)), 0 0 1px rgb(0, 0, 0)"
         ));
     }
 }

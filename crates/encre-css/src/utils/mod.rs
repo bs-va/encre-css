@@ -16,6 +16,9 @@ pub mod shadow;
 pub mod spacing;
 pub mod value_matchers;
 
+#[cfg(test)]
+pub(crate) mod testing;
+
 /// Quickly format a negative value (returns "-" if true or "" otherwise).
 pub fn format_negative(is_negative: &bool) -> &'static str {
     if *is_negative {

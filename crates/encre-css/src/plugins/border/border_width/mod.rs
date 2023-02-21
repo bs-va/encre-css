@@ -2,13 +2,19 @@
 #![doc(alias = "border")]
 use crate::prelude::build_plugin::*;
 
-fn width_can_handle(context: &mut ContextCanHandle) -> bool {
+fn width_can_handle(context: &ContextCanHandle) -> bool {
     match context.modifier {
         Modifier::Builtin { value, .. } => value.is_empty() || value.parse::<usize>().is_ok(),
-        Modifier::Arbitrary { hint, value, .. } => {
-            *hint == "length"
-                || *hint == "line-width"
-                || (hint.is_empty() && (is_matching_length(value) || is_matching_line_width(value)))
+        Modifier::Arbitrary {
+            hint,
+            value,
+            prefix,
+        } => {
+            prefix.is_empty()
+                && (*hint == "length"
+                    || *hint == "line-width"
+                    || (hint.is_empty()
+                        && (is_matching_length(value) || is_matching_line_width(value))))
         }
     }
 }
@@ -37,21 +43,7 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => value.is_empty() || value.parse::<usize>().is_ok(),
-            Modifier::Arbitrary {
-                prefix,
-                hint,
-                value,
-                ..
-            } => {
-                prefix.is_empty()
-                    && (*hint == "length"
-                        || *hint == "line-width"
-                        || (hint.is_empty()
-                            && (is_matching_length(value) || is_matching_line_width(value))))
-            }
-        }
+        width_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -63,8 +55,8 @@ impl Plugin for PluginDefinition {
 pub(crate) struct PluginTopDefinition;
 
 impl Plugin for PluginTopDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        width_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        width_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -76,8 +68,8 @@ impl Plugin for PluginTopDefinition {
 pub(crate) struct PluginBottomDefinition;
 
 impl Plugin for PluginBottomDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        width_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        width_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -89,8 +81,8 @@ impl Plugin for PluginBottomDefinition {
 pub(crate) struct PluginLeftDefinition;
 
 impl Plugin for PluginLeftDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        width_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        width_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -102,8 +94,8 @@ impl Plugin for PluginLeftDefinition {
 pub(crate) struct PluginRightDefinition;
 
 impl Plugin for PluginRightDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        width_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        width_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -115,8 +107,8 @@ impl Plugin for PluginRightDefinition {
 pub(crate) struct PluginXDefinition;
 
 impl Plugin for PluginXDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        width_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        width_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -128,8 +120,8 @@ impl Plugin for PluginXDefinition {
 pub(crate) struct PluginYDefinition;
 
 impl Plugin for PluginYDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        width_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        width_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {

@@ -11,35 +11,25 @@ Utilities for setting the maximum height of an element.
     <tr><td>max-h-<i>&lt;float&gt;</i></td><td>max-height: <i>&lt;float / 4&gt;</i>rem;</td></tr>
     <tr><td>max-h-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>max-height: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
     <tr><td>max-h-px</td><td>max-height: 1px;</td></tr>
-    <tr><td>max-h-screen</td><td>max-height: 100vh;</td></tr>
     <tr><td>max-h-none</td><td>max-height: none;</td></tr>
-    <tr><td>max-h-xs</td><td>max-height: 20rem;</td></tr>
-    <tr><td>max-h-sm</td><td>max-height: 24rem;</td></tr>
-    <tr><td>max-h-md</td><td>max-height: 28rem;</td></tr>
-    <tr><td>max-h-lg</td><td>max-height: 32rem;</td></tr>
-    <tr><td>max-h-xl</td><td>max-height: 36rem;</td></tr>
-    <tr><td>max-h-2xl</td><td>max-height: 42rem;</td></tr>
-    <tr><td>max-h-3xl</td><td>max-height: 48rem;</td></tr>
-    <tr><td>max-h-4xl</td><td>max-height: 56rem;</td></tr>
-    <tr><td>max-h-5xl</td><td>max-height: 64rem;</td></tr>
-    <tr><td>max-h-6xl</td><td>max-height: 72rem;</td></tr>
-    <tr><td>max-h-7xl</td><td>max-height: 80rem;</td></tr>
-    <tr><td>max-h-full</td><td>max-height: 100%;</td></tr>
-    <tr><td>max-h-min</td><td>max-height: min-content;</td></tr>
-    <tr><td>max-h-max</td><td>max-height: max-content;</td></tr>
-    <tr><td>max-h-fit</td><td>max-height: fit-content;</td></tr>
+    <tr><td>min-h-full</td><td>min-height: 100%;</td></tr>
+    <tr><td>min-h-auto</td><td>min-height: auto;</td></tr>
+    <tr><td>min-h-screen</td><td>min-height: 100vh;</td></tr>
+    <tr><td>min-h-min</td><td>min-height: min-content;</td></tr>
+    <tr><td>min-h-max</td><td>min-height: max-content;</td></tr>
+    <tr><td>min-h-fit</td><td>min-height: fit-content</td></tr>
   </tbody>
 </table>
 
 ### Tailwind compatibility
 
 Maximum height values don't follow Tailwind's philosophy of limiting possible values and all
-spacing values are supported (`screen` also). They are however perfectly compatible with
+spacing values are supported. They are however perfectly compatible with
 Tailwind's values.
 
 ### Arbitrary values
 
-Any [`<length>`](crate::utils::value_matchers::is_matching_length) property is allowed as arbitrary value.
+Any [`<length>`](crate::utils::value_matchers::is_matching_length) or [`<percentage>`](crate::utils::value_matchers::is_matching_percentage) property is allowed as arbitrary value.
 For example, `max-h-[3rem]`.
 
 [Tailwind reference](https://tailwindcss.com/docs/max-height)

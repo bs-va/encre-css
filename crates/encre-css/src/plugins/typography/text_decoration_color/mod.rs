@@ -28,7 +28,7 @@ impl Plugin for PluginDefinition {
             }
             Modifier::Arbitrary { value, .. } => {
                 context.buffer.lines([
-                    format_args!("-webkit-text-decoration-color: {value}"),
+                    format_args!("-webkit-text-decoration-color: {value};"),
                     format_args!("text-decoration-color: {value};"),
                 ]);
             }

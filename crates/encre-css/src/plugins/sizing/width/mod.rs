@@ -14,26 +14,24 @@ impl Plugin for PluginDefinition {
                 spacing::is_matching_builtin_spacing(value)
                     || ["full", "screen", "min", "max", "fit", "auto"].contains(value)
             }
-            Modifier::Arbitrary { value, .. } => is_matching_length(value),
+            Modifier::Arbitrary { value, .. } => {
+                is_matching_length(value) || is_matching_percentage(value)
+            }
         }
     }
 
     fn handle(&self, context: &mut ContextHandle) {
         match context.modifier {
             Modifier::Builtin { is_negative, value } => {
-                if *value == "screen" {
-                    return context.buffer.line("width: 100vw;");
-                }
-
                 context.buffer.line(format_args!(
                     "width: {};",
                     match *value {
-                        "auto" => Cow::from("auto"),
-                        "full" => Cow::from("100%"),
-                        "screen" => Cow::from("100vw"),
-                        "min" => Cow::from("min-content"),
-                        "max" => Cow::from("max-content"),
-                        "fit" => Cow::from("fit-content"),
+                        "auto" => Cow::Borrowed("auto"),
+                        "full" => Cow::Borrowed("100%"),
+                        "screen" => Cow::Borrowed("100vw"),
+                        "min" => Cow::Borrowed("min-content"),
+                        "max" => Cow::Borrowed("max-content"),
+                        "fit" => Cow::Borrowed("fit-content"),
                         _ => spacing::get(value, *is_negative).unwrap(),
                     },
                 ));

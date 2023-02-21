@@ -3,7 +3,7 @@
 use super::CSS_TRANSFORM;
 use crate::prelude::build_plugin::*;
 
-fn skew_can_handle(context: &mut ContextCanHandle) -> bool {
+fn skew_can_handle(context: &ContextCanHandle) -> bool {
     match context.modifier {
         Modifier::Builtin { value, .. } => value.parse::<usize>().map_or(false, |v| v <= 360),
         Modifier::Arbitrary { value, .. } => is_matching_angle(value),
@@ -29,8 +29,8 @@ fn skew_handle(css_prop: &str, context: &mut ContextHandle) {
 pub(crate) struct PluginXDefinition;
 
 impl Plugin for PluginXDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        skew_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        skew_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {
@@ -42,8 +42,8 @@ impl Plugin for PluginXDefinition {
 pub(crate) struct PluginYDefinition;
 
 impl Plugin for PluginYDefinition {
-    fn can_handle(&self, mut context: ContextCanHandle) -> bool {
-        skew_can_handle(&mut context)
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        skew_can_handle(&context)
     }
 
     fn handle(&self, context: &mut ContextHandle) {

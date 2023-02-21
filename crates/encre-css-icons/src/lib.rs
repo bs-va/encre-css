@@ -487,10 +487,7 @@ struct Icons;
 
 impl Plugin for Icons {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        match context.modifier {
-            Modifier::Builtin { value, .. } => COLLECTIONS.iter().any(|c| value.starts_with(c)),
-            Modifier::Arbitrary { .. } => false,
-        }
+        matches!(context.modifier, Modifier::Builtin { value, .. } if COLLECTIONS.iter().any(|c| value.starts_with(c)))
     }
 
     fn handle(&self, context: &mut ContextHandle) {

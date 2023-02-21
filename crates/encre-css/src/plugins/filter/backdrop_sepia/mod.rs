@@ -15,9 +15,9 @@ impl Plugin for PluginDefinition {
         if let Modifier::Builtin { value, .. } = context.modifier {
             #[allow(clippy::cast_precision_loss)]
             match *value {
-                "" => context.buffer.line("--en-sepia: sepia(100%);"),
+                "" => context.buffer.line("--en-backdrop-sepia: sepia(100%);"),
                 _ => context.buffer.line(format_args!(
-                    "--en-sepia: sepia({});",
+                    "--en-backdrop-sepia: sepia({});",
                     value.parse::<usize>().unwrap() as f32 / 100.
                 )),
             };
