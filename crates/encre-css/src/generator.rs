@@ -108,22 +108,21 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle)>(
     } = context;
 
     // Write the class
-    let mut base_class = ".".to_string()
-        + &selector
-            .full
-            .chars()
-            .enumerate()
-            .map(|(i, ch)| {
-                if !ch.is_alphanumeric() && ch != '-' && ch != '_' {
-                    format!("\\{ch}")
-                } else if i == 0 && ch.is_numeric() {
-                    // CSS classes must not start with a number, we need to escape it
-                    "\\3".to_string() + &ch.to_string()
-                } else {
-                    ch.to_string()
-                }
-            })
-            .collect::<String>();
+    let mut base_class = String::with_capacity(1 + selector.full.len());
+    base_class.push('.');
+
+    selector.full.chars().enumerate().for_each(|(i, ch)| {
+        if !ch.is_alphanumeric() && ch != '-' && ch != '_' {
+            base_class.push('\\');
+            base_class.push(ch);
+        } else if i == 0 && ch.is_numeric() {
+            // CSS classes must not start with a number, we need to escape it
+            base_class.push_str("\\3");
+            base_class.push(ch);
+        } else {
+            base_class.push(ch);
+        }
+    });
 
     if !selector.variants.is_empty() {
         selector

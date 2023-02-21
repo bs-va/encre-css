@@ -196,41 +196,32 @@ fn parse_recursive<'a>(
                 variants.push(Variant::Arbitrary(underscores_to_spaces(unescape(
                     Cow::from(variant),
                 ))));
-            } else if let Some((order, variant)) = BUILTIN_VARIANTS
+            } else if let Some((order, variant)) = BUILTIN_VARIANTS.get(variant) {
+                variants.push(Variant::Builtin(*order, variant.clone()));
+            } else if let Some((order, variant)) = custom_variants
                 .iter()
                 .enumerate()
-                .chain(
-                    custom_variants
-                        .iter()
-                        .enumerate()
-                        .map(|v| (v.0 + BUILTIN_VARIANTS.len(), v.1)),
-                )
+                .map(|v| (v.0 + BUILTIN_VARIANTS.len(), v.1))
                 .find(|(_, v)| v.0 == variant)
             {
                 variants.push(Variant::Builtin(order, variant.1.clone()));
             } else {
                 // Maybe a parent or peer variant
                 if let Some(group_variant) = variant.strip_prefix("group-") {
-                    if let Some((order, (_, VariantType::PseudoClass(class)))) = BUILTIN_VARIANTS
-                        .iter()
-                        .enumerate()
-                        .find(|(_, v)| v.0 == group_variant)
+                    if let Some((order, VariantType::PseudoClass(class))) =
+                        BUILTIN_VARIANTS.get(group_variant)
                     {
                         variants.push(Variant::Builtin(order + 1000, VariantType::Group(class)));
                     }
                 } else if let Some(peer_not_variant) = variant.strip_prefix("peer-not-") {
-                    if let Some((order, (_, VariantType::PseudoClass(class)))) = BUILTIN_VARIANTS
-                        .iter()
-                        .enumerate()
-                        .find(|(_, v)| v.0 == peer_not_variant)
+                    if let Some((order, VariantType::PseudoClass(class))) =
+                        BUILTIN_VARIANTS.get(peer_not_variant)
                     {
                         variants.push(Variant::Builtin(order + 2000, VariantType::PeerNot(class)));
                     }
                 } else if let Some(peer_variant) = variant.strip_prefix("peer-") {
-                    if let Some((order, (_, VariantType::PseudoClass(class)))) = BUILTIN_VARIANTS
-                        .iter()
-                        .enumerate()
-                        .find(|(_, v)| v.0 == peer_variant)
+                    if let Some((order, VariantType::PseudoClass(class))) =
+                        BUILTIN_VARIANTS.get(peer_variant)
                     {
                         variants.push(Variant::Builtin(order + 3000, VariantType::Peer(class)));
                     }

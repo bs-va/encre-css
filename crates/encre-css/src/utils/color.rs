@@ -64,7 +64,7 @@ pub fn is_matching_builtin_color(config: &Config, mut modifier: &str) -> bool {
         return true;
     }
 
-    BUILTIN_COLORS.iter().any(|color| color.0 == modifier) || config.theme.colors.contains(modifier)
+    BUILTIN_COLORS.contains_key(modifier) || config.theme.colors.contains(modifier)
 }
 
 /// Get a color from a modifier.
@@ -112,10 +112,7 @@ pub fn get<'a>(
         // Custom theme values override builtin colors
         hex_to_rgb(hex_color)
     } else {
-        BUILTIN_COLORS
-            .iter()
-            .find(|color| color.0 == modifier)
-            .map(|color| color.1)
+        BUILTIN_COLORS.get(modifier).copied()
     };
 
     // Convert the array to a CSS color with an opacity value (if the color is found)
