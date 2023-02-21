@@ -414,7 +414,7 @@ dependencies = [
 
 [[package]]
 name = "encre-css"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "criterion",
  "pretty_assertions",
@@ -425,7 +425,7 @@ dependencies = [
 
 [[package]]
 name = "encre-css-cli"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "clap 4.0.18",
  "color-eyre",

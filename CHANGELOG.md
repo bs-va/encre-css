@@ -2,18 +2,73 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.8.0] - 2022-11-05
+## [0.8.1] - 2023-02-21
 
 ### Bug Fixes
 
+- [**breaking**] Add a Serde tag to each configuration enum + place the safelist first in the configuration
+- `max_width` and `grid_auto_flow` plugins not working as they should
+- Some inconsistencies in plugins
+- Some arbitrary values not working with spaces
+- Remove support for <line width> arbitrary values in the `divide-width` plugin
+
+### Documentation
+
+- Fix a typo
+- Fix some verb tense mistakes
+- Fix capitalization MacOS -> macOS
+- Fix hints rendering on mobile
+- Fix badly closed <tr>
+- Fix capitalization of "on-demand"
+
+### Features
+
+- Support arbitrary values containing several `url()`
+
+### Miscellaneous Tasks
+
+- Update copyright year
+- Fix Clippy warnings
+- Update dependencies
+
+### Refactor
+
+- Avoid cloning variants when parsing the modifier
+- `hex_to_rgb` returns `Option` instead of `Result` + add tests
+
+### Testing
+
+- Add more tests for the preflight
+- Add tests for each plugin, fix numerous bugs or inconsistencies
+
+## [0.8.0] - 2022-11-04
+
+### Bug Fixes
+
+- Avoid losing classes when sorting them + deduplicate variant groups
+- Improve sorting of selectors
+- Ignore newlines and whitespaces in the `check_selectors` function
+- [**breaking**] Use the config as the first argument of the `register` function
+- Fix Clippy warnings
 - `from-` utility classes
 
 ### Documentation
 
+- Fix some typos
+- Use another instance of tokei
+- Fix vocabulary mistake
+- Improve documentation + add `display: inline-block;` to all icons by default
+- Add keywork aliases to all plugins
+- Handle errors when calling `Config::from_file`
+- Update the links
+- Improve the use of Flexbox in the notification footer example
 - Explain arbitrary variants used to generated CSS at rules, add a link to a benchmark
 
 ### Features
 
+- Implement `Serialize` for `Config`
+- Support omitting the dash after the first modifier, run `cargo fmt`, fix clippy warnings
+- Sort selectors in variant groups in `sort_selectors` (+ fix splitting when parenthesis are wrapped in brackets)
 - [**breaking**] Define a `Buffer` structure handling the CSS generated and the indentation
 - Support shortcuts
 - Support the safelist configuration + inline some configuration functions
@@ -21,9 +76,14 @@ All notable changes to this project will be documented in this file.
 
 ### Miscellaneous Tasks
 
+- Commit `Cargo.lock` and fix links in `Cargo.toml`
+- Clean up documentation, update dependencies
+- Remove TODOs about better matching arbitrary values
+- Add a CHANGELOG generated with git-cliff
 - Update dependencies
 - Remove `rayon`
-- Rename the `encre` binary to `encre-css` and update the documentation
+- Rename the `encre` binary to `encrecss` and update the documentation
+- Release v0.8.0
 
 ### Performance
 
@@ -40,6 +100,10 @@ All notable changes to this project will be documented in this file.
 - Rewrite some plugins using the `matches!` macro + simplify some `match` blocks
 - [**breaking**] New way of creating an `EncreGenerator` + improve documentation tests
 - [**breaking**] Privatize the `selector::parser::{unescape, underscores_to_spaces}` functions
+
+### Styling
+
+- Run `cargo fmt`
 
 ## [0.7.0] - 2022-08-12
 
