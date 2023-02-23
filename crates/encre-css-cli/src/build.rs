@@ -70,7 +70,7 @@ fn scan_path<T: AsRef<Path>>(glob_path: T, buffer: &mut String) {
         Err(e) => panic!("{}", e),
     };
 
-    if prefix == glob_path.as_ref() {
+    if prefix == glob_path.as_ref() && prefix.is_file() {
         match fs::File::open(&glob_path) {
             Ok(mut file) => {
                 let file_len = file
@@ -99,33 +99,37 @@ fn scan_path<T: AsRef<Path>>(glob_path: T, buffer: &mut String) {
     } else {
         glob.walk(prefix).for_each(|entry| {
             if let Ok(entry) = entry {
-                match fs::File::open(entry.path()) {
-                    Ok(file) => {
-                        let mut reader = BufReader::new(file);
-                        let file_len = reader
-                            .seek(SeekFrom::End(0))
-                            .expect("failed to seek to the end of the file");
-                        reader
-                            .rewind()
-                            .expect("failed to seek to the start of the file");
+                let path = entry.path();
 
-                        #[allow(clippy::cast_possible_truncation)]
-                        buffer.reserve(file_len as usize);
+                if path.is_file() {
+                    match fs::File::open(path) {
+                        Ok(file) => {
+                            let mut reader = BufReader::new(file);
+                            let file_len = reader
+                                .seek(SeekFrom::End(0))
+                                .expect("failed to seek to the end of the file");
+                            reader
+                                .rewind()
+                                .expect("failed to seek to the start of the file");
 
-                        if let Err(e) = reader.read_to_string(buffer) {
+                            #[allow(clippy::cast_possible_truncation)]
+                            buffer.reserve(file_len as usize);
+
+                            if let Err(e) = reader.read_to_string(buffer) {
+                                eprintln!(
+                                    "Failed to read the file {}: {}",
+                                    glob_path.as_ref().display(),
+                                    e
+                                );
+                            }
+                        }
+                        Err(e) => {
                             eprintln!(
-                                "Failed to read the file {}: {}",
+                                "Failed to open the file {}: {}",
                                 glob_path.as_ref().display(),
                                 e
                             );
                         }
-                    }
-                    Err(e) => {
-                        eprintln!(
-                            "Failed to open the file {}: {}",
-                            glob_path.as_ref().display(),
-                            e
-                        );
                     }
                 }
             }
