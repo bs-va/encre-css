@@ -356,6 +356,13 @@ mod tests {
     #[test]
     fn ring_width() {
         assert_eq!(
+            testing::generate_css("ring"),
+            ".ring {
+  --en-ring-shadow: var(--en-ring-inset) 0 0 0 calc(3px + var(--en-ring-offset-width)) var(--en-ring-color);
+  box-shadow: var(--en-ring-offset-shadow), var(--en-ring-shadow), var(--en-shadow, 0 0 #0000);
+}"
+        );
+        assert_eq!(
             testing::generate_css("ring-11"),
             ".ring-11 {
   --en-ring-shadow: var(--en-ring-inset) 0 0 0 calc(11px + var(--en-ring-offset-width)) var(--en-ring-color);

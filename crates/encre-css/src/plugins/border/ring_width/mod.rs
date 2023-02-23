@@ -29,7 +29,7 @@ impl Plugin for PluginDefinition {
                     return context.buffer.line("--en-ring-inset: inset;");
                 }
 
-                context.buffer.line(format_args!("--en-ring-shadow: var(--en-ring-inset) 0 0 0 calc({}px + var(--en-ring-offset-width)) var(--en-ring-color);", if value.is_empty() { "3px" } else { value }));
+                context.buffer.line(format_args!("--en-ring-shadow: var(--en-ring-inset) 0 0 0 calc({}px + var(--en-ring-offset-width)) var(--en-ring-color);", if value.is_empty() { "3" } else { value }));
             }
             Modifier::Arbitrary { value, .. } => context.buffer.line(format_args!("--en-ring-shadow: var(--en-ring-inset) 0 0 0 calc({value} + var(--en-ring-offset-width)) var(--en-ring-color);")),
         }
