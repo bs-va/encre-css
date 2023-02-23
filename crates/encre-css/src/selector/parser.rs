@@ -170,12 +170,12 @@ fn parse_recursive<'a>(
     let span = span.unwrap_or(0..val.len());
 
     // Parse variants
-    let mut variants = vec![];
     let mut remaining = (0, "");
 
-    {
+    let variants = {
         let custom_variants = config.get_custom_variants();
         let mut iter = split_ignore_arbitrary(val, VARIANT_SEPARATOR, true).peekable();
+        let mut variants = Vec::with_capacity(iter.size_hint().0);
 
         while let Some(mut part) = iter.next() {
             if iter.peek().is_none() {
@@ -201,10 +201,12 @@ fn parse_recursive<'a>(
             } else if let Some((order, variant)) = custom_variants
                 .iter()
                 .enumerate()
-                .map(|v| (v.0 + BUILTIN_VARIANTS.len(), v.1))
                 .find(|(_, v)| v.0 == variant)
             {
-                variants.push(Variant::Builtin(order, variant.1.clone()));
+                variants.push(Variant::Builtin(
+                    BUILTIN_VARIANTS.len() + order,
+                    variant.1.clone(),
+                ));
             } else {
                 // Maybe a parent or peer variant
                 if let Some(group_variant) = variant.strip_prefix("group-") {
@@ -233,7 +235,8 @@ fn parse_recursive<'a>(
                 }
             }
         }
-    }
+        variants
+    };
 
     if remaining.1.is_empty() {
         return vec![Err(ParseError::new(
