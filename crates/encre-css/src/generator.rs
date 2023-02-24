@@ -480,7 +480,7 @@ mod tests {
                 .as_ref()
                 .unwrap()
                 .clone(),
-            parse("content-['hello']", None, None, &config)[0]
+            parse("content-['hello:>\"']", None, None, &config)[0]
                 .as_ref()
                 .unwrap()
                 .clone(),
@@ -488,7 +488,7 @@ mod tests {
 
         let config = base_config();
         let mut generator = EncreGenerator::new(&config);
-        generator.scan(r#"<div class="bg-red-300 content-['hello']"></div>"#);
+        generator.scan(r#"<div class="bg-red-300 content-['hello:>"']"></div>"#);
 
         assert_eq!(expected, generator.scanned_selectors);
     }

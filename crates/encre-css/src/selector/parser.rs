@@ -14,12 +14,6 @@ pub(crate) const ARBITRARY_END: char = ']';
 pub(crate) const GROUP_START: char = '(';
 pub(crate) const GROUP_END: char = ')';
 pub(crate) const ESCAPE: char = '\\';
-const GROUP_SELECTOR_SEPARATOR: char = ',';
-const VARIANT_SEPARATOR: char = ':';
-const MODIFIER_SEPARATOR: char = '-';
-const HINT_SEPARATOR: char = ':';
-const NEGATIVE_FLAG: char = '-';
-const IMPORTANT_FLAG: char = '!';
 
 const WILL_BE_REPLACED_BY_UNDERSCORE: &str = "WILL-BE-REPLACED-BY-UNDERSCORE";
 
@@ -170,25 +164,51 @@ fn parse_recursive<'a>(
     let span = span.unwrap_or(0..val.len());
 
     // Parse variants
-    let mut remaining = (0, "");
-
-    let variants = {
+    let (variants, mut remaining) = {
         let custom_variants = config.get_custom_variants();
-        let mut iter = split_ignore_arbitrary(val, VARIANT_SEPARATOR, true).peekable();
-        let mut variants = Vec::with_capacity(iter.size_hint().0);
 
-        while let Some(mut part) = iter.next() {
-            if iter.peek().is_none() {
-                remaining = part;
+        let mut arbitraries = 0usize;
+        let mut groups = 0usize;
+        let mut last_index = 0;
+        let mut variants = vec![];
+
+        for ch in val.char_indices() {
+            if last_index > val.len() {
                 continue;
             }
 
+            match ch.1 {
+                '[' => {
+                    arbitraries = arbitraries.saturating_add(1);
+                    continue;
+                }
+                ']' => {
+                    arbitraries = arbitraries.saturating_sub(1);
+                    continue;
+                }
+                '(' if arbitraries == 0 => {
+                    groups = groups.saturating_add(1);
+                    continue;
+                }
+                ')' if arbitraries == 0 => {
+                    groups = groups.saturating_sub(1);
+                    continue;
+                }
+                ':' if arbitraries == 0 && groups == 0 => (),
+                _ => {
+                    continue;
+                }
+            }
+
+            let mut part = &val[last_index..ch.0];
+            last_index = ch.0 + 1;
+
             let (is_arbitrary, variant) = {
-                if part.1.starts_with(ARBITRARY_START) && part.1.ends_with(ARBITRARY_END) {
-                    unwrap_string(&mut part.1);
-                    (true, part.1)
+                if part.starts_with(ARBITRARY_START) && part.ends_with(ARBITRARY_END) {
+                    unwrap_string(&mut part);
+                    (true, part)
                 } else {
-                    (false, part.1)
+                    (false, part)
                 }
             };
 
@@ -235,7 +255,8 @@ fn parse_recursive<'a>(
                 }
             }
         }
-        variants
+
+        (variants, (last_index, &val[last_index..]))
     };
 
     if remaining.1.is_empty() {
@@ -257,7 +278,7 @@ fn parse_recursive<'a>(
             ))];
         }
 
-        split_ignore_arbitrary(remaining.1, GROUP_SELECTOR_SEPARATOR, true)
+        split_ignore_arbitrary(remaining.1, ',', true)
             .flat_map(|(i, sub_selector)| {
                 #[allow(clippy::range_plus_one)]
                 let mut new_selectors = parse_recursive(
@@ -284,14 +305,14 @@ fn parse_recursive<'a>(
             .collect()
     } else {
         // Child selector
-        let is_important = if let Some(new_remaining) = remaining.1.strip_prefix(IMPORTANT_FLAG) {
+        let is_important = if let Some(new_remaining) = remaining.1.strip_prefix('!') {
             remaining = (remaining.0, new_remaining);
             true
         } else {
             false
         };
 
-        let is_negative = if let Some(new_remaining) = remaining.1.strip_prefix(NEGATIVE_FLAG) {
+        let is_negative = if let Some(new_remaining) = remaining.1.strip_prefix('-') {
             remaining = (remaining.0, new_remaining);
             true
         } else {
@@ -374,18 +395,18 @@ fn parse_modifier(mut modifier: &str, is_negative: bool) -> Option<Modifier> {
         });
     }
 
-    if modifier.chars().next().unwrap() == MODIFIER_SEPARATOR {
+    if modifier.starts_with('-') {
         modifier = &modifier[1..];
     }
 
     if let Some((prefix, mut value)) = modifier.split_once(ARBITRARY_START) {
-        if value.chars().last().unwrap() == ARBITRARY_END {
+        if value.chars().last().map_or(false, |v| v == ARBITRARY_END) {
             value = &value[..value.len() - 1];
         } else {
             return None;
         }
 
-        let (hint, value) = if let Some((maybe_hint, rest)) = value.split_once(HINT_SEPARATOR) {
+        let (hint, value) = if let Some((maybe_hint, rest)) = value.split_once(':') {
             if VALID_PLUGIN_HINT.contains(&maybe_hint) {
                 (maybe_hint, to_css_value(rest))
             } else {

@@ -1,8 +1,6 @@
 //! Define a structure used to scan content.
 use std::collections::BTreeSet;
 
-use crate::utils::split_ignore_arbitrary;
-
 /// A structure responsible for scanning some content and returning a list of possible classes.
 ///
 /// By default, it splits the content by spaces, double quotes, single quotes and backticks and
@@ -69,12 +67,34 @@ impl Default for Scanner {
     fn default() -> Self {
         Self {
             scan_fn: Box::new(|val| {
-                split_ignore_arbitrary(
-                    val,
-                    |ch| ch == ' ' || ch == '"' || ch == '\'' || ch == '`',
-                    false,
-                )
-                .map(|(_, v)| v)
+                let mut is_dashed = false;
+                let mut is_arbitrary = false;
+
+                val.split(|ch| {
+                    // Escape all characters in arbitrary values prefixed by a dash (used to avoid
+                    // ignoring values in, for example, JS arrays, given that they are defined
+                    // using square brackets)
+                    match ch {
+                        '-' => {
+                            is_dashed = true;
+                            false
+                        }
+                        '[' if is_dashed => {
+                            is_arbitrary = true;
+                            is_dashed = false;
+                            false
+                        }
+                        ']' => {
+                            is_arbitrary = false;
+                            is_dashed = false;
+                            false
+                        }
+                        _ => {
+                            is_dashed = false;
+                            ch == ' ' || (!is_arbitrary && (ch == '\'' || ch == '"' || ch == '`'))
+                        }
+                    }
+                })
                 .collect::<BTreeSet<&str>>()
             }),
         }
@@ -90,8 +110,14 @@ mod tests {
     #[test]
     fn default_scanner_test() {
         assert_eq!(
-            Scanner::default().scan("test bg-red-500 'hello'"),
-            BTreeSet::from(["", "test", "bg-red-500", "hello"])
+            Scanner::default().scan("test bg-red-500 'hello' content-[some_[_square]_brackets]"),
+            BTreeSet::from([
+                "",
+                "test",
+                "bg-red-500",
+                "hello",
+                "content-[some_[_square]_brackets]"
+            ])
         );
     }
 
