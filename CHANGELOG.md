@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.0] - 2023-02-24
+
+### Bug Fixes
+
+- `ring` plugin
+- Try to read only files
+
+### Features
+
+- Support all logical properties (e.g. `border-inline-start-color`)
+
+### Performance
+
+- Improve performance of class name generation, use `phf` to generate hashed structures of colors and variants
+- Reserve Vec with capacity when parsing variants
+- Optimize scanning
+
+### Ci
+
+- Add grcov-based test coverage
+
 ## [0.8.1] - 2023-02-21
 
 ### Bug Fixes
@@ -83,7 +104,6 @@ All notable changes to this project will be documented in this file.
 - Update dependencies
 - Remove `rayon`
 - Rename the `encre` binary to `encrecss` and update the documentation
-- Release v0.8.0
 
 ### Performance
 

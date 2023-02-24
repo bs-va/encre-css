@@ -17,7 +17,7 @@
 //! To integrate `encre-css-icons` with `encre-css`, add it in your `Cargo.toml`:
 //!
 //! <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">[dependencies]</span>
-//! encre-css-icons = { git = <span class="string">"https://gitlab.com/encre-org/encre-css.git"</span>, tag = <span class="string">"v0.8.0"</span> }</code></pre></div>
+//! encre-css-icons = { git = <span class="string">"https://gitlab.com/encre-org/encre-css.git"</span>, tag = <span class="string">"v0.9.0"</span> }</code></pre></div>
 //!
 //! Then, call the `register` function with a mutable reference to a `Config`
 //! structure and some parameters (all parameters are optional, you can use `None`

@@ -1,12 +1,14 @@
 [package]
 name = "encre-css"
-version = "0.8.1"
+version = "0.9.0"
 description = "A TailwindCSS-compatible utility-first CSS generation library written in Rust"
 authors = ["nifou <nifou@mailfence.com>"]
 license = "MIT"
 edition = "2021"
 repository = "https://gitlab.com/encre-org/encre-css.git"
-documentation = "https://encre-org.gitlab.io/encre-css/encre_css"
+documentation = "https://docs.rs/encre-css"
+keywords = ["tailwind", "css", "compiler"]
+categories = ["web-programming"]
 
 [[bench]]
 name = "benchmark"

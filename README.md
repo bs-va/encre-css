@@ -19,8 +19,12 @@
     <img alt="Dependency status" src="https://deps.rs/repo/gitlab/encre-org/encre-css/status.svg" />
   </a>
 
-  <a href="https://encre-org.gitlab.io/encre-css/encre_css">
-    <img alt="Documentation on gitlab.io" src="https://img.shields.io/static/v1?label=docs&message=gitlab.io&color=blue" />
+  <a href="https://crates.io/crates/encre-css">
+    <img alt="Published on crates.io" src="https://img.shields.io/crates/v/encre-css" />
+  </a>
+
+  <a href="https://docs.rs/encre-css">
+    <img alt="Documentation on docs.rs" src="https://img.shields.io/docsrs/encre-css" />
   </a>
 
   <br>
@@ -112,7 +116,7 @@ Add `encre-css` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-encre-css = { git = "https://gitlab.com/encre-org/encre-css.git", tag = "v0.8.0" }
+encre-css = "0.9.0"
 ```
 
 Generating styles takes three steps:
@@ -154,7 +158,7 @@ assert!(generator.generate().expect("failed to generate the CSS").ends_with(r#"
 A command line interface is also available. Install it using:
 
 ```bash
-cargo install --git https://gitlab.com/encre-org/encre-css.git
+cargo install encre-css-cli
 ```
 
 Then run `encrecss --help` for instructions on how to use it.
@@ -162,7 +166,7 @@ Then run `encrecss --help` for instructions on how to use it.
 ## Plugins
 
 `encre-css` was built with modularity in mind and it is possible to write or use
-custom plugins. [Learn more](https://encre-org.gitlab.io/encre-css/encre_css/plugins/index.html)
+custom plugins. [Learn more](https://docs.rs/encre-css/latest/plugins)
 
 ## About the name
 

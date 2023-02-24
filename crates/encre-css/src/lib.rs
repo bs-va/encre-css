@@ -124,7 +124,7 @@
 //! Add `encre-css` to your `Cargo.toml`:
 //!
 //! <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">[dependencies]</span>
-//! encre-css = { git = <span class="string">"https://gitlab.com/encre-org/encre-css.git"</span>, tag = <span class="string">"v0.8.0"</span> }</code></pre></div>
+//! encre-css = <span class="string">"v0.9.0"</span></code></pre></div>
 //!
 //! Generating styles takes three steps:
 //! - First, you need to _configure_ the main [`EncreGenerator`] structure
@@ -170,7 +170,7 @@
 //! A command line interface is also available. Install it using:
 //!
 //! ```bash
-//! cargo install --git https://gitlab.com/encre-org/encre-css.git
+//! cargo install encre-css-cli
 //! ```
 //!
 //! Then run `encrecss --help` for instructions on how to use it.
