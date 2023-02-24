@@ -19,7 +19,7 @@ impl Plugin for PluginDefinition {
     fn handle(&self, context: &mut ContextHandle) {
         match context.modifier {
             Modifier::Builtin { value, .. } => {
-                context.buffer.line(format_args!("flex-wrap: {value};"))
+                context.buffer.line(format_args!("flex-wrap: {value};"));
             }
             Modifier::Arbitrary { .. } => unreachable!(),
         }

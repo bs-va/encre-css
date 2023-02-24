@@ -1,5 +1,5 @@
 <div align="center">
-  <img src=".assets/logo.svg" />
+  <img src="https://gitlab.com/encre-org/encre-css/raw/main/.assets/logo.png" width="100" />
   <h1>encre-css</h1>
   <p>A TailwindCSS-compatible utility-first CSS generation library written in Rust</p>
 
@@ -116,7 +116,7 @@ Add `encre-css` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-encre-css = "0.9.0"
+encre-css = "0.9.3"
 ```
 
 Generating styles takes three steps:

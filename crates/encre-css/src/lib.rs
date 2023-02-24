@@ -124,7 +124,7 @@
 //! Add `encre-css` to your `Cargo.toml`:
 //!
 //! <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">[dependencies]</span>
-//! encre-css = <span class="string">"v0.9.0"</span></code></pre></div>
+//! encre-css = <span class="string">"v0.9.3"</span></code></pre></div>
 //!
 //! Generating styles takes three steps:
 //! - First, you need to _configure_ the main [`EncreGenerator`] structure
