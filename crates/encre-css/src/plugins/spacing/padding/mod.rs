@@ -78,6 +78,32 @@ impl Plugin for PluginYDefinition {
 }
 
 #[derive(Debug)]
+pub(crate) struct PluginStartDefinition;
+
+impl Plugin for PluginStartDefinition {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        padding_can_handle(&context)
+    }
+
+    fn handle(&self, context: &mut ContextHandle) {
+        padding_handle(&["padding-inline-start"], context);
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct PluginEndDefinition;
+
+impl Plugin for PluginEndDefinition {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        padding_can_handle(&context)
+    }
+
+    fn handle(&self, context: &mut ContextHandle) {
+        padding_handle(&["padding-inline-end"], context);
+    }
+}
+
+#[derive(Debug)]
 pub(crate) struct PluginTopDefinition;
 
 impl Plugin for PluginTopDefinition {

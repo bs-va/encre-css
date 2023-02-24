@@ -39,6 +39,26 @@ mod tests {
   border-color: rgb(12,12,12);
 }"
         );
+        assert_eq!(
+            testing::generate_css("border-x-[#ff0]"),
+            r".border-x-\[\#ff0\] {
+  border-left-color: #ff0;
+  border-right-color: #ff0;
+}"
+        );
+        assert_eq!(
+            testing::generate_css("border-s-blue-400"),
+            ".border-s-blue-400 {
+  --en-border-opacity: 1;
+  border-inline-start-color: rgb(96 165 250 / var(--en-border-opacity));
+}"
+        );
+        assert_eq!(
+            testing::generate_css("border-e-blue-400/10"),
+            r".border-e-blue-400\/10 {
+  border-inline-end-color: rgb(96 165 250 / 0.1);
+}"
+        );
     }
 
     #[test]
@@ -90,6 +110,12 @@ mod tests {
 }"
         );
         assert_eq!(
+            testing::generate_css("border-s"),
+            ".border-s {
+  border-inline-start-width: 1px;
+}"
+        );
+        assert_eq!(
             testing::generate_css("border-t"),
             ".border-t {
   border-top-width: 1px;
@@ -107,6 +133,12 @@ mod tests {
             ".border-x-24 {
   border-left-width: 24px;
   border-right-width: 24px;
+}"
+        );
+        assert_eq!(
+            testing::generate_css("border-e-2"),
+            ".border-e-2 {
+  border-inline-end-width: 2px;
 }"
         );
         assert_eq!(
@@ -158,6 +190,13 @@ mod tests {
 }"
         );
         assert_eq!(
+            testing::generate_css("rounded-s"),
+            ".rounded-s {
+  border-start-start-radius: 0.25rem;
+  border-end-start-radius: 0.25rem;
+}"
+        );
+        assert_eq!(
             testing::generate_css("rounded-xl"),
             ".rounded-xl {
   border-radius: 0.75rem;
@@ -174,6 +213,12 @@ mod tests {
             testing::generate_css("rounded-bl-full"),
             ".rounded-bl-full {
   border-bottom-left-radius: 9999px;
+}"
+        );
+        assert_eq!(
+            testing::generate_css("rounded-ee-md"),
+            ".rounded-ee-md {
+  border-end-end-radius: 0.375rem;
 }"
         );
         assert_eq!(

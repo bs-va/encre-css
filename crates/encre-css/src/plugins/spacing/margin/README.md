@@ -20,6 +20,14 @@ Utilities for controlling an element's margin.
     <tr><td>my-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>margin-top: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;<br>margin-bottom: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
     <tr><td>my-px</td><td>margin-top: 1px;<br>margin-bottom: 1px;</td></tr>
     <tr><td>my-auto</td><td>margin-top: auto;<br>margin-bottom: auto;</td></tr>
+    <tr><td>ms-<i>&lt;float&gt;</i></td><td>margin-inline-start: <i>&lt;float / 4&gt;</i>rem;</td></tr>
+    <tr><td>ms-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>margin-inline-start: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
+    <tr><td>ms-px</td><td>margin-inline-start: 1px;</td></tr>
+    <tr><td>ms-auto</td><td>margin-inline-start: auto;</td></tr>
+    <tr><td>me-<i>&lt;float&gt;</i></td><td>margin-inline-end: <i>&lt;float / 4&gt;</i>rem;</td></tr>
+    <tr><td>me-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>margin-inline-end: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
+    <tr><td>me-px</td><td>margin-inline-end: 1px;</td></tr>
+    <tr><td>me-auto</td><td>margin-inline-end: auto;</td></tr>
     <tr><td>mt-<i>&lt;float&gt;</i></td><td>margin-top: <i>&lt;float / 4&gt;</i>rem;</td></tr>
     <tr><td>mt-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>margin-top: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
     <tr><td>mt-px</td><td>margin-top: 1px;</td></tr>

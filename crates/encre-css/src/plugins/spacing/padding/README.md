@@ -20,6 +20,14 @@ Utilities for controlling an element's padding.
     <tr><td>py-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>padding-top: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;<br>padding-bottom: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
     <tr><td>py-px</td><td>padding-top: 1px;<br>padding-bottom: 1px;</td></tr>
     <tr><td>py-auto</td><td>padding-top: auto;<br>padding-bottom: auto;</td></tr>
+    <tr><td>ps-<i>&lt;float&gt;</i></td><td>padding-inline-start: <i>&lt;float / 4&gt;</i>rem;</td></tr>
+    <tr><td>ps-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>padding-inline-start: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
+    <tr><td>ps-px</td><td>padding-inline-start: 1px;</td></tr>
+    <tr><td>ps-auto</td><td>padding-inline-start: auto;</td></tr>
+    <tr><td>pe-<i>&lt;float&gt;</i></td><td>padding-inline-end: <i>&lt;float / 4&gt;</i>rem;</td></tr>
+    <tr><td>pe-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>padding-inline-end: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
+    <tr><td>pe-px</td><td>padding-inline-end: 1px;</td></tr>
+    <tr><td>pe-auto</td><td>padding-inline-end: auto;</td></tr>
     <tr><td>pt-<i>&lt;float&gt;</i></td><td>padding-top: <i>&lt;float / 4&gt;</i>rem;</td></tr>
     <tr><td>pt-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>padding-top: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
     <tr><td>pt-px</td><td>padding-top: 1px;</td></tr>

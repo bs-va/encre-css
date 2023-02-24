@@ -61,6 +61,90 @@ impl Plugin for PluginDefinition {
 }
 
 #[derive(Debug)]
+pub(crate) struct PluginStartDefinition;
+
+impl Plugin for PluginStartDefinition {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(&context)
+    }
+
+    fn handle(&self, context: &mut ContextHandle) {
+        radius_handle(
+            &["border-start-start-radius", "border-end-start-radius"],
+            context,
+        );
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct PluginEndDefinition;
+
+impl Plugin for PluginEndDefinition {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(&context)
+    }
+
+    fn handle(&self, context: &mut ContextHandle) {
+        radius_handle(
+            &["border-start-end-radius", "border-end-end-radius"],
+            context,
+        );
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct PluginStartStartDefinition;
+
+impl Plugin for PluginStartStartDefinition {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(&context)
+    }
+
+    fn handle(&self, context: &mut ContextHandle) {
+        radius_handle(&["border-start-start-radius"], context);
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct PluginStartEndDefinition;
+
+impl Plugin for PluginStartEndDefinition {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(&context)
+    }
+
+    fn handle(&self, context: &mut ContextHandle) {
+        radius_handle(&["border-start-end-radius"], context);
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct PluginEndEndDefinition;
+
+impl Plugin for PluginEndEndDefinition {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(&context)
+    }
+
+    fn handle(&self, context: &mut ContextHandle) {
+        radius_handle(&["border-end-end-radius"], context);
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct PluginEndStartDefinition;
+
+impl Plugin for PluginEndStartDefinition {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        radius_can_handle(&context)
+    }
+
+    fn handle(&self, context: &mut ContextHandle) {
+        radius_handle(&["border-end-start-radius"], context);
+    }
+}
+
+#[derive(Debug)]
 pub(crate) struct PluginTopRightDefinition;
 
 impl Plugin for PluginTopRightDefinition {

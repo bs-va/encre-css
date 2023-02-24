@@ -104,6 +104,32 @@ impl Plugin for PluginRightDefinition {
 }
 
 #[derive(Debug)]
+pub(crate) struct PluginStartDefinition;
+
+impl Plugin for PluginStartDefinition {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        width_can_handle(&context)
+    }
+
+    fn handle(&self, context: &mut ContextHandle) {
+        width_handle(&["border-inline-start-width"], context);
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct PluginEndDefinition;
+
+impl Plugin for PluginEndDefinition {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        width_can_handle(&context)
+    }
+
+    fn handle(&self, context: &mut ContextHandle) {
+        width_handle(&["border-inline-end-width"], context);
+    }
+}
+
+#[derive(Debug)]
 pub(crate) struct PluginXDefinition;
 
 impl Plugin for PluginXDefinition {

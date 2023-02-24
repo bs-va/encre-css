@@ -67,7 +67,7 @@ pub mod typography;
 /// indented.
 ///
 /// It is common to use the [`unreachable!`] macro if the [`Plugin::handle`] method cannot be
-/// called because [`Plugin::can_handle`] returned `false`.
+/// called because you are sure that [`Plugin::can_handle`] returned `false`.
 ///
 /// # Example (defines the `stroke-width` plugin)
 ///

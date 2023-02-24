@@ -20,6 +20,14 @@ Utilities for controlling the scroll offset around items in a snap container.
     <tr><td>scroll-my-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>scroll-margin-top: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;<br>scroll-margin-bottom: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
     <tr><td>scroll-my-px</td><td>scroll-margin-top: 1px;<br>scroll-margin-bottom: 1px;</td></tr>
     <tr><td>scroll-my-auto</td><td>scroll-margin-top: auto;<br>scroll-margin-bottom: auto;</td></tr>
+    <tr><td>scroll-ms-<i>&lt;float&gt;</i></td><td>scroll-margin-inline-start: <i>&lt;float / 4&gt;</i>rem;</td></tr>
+    <tr><td>scroll-ms-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>scroll-margin-inline-start: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
+    <tr><td>scroll-ms-px</td><td>scroll-margin-inline-start: 1px;</td></tr>
+    <tr><td>scroll-ms-auto</td><td>scroll-margin-inline-start: auto;</td></tr>
+    <tr><td>scroll-me-<i>&lt;float&gt;</i></td><td>scroll-margin-inline-end: <i>&lt;float / 4&gt;</i>rem;</td></tr>
+    <tr><td>scroll-me-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>scroll-margin-inline-end: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
+    <tr><td>scroll-me-px</td><td>scroll-margin-inline-end: 1px;</td></tr>
+    <tr><td>scroll-me-auto</td><td>scroll-margin-inline-end: auto;</td></tr>
     <tr><td>scroll-mt-<i>&lt;float&gt;</i></td><td>scroll-margin-top: <i>&lt;float / 4&gt;</i>rem;</td></tr>
     <tr><td>scroll-mt-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>scroll-margin-top: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
     <tr><td>scroll-mt-px</td><td>scroll-margin-top: 1px;</td></tr>

@@ -68,6 +68,32 @@ impl Plugin for PluginYDefinition {
 }
 
 #[derive(Debug)]
+pub(crate) struct PluginStartDefinition;
+
+impl Plugin for PluginStartDefinition {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scroll_margin_can_handle(&context)
+    }
+
+    fn handle(&self, context: &mut ContextHandle) {
+        scroll_margin_handle(&["scroll-margin-inline-start"], context);
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct PluginEndDefinition;
+
+impl Plugin for PluginEndDefinition {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        scroll_margin_can_handle(&context)
+    }
+
+    fn handle(&self, context: &mut ContextHandle) {
+        scroll_margin_handle(&["scroll-margin-inline-end"], context);
+    }
+}
+
+#[derive(Debug)]
 pub(crate) struct PluginLeftDefinition;
 
 impl Plugin for PluginLeftDefinition {

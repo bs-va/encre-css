@@ -23,6 +23,16 @@ Utilities for controlling the placement of positioned elements.
     <tr><td>inset-y-px</td><td>top: 1px;<br>bottom: 1px;</td></tr>
     <tr><td>inset-y-auto</td><td>top: auto;<br>bottom: auto;</td></tr>
     <tr><td>inset-y-full</td><td>top: 100%;<br>bottom: 100%;</td></tr>
+    <tr><td>start-<i>&lt;float&gt;</i></td><td>inset-inline-start: <i>&lt;float / 4&gt;</i>rem;</td></tr>
+    <tr><td>start-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>inset-inline-start: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
+    <tr><td>start-px</td><td>inset-inline-start: 1px;</td></tr>
+    <tr><td>start-auto</td><td>inset-inline-start: auto;</td></tr>
+    <tr><td>start-full</td><td>inset-inline-start: 100%;</td></tr>
+    <tr><td>end-<i>&lt;float&gt;</i></td><td>inset-inline-inset-inline-end: <i>&lt;float / 4&gt;</i>rem;</td></tr>
+    <tr><td>end-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>inset-inline-inset-inline-end: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
+    <tr><td>end-px</td><td>inset-inline-inset-inline-end: 1px;</td></tr>
+    <tr><td>end-auto</td><td>inset-inline-inset-inline-end: auto;</td></tr>
+    <tr><td>end-full</td><td>inset-inline-inset-inline-end: 100%;</td></tr>
     <tr><td>top-<i>&lt;float&gt;</i></td><td>top: <i>&lt;float / 4&gt;</i>rem;</td></tr>
     <tr><td>top-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>top: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
     <tr><td>top-px</td><td>top: 1px;</td></tr>

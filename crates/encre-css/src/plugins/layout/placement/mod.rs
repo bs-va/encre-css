@@ -81,6 +81,32 @@ impl Plugin for PluginInsetYDefinition {
 }
 
 #[derive(Debug)]
+pub(crate) struct PluginStartDefinition;
+
+impl Plugin for PluginStartDefinition {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        placement_can_handle(&context)
+    }
+
+    fn handle(&self, context: &mut ContextHandle) {
+        placement_handle(&["inset-inline-start"], context);
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct PluginEndDefinition;
+
+impl Plugin for PluginEndDefinition {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        placement_can_handle(&context)
+    }
+
+    fn handle(&self, context: &mut ContextHandle) {
+        placement_handle(&["inset-inline-end"], context);
+    }
+}
+
+#[derive(Debug)]
 pub(crate) struct PluginTopDefinition;
 
 impl Plugin for PluginTopDefinition {

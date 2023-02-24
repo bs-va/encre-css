@@ -75,6 +75,32 @@ impl Plugin for PluginYDefinition {
 }
 
 #[derive(Debug)]
+pub(crate) struct PluginStartDefinition;
+
+impl Plugin for PluginStartDefinition {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        color_can_handle(&context)
+    }
+
+    fn handle(&self, context: &mut ContextHandle) {
+        color_handle(&["border-inline-start-color"], context);
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct PluginEndDefinition;
+
+impl Plugin for PluginEndDefinition {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        color_can_handle(&context)
+    }
+
+    fn handle(&self, context: &mut ContextHandle) {
+        color_handle(&["border-inline-end-color"], context);
+    }
+}
+
+#[derive(Debug)]
 pub(crate) struct PluginLeftDefinition;
 
 impl Plugin for PluginLeftDefinition {
