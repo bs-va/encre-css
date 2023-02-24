@@ -11,9 +11,26 @@ variables:
 
 check:test:
   stage: test
+  image: rustdocker/rust:nightly
+  variables:
+    RUSTFLAGS: "-Cinstrument-coverage"
+    LLVM_PROFILE_FILE: "coverage-%p-%m.profraw"
   script:
     - rustc --version && cargo --version
-    - cargo test --workspace
+    - rustup component add llvm-tools-preview
+    - cargo test
+    - curl -L https://github.com/mozilla/grcov/releases/latest/download/grcov-x86_64-unknown-linux-gnu.tar.bz2 | tar jxf -
+    - ./grcov . --binary-path ./target/debug/ -s . -t html --branch --excl-br-start "mod tests \{|// grcov-ignore-start" --excl-start "mod tests \{|// grcov-ignore-start" --excl-stop "// grcov-ignore-stop" --excl-br-stop "// grcov-ignore-stop" --excl-br-line "#\[derive\(|unreachable!()|todo!()" --excl-line "#\[derive\(|unreachable!()|todo!()" --ignore-not-existing --ignore "*cargo*" -o ./coverage/
+    - ./grcov . --binary-path ./target/debug/ -s . -t lcov --branch --excl-br-start "mod tests \{|// grcov-ignore-start" --excl-start "mod tests \{|// grcov-ignore-start" --excl-stop "// grcov-ignore-stop" --excl-br-stop "// grcov-ignore-stop" --excl-br-line "#\[derive\(|unreachable!()|todo!()" --excl-line "#\[derive\(|unreachable!()|todo!()" --ignore-not-existing --ignore "*cargo*" -o coverage.lcov
+    - apt-get update && apt-get install -y lcov
+    - lcov --summary coverage.lcov
+  coverage: '/\s*lines\.*:\s*([\d\.]+%)/'
+  artifacts:
+    paths:
+      - 'coverage'
+  only:
+    - merge_requests
+    - main
 
 pages:
   stage: deploy

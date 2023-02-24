@@ -11,6 +11,10 @@
     <img alt="Pipeline status" src="https://gitlab.com/encre-org/encre-css/badges/main/pipeline.svg" />
   </a>
 
+  <a href="https://gitlab.com/encre-org/encre-css/-/pipelines">
+    <img alt="Coverage report" src="https://gitlab.com/encre-org/encre-css/badges/main/coverage.svg" />
+  </a>
+
   <a href="https://deps.rs/repo/gitlab/encre-org/encre-css">
     <img alt="Dependency status" src="https://deps.rs/repo/gitlab/encre-org/encre-css/status.svg" />
   </a>
