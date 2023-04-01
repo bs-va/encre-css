@@ -334,7 +334,7 @@ fn parse_recursive<'a>(
                 modifier: Modifier::Arbitrary {
                     prefix: "",
                     hint: "",
-                    value: Cow::from(&remaining.1[1..remaining.1.len() - 1]),
+                    value: to_css_value(&remaining.1[1..remaining.1.len() - 1]),
                 },
                 variants,
                 is_important,
