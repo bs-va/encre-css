@@ -166,7 +166,7 @@ Then run `encrecss --help` for instructions on how to use it.
 ## Plugins
 
 `encre-css` was built with modularity in mind and it is possible to write or use
-custom plugins. [Learn more](https://docs.rs/encre-css/latest/plugins)
+custom plugins. [Learn more](https://docs.rs/encre-css/latest/encre_css/plugins)
 
 ## About the name
 
