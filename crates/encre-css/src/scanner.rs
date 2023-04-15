@@ -1,10 +1,11 @@
 //! Define a structure used to scan content.
-use std::collections::BTreeSet;
+use std::{collections::BTreeSet, sync::Arc};
 
 /// A structure responsible for scanning some content and returning a list of possible classes.
 ///
-/// By default, it splits the content by spaces, double quotes, single quotes and backticks and
-/// ignores arbitrary values / variants and variant groups by using [`split_ignore_arbitrary`].
+/// By default, it splits the content by spaces, double quotes, single quotes, backticks and new
+/// lines, while ignoring arbitrary the content inside values/variants and variant groups
+/// by using [`split_ignore_arbitrary`].
 /// It is recommended to use this function when splitting classes with characters which can be
 /// included inside arbitrary strings.
 ///
@@ -14,7 +15,7 @@ use std::collections::BTreeSet;
 /// HTML attribute.
 ///
 /// ```
-/// use encre_css::{EncreGenerator, Config, Scanner, utils::split_ignore_arbitrary};
+/// use encre_css::{Config, Scanner, utils::split_ignore_arbitrary, generate};
 /// use std::collections::BTreeSet;
 ///
 /// let mut config = Config::default();
@@ -23,10 +24,9 @@ use std::collections::BTreeSet;
 ///     .flatten()
 ///     .collect::<BTreeSet<&str>>());
 ///
-/// let mut generator = EncreGenerator::new(&config);
-/// generator.scan(r#"<h1 data-en="underline"></h1><p data-en="bg-red-200 text-blue-300"></p>"#);
+/// let generated = generate([r#"<h1 data-en="underline"></h1><p data-en="bg-red-200 text-blue-300"></p>"#], &config);
 ///
-/// assert!(generator.generate().ends_with(".bg-red-200 {
+/// assert!(generated.ends_with(".bg-red-200 {
 ///   --en-bg-opacity: 1;
 ///   background-color: rgb(254 202 202 / var(--en-bg-opacity));
 /// }
@@ -42,11 +42,12 @@ use std::collections::BTreeSet;
 /// }"));
 /// ```
 ///
-/// [`utils::split_ignore_arbitray`]: crate::utils::split_ignore_arbitrary
+/// [`split_ignore_arbitrary`]: crate::utils::split_ignore_arbitrary
 #[allow(missing_debug_implementations)]
 #[allow(clippy::type_complexity)]
+#[derive(Clone)]
 pub struct Scanner {
-    scan_fn: Box<dyn Fn(&str) -> BTreeSet<&str> + Send + Sync>,
+    scan_fn: Arc<dyn Fn(&str) -> BTreeSet<&str> + Send + Sync>,
 }
 
 impl Scanner {
@@ -54,7 +55,7 @@ impl Scanner {
     /// classes.
     pub fn from_fn<T: 'static + Fn(&str) -> BTreeSet<&str> + Send + Sync>(scan_fn: T) -> Self {
         Self {
-            scan_fn: Box::new(scan_fn),
+            scan_fn: Arc::new(scan_fn),
         }
     }
 
@@ -66,7 +67,7 @@ impl Scanner {
 impl Default for Scanner {
     fn default() -> Self {
         Self {
-            scan_fn: Box::new(|val| {
+            scan_fn: Arc::new(|val| {
                 let mut is_dashed = false;
                 let mut is_arbitrary = false;
 
@@ -91,7 +92,7 @@ impl Default for Scanner {
                         }
                         _ => {
                             is_dashed = false;
-                            ch == ' ' || (!is_arbitrary && (ch == '\'' || ch == '"' || ch == '`'))
+                            ch == ' ' || (!is_arbitrary && (ch == '\'' || ch == '"' || ch == '`' || ch == '\n'))
                         }
                     }
                 })
@@ -110,13 +111,18 @@ mod tests {
     #[test]
     fn default_scanner_test() {
         assert_eq!(
-            Scanner::default().scan("test bg-red-500 'hello' content-[some_[_square]_brackets]"),
+            Scanner::default().scan("test bg-red-500 'hello' content-[some_[_square]_brackets] foo-bar sm:focus:ring hover:bg-black border-[#333] text-[color:var(--hello)]"),
             BTreeSet::from([
                 "",
                 "test",
                 "bg-red-500",
                 "hello",
-                "content-[some_[_square]_brackets]"
+                "content-[some_[_square]_brackets]",
+                "foo-bar",
+                "sm:focus:ring",
+                "hover:bg-black",
+                "border-[#333]",
+                "text-[color:var(--hello)]",
             ])
         );
     }
@@ -128,6 +134,34 @@ mod tests {
         assert_eq!(
             scanner.scan("test|bg-red-500|'hello'"),
             BTreeSet::from(["test", "bg-red-500", "'hello'"])
+        );
+    }
+
+    #[test]
+    fn utf8_scan() {
+        assert_eq!(
+            Scanner::default().scan("<div class=\"before:content-[J\u{e4}s\u{f8}n_Doe] content-[\u{2192}]\">\u{306}</div>"),
+            BTreeSet::from([
+                "<div",
+                ">\u{306}</div>",
+                "before:content-[J\u{e4}s\u{f8}n_Doe]",
+                "class=",
+                "content-[\u{2192}]",
+            ])
+        );
+    }
+
+    #[test]
+    fn scan_prevent_splitting_arbitrary_values() {
+        assert_eq!(
+            Scanner::default().scan(r#"<div class="bg-red-300 content-['hello:>"']"></div>"#),
+            BTreeSet::from([
+                "<div",
+                "></div>",
+                "bg-red-300",
+                "class=",
+                "content-['hello:>\"']",
+            ])
         );
     }
 }

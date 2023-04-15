@@ -12,14 +12,14 @@ pub mod gradient_color_stops;
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::testing;
+    use crate::{generate, utils::testing::base_config};
 
     use pretty_assertions::assert_eq;
 
     #[test]
     fn background_attachment() {
         assert_eq!(
-            testing::generate_css("bg-fixed"),
+            generate(["bg-fixed"], &base_config()),
             ".bg-fixed {
   background-attachment: fixed;
 }"
@@ -29,19 +29,19 @@ mod tests {
     #[test]
     fn background_clip() {
         assert_eq!(
-            testing::generate_css("bg-clip-border"),
+            generate(["bg-clip-border"], &base_config()),
             ".bg-clip-border {
   background-clip: border-box;
 }"
         );
         assert_eq!(
-            testing::generate_css("bg-clip-padding"),
+            generate(["bg-clip-padding"], &base_config()),
             ".bg-clip-padding {
   background-clip: padding-box;
 }"
         );
         assert_eq!(
-            testing::generate_css("bg-clip-text"),
+            generate(["bg-clip-text"], &base_config()),
             ".bg-clip-text {
   background-clip: text;
 }"
@@ -51,7 +51,7 @@ mod tests {
     #[test]
     fn background_origin() {
         assert_eq!(
-            testing::generate_css("bg-origin-padding"),
+            generate(["bg-origin-padding"], &base_config()),
             ".bg-origin-padding {
   background-origin: padding-box;
 }"
@@ -61,7 +61,7 @@ mod tests {
     #[test]
     fn background_repeat() {
         assert_eq!(
-            testing::generate_css("bg-repeat-y"),
+            generate(["bg-repeat-y"], &base_config()),
             ".bg-repeat-y {
   background-repeat: repeat-y;
 }"
@@ -71,13 +71,13 @@ mod tests {
     #[test]
     fn background_size() {
         assert_eq!(
-            testing::generate_css("bg-cover"),
+            generate(["bg-cover"], &base_config()),
             ".bg-cover {
   background-size: cover;
 }"
         );
         assert_eq!(
-            testing::generate_css("bg-[25%]"),
+            generate(["bg-[25%]"], &base_config()),
             r".bg-\[25\%\] {
   background-size: 25%;
 }"
@@ -87,13 +87,13 @@ mod tests {
     #[test]
     fn background_position() {
         assert_eq!(
-            testing::generate_css("bg-right-bottom"),
+            generate(["bg-right-bottom"], &base_config()),
             ".bg-right-bottom {
   background-position: right bottom;
 }"
         );
         assert_eq!(
-            testing::generate_css("bg-[position:25%_100px]"),
+            generate(["bg-[position:25%_100px]"], &base_config()),
             r".bg-\[position\:25\%_100px\] {
   background-position: 25% 100px;
 }"
@@ -103,19 +103,19 @@ mod tests {
     #[test]
     fn background_image() {
         assert_eq!(
-            testing::generate_css("bg-gradient-to-b"),
+            generate(["bg-gradient-to-b"], &base_config()),
             ".bg-gradient-to-b {
   background-image: linear-gradient(to bottom, var(--en-gradient-stops));
 }"
         );
         assert_eq!(
-            testing::generate_css("bg-[url('/hello.png')]"),
+            generate(["bg-[url('/hello.png')]"], &base_config()),
             r".bg-\[url\(\'\/hello\.png\'\)\] {
   background-image: url('/hello.png');
 }"
         );
         assert_eq!(
-            testing::generate_css("bg-[url('/hello_with_underscores.png')]"),
+            generate(["bg-[url('/hello_with_underscores.png')]"], &base_config()),
             r".bg-\[url\(\'\/hello_with_underscores\.png\'\)\] {
   background-image: url('/hello_with_underscores.png');
 }"
@@ -125,20 +125,20 @@ mod tests {
     #[test]
     fn background_color() {
         assert_eq!(
-            testing::generate_css("bg-red-400"),
+            generate(["bg-red-400"], &base_config()),
             ".bg-red-400 {
   --en-bg-opacity: 1;
   background-color: rgb(248 113 113 / var(--en-bg-opacity));
 }"
         );
         assert_eq!(
-            testing::generate_css("bg-[rgb(12,12,12)]"),
+            generate(["bg-[rgb(12,12,12)]"], &base_config()),
             r".bg-\[rgb\(12\,12\,12\)\] {
   background-color: rgb(12,12,12);
 }"
         );
         assert_eq!(
-            testing::generate_css("bg-[purple]"),
+            generate(["bg-[purple]"], &base_config()),
             r".bg-\[purple\] {
   background-color: purple;
 }"
@@ -148,13 +148,13 @@ mod tests {
     #[test]
     fn background_opacity() {
         assert_eq!(
-            testing::generate_css("bg-red-400/12"),
+            generate(["bg-red-400/12"], &base_config()),
             r".bg-red-400\/12 {
   background-color: rgb(248 113 113 / 0.12);
 }"
         );
         assert_eq!(
-            testing::generate_css("bg-opacity-12"),
+            generate(["bg-opacity-12"], &base_config()),
             ".bg-opacity-12 {
   --en-bg-opacity: 0.12;
 }"

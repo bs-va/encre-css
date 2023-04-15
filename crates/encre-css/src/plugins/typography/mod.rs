@@ -28,28 +28,28 @@ pub mod word_break;
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::testing;
+    use crate::{generate, utils::testing::base_config};
 
     use pretty_assertions::assert_eq;
 
     #[test]
     fn content() {
         assert_eq!(
-            testing::generate_css("before:content-none"),
+            generate(["before:content-none"], &base_config()),
             r".before\:content-none::before {
   --en-content: none;
   content: var(--en-content);
 }"
         );
         assert_eq!(
-            testing::generate_css("before:content-['1234_some_words']"),
+            generate(["before:content-['1234_some_words']"], &base_config()),
             r".before\:content-\[\'1234_some_words\'\]::before {
   --en-content: '1234 some words';
   content: var(--en-content);
 }"
         );
         assert_eq!(
-            testing::generate_css("before:content-[':-><-:']"),
+            generate(["before:content-[':-><-:']"], &base_config()),
             r".before\:content-\[\'\:-\>\<-\:\'\]::before {
   --en-content: ':-><-:';
   content: var(--en-content);
@@ -60,13 +60,13 @@ mod tests {
     #[test]
     fn font_family() {
         assert_eq!(
-            testing::generate_css("font-mono"),
+            generate(["font-mono"], &base_config()),
             r#".font-mono {
   font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }"#
         );
         assert_eq!(
-            testing::generate_css("font-['Open_Sans',Roboto,sans-serif]"),
+            generate(["font-['Open_Sans',Roboto,sans-serif]"], &base_config()),
             r".font-\[\'Open_Sans\'\,Roboto\,sans-serif\] {
   font-family: 'Open Sans',Roboto,sans-serif;
 }"
@@ -77,116 +77,116 @@ mod tests {
     #[allow(clippy::too_many_lines)]
     fn font_size() {
         assert_eq!(
-            testing::generate_css("text-xs"),
+            generate(["text-xs"], &base_config()),
             ".text-xs {
   font-size: 0.75rem;
   line-height: 1rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("text-sm"),
+            generate(["text-sm"], &base_config()),
             ".text-sm {
   font-size: 0.875rem;
   line-height: 1.25rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("text-base"),
+            generate(["text-base"], &base_config()),
             ".text-base {
   font-size: 1rem;
   line-height: 1.5rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("text-lg"),
+            generate(["text-lg"], &base_config()),
             ".text-lg {
   font-size: 1.125rem;
   line-height: 1.75rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("text-xl"),
+            generate(["text-xl"], &base_config()),
             ".text-xl {
   font-size: 1.25rem;
   line-height: 1.75rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("text-2xl"),
+            generate(["text-2xl"], &base_config()),
             ".text-2xl {
   font-size: 1.5rem;
   line-height: 2rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("text-3xl"),
+            generate(["text-3xl"], &base_config()),
             ".text-3xl {
   font-size: 1.875rem;
   line-height: 2.25rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("text-4xl"),
+            generate(["text-4xl"], &base_config()),
             ".text-4xl {
   font-size: 2.25rem;
   line-height: 2.5rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("text-5xl"),
+            generate(["text-5xl"], &base_config()),
             ".text-5xl {
   font-size: 3rem;
   line-height: 1;
 }"
         );
         assert_eq!(
-            testing::generate_css("text-6xl"),
+            generate(["text-6xl"], &base_config()),
             ".text-6xl {
   font-size: 3.75rem;
   line-height: 1;
 }"
         );
         assert_eq!(
-            testing::generate_css("text-7xl"),
+            generate(["text-7xl"], &base_config()),
             ".text-7xl {
   font-size: 4.5rem;
   line-height: 1;
 }"
         );
         assert_eq!(
-            testing::generate_css("text-8xl"),
+            generate(["text-8xl"], &base_config()),
             ".text-8xl {
   font-size: 6rem;
   line-height: 1;
 }"
         );
         assert_eq!(
-            testing::generate_css("text-9xl"),
+            generate(["text-9xl"], &base_config()),
             ".text-9xl {
   font-size: 8rem;
   line-height: 1;
 }"
         );
         assert_eq!(
-            testing::generate_css("text-[18px]"),
+            generate(["text-[18px]"], &base_config()),
             r".text-\[18px\] {
   font-size: 18px;
 }"
         );
         assert_eq!(
-            testing::generate_css("text-[10%]"),
+            generate(["text-[10%]"], &base_config()),
             r".text-\[10\%\] {
   font-size: 10%;
 }"
         );
         assert_eq!(
-            testing::generate_css("text-[x-large]"),
+            generate(["text-[x-large]"], &base_config()),
             r".text-\[x-large\] {
   font-size: x-large;
 }"
         );
         assert_eq!(
-            testing::generate_css("text-[smaller]"),
+            generate(["text-[smaller]"], &base_config()),
             r".text-\[smaller\] {
   font-size: smaller;
 }"
@@ -196,14 +196,14 @@ mod tests {
     #[test]
     fn font_smoothing() {
         assert_eq!(
-            testing::generate_css("antialised"),
+            generate(["antialised"], &base_config()),
             ".antialised {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }"
         );
         assert_eq!(
-            testing::generate_css("subpixel-antialised"),
+            generate(["subpixel-antialised"], &base_config()),
             ".subpixel-antialised {
   -webkit-font-smoothing: auto;
   -moz-osx-font-smoothing: auto;
@@ -214,13 +214,13 @@ mod tests {
     #[test]
     fn font_style() {
         assert_eq!(
-            testing::generate_css("italic"),
+            generate(["italic"], &base_config()),
             ".italic {
   font-style: italic;
 }"
         );
         assert_eq!(
-            testing::generate_css("not-italic"),
+            generate(["not-italic"], &base_config()),
             ".not-italic {
   font-style: normal;
 }"
@@ -230,62 +230,62 @@ mod tests {
     #[test]
     fn font_variant_numeric() {
         assert_eq!(
-            testing::generate_css("normal-nums"),
+            generate(["normal-nums"], &base_config()),
             ".normal-nums {
   font-variant-numeric: normal;
 }"
         );
         assert_eq!(
-            testing::generate_css("ordinal"),
+            generate(["ordinal"], &base_config()),
             ".ordinal {
   --en-ordinal: ordinal;
   font-variant-numeric: var(--en-ordinal) var(--en-slashed-zero) var(--en-numeric-figure) var(--en-numeric-spacing) var(--en-numeric-fraction);
 }"
         );
         assert_eq!(
-            testing::generate_css("slashed-zero"),
+            generate(["slashed-zero"], &base_config()),
             ".slashed-zero {
   --en-slashed-zero: slashed-zero;
   font-variant-numeric: var(--en-ordinal) var(--en-slashed-zero) var(--en-numeric-figure) var(--en-numeric-spacing) var(--en-numeric-fraction);
 }"
         );
         assert_eq!(
-            testing::generate_css("lining-nums"),
+            generate(["lining-nums"], &base_config()),
             ".lining-nums {
   --en-numeric-figure: lining-nums;
   font-variant-numeric: var(--en-ordinal) var(--en-slashed-zero) var(--en-numeric-figure) var(--en-numeric-spacing) var(--en-numeric-fraction);
 }"
         );
         assert_eq!(
-            testing::generate_css("oldstyle-nums"),
+            generate(["oldstyle-nums"], &base_config()),
             ".oldstyle-nums {
   --en-numeric-figure: oldstyle-nums;
   font-variant-numeric: var(--en-ordinal) var(--en-slashed-zero) var(--en-numeric-figure) var(--en-numeric-spacing) var(--en-numeric-fraction);
 }"
         );
         assert_eq!(
-            testing::generate_css("proportional-nums"),
+            generate(["proportional-nums"], &base_config()),
             ".proportional-nums {
   --en-numeric-spacing: proportional-nums;
   font-variant-numeric: var(--en-ordinal) var(--en-slashed-zero) var(--en-numeric-figure) var(--en-numeric-spacing) var(--en-numeric-fraction);
 }"
         );
         assert_eq!(
-            testing::generate_css("tabular-nums"),
+            generate(["tabular-nums"], &base_config()),
             ".tabular-nums {
   --en-numeric-spacing: tabular-nums;
   font-variant-numeric: var(--en-ordinal) var(--en-slashed-zero) var(--en-numeric-figure) var(--en-numeric-spacing) var(--en-numeric-fraction);
 }"
         );
         assert_eq!(
-            testing::generate_css("diagonal-fractions"),
+            generate(["diagonal-fractions"], &base_config()),
             ".diagonal-fractions {
   --en-numeric-fraction: diagonal-fractions;
   font-variant-numeric: var(--en-ordinal) var(--en-slashed-zero) var(--en-numeric-figure) var(--en-numeric-spacing) var(--en-numeric-fraction);
 }"
         );
         assert_eq!(
-            testing::generate_css("stacked-fractions"),
+            generate(["stacked-fractions"], &base_config()),
             ".stacked-fractions {
   --en-numeric-fraction: stacked-fractions;
   font-variant-numeric: var(--en-ordinal) var(--en-slashed-zero) var(--en-numeric-figure) var(--en-numeric-spacing) var(--en-numeric-fraction);
@@ -296,61 +296,61 @@ mod tests {
     #[test]
     fn font_weight() {
         assert_eq!(
-            testing::generate_css("font-thin"),
+            generate(["font-thin"], &base_config()),
             ".font-thin {
   font-weight: 100;
 }"
         );
         assert_eq!(
-            testing::generate_css("font-extralight"),
+            generate(["font-extralight"], &base_config()),
             ".font-extralight {
   font-weight: 200;
 }"
         );
         assert_eq!(
-            testing::generate_css("font-light"),
+            generate(["font-light"], &base_config()),
             ".font-light {
   font-weight: 300;
 }"
         );
         assert_eq!(
-            testing::generate_css("font-normal"),
+            generate(["font-normal"], &base_config()),
             ".font-normal {
   font-weight: 400;
 }"
         );
         assert_eq!(
-            testing::generate_css("font-medium"),
+            generate(["font-medium"], &base_config()),
             ".font-medium {
   font-weight: 500;
 }"
         );
         assert_eq!(
-            testing::generate_css("font-semibold"),
+            generate(["font-semibold"], &base_config()),
             ".font-semibold {
   font-weight: 600;
 }"
         );
         assert_eq!(
-            testing::generate_css("font-bold"),
+            generate(["font-bold"], &base_config()),
             ".font-bold {
   font-weight: 700;
 }"
         );
         assert_eq!(
-            testing::generate_css("font-extrabold"),
+            generate(["font-extrabold"], &base_config()),
             ".font-extrabold {
   font-weight: 800;
 }"
         );
         assert_eq!(
-            testing::generate_css("font-black"),
+            generate(["font-black"], &base_config()),
             ".font-black {
   font-weight: 900;
 }"
         );
         assert_eq!(
-            testing::generate_css("font-[50]"),
+            generate(["font-[50]"], &base_config()),
             r".font-\[50\] {
   font-weight: 50;
 }"
@@ -360,43 +360,43 @@ mod tests {
     #[test]
     fn letter_spacing() {
         assert_eq!(
-            testing::generate_css("tracking-tighter"),
+            generate(["tracking-tighter"], &base_config()),
             ".tracking-tighter {
   letter-spacing: -0.05em;
 }"
         );
         assert_eq!(
-            testing::generate_css("tracking-tight"),
+            generate(["tracking-tight"], &base_config()),
             ".tracking-tight {
   letter-spacing: -0.025em;
 }"
         );
         assert_eq!(
-            testing::generate_css("tracking-normal"),
+            generate(["tracking-normal"], &base_config()),
             ".tracking-normal {
   letter-spacing: 0;
 }"
         );
         assert_eq!(
-            testing::generate_css("tracking-wide"),
+            generate(["tracking-wide"], &base_config()),
             ".tracking-wide {
   letter-spacing: 0.025em;
 }"
         );
         assert_eq!(
-            testing::generate_css("tracking-wider"),
+            generate(["tracking-wider"], &base_config()),
             ".tracking-wider {
   letter-spacing: 0.05em;
 }"
         );
         assert_eq!(
-            testing::generate_css("tracking-widest"),
+            generate(["tracking-widest"], &base_config()),
             ".tracking-widest {
   letter-spacing: 0.1em;
 }"
         );
         assert_eq!(
-            testing::generate_css("tracking-[10px]"),
+            generate(["tracking-[10px]"], &base_config()),
             r".tracking-\[10px\] {
   letter-spacing: 10px;
 }"
@@ -406,13 +406,13 @@ mod tests {
     #[test]
     fn line_clamp() {
         assert_eq!(
-            testing::generate_css("line-clamp-none"),
+            generate(["line-clamp-none"], &base_config()),
             ".line-clamp-none {
   -webkit-line-clamp: unset;
 }"
         );
         assert_eq!(
-            testing::generate_css("line-clamp-12"),
+            generate(["line-clamp-12"], &base_config()),
             ".line-clamp-12 {
   overflow: hidden;
   display: -webkit-box;
@@ -425,73 +425,73 @@ mod tests {
     #[test]
     fn line_height() {
         assert_eq!(
-            testing::generate_css("leading-none"),
+            generate(["leading-none"], &base_config()),
             ".leading-none {
   line-height: 1;
 }"
         );
         assert_eq!(
-            testing::generate_css("leading-tight"),
+            generate(["leading-tight"], &base_config()),
             ".leading-tight {
   line-height: 1.25;
 }"
         );
         assert_eq!(
-            testing::generate_css("leading-snug"),
+            generate(["leading-snug"], &base_config()),
             ".leading-snug {
   line-height: 1.375;
 }"
         );
         assert_eq!(
-            testing::generate_css("leading-normal"),
+            generate(["leading-normal"], &base_config()),
             ".leading-normal {
   line-height: 1.5;
 }"
         );
         assert_eq!(
-            testing::generate_css("leading-relaxed"),
+            generate(["leading-relaxed"], &base_config()),
             ".leading-relaxed {
   line-height: 1.625;
 }"
         );
         assert_eq!(
-            testing::generate_css("leading-loose"),
+            generate(["leading-loose"], &base_config()),
             ".leading-loose {
   line-height: 2;
 }"
         );
         assert_eq!(
-            testing::generate_css("leading-4"),
+            generate(["leading-4"], &base_config()),
             ".leading-4 {
   line-height: 1rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("-leading-4"),
+            generate(["-leading-4"], &base_config()),
             ".-leading-4 {
   line-height: -1rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("leading-1/2"),
+            generate(["leading-1/2"], &base_config()),
             r".leading-1\/2 {
   line-height: 50%;
 }"
         );
         assert_eq!(
-            testing::generate_css("leading-[8]"),
+            generate(["leading-[8]"], &base_config()),
             r".leading-\[8\] {
   line-height: 8;
 }"
         );
         assert_eq!(
-            testing::generate_css("leading-[16px]"),
+            generate(["leading-[16px]"], &base_config()),
             r".leading-\[16px\] {
   line-height: 16px;
 }"
         );
         assert_eq!(
-            testing::generate_css("leading-[22%]"),
+            generate(["leading-[22%]"], &base_config()),
             r".leading-\[22\%\] {
   line-height: 22%;
 }"
@@ -501,13 +501,13 @@ mod tests {
     #[test]
     fn list_style_position() {
         assert_eq!(
-            testing::generate_css("list-inside"),
+            generate(["list-inside"], &base_config()),
             ".list-inside {
   list-style-position: inside;
 }"
         );
         assert_eq!(
-            testing::generate_css("list-outside"),
+            generate(["list-outside"], &base_config()),
             ".list-outside {
   list-style-position: outside;
 }"
@@ -517,25 +517,25 @@ mod tests {
     #[test]
     fn list_style_type() {
         assert_eq!(
-            testing::generate_css("list-disc"),
+            generate(["list-disc"], &base_config()),
             ".list-disc {
   list-style-type: disc;
 }"
         );
         assert_eq!(
-            testing::generate_css("list-decimal"),
+            generate(["list-decimal"], &base_config()),
             ".list-decimal {
   list-style-type: decimal;
 }"
         );
         assert_eq!(
-            testing::generate_css("list-none"),
+            generate(["list-none"], &base_config()),
             ".list-none {
   list-style-type: none;
 }"
         );
         assert_eq!(
-            testing::generate_css("list-[greek]"),
+            generate(["list-[greek]"], &base_config()),
             r".list-\[greek\] {
   list-style-type: greek;
 }"
@@ -545,13 +545,13 @@ mod tests {
     #[test]
     fn text_align() {
         assert_eq!(
-            testing::generate_css("text-center"),
+            generate(["text-center"], &base_config()),
             ".text-center {
   text-align: center;
 }"
         );
         assert_eq!(
-            testing::generate_css("text-justify"),
+            generate(["text-justify"], &base_config()),
             ".text-justify {
   text-align: justify;
 }"
@@ -561,20 +561,20 @@ mod tests {
     #[test]
     fn text_color() {
         assert_eq!(
-            testing::generate_css("text-red-400"),
+            generate(["text-red-400"], &base_config()),
             ".text-red-400 {
   --en-text-opacity: 1;
   color: rgb(248 113 113 / var(--en-text-opacity));
 }"
         );
         assert_eq!(
-            testing::generate_css("text-[rgb(12,12,12)]"),
+            generate(["text-[rgb(12,12,12)]"], &base_config()),
             r".text-\[rgb\(12\,12\,12\)\] {
   color: rgb(12,12,12);
 }"
         );
         assert_eq!(
-            testing::generate_css("text-[purple]"),
+            generate(["text-[purple]"], &base_config()),
             r".text-\[purple\] {
   color: purple;
 }"
@@ -584,14 +584,14 @@ mod tests {
     #[test]
     fn text_decoration() {
         assert_eq!(
-            testing::generate_css("underline"),
+            generate(["underline"], &base_config()),
             ".underline {
   -webkit-text-decoration-line: underline;
   text-decoration-line: underline;
 }"
         );
         assert_eq!(
-            testing::generate_css("no-underline"),
+            generate(["no-underline"], &base_config()),
             ".no-underline {
   -webkit-text-decoration-line: none;
   text-decoration-line: none;
@@ -602,21 +602,21 @@ mod tests {
     #[test]
     fn text_decoration_color() {
         assert_eq!(
-            testing::generate_css("decoration-red-400"),
+            generate(["decoration-red-400"], &base_config()),
             ".decoration-red-400 {
   -webkit-text-decoration-color: rgb(248 113 113);
   text-decoration-color: rgb(248 113 113);
 }"
         );
         assert_eq!(
-            testing::generate_css("decoration-[rgb(12,12,12)]"),
+            generate(["decoration-[rgb(12,12,12)]"], &base_config()),
             r".decoration-\[rgb\(12\,12\,12\)\] {
   -webkit-text-decoration-color: rgb(12,12,12);
   text-decoration-color: rgb(12,12,12);
 }"
         );
         assert_eq!(
-            testing::generate_css("decoration-[purple]"),
+            generate(["decoration-[purple]"], &base_config()),
             r".decoration-\[purple\] {
   -webkit-text-decoration-color: purple;
   text-decoration-color: purple;
@@ -627,7 +627,7 @@ mod tests {
     #[test]
     fn text_decoration_style() {
         assert_eq!(
-            testing::generate_css("decoration-wavy"),
+            generate(["decoration-wavy"], &base_config()),
             ".decoration-wavy {
   text-decoration-style: wavy;
 }"
@@ -637,31 +637,31 @@ mod tests {
     #[test]
     fn text_decoration_thickness() {
         assert_eq!(
-            testing::generate_css("decoration-auto"),
+            generate(["decoration-auto"], &base_config()),
             ".decoration-auto {
   text-decoration-thickness: auto;
 }"
         );
         assert_eq!(
-            testing::generate_css("decoration-from-font"),
+            generate(["decoration-from-font"], &base_config()),
             ".decoration-from-font {
   text-decoration-thickness: from-font;
 }"
         );
         assert_eq!(
-            testing::generate_css("decoration-12"),
+            generate(["decoration-12"], &base_config()),
             ".decoration-12 {
   text-decoration-thickness: 12px;
 }"
         );
         assert_eq!(
-            testing::generate_css("decoration-[4.2rem]"),
+            generate(["decoration-[4.2rem]"], &base_config()),
             r".decoration-\[4\.2rem\] {
   text-decoration-thickness: 4.2rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("decoration-[2%]"),
+            generate(["decoration-[2%]"], &base_config()),
             r".decoration-\[2\%\] {
   text-decoration-thickness: 2%;
 }"
@@ -671,19 +671,19 @@ mod tests {
     #[test]
     fn text_indent() {
         assert_eq!(
-            testing::generate_css("indent-2"),
+            generate(["indent-2"], &base_config()),
             ".indent-2 {
   text-indent: 0.5rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("-indent-2"),
+            generate(["-indent-2"], &base_config()),
             ".-indent-2 {
   text-indent: -0.5rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("indent-[20px]"),
+            generate(["indent-[20px]"], &base_config()),
             r".indent-\[20px\] {
   text-indent: 20px;
 }"
@@ -693,13 +693,13 @@ mod tests {
     #[test]
     fn text_opacity() {
         assert_eq!(
-            testing::generate_css("text-red-400/12"),
+            generate(["text-red-400/12"], &base_config()),
             r".text-red-400\/12 {
   color: rgb(248 113 113 / 0.12);
 }"
         );
         assert_eq!(
-            testing::generate_css("text-opacity-12"),
+            generate(["text-opacity-12"], &base_config()),
             ".text-opacity-12 {
   --en-text-opacity: 0.12;
 }"
@@ -709,7 +709,7 @@ mod tests {
     #[test]
     fn text_overflow() {
         assert_eq!(
-            testing::generate_css("truncate"),
+            generate(["truncate"], &base_config()),
             ".truncate {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -717,13 +717,13 @@ mod tests {
 }"
         );
         assert_eq!(
-            testing::generate_css("text-ellipsis"),
+            generate(["text-ellipsis"], &base_config()),
             ".text-ellipsis {
   text-overflow: ellipsis;
 }"
         );
         assert_eq!(
-            testing::generate_css("text-clip"),
+            generate(["text-clip"], &base_config()),
             ".text-clip {
   text-overflow: clip;
 }"
@@ -733,13 +733,13 @@ mod tests {
     #[test]
     fn text_transform() {
         assert_eq!(
-            testing::generate_css("normal-case"),
+            generate(["normal-case"], &base_config()),
             ".normal-case {
   text-transform: none;
 }"
         );
         assert_eq!(
-            testing::generate_css("uppercase"),
+            generate(["uppercase"], &base_config()),
             ".uppercase {
   text-transform: uppercase;
 }"
@@ -749,25 +749,25 @@ mod tests {
     #[test]
     fn text_underline_offset() {
         assert_eq!(
-            testing::generate_css("underline-offset-auto"),
+            generate(["underline-offset-auto"], &base_config()),
             ".underline-offset-auto {
   text-underline-offset: auto;
 }"
         );
         assert_eq!(
-            testing::generate_css("underline-offset-12"),
+            generate(["underline-offset-12"], &base_config()),
             ".underline-offset-12 {
   text-underline-offset: 12px;
 }"
         );
         assert_eq!(
-            testing::generate_css("underline-offset-[2rem]"),
+            generate(["underline-offset-[2rem]"], &base_config()),
             r".underline-offset-\[2rem\] {
   text-underline-offset: 2rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("underline-offset-[10%]"),
+            generate(["underline-offset-[10%]"], &base_config()),
             r".underline-offset-\[10\%\] {
   text-underline-offset: 10%;
 }"
@@ -777,13 +777,13 @@ mod tests {
     #[test]
     fn vertical_align() {
         assert_eq!(
-            testing::generate_css("align-sub"),
+            generate(["align-sub"], &base_config()),
             ".align-sub {
   vertical-align: sub;
 }"
         );
         assert_eq!(
-            testing::generate_css("align-text-top"),
+            generate(["align-text-top"], &base_config()),
             ".align-text-top {
   vertical-align: text-top;
 }"
@@ -793,13 +793,13 @@ mod tests {
     #[test]
     fn whitespace() {
         assert_eq!(
-            testing::generate_css("whitespace-normal"),
+            generate(["whitespace-normal"], &base_config()),
             ".whitespace-normal {
   white-space: normal;
 }"
         );
         assert_eq!(
-            testing::generate_css("whitespace-pre-wrap"),
+            generate(["whitespace-pre-wrap"], &base_config()),
             ".whitespace-pre-wrap {
   white-space: pre-wrap;
 }"
@@ -809,14 +809,14 @@ mod tests {
     #[test]
     fn word_break() {
         assert_eq!(
-            testing::generate_css("break-normal"),
+            generate(["break-normal"], &base_config()),
             ".break-normal {
   overflow-wrap: normal;
   word-break: normal;
 }"
         );
         assert_eq!(
-            testing::generate_css("break-keep"),
+            generate(["break-keep"], &base_config()),
             ".break-keep {
   word-break: keep-all;
 }"

@@ -11,19 +11,15 @@ To integrate `encre-css-typography` with `encre-css`, add it in your `Cargo.toml
 encre-css-typography = { git = "https://gitlab.com/encre-org/encre-css.git", tag = "v0.9.3" }
 ```
 
-Then, call the `register` function with a mutable reference to a `Config`
-structure:
+Then, call the `register` function with a mutable reference to a `Config` structure:
 
 ```rust
-use encre_css::{Config, EncreGenerator};
+use encre_css::{Config, generate};
 
 let mut config = Config::from_file("encre-css.toml")?;
 // Or let mut config = Config::default();
 encre_css_typography::register(&mut config);
 
-let mut generator = EncreGenerator::new(&config);
-generator.scan(r#"<div class="prose prose-headings:text-blue-500 prose-slate lg:prose-lg dark:prose-invert"></div>"#);
-
-let css = generator.generate();
+let _css = generate([r#"<div class="prose prose-headings:text-blue-500 prose-slate lg:prose-lg dark:prose-invert"></div>"#], &config);
 // Do something with the CSS
 ```

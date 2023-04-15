@@ -126,26 +126,23 @@
 //! <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">[dependencies]</span>
 //! encre-css = <span class="string">"0.9.3"</span></code></pre></div>
 //!
-//! Generating styles takes three steps:
-//! - First, you need to _configure_ the main [`EncreGenerator`] structure
-//! by making a [`Config`] structure. It can be created by reading a [TOML](https://toml.io) file using
+//! Generating styles takes two steps:
+//! - You need to _configure_ the CSS generation by making a [`Config`] structure.
+//! It can be created by reading a [TOML](https://toml.io) file using
 //! [`Config::from_file`] or by using the default values with [`Config::default`];
-//! - Then, you need to _scan content_ to extract and collect all useful atomic classes using
-//! [`EncreGenerator::scan`] or [`EncreGenerator::add_selector`] to manually add **a
-//! single** previously scanned selector or [`EncreGenerator::add_selectors`] to manually add
-//! **several** previously scanned selectors;
-//! - Finally, you need to _generate the styles_ using [`EncreGenerator::generate`].
+//! - Then, you need to _generate the styles_ based on some sources using the [`generate`]
+//! function. This function will scan the content of the sources, extract atomic classes and
+//! generate the style needed for each class.
 //!
 //! ### Example
 //!
 //! ```
-//! use encre_css::{EncreGenerator, Config};
+//! use encre_css::{Config, generate};
 //!
 //! let config = Config::default();
-//! let mut generator = EncreGenerator::new(&config);
-//! generator.scan(r#"<p class="w-auto bg-red-200 rounded-md">Hello world!</p>"#);
+//! let generated = generate([r#"<p class="w-auto bg-red-200 rounded-md">Hello world!</p>"#], &config);
 //!
-//! assert!(generator.generate().ends_with(".w-auto {
+//! assert!(generated.ends_with(".w-auto {
 //!   width: auto;
 //! }
 //!
@@ -220,7 +217,7 @@ pub mod utils;
 
 pub use config::Config;
 pub use error::{Error, Result};
-pub use generator::EncreGenerator;
+pub use generator::generate;
 pub use preflight::Preflight;
 pub use scanner::Scanner;
 pub use toml::toml;

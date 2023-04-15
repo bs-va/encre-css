@@ -1,20 +1,15 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use encre_css::{utils::value_matchers, Config, EncreGenerator};
+use encre_css::{generate, utils::value_matchers, Config};
 use std::fs;
 
 fn scan(c: &mut Criterion) {
-    let config = Config::default();
-    let mut generator = EncreGenerator::new(&config);
-
     c.bench_function("scan", |b| b.iter(|| {
-        generator.scan(r#"<div class="w-full h-full absolute bg-blue-500 foo-bar sm:focus:ring hover:bg-black border-[#333] text-[color:var(--hello)]"></div>"#);
+        generate([r#"<div class="w-full h-full absolute bg-blue-500 foo-bar sm:focus:ring hover:bg-black border-[#333] text-[color:var(--hello)]"></div>"#], &Config::default())
     }));
 
     let file_content = fs::read_to_string("tests/fixtures/index.js").unwrap();
     c.bench_function("scan_large_file", |b| {
-        b.iter(|| {
-            generator.scan(&file_content);
-        })
+        b.iter(|| generate([file_content.as_str()], &Config::default()))
     });
 }
 
@@ -34,12 +29,8 @@ fn matchers(c: &mut Criterion) {
 
 fn generation(c: &mut Criterion) {
     c.bench_function("scan and generate", move |b| {
-        let config = Config::default();
         b.iter(move || {
-            let mut generator = EncreGenerator::new(&config);
-            generator.scan(r#"<div class="w-full h-full absolute bg-blue-500 foo-bar sm:focus:ring hover:bg-black border-[#333] text-[color:var(--hello)]"></div>"#);
-
-            generator.generate();
+            generate([r#"<div class="w-full h-full absolute bg-blue-500 foo-bar sm:focus:ring hover:bg-black border-[#333] text-[color:var(--hello)]"></div>"#], &Config::default());
         })
     });
 }

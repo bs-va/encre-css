@@ -142,6 +142,7 @@ pub(crate) fn parse<'a>(
     span: Option<Range<usize>>,
     full_class: Option<&'a str>,
     config: &Config,
+    config_derived_variants: &[(Cow<'static, str>, VariantType)],
 ) -> Vec<Result<Selector<'a>, ParseError<'a>>> {
     // The shortest selector is `m1`
     if val.len() < 2 {
@@ -151,7 +152,7 @@ pub(crate) fn parse<'a>(
         ))];
     }
 
-    parse_recursive(val, span, full_class, config)
+    parse_recursive(val, span, full_class, config, config_derived_variants)
 }
 
 #[allow(clippy::too_many_lines)]
@@ -160,13 +161,12 @@ fn parse_recursive<'a>(
     span: Option<Range<usize>>,
     full_class: Option<&'a str>,
     config: &Config,
+    config_derived_variants: &[(Cow<'static, str>, VariantType)],
 ) -> Vec<Result<Selector<'a>, ParseError<'a>>> {
     let span = span.unwrap_or(0..val.len());
 
     // Parse variants
     let (variants, mut remaining) = {
-        let custom_variants = config.get_custom_variants();
-
         let mut arbitraries = 0usize;
         let mut groups = 0usize;
         let mut last_index = 0;
@@ -218,8 +218,10 @@ fn parse_recursive<'a>(
                 ))));
             } else if let Some((order, variant)) = BUILTIN_VARIANTS.get(variant) {
                 variants.push(Variant::Builtin(*order, variant.clone()));
-            } else if let Some((order, variant)) = custom_variants
+            } else if let Some((order, variant)) = config
+                .custom_variants
                 .iter()
+                .chain(config_derived_variants)
                 .enumerate()
                 .find(|(_, v)| v.0 == variant)
             {
@@ -293,6 +295,7 @@ fn parse_recursive<'a>(
                         val
                     }),
                     config,
+                    config_derived_variants,
                 );
 
                 // Merge the common variants with each child selector variant list
@@ -432,16 +435,25 @@ fn parse_modifier(mut modifier: &str, is_negative: bool) -> Option<Modifier> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[allow(clippy::wildcard_imports)]
     use crate::{config::Config, plugins::*, selector::Selector};
 
     use pretty_assertions::assert_eq;
 
     #[test]
     fn basic_single() {
+        let config = Config::default();
         assert_eq!(
-            parse("absolute", None, None, &Config::default())[0]
-                .as_ref()
-                .unwrap(),
+            parse(
+                "absolute",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
             &Selector {
                 full: "absolute",
                 order: 4,
@@ -458,10 +470,17 @@ mod tests {
 
     #[test]
     fn basic_multiple() {
+        let config = Config::default();
         assert_eq!(
-            parse("text-center", None, None, &Config::default())[0]
-                .as_ref()
-                .unwrap(),
+            parse(
+                "text-center",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
             &Selector {
                 full: "text-center",
                 order: 185,
@@ -478,10 +497,17 @@ mod tests {
 
     #[test]
     fn basic_opacity() {
+        let config = Config::default();
         assert_eq!(
-            parse("bg-red-500/25", None, None, &Config::default())[0]
-                .as_ref()
-                .unwrap(),
+            parse(
+                "bg-red-500/25",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
             &Selector {
                 full: "bg-red-500/25",
                 order: 158,
@@ -498,8 +524,9 @@ mod tests {
 
     #[test]
     fn basic_important() {
+        let config = Config::default();
         assert_eq!(
-            parse("!px-4", None, None, &Config::default())[0]
+            parse("!px-4", None, None, &config, &config.get_derived_variants())[0]
                 .as_ref()
                 .unwrap(),
             &Selector {
@@ -518,8 +545,9 @@ mod tests {
 
     #[test]
     fn basic_negative() {
+        let config = Config::default();
         assert_eq!(
-            parse("-px-4", None, None, &Config::default())[0]
+            parse("-px-4", None, None, &config, &config.get_derived_variants())[0]
                 .as_ref()
                 .unwrap(),
             &Selector {
@@ -538,10 +566,17 @@ mod tests {
 
     #[test]
     fn basic_important_and_negative() {
+        let config = Config::default();
         assert_eq!(
-            parse("!-px-4", None, None, &Config::default())[0]
-                .as_ref()
-                .unwrap(),
+            parse(
+                "!-px-4",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
             &Selector {
                 full: "!-px-4",
                 order: 177,
@@ -558,8 +593,9 @@ mod tests {
 
     #[test]
     fn basic_integer() {
+        let config = Config::default();
         assert_eq!(
-            parse("px-4", None, None, &Config::default())[0]
+            parse("px-4", None, None, &config, &config.get_derived_variants())[0]
                 .as_ref()
                 .unwrap(),
             &Selector {
@@ -578,10 +614,17 @@ mod tests {
 
     #[test]
     fn basic_float() {
+        let config = Config::default();
         assert_eq!(
-            parse("px-1.5", None, None, &Config::default())[0]
-                .as_ref()
-                .unwrap(),
+            parse(
+                "px-1.5",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
             &Selector {
                 full: "px-1.5",
                 order: 177,
@@ -598,10 +641,17 @@ mod tests {
 
     #[test]
     fn variants_single() {
+        let config = Config::default();
         assert_eq!(
-            parse("hover:text-center", None, None, &Config::default())[0]
-                .as_ref()
-                .unwrap(),
+            parse(
+                "hover:text-center",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
             &Selector {
                 full: "hover:text-center",
                 order: 185,
@@ -618,12 +668,14 @@ mod tests {
 
     #[test]
     fn variants_multiple() {
+        let config = Config::default();
         assert_eq!(
             parse(
                 "marker:xl:hover:text-center",
                 None,
                 None,
-                &Config::default()
+                &config,
+                &config.get_derived_variants(),
             )[0]
             .as_ref()
             .unwrap(),
@@ -653,10 +705,17 @@ mod tests {
 
     #[test]
     fn variants_negative() {
+        let config = Config::default();
         assert_eq!(
-            parse("marker:xl:hover:-mx-4", None, None, &Config::default())[0]
-                .as_ref()
-                .unwrap(),
+            parse(
+                "marker:xl:hover:-mx-4",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
             &Selector {
                 full: "marker:xl:hover:-mx-4",
                 order: 22,
@@ -683,10 +742,17 @@ mod tests {
 
     #[test]
     fn arbitrary_variant() {
+        let config = Config::default();
         assert_eq!(
-            parse("[&>*]:text-center", None, None, &Config::default())[0]
-                .as_ref()
-                .unwrap(),
+            parse(
+                "[&>*]:text-center",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
             &Selector {
                 full: "[&>*]:text-center",
                 order: 185,
@@ -703,12 +769,14 @@ mod tests {
 
     #[test]
     fn arbitrary_variant_at_rule() {
+        let config = Config::default();
         assert_eq!(
             parse(
                 "[@supports_not_(display:grid)]:grid",
                 None,
                 None,
-                &Config::default()
+                &config,
+                &config.get_derived_variants(),
             )[0]
             .as_ref()
             .unwrap(),
@@ -730,10 +798,17 @@ mod tests {
 
     #[test]
     fn arbitrary_variant_multiple() {
+        let config = Config::default();
         assert_eq!(
-            parse("xl:[&>*]:focus:text-center", None, None, &Config::default())[0]
-                .as_ref()
-                .unwrap(),
+            parse(
+                "xl:[&>*]:focus:text-center",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
             &Selector {
                 full: "xl:[&>*]:focus:text-center",
                 order: 185,
@@ -757,10 +832,17 @@ mod tests {
 
     #[test]
     fn arbitrary_variant_negative() {
+        let config = Config::default();
         assert_eq!(
-            parse("xl:[&>*]:focus:-m-4", None, None, &Config::default())[0]
-                .as_ref()
-                .unwrap(),
+            parse(
+                "xl:[&>*]:focus:-m-4",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
             &Selector {
                 full: "xl:[&>*]:focus:-m-4",
                 order: 21,
@@ -784,10 +866,17 @@ mod tests {
 
     #[test]
     fn arbitrary_value() {
+        let config = Config::default();
         assert_eq!(
-            parse("mx-[12px]", None, None, &Config::default())[0]
-                .as_ref()
-                .unwrap(),
+            parse(
+                "mx-[12px]",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
             &Selector {
                 full: "mx-[12px]",
                 order: 22,
@@ -805,12 +894,14 @@ mod tests {
 
     #[test]
     fn complex_arbitrary_value() {
+        let config = Config::default();
         assert_eq!(
             parse(
                 "bg-[url('/hello_world.png')]",
                 None,
                 None,
-                &Config::default()
+                &config,
+                &config.get_derived_variants(),
             )[0]
             .as_ref()
             .unwrap(),
@@ -831,10 +922,17 @@ mod tests {
 
     #[test]
     fn arbitrary_value_hint() {
+        let config = Config::default();
         assert_eq!(
-            parse("bg-[color:#fff]", None, None, &Config::default())[0]
-                .as_ref()
-                .unwrap(),
+            parse(
+                "bg-[color:#fff]",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
             &Selector {
                 full: "bg-[color:#fff]",
                 order: 158,
@@ -852,10 +950,17 @@ mod tests {
 
     #[test]
     fn arbitrary_value_with_variants() {
+        let config = Config::default();
         assert_eq!(
-            parse("xl:marker:bg-[#fff]", None, None, &Config::default())[0]
-                .as_ref()
-                .unwrap(),
+            parse(
+                "xl:marker:bg-[#fff]",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
             &Selector {
                 full: "xl:marker:bg-[#fff]",
                 order: 158,
@@ -882,10 +987,17 @@ mod tests {
 
     #[test]
     fn arbitrary_value_with_variants_and_hint() {
+        let config = Config::default();
         assert_eq!(
-            parse("xl:marker:bg-[color:#fff]", None, None, &Config::default())[0]
-                .as_ref()
-                .unwrap(),
+            parse(
+                "xl:marker:bg-[color:#fff]",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
             &Selector {
                 full: "xl:marker:bg-[color:#fff]",
                 order: 158,
@@ -912,10 +1024,17 @@ mod tests {
 
     #[test]
     fn arbitrary_value_with_arbitrary_variant() {
+        let config = Config::default();
         assert_eq!(
-            parse("[&>*]:bg-[#fff]", None, None, &Config::default())[0]
-                .as_ref()
-                .unwrap(),
+            parse(
+                "[&>*]:bg-[#fff]",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
             &Selector {
                 full: "[&>*]:bg-[#fff]",
                 order: 158,
@@ -933,12 +1052,14 @@ mod tests {
 
     #[test]
     fn arbitrary_variant_escaped() {
+        let config = Config::default();
         assert_eq!(
             parse(
                 r"[\[type='input'\]_&>:*]:bg-red-300",
                 None,
                 None,
-                &Config::default()
+                &config,
+                &config.get_derived_variants(),
             )[0]
             .as_ref()
             .unwrap(),
@@ -958,10 +1079,17 @@ mod tests {
 
     #[test]
     fn arbitrary_value_with_arbitrary_variant_mixed() {
+        let config = Config::default();
         assert_eq!(
-            parse("xl:[&>*]:hover:bg-[#fff]", None, None, &Config::default())[0]
-                .as_ref()
-                .unwrap(),
+            parse(
+                "xl:[&>*]:hover:bg-[#fff]",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
             &Selector {
                 full: "xl:[&>*]:hover:bg-[#fff]",
                 order: 158,
@@ -986,12 +1114,14 @@ mod tests {
 
     #[test]
     fn arbitrary_value_with_arbitrary_variant_and_hint() {
+        let config = Config::default();
         assert_eq!(
             parse(
                 "xl:[&>*]:hover:bg-[color:#fff]",
                 None,
                 None,
-                &Config::default()
+                &config,
+                &config.get_derived_variants(),
             )[0]
             .as_ref()
             .unwrap(),
@@ -1019,12 +1149,14 @@ mod tests {
 
     #[test]
     fn arbitrary_value_escaped() {
+        let config = Config::default();
         assert_eq!(
             parse(
                 r"bg-[url('/url_with_\]\)\'.png')]",
                 None,
                 None,
-                &Config::default()
+                &config,
+                &config.get_derived_variants(),
             )[0]
             .as_ref()
             .unwrap(),
@@ -1045,12 +1177,14 @@ mod tests {
 
     #[test]
     fn arbitrary_css_property() {
+        let config = Config::default();
         assert_eq!(
             parse(
                 "hover:[mask-type:luminance]",
                 None,
                 None,
-                &Config::default()
+                &config,
+                &config.get_derived_variants(),
             )[0]
             .as_ref()
             .unwrap(),
@@ -1071,12 +1205,14 @@ mod tests {
 
     #[test]
     fn variant_grouping() {
+        let config = Config::default();
         assert_eq!(
             parse(
                 "hover:(focus:bg-gray-500,text-[color:black,])",
                 None,
                 None,
-                &Config::default(),
+                &config,
+                &config.get_derived_variants(),
             ),
             vec![
                 Ok(Selector {
@@ -1111,8 +1247,15 @@ mod tests {
 
     #[test]
     fn variant_grouping_single() {
+        let config = Config::default();
         assert_eq!(
-            parse("hover:(bg-gray-500)", None, None, &Config::default()),
+            parse(
+                "hover:(bg-gray-500)",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            ),
             vec![Ok(Selector {
                 full: "hover:(bg-gray-500)",
                 order: 158,
@@ -1129,12 +1272,14 @@ mod tests {
 
     #[test]
     fn variant_grouping_nested() {
+        let config = Config::default();
         assert_eq!(
             parse(
                 "focus:([&>*]:-m-4,xl:dark:(bg-red-100,rtl:text-[color:black]))",
                 None,
                 None,
-                &Config::default(),
+                &config,
+                &config.get_derived_variants(),
             ),
             vec![
                 Ok(Selector {
@@ -1201,12 +1346,14 @@ mod tests {
 
     #[test]
     fn variant_grouping_nested_escaped() {
+        let config = Config::default();
         assert_eq!(
             parse(
                 r"focus:([&>*]:-m-4,xl:dark:([\[type='text'\].light_&,.foo]:bg-red-100,text-[color:black,]))",
                 None,
                 None,
-                &Config::default(),
+                &config,
+                &config.get_derived_variants(),
             ),
             vec![
                 Ok(Selector {
@@ -1273,12 +1420,14 @@ mod tests {
 
     #[test]
     fn variant_grouping_complex_nested() {
+        let config = Config::default();
         assert_eq!(
             parse(
                 r"xl:(focus:(outline,outline-red-200),dark:(bg-black,text-white))",
                 None,
                 None,
-                &Config::default(),
+                &config,
+                &config.get_derived_variants(),
             ),
             vec![
                 Ok(Selector {

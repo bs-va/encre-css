@@ -22,20 +22,20 @@ pub mod z_index;
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::testing;
+    use crate::{generate, utils::testing::base_config};
 
     use pretty_assertions::assert_eq;
 
     #[test]
     fn aspect_ratio() {
         assert_eq!(
-            testing::generate_css("aspect-auto"),
+            generate(["aspect-auto"], &base_config()),
             ".aspect-auto {
   aspect-ratio: auto;
 }"
         );
         assert_eq!(
-            testing::generate_css("aspect-video"),
+            generate(["aspect-video"], &base_config()),
             ".aspect-video {
   aspect-ratio: 16 / 9;
 }"
@@ -45,7 +45,7 @@ mod tests {
     #[test]
     fn box_decoration_break() {
         assert_eq!(
-            testing::generate_css("box-decoration-clone"),
+            generate(["box-decoration-clone"], &base_config()),
             ".box-decoration-clone {
   box-decoration-break: clone;
 }"
@@ -55,7 +55,7 @@ mod tests {
     #[test]
     fn box_sizing() {
         assert_eq!(
-            testing::generate_css("box-content"),
+            generate(["box-content"], &base_config()),
             ".box-content {
   box-sizing: content-box;
 }"
@@ -65,19 +65,19 @@ mod tests {
     #[test]
     fn break_after() {
         assert_eq!(
-            testing::generate_css("break-after-all"),
+            generate(["break-after-all"], &base_config()),
             ".break-after-all {
   break-after: all;
 }"
         );
         assert_eq!(
-            testing::generate_css("break-after-avoid-page"),
+            generate(["break-after-avoid-page"], &base_config()),
             ".break-after-avoid-page {
   break-after: avoid-page;
 }"
         );
         assert_eq!(
-            testing::generate_css("break-after-column"),
+            generate(["break-after-column"], &base_config()),
             ".break-after-column {
   break-after: column;
 }"
@@ -87,19 +87,19 @@ mod tests {
     #[test]
     fn break_before() {
         assert_eq!(
-            testing::generate_css("break-before-all"),
+            generate(["break-before-all"], &base_config()),
             ".break-before-all {
   break-before: all;
 }"
         );
         assert_eq!(
-            testing::generate_css("break-before-avoid-page"),
+            generate(["break-before-avoid-page"], &base_config()),
             ".break-before-avoid-page {
   break-before: avoid-page;
 }"
         );
         assert_eq!(
-            testing::generate_css("break-before-column"),
+            generate(["break-before-column"], &base_config()),
             ".break-before-column {
   break-before: column;
 }"
@@ -109,13 +109,13 @@ mod tests {
     #[test]
     fn break_inside() {
         assert_eq!(
-            testing::generate_css("break-inside-auto"),
+            generate(["break-inside-auto"], &base_config()),
             ".break-inside-auto {
   break-inside: auto;
 }"
         );
         assert_eq!(
-            testing::generate_css("break-inside-avoid-page"),
+            generate(["break-inside-avoid-page"], &base_config()),
             ".break-inside-avoid-page {
   break-inside: avoid-page;
 }"
@@ -125,7 +125,7 @@ mod tests {
     #[test]
     fn clear() {
         assert_eq!(
-            testing::generate_css("clear-both"),
+            generate(["clear-both"], &base_config()),
             ".clear-both {
   clear: both;
 }"
@@ -135,13 +135,13 @@ mod tests {
     #[test]
     fn columns() {
         assert_eq!(
-            testing::generate_css("columns-md"),
+            generate(["columns-md"], &base_config()),
             ".columns-md {
   columns: 28rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("columns-4"),
+            generate(["columns-4"], &base_config()),
             ".columns-4 {
   columns: 4;
 }"
@@ -151,7 +151,7 @@ mod tests {
     #[test]
     fn container() {
         assert_eq!(
-            testing::generate_css("container"),
+            generate(["container"], &base_config()),
             ".container {
   width: 100%;
 }
@@ -191,13 +191,13 @@ mod tests {
     #[test]
     fn display() {
         assert_eq!(
-            testing::generate_css("inline-flex"),
+            generate(["inline-flex"], &base_config()),
             ".inline-flex {
   display: inline-flex;
 }"
         );
         assert_eq!(
-            testing::generate_css("hidden"),
+            generate(["hidden"], &base_config()),
             ".hidden {
   display: none;
 }"
@@ -207,7 +207,7 @@ mod tests {
     #[test]
     fn floats() {
         assert_eq!(
-            testing::generate_css("float-right"),
+            generate(["float-right"], &base_config()),
             ".float-right {
   float: right;
 }"
@@ -217,13 +217,13 @@ mod tests {
     #[test]
     fn isolation() {
         assert_eq!(
-            testing::generate_css("isolate"),
+            generate(["isolate"], &base_config()),
             ".isolate {
   isolation: isolate;
 }"
         );
         assert_eq!(
-            testing::generate_css("isolation-auto"),
+            generate(["isolation-auto"], &base_config()),
             ".isolation-auto {
   isolation: auto;
 }"
@@ -233,13 +233,13 @@ mod tests {
     #[test]
     fn object_fit() {
         assert_eq!(
-            testing::generate_css("object-contain"),
+            generate(["object-contain"], &base_config()),
             ".object-contain {
   object-fit: contain;
 }"
         );
         assert_eq!(
-            testing::generate_css("object-scale-down"),
+            generate(["object-scale-down"], &base_config()),
             ".object-scale-down {
   object-fit: scale-down;
 }"
@@ -249,19 +249,19 @@ mod tests {
     #[test]
     fn object_position() {
         assert_eq!(
-            testing::generate_css("object-bottom"),
+            generate(["object-bottom"], &base_config()),
             ".object-bottom {
   object-position: bottom;
 }"
         );
         assert_eq!(
-            testing::generate_css("object-left-top"),
+            generate(["object-left-top"], &base_config()),
             ".object-left-top {
   object-position: left top;
 }"
         );
         assert_eq!(
-            testing::generate_css("object-[center_bottom]"),
+            generate(["object-[center_bottom]"], &base_config()),
             r".object-\[center_bottom\] {
   object-position: center bottom;
 }"
@@ -271,13 +271,13 @@ mod tests {
     #[test]
     fn overflow() {
         assert_eq!(
-            testing::generate_css("overflow-hidden"),
+            generate(["overflow-hidden"], &base_config()),
             ".overflow-hidden {
   overflow: hidden;
 }"
         );
         assert_eq!(
-            testing::generate_css("overflow-y-scroll"),
+            generate(["overflow-y-scroll"], &base_config()),
             ".overflow-y-scroll {
   overflow-y: scroll;
 }"
@@ -287,13 +287,13 @@ mod tests {
     #[test]
     fn overscroll_behavior() {
         assert_eq!(
-            testing::generate_css("overscroll-auto"),
+            generate(["overscroll-auto"], &base_config()),
             ".overscroll-auto {
   overscroll-behavior: auto;
 }"
         );
         assert_eq!(
-            testing::generate_css("overscroll-y-none"),
+            generate(["overscroll-y-none"], &base_config()),
             ".overscroll-y-none {
   overscroll-behavior-y: none;
 }"
@@ -303,31 +303,31 @@ mod tests {
     #[test]
     fn placement() {
         assert_eq!(
-            testing::generate_css("top-12"),
+            generate(["top-12"], &base_config()),
             ".top-12 {
   top: 3rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("top-[1px]"),
+            generate(["top-[1px]"], &base_config()),
             r".top-\[1px\] {
   top: 1px;
 }"
         );
         assert_eq!(
-            testing::generate_css("left-auto"),
+            generate(["left-auto"], &base_config()),
             ".left-auto {
   left: auto;
 }"
         );
         assert_eq!(
-            testing::generate_css("right-full"),
+            generate(["right-full"], &base_config()),
             ".right-full {
   right: 100%;
 }"
         );
         assert_eq!(
-            testing::generate_css("inset-2"),
+            generate(["inset-2"], &base_config()),
             ".inset-2 {
   top: 0.5rem;
   right: 0.5rem;
@@ -336,19 +336,19 @@ mod tests {
 }"
         );
         assert_eq!(
-            testing::generate_css("-left-20"),
+            generate(["-left-20"], &base_config()),
             ".-left-20 {
   left: -5rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("right-[20%]"),
+            generate(["right-[20%]"], &base_config()),
             r".right-\[20\%\] {
   right: 20%;
 }"
         );
         assert_eq!(
-            testing::generate_css("inset-[20px]"),
+            generate(["inset-[20px]"], &base_config()),
             r".inset-\[20px\] {
   top: 20px;
   right: 20px;
@@ -357,7 +357,7 @@ mod tests {
 }"
         );
         assert_eq!(
-            testing::generate_css("inset-y-[10em]"),
+            generate(["inset-y-[10em]"], &base_config()),
             r".inset-y-\[10em\] {
   top: 10em;
   bottom: 10em;
@@ -368,7 +368,7 @@ mod tests {
     #[test]
     fn position() {
         assert_eq!(
-            testing::generate_css("relative"),
+            generate(["relative"], &base_config()),
             ".relative {
   position: relative;
 }"
@@ -378,13 +378,13 @@ mod tests {
     #[test]
     fn visibility() {
         assert_eq!(
-            testing::generate_css("visible"),
+            generate(["visible"], &base_config()),
             ".visible {
   visibility: visible;
 }"
         );
         assert_eq!(
-            testing::generate_css("invisible"),
+            generate(["invisible"], &base_config()),
             ".invisible {
   visibility: hidden;
 }"
@@ -394,7 +394,7 @@ mod tests {
     #[test]
     fn z_index() {
         assert_eq!(
-            testing::generate_css("z-22"),
+            generate(["z-22"], &base_config()),
             ".z-22 {
   z-index: 22;
 }"

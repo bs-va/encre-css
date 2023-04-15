@@ -18,21 +18,21 @@ pub mod place_self;
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::testing;
+    use crate::{generate, utils::testing::base_config};
 
     use pretty_assertions::assert_eq;
 
     #[test]
     fn align_content() {
         assert_eq!(
-            testing::generate_css("content-center"),
+            generate(["content-center"], &base_config()),
             ".content-center {
   align-content: center;
 }"
         );
 
         assert_eq!(
-            testing::generate_css("content-evenly"),
+            generate(["content-evenly"], &base_config()),
             ".content-evenly {
   align-content: space-evenly;
 }"
@@ -42,14 +42,14 @@ mod tests {
     #[test]
     fn align_items() {
         assert_eq!(
-            testing::generate_css("items-center"),
+            generate(["items-center"], &base_config()),
             ".items-center {
   align-items: center;
 }"
         );
 
         assert_eq!(
-            testing::generate_css("items-baseline"),
+            generate(["items-baseline"], &base_config()),
             ".items-baseline {
   align-items: baseline;
 }"
@@ -59,14 +59,14 @@ mod tests {
     #[test]
     fn align_self() {
         assert_eq!(
-            testing::generate_css("self-center"),
+            generate(["self-center"], &base_config()),
             ".self-center {
   align-self: center;
 }"
         );
 
         assert_eq!(
-            testing::generate_css("self-stretch"),
+            generate(["self-stretch"], &base_config()),
             ".self-stretch {
   align-self: stretch;
 }"
@@ -76,19 +76,19 @@ mod tests {
     #[test]
     fn flex() {
         assert_eq!(
-            testing::generate_css("flex-1"),
+            generate(["flex-1"], &base_config()),
             ".flex-1 {
   flex: 1 1 0%;
 }"
         );
         assert_eq!(
-            testing::generate_css("flex-none"),
+            generate(["flex-none"], &base_config()),
             ".flex-none {
   flex: none;
 }"
         );
         assert_eq!(
-            testing::generate_css("flex-[1_2_100px]"),
+            generate(["flex-[1_2_100px]"], &base_config()),
             r".flex-\[1_2_100px\] {
   flex: 1 2 100px;
 }"
@@ -98,25 +98,25 @@ mod tests {
     #[test]
     fn flex_basis() {
         assert_eq!(
-            testing::generate_css("basis-4"),
+            generate(["basis-4"], &base_config()),
             ".basis-4 {
   flex-basis: 1rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("basis-auto"),
+            generate(["basis-auto"], &base_config()),
             ".basis-auto {
   flex-basis: auto;
 }"
         );
         assert_eq!(
-            testing::generate_css("-basis-4"),
+            generate(["-basis-4"], &base_config()),
             ".-basis-4 {
   flex-basis: -1rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("basis-[10px]"),
+            generate(["basis-[10px]"], &base_config()),
             r".basis-\[10px\] {
   flex-basis: 10px;
 }"
@@ -126,14 +126,14 @@ mod tests {
     #[test]
     fn flex_direction() {
         assert_eq!(
-            testing::generate_css("flex-row"),
+            generate(["flex-row"], &base_config()),
             ".flex-row {
   flex-direction: row;
 }"
         );
 
         assert_eq!(
-            testing::generate_css("flex-col-reverse"),
+            generate(["flex-col-reverse"], &base_config()),
             ".flex-col-reverse {
   flex-direction: column-reverse;
 }"
@@ -143,13 +143,13 @@ mod tests {
     #[test]
     fn flex_grow() {
         assert_eq!(
-            testing::generate_css("grow"),
+            generate(["grow"], &base_config()),
             ".grow {
   flex-grow: 1;
 }"
         );
         assert_eq!(
-            testing::generate_css("grow-12"),
+            generate(["grow-12"], &base_config()),
             ".grow-12 {
   flex-grow: 12;
 }"
@@ -159,13 +159,13 @@ mod tests {
     #[test]
     fn flex_shrink() {
         assert_eq!(
-            testing::generate_css("shrink"),
+            generate(["shrink"], &base_config()),
             ".shrink {
   flex-shrink: 1;
 }"
         );
         assert_eq!(
-            testing::generate_css("shrink-12"),
+            generate(["shrink-12"], &base_config()),
             ".shrink-12 {
   flex-shrink: 12;
 }"
@@ -175,13 +175,13 @@ mod tests {
     #[test]
     fn flex_wrap() {
         assert_eq!(
-            testing::generate_css("flex-nowrap"),
+            generate(["flex-nowrap"], &base_config()),
             ".flex-nowrap {
   flex-wrap: nowrap;
 }"
         );
         assert_eq!(
-            testing::generate_css("flex-wrap-reverse"),
+            generate(["flex-wrap-reverse"], &base_config()),
             ".flex-wrap-reverse {
   flex-wrap: wrap-reverse;
 }"
@@ -191,14 +191,14 @@ mod tests {
     #[test]
     fn justify_content() {
         assert_eq!(
-            testing::generate_css("justify-center"),
+            generate(["justify-center"], &base_config()),
             ".justify-center {
   justify-content: center;
 }"
         );
 
         assert_eq!(
-            testing::generate_css("justify-evenly"),
+            generate(["justify-evenly"], &base_config()),
             ".justify-evenly {
   justify-content: space-evenly;
 }"
@@ -208,14 +208,14 @@ mod tests {
     #[test]
     fn justify_items() {
         assert_eq!(
-            testing::generate_css("justify-items-center"),
+            generate(["justify-items-center"], &base_config()),
             ".justify-items-center {
   justify-items: center;
 }"
         );
 
         assert_eq!(
-            testing::generate_css("justify-items-end"),
+            generate(["justify-items-end"], &base_config()),
             ".justify-items-end {
   justify-items: end;
 }"
@@ -225,14 +225,14 @@ mod tests {
     #[test]
     fn justify_self() {
         assert_eq!(
-            testing::generate_css("justify-self-center"),
+            generate(["justify-self-center"], &base_config()),
             ".justify-self-center {
   justify-self: center;
 }"
         );
 
         assert_eq!(
-            testing::generate_css("justify-self-auto"),
+            generate(["justify-self-auto"], &base_config()),
             ".justify-self-auto {
   justify-self: auto;
 }"
@@ -242,14 +242,14 @@ mod tests {
     #[test]
     fn place_content() {
         assert_eq!(
-            testing::generate_css("place-content-center"),
+            generate(["place-content-center"], &base_config()),
             ".place-content-center {
   place-content: center;
 }"
         );
 
         assert_eq!(
-            testing::generate_css("place-content-evenly"),
+            generate(["place-content-evenly"], &base_config()),
             ".place-content-evenly {
   place-content: space-evenly;
 }"
@@ -259,14 +259,14 @@ mod tests {
     #[test]
     fn place_items() {
         assert_eq!(
-            testing::generate_css("place-items-center"),
+            generate(["place-items-center"], &base_config()),
             ".place-items-center {
   place-items: center;
 }"
         );
 
         assert_eq!(
-            testing::generate_css("place-items-end"),
+            generate(["place-items-end"], &base_config()),
             ".place-items-end {
   place-items: end;
 }"
@@ -276,14 +276,14 @@ mod tests {
     #[test]
     fn place_self() {
         assert_eq!(
-            testing::generate_css("place-self-center"),
+            generate(["place-self-center"], &base_config()),
             ".place-self-center {
   place-self: center;
 }"
         );
 
         assert_eq!(
-            testing::generate_css("place-self-auto"),
+            generate(["place-self-auto"], &base_config()),
             ".place-self-auto {
   place-self: auto;
 }"

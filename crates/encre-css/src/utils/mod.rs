@@ -193,9 +193,10 @@ fn sort_selectors_recursive<'a>(
         }
     }
 
+    let config_derived_variants = config.get_derived_variants();
     let mut selectors = val
         .filter_map(|v| {
-            let selectors = parse(v.trim(), None, None, config);
+            let selectors = parse(v.trim(), None, None, config, &config_derived_variants);
 
             if selectors.len() > 1 {
                 // Sort variant groups
@@ -293,6 +294,7 @@ pub fn sort_selectors(val: &str, config: &Config) -> String {
 /// ]);
 /// ```
 pub fn check_selectors<'a>(val: &'a str, config: &Config) -> Vec<ParseError<'a>> {
+    let config_derived_variants = config.get_derived_variants();
     val.char_indices()
         .chain(iter::once((val.len(), ' ')))
         .filter(|(_, ch)| ch.is_whitespace())
@@ -302,7 +304,7 @@ pub fn check_selectors<'a>(val: &'a str, config: &Config) -> Vec<ParseError<'a>>
             Some((old_i..i, &val[old_i..i]))
         })
         .filter(|(_, v)| !v.is_empty())
-        .flat_map(|(span, v)| parse(v.trim(), Some(span), None, config))
+        .flat_map(|(span, v)| parse(v.trim(), Some(span), None, config, &config_derived_variants))
         .filter_map(|s| if let Err(e) = s { Some(e) } else { None })
         .collect::<Vec<ParseError>>()
 }

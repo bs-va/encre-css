@@ -1,10 +1,10 @@
-//! Define the [`Config`] structure used to configure an [`EncreGenerator`] using a
+//! Define the [`Config`] structure used to configure the [`generate`] function using a
 //! [Tailwind-like configuration](https://tailwindcss.com/docs/configuration).
 //!
 //! # Example
 //!
 //! ```
-//! use encre_css::{EncreGenerator, Config, config::DarkMode};
+//! use encre_css::{Config, config::DarkMode, generate};
 //!
 //! let mut config = Config::default();
 //!
@@ -21,10 +21,9 @@
 //! config.theme.screens.add("laptop", "1024px");
 //! config.theme.screens.add("desktop", "1280px");
 //!
-//! let mut generator = EncreGenerator::new(&config);
-//! generator.add_selector("tablet:dark:bg-primary");
+//! let generated = generate(["tablet:dark:bg-primary"], &config);
 //!
-//! assert!(generator.generate().ends_with(r#"@media (min-width: 640px) {
+//! assert!(generated.ends_with(r#"@media (min-width: 640px) {
 //!   .dark .tablet\:dark\:bg-primary {
 //!     --en-bg-opacity: 1;
 //!     background-color: rgb(211 25 140 / var(--en-bg-opacity));
@@ -40,7 +39,7 @@
 //! screens = { tablet = <span class="string">"640px"</span>, laptop = <span class="string">"1024px"</span>, desktop = <span class="string">"1280px"</span> }
 //! </code></pre></div>
 //!
-//! [`EncreGenerator`]: crate::EncreGenerator
+//! [`generate`]: crate::generate
 use crate::{
     error::{Error, Result},
     preflight::Preflight,
@@ -58,7 +57,6 @@ use std::{
     collections::{BTreeMap, BTreeSet},
     fmt, fs, iter,
     path::Path,
-    sync::{Mutex, MutexGuard},
 };
 
 /// The list of all default colors.
@@ -860,7 +858,7 @@ pub const BUILTIN_PLUGINS: &[(Cow<'static, str>, &'static (dyn Plugin + Send + S
 /// Configuration for the [`Theme::dark_mode`] field.
 ///
 /// It defines how the `dark:` variant should behave.
-#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "lowercase")]
 #[serde(tag = "type", content = "class")]
 pub enum DarkMode {
@@ -870,15 +868,14 @@ pub enum DarkMode {
     /// # Example
     ///
     /// ```
-    /// use encre_css::{EncreGenerator, Config, config::DarkMode};
+    /// use encre_css::{Config, config::DarkMode, generate};
     ///
     /// let mut config = Config::default();
     /// config.theme.dark_mode = DarkMode::new_class("body.dark");
     ///
-    /// let mut generator = EncreGenerator::new(&config);
-    /// generator.add_selector("dark:text-white");
+    /// let generated = generate(["dark:text-white"], &config);
     ///
-    /// assert!(generator.generate().ends_with(r#"body.dark .dark\:text-white {
+    /// assert!(generated.ends_with(r#"body.dark .dark\:text-white {
     ///   --en-text-opacity: 1;
     ///   color: rgb(255 255 255 / var(--en-text-opacity));
     /// }"#));
@@ -891,15 +888,14 @@ pub enum DarkMode {
     /// # Example
     ///
     /// ```
-    /// use encre_css::{EncreGenerator, Config, config::DarkMode};
+    /// use encre_css::{Config, config::DarkMode, generate};
     ///
     /// let mut config = Config::default();
     /// config.theme.dark_mode = DarkMode::Media;
     ///
-    /// let mut generator = EncreGenerator::new(&config);
-    /// generator.add_selector("dark:text-white");
+    /// let generated = generate(["dark:text-white"], &config);
     ///
-    /// assert!(generator.generate().ends_with(r#"@media (prefers-color-scheme: dark) {
+    /// assert!(generated.ends_with(r#"@media (prefers-color-scheme: dark) {
     ///   .dark\:text-white {
     ///     --en-text-opacity: 1;
     ///     color: rgb(255 255 255 / var(--en-text-opacity));
@@ -925,7 +921,7 @@ impl DarkMode {
 /// Configuration for the [`Theme::screens`] field.
 ///
 /// It defines a list of custom screen breakpoints.
-#[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize, Clone)]
 pub struct Screens(BTreeMap<Cow<'static, str>, Cow<'static, str>>);
 
 impl Screens {
@@ -954,7 +950,7 @@ impl Screens {
 /// Configuration for the [`Theme::colors`] field.
 ///
 /// It defines a list of custom colors.
-#[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize, Clone)]
 pub struct Colors(BTreeMap<Cow<'static, str>, Cow<'static, str>>);
 
 impl Colors {
@@ -992,15 +988,14 @@ impl Colors {
 /// # Example
 ///
 /// ```
-/// use encre_css::{EncreGenerator, Config};
+/// use encre_css::{Config, generate};
 ///
 /// let mut config = Config::default();
 /// config.shortcuts.add("btn", "border-1 rounded-xl bg-red-500");
 ///
-/// let mut generator = EncreGenerator::new(&config);
-/// generator.scan(r#"<button class="btn">Click me</button>"#);
+/// let generated = generate([r#"<button class="btn">Click me</button>"#], &config);
 ///
-/// assert!(generator.generate().ends_with(r#".btn {
+/// assert!(generated.ends_with(r#".btn {
 ///   border-radius: 0.75rem;
 /// }
 ///
@@ -1013,7 +1008,7 @@ impl Colors {
 ///   background-color: rgb(239 68 68 / var(--en-bg-opacity));
 /// }"#));
 /// ```
-#[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize, Clone)]
 pub struct Shortcuts(BTreeMap<Cow<'static, str>, Cow<'static, str>>);
 
 impl Shortcuts {
@@ -1045,7 +1040,7 @@ impl Shortcuts {
 /// It should be used when you dynamically create selectors (for example, in Javascript
 /// `text-${ active ? "blue" : "gray" }-400`, in this case, `text-blue-400` and `text-gray-400`
 /// should be added to the safelist).
-#[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize, Clone)]
 pub struct Safelist(BTreeSet<Cow<'static, str>>);
 
 impl Safelist {
@@ -1073,7 +1068,7 @@ impl Safelist {
 /// The fields are represented as [`toml::Value`] to allow all types to be serialized.
 /// It is recommended to use a table by plugin (e.g. the `encre-css-icons`'s plugin uses the
 /// `icons` key containing a table grouping all configuration fields).
-#[derive(Debug, PartialEq, Default, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Default, Serialize, Deserialize, Clone)]
 pub struct Extra(BTreeMap<Cow<'static, str>, toml::Value>);
 
 impl Extra {
@@ -1099,7 +1094,7 @@ impl Extra {
 /// Configuration for the [`Config::theme`] field.
 ///
 /// It defines some design system specific values like custom colors or screen breakpoints.
-#[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize, Clone)]
 pub struct Theme {
     /// Dark mode configuration.
     ///
@@ -1120,15 +1115,54 @@ pub struct Theme {
     pub colors: Colors,
 }
 
-/// The configuration of the [`EncreGenerator`] structure.
+/// The configuration of the CSS generation done in the [`generate`] function.
 ///
-/// It can either be manually created or deserialized from a
-/// [TOML](https://toml.io) file using [`Config::from_file`].
+/// You can create a configuration using one of the ways listed below:
+///
+/// - It can be the default one:
+///
+/// ```
+/// use encre_css::{Config, generate};
+///
+/// let config = Config::default();
+/// let _generated = generate([], &config);
+/// ```
+///
+/// - It can be a customized one:
+///
+/// ```
+/// use encre_css::{Config, generate};
+///
+/// let mut config = Config::default();
+/// config.theme.colors.add("flashy", "#ff2d20");
+///
+/// let _generated = generate([], &config);
+/// ```
+///
+/// - It can be loaded from a [TOML](https://toml.io) file:
+///
+/// <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment"># encre-css.toml</span>
+/// <span class="kw">[theme]</span>
+/// dark_mode = { type = <span class="string">"class"</span>, class = <span class="string">".dark"</span> }
+/// screens = { 3xl = <span class="string">"1600px"</span>, lg = <span class="string">"2000px"</span> }<br>
+/// <span class="kw">[theme.colors]</span>
+/// primary = <span class="string">"#e5186a"</span>
+/// yellow-400 = <span class="string">"#ffef0e"</span></code></pre></div>
+///
+/// ```no_run
+/// use encre_css::{Config, generate};
+///
+/// # fn main() -> encre_css::Result<()> {
+/// let config = Config::from_file("encre-css.toml")?;
+/// let _generated = generate([], &config);
+/// # Ok(())
+/// # }
+/// ```
 ///
 /// Based on [Tailwind's configuration](https://tailwindcss.com/docs/configuration).
 ///
-/// [`EncreGenerator`]: crate::EncreGenerator
-#[derive(Default, Serialize, Deserialize)]
+/// [`generate`]: crate::generate
+#[derive(Default, Serialize, Deserialize, Clone)]
 pub struct Config {
     /// Safelist configuration.
     #[serde(default)]
@@ -1166,55 +1200,39 @@ pub struct Config {
     ///
     /// This field is skipped when deserializing from a [TOML](https://toml.io) file.
     #[serde(skip)]
-    custom_variants: Mutex<Vec<(Cow<'static, str>, VariantType)>>,
+    pub(crate) custom_variants: Vec<(Cow<'static, str>, VariantType)>,
     // TODO: Prefix (en-)
 }
 
 impl Config {
-    pub(crate) fn get_custom_variants(&self) -> MutexGuard<Vec<(Cow<'static, str>, VariantType)>> {
-        // Initialize the list of custom variants if not already initialized
-        let mut custom_variants = self
-            .custom_variants
-            .try_lock()
-            .expect("failed to lock the list of custom variants");
-
-        if !custom_variants.iter().any(|v| v.0 == Cow::Borrowed("dark")) {
-            custom_variants.extend(
-                self.theme
-                    .screens
-                    .iter()
-                    .map(|screen| {
-                        (
-                            screen.0.clone(),
-                            VariantType::AtRule(Cow::Owned(format!(
-                                "@media (min-width: {})",
-                                screen.1
-                            ))),
-                        )
-                    })
-                    .chain(BUILTIN_SCREENS.iter().map(|screen| {
-                        (
-                            Cow::from(screen.0),
-                            VariantType::AtRule(Cow::Owned(format!(
-                                "@media (min-width: {})",
-                                screen.1
-                            ))),
-                        )
-                    }))
-                    .chain(iter::once(match &self.theme.dark_mode {
-                        DarkMode::Media => (
-                            Cow::from("dark"),
-                            VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)")),
-                        ),
-                        DarkMode::Class(name) => (
-                            Cow::from("dark"),
-                            VariantType::WrapClass(name.clone() + " &"),
-                        ),
-                    })),
-            );
-        }
-
-        custom_variants
+    /// Get variants derived from other configuration fields like breakpoints and the dark mode.
+    pub(crate) fn get_derived_variants(&self) -> Vec<(Cow<'static, str>, VariantType)> {
+        self.theme
+            .screens
+            .iter()
+            .map(|screen| {
+                (
+                    screen.0.clone(),
+                    VariantType::AtRule(Cow::Owned(format!("@media (min-width: {})", screen.1))),
+                )
+            })
+            .chain(BUILTIN_SCREENS.iter().map(|screen| {
+                (
+                    Cow::from(screen.0),
+                    VariantType::AtRule(Cow::Owned(format!("@media (min-width: {})", screen.1))),
+                )
+            }))
+            .chain(iter::once(match &self.theme.dark_mode {
+                DarkMode::Media => (
+                    Cow::from("dark"),
+                    VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)")),
+                ),
+                DarkMode::Class(name) => (
+                    Cow::from("dark"),
+                    VariantType::WrapClass(name.clone() + " &"),
+                ),
+            }))
+            .collect()
     }
 
     /// Register a custom plugin which will be used during CSS generation.
@@ -1225,7 +1243,7 @@ impl Config {
     /// # Example
     ///
     /// ```
-    /// use encre_css::{Config, EncreGenerator, prelude::build_plugin::*};
+    /// use encre_css::{Config, prelude::build_plugin::*, generate};
     ///
     /// #[derive(Debug)]
     /// struct Prose;
@@ -1249,11 +1267,9 @@ impl Config {
     /// let mut config = Config::default();
     /// config.register_plugin("prose", &Prose);
     ///
-    /// let mut generator = EncreGenerator::new(&config);
-    /// generator.add_selector("prose");
-    /// generator.add_selector("prose-invert");
+    /// let generated = generate(["prose", "prose-invert"], &config);
     ///
-    /// assert!(generator.generate().ends_with(".prose {
+    /// assert!(generated.ends_with(".prose {
     ///   color: #333;
     /// }
     ///
@@ -1277,16 +1293,15 @@ impl Config {
     /// # Example
     ///
     /// ```
-    /// use encre_css::{Config, EncreGenerator, selector::VariantType};
+    /// use encre_css::{Config, selector::VariantType, generate};
     /// use std::borrow::Cow;
     ///
     /// let mut config = Config::default();
     /// config.register_variant("headings", VariantType::WrapClass(Cow::Borrowed("& :where(h1, h2, h3, h4, h5, h6)")));
     ///
-    /// let mut generator = EncreGenerator::new(&config);
-    /// generator.add_selector("headings:text-gray-700");
+    /// let generated = generate(["headings:text-gray-700"], &config);
     ///
-    /// assert!(generator.generate().ends_with(".headings\\:text-gray-700 :where(h1, h2, h3, h4, h5, h6) {
+    /// assert!(generated.ends_with(".headings\\:text-gray-700 :where(h1, h2, h3, h4, h5, h6) {
     ///   --en-text-opacity: 1;
     ///   color: rgb(55 65 81 / var(--en-text-opacity));
     /// }"));
@@ -1297,8 +1312,6 @@ impl Config {
         variant_type: VariantType,
     ) {
         self.custom_variants
-            .try_lock()
-            .expect("failed to lock the list of custom variants")
             .push((variant_name.into(), variant_type));
     }
 
@@ -1315,22 +1328,21 @@ impl Config {
     /// yellow-400 = <span class="string">"#ffef0e"</span></code></pre></div>
     ///
     /// ```no_run
-    /// use encre_css::Config;
+    /// use encre_css::{Config, generate};
     ///
     /// # fn main() -> encre_css::Result<()> {
-    /// let _config = Config::from_file("encre-css.toml")?;
+    /// let config = Config::from_file("encre-css.toml")?;
+    /// let _generated = generate([], &config);
     /// # Ok(())
     /// # }
     /// ```
     ///
-    /// See [`EncreGenerator::new`] for other ways of creating a configuration.
+    /// See [`Config`] for other ways of creating a configuration.
     ///
     /// # Errors
     ///
     /// Returns [`Error::ConfigFileNotFound`] if the given file does not exist.
     /// Returns [`Error::ConfigParsing`] if the given file could not be parsed.
-    ///
-    /// [`EncreGenerator::new`]: crate::EncreGenerator::new
     pub fn from_file<T: AsRef<Path>>(path: T) -> Result<Self> {
         Ok(toml::from_str(&fs::read_to_string(&path).map_err(
             |e| Error::ConfigFileNotFound(path.as_ref().to_path_buf(), e),
@@ -1340,14 +1352,25 @@ impl Config {
 
 impl PartialEq for Config {
     fn eq(&self, other: &Self) -> bool {
-        self.theme.eq(&other.theme)
+        self.safelist == other.safelist
+            && self.theme == other.theme
+            && self.preflight == other.preflight
+            && self.shortcuts == other.shortcuts
+            && self.extra == other.extra
+            && self.custom_variants == other.custom_variants
     }
 }
 
 impl fmt::Debug for Config {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Config")
+            .field("safelist", &self.safelist)
             .field("theme", &self.theme)
+            .field("preflight", &self.preflight)
+            .field("shortcuts", &self.shortcuts)
+            .field("extra", &self.extra)
+            .field("custom_plugins", &self.custom_plugins)
+            .field("custom_variants", &self.custom_variants)
             .finish()
     }
 }
@@ -1355,17 +1378,9 @@ impl fmt::Debug for Config {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::EncreGenerator;
+    use crate::{generate, utils::testing::base_config};
 
     use pretty_assertions::assert_eq;
-
-    fn base_config() -> Config {
-        // Disable the preflight to simplify test assertions
-        Config {
-            preflight: Preflight::None,
-            ..Default::default()
-        }
-    }
 
     #[test]
     fn gen_css_with_custom_config() {
@@ -1373,11 +1388,10 @@ mod tests {
         config.theme.colors.add("rosa-500", "#e5186a");
         config.theme.screens.add("3xl", "1600px");
 
-        let mut generator = EncreGenerator::new(&config);
-        generator.add_selector("3xl:text-rosa-500");
+        let generated = generate(["3xl:text-rosa-500"], &config);
 
         assert_eq!(
-            generator.generate(),
+            generated,
             String::from(
                 r#"@media (min-width: 1600px) {
   .\33xl\:text-rosa-500 {
@@ -1397,12 +1411,10 @@ mod tests {
             .add("btn", "bg-red-500 border-1 rounded-xl");
         config.shortcuts.add("bg", "bg-blue-100");
 
-        let mut generator = EncreGenerator::new(&config);
-        generator.add_selector("btn");
-        generator.add_selector("bg-yellow-500");
+        let generated = generate(["btn", "bg-yellow-500"], &config);
 
         assert_eq!(
-            generator.generate(),
+            generated,
             String::from(
                 r#".btn {
   border-radius: 0.75rem;
@@ -1432,11 +1444,10 @@ mod tests {
         config.safelist.add("btn");
         config.shortcuts.add("btn", "text-red-400");
 
-        let mut generator = EncreGenerator::new(&config);
-        generator.add_selector("bg-red-300");
+        let generated = generate(["bg-red-300"], &config);
 
         assert_eq!(
-            generator.generate(),
+            generated,
             String::from(
                 r#".bg-red-300 {
   --en-bg-opacity: 1;
@@ -1494,11 +1505,10 @@ mod tests {
             HashMap::from_iter([("tada", "\u{1f389}"), ("rocket", "\u{1f680}")]),
         );
 
-        let mut generator = EncreGenerator::new(&config);
-        generator.add_selector("emoji-tada");
+        let generated = generate(["emoji-tada"], &config);
 
         assert_eq!(
-            generator.generate(),
+            generated,
             String::from(
                 ".emoji-tada {
   content: \"\u{1f389}\";
@@ -1540,11 +1550,10 @@ mod tests {
         let mut config = Config::from_file("tests/fixtures/extra-fields-config.toml").unwrap();
         config.register_plugin("emoji", &EmojiPlugin);
 
-        let mut generator = EncreGenerator::new(&config);
-        generator.add_selector("emoji-tada");
+        let generated = generate(["emoji-tada"], &config);
 
         assert_eq!(
-            generator.generate(),
+            generated,
             String::from(
                 ".emoji-tada {
   content: \"\u{1f389}\";
@@ -1557,15 +1566,19 @@ mod tests {
     fn config_is_extended_and_overridden() {
         let config = Config::from_file("tests/fixtures/custom-config.toml").unwrap();
 
-        let mut generator = EncreGenerator::new(&config);
-        generator.add_selector("bg-rosa-500");
-        generator.add_selector("bg-yellow-400");
-        generator.add_selector("bg-yellow-100");
-        generator.add_selector("3xl:underline");
-        generator.add_selector("lg:text-rosa-500");
+        let generated = generate(
+            [
+                "bg-rosa-500",
+                "bg-yellow-400",
+                "bg-yellow-100",
+                "3xl:underline",
+                "lg:text-rosa-500",
+            ],
+            &config,
+        );
 
         assert_eq!(
-            generator.generate(),
+            generated,
             String::from(
                 r#".bg-rosa-500 {
   --en-bg-opacity: 1;

@@ -10,18 +10,18 @@ const CSS_TRANSFORM: &str = "transform: translate(var(--en-translate-x), var(--e
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::testing;
+    use crate::{generate, utils::testing::base_config};
 
     use pretty_assertions::assert_eq;
 
     #[test]
     fn rotate() {
-        assert_eq!(testing::generate_css("rotate-20"), ".rotate-20 {
+        assert_eq!(generate(["rotate-20"], &base_config()), ".rotate-20 {
   --en-rotate: 20deg;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
 }");
         assert_eq!(
-            testing::generate_css("rotate-[1.25turn]"),
+            generate(["rotate-[1.25turn]"], &base_config()),
             r".rotate-\[1\.25turn\] {
   --en-rotate: 1.25turn;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
@@ -31,16 +31,16 @@ mod tests {
 
     #[test]
     fn scale() {
-        assert_eq!(testing::generate_css("scale-150"), ".scale-150 {
+        assert_eq!(generate(["scale-150"], &base_config()), ".scale-150 {
   --en-scale-x: 1.5;
   --en-scale-y: 1.5;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
 }");
-        assert_eq!(testing::generate_css("scale-x-20"), ".scale-x-20 {
+        assert_eq!(generate(["scale-x-20"], &base_config()), ".scale-x-20 {
   --en-scale-x: 0.2;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
 }");
-        assert_eq!(testing::generate_css("scale-y-45"), ".scale-y-45 {
+        assert_eq!(generate(["scale-y-45"], &base_config()), ".scale-y-45 {
   --en-scale-y: 0.45;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
 }");
@@ -48,23 +48,23 @@ mod tests {
 
     #[test]
     fn skew() {
-        assert_eq!(testing::generate_css("skew-x-20"), ".skew-x-20 {
+        assert_eq!(generate(["skew-x-20"], &base_config()), ".skew-x-20 {
   --en-skew-x: 20deg;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
 }");
-        assert_eq!(testing::generate_css("skew-y-20"), ".skew-y-20 {
+        assert_eq!(generate(["skew-y-20"], &base_config()), ".skew-y-20 {
   --en-skew-y: 20deg;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
 }");
         assert_eq!(
-            testing::generate_css("skew-x-[1.25turn]"),
+            generate(["skew-x-[1.25turn]"], &base_config()),
             r".skew-x-\[1\.25turn\] {
   --en-skew-x: 1.25turn;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
 }"
         );
         assert_eq!(
-            testing::generate_css("skew-y-[1.25turn]"),
+            generate(["skew-y-[1.25turn]"], &base_config()),
             r".skew-y-\[1\.25turn\] {
   --en-skew-y: 1.25turn;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
@@ -74,35 +74,35 @@ mod tests {
 
     #[test]
     fn translate() {
-        assert_eq!(testing::generate_css("translate-x-20"), ".translate-x-20 {
+        assert_eq!(generate(["translate-x-20"], &base_config()), ".translate-x-20 {
   --en-translate-x: 5rem;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
 }");
-        assert_eq!(testing::generate_css("-translate-x-20"), ".-translate-x-20 {
+        assert_eq!(generate(["-translate-x-20"], &base_config()), ".-translate-x-20 {
   --en-translate-x: -5rem;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
 }");
-        assert_eq!(testing::generate_css("translate-y-20"), ".translate-y-20 {
+        assert_eq!(generate(["translate-y-20"], &base_config()), ".translate-y-20 {
   --en-translate-y: 5rem;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
 }");
-        assert_eq!(testing::generate_css("translate-x-auto"), ".translate-x-auto {
+        assert_eq!(generate(["translate-x-auto"], &base_config()), ".translate-x-auto {
   --en-translate-x: auto;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
 }");
-        assert_eq!(testing::generate_css("translate-y-full"), ".translate-y-full {
+        assert_eq!(generate(["translate-y-full"], &base_config()), ".translate-y-full {
   --en-translate-y: 100%;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
 }");
         assert_eq!(
-            testing::generate_css("translate-x-[1.25%]"),
+            generate(["translate-x-[1.25%]"], &base_config()),
             r".translate-x-\[1\.25\%\] {
   --en-translate-x: 1.25%;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
 }"
         );
         assert_eq!(
-            testing::generate_css("translate-y-[10px]"),
+            generate(["translate-y-[10px]"], &base_config()),
             r".translate-y-\[10px\] {
   --en-translate-y: 10px;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
@@ -113,19 +113,19 @@ mod tests {
     #[test]
     fn transform_origin() {
         assert_eq!(
-            testing::generate_css("origin-center"),
+            generate(["origin-center"], &base_config()),
             ".origin-center {
   transform-origin: center;
 }"
         );
         assert_eq!(
-            testing::generate_css("origin-[bottom_right_60px]"),
+            generate(["origin-[bottom_right_60px]"], &base_config()),
             r".origin-\[bottom_right_60px\] {
   transform-origin: bottom right 60px;
 }"
         );
         assert_eq!(
-            testing::generate_css("origin-[-100%_40%]"),
+            generate(["origin-[-100%_40%]"], &base_config()),
             r".origin-\[-100\%_40\%\] {
   transform-origin: -100% 40%;
 }"
@@ -134,11 +134,11 @@ mod tests {
 
     #[test]
     fn transform_type() {
-        assert_eq!(testing::generate_css("transform-gpu"), ".transform-gpu {
+        assert_eq!(generate(["transform-gpu"], &base_config()), ".transform-gpu {
   transform: translate3d(var(--en-translate-x), var(--en-translate-y), 0) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
 }");
         assert_eq!(
-            testing::generate_css("transform-none"),
+            generate(["transform-none"], &base_config()),
             ".transform-none {
   transform: none;
 }"

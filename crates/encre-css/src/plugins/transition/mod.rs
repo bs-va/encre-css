@@ -7,21 +7,21 @@ pub mod transition_timing_function;
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::testing;
+    use crate::{generate, utils::testing::base_config};
 
     use pretty_assertions::assert_eq;
 
     #[test]
     fn animation() {
         assert_eq!(
-            testing::generate_css("animate-none"),
+            generate(["animate-none"], &base_config()),
             ".animate-none {
   -webkit-animation: none;
   animation: none;
 }"
         );
         assert_eq!(
-            testing::generate_css("animate-spin"),
+            generate(["animate-spin"], &base_config()),
             "@-webkit-keyframes spin {
   to {
     transform: rotate(360deg);
@@ -43,7 +43,7 @@ mod tests {
 }"
         );
         assert_eq!(
-            testing::generate_css("animate-ping"),
+            generate(["animate-ping"], &base_config()),
             "@-webkit-keyframes ping {
   75%, 100% {
     transform: scale(2);
@@ -64,7 +64,7 @@ mod tests {
 }"
         );
         assert_eq!(
-            testing::generate_css("animate-pulse"),
+            generate(["animate-pulse"], &base_config()),
             "@-webkit-keyframes pulse {
   50% {
     opacity: .5;
@@ -86,7 +86,7 @@ mod tests {
 }"
         );
         assert_eq!(
-            testing::generate_css("animate-bounce"),
+            generate(["animate-bounce"], &base_config()),
             "@-webkit-keyframes bounce {
   0%, 100% {
     transform: translateY(-25%);
@@ -124,13 +124,13 @@ mod tests {
     #[test]
     fn transition_delay() {
         assert_eq!(
-            testing::generate_css("delay-12"),
+            generate(["delay-12"], &base_config()),
             ".delay-12 {
   transition-delay: 12ms;
 }"
         );
         assert_eq!(
-            testing::generate_css("delay-[4.3ms]"),
+            generate(["delay-[4.3ms]"], &base_config()),
             r".delay-\[4\.3ms\] {
   transition-delay: 4.3ms;
 }"
@@ -140,13 +140,13 @@ mod tests {
     #[test]
     fn transition_duration() {
         assert_eq!(
-            testing::generate_css("duration-12"),
+            generate(["duration-12"], &base_config()),
             ".duration-12 {
   transition-duration: 12ms;
 }"
         );
         assert_eq!(
-            testing::generate_css("duration-[4.3ms]"),
+            generate(["duration-[4.3ms]"], &base_config()),
             r".duration-\[4\.3ms\] {
   transition-duration: 4.3ms;
 }"
@@ -156,7 +156,7 @@ mod tests {
     #[test]
     fn transition_property() {
         assert_eq!(
-            testing::generate_css("transition"),
+            generate(["transition"], &base_config()),
             ".transition {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -164,13 +164,13 @@ mod tests {
 }"
         );
         assert_eq!(
-            testing::generate_css("transition-none"),
+            generate(["transition-none"], &base_config()),
             ".transition-none {
   transition-property: none;
 }"
         );
         assert_eq!(
-            testing::generate_css("transition-all"),
+            generate(["transition-all"], &base_config()),
             ".transition-all {
   transition-property: all;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -178,7 +178,7 @@ mod tests {
 }"
         );
         assert_eq!(
-            testing::generate_css("transition-colors"),
+            generate(["transition-colors"], &base_config()),
             ".transition-colors {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -186,7 +186,7 @@ mod tests {
 }"
         );
         assert_eq!(
-            testing::generate_css("transition-opacity"),
+            generate(["transition-opacity"], &base_config()),
             ".transition-opacity {
   transition-property: opacity;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -194,7 +194,7 @@ mod tests {
 }"
         );
         assert_eq!(
-            testing::generate_css("transition-shadow"),
+            generate(["transition-shadow"], &base_config()),
             ".transition-shadow {
   transition-property: box-shadow;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -202,7 +202,7 @@ mod tests {
 }"
         );
         assert_eq!(
-            testing::generate_css("transition-transform"),
+            generate(["transition-transform"], &base_config()),
             ".transition-transform {
   transition-property: transform;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -210,7 +210,7 @@ mod tests {
 }"
         );
         assert_eq!(
-            testing::generate_css("transition-[custom]"),
+            generate(["transition-[custom]"], &base_config()),
             r".transition-\[custom\] {
   transition-property: custom;
 }"
@@ -220,31 +220,31 @@ mod tests {
     #[test]
     fn transition_timing_function() {
         assert_eq!(
-            testing::generate_css("ease-linear"),
+            generate(["ease-linear"], &base_config()),
             ".ease-linear {
   transition-timing-function: linear;
 }"
         );
         assert_eq!(
-            testing::generate_css("ease-in"),
+            generate(["ease-in"], &base_config()),
             ".ease-in {
   transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
 }"
         );
         assert_eq!(
-            testing::generate_css("ease-out"),
+            generate(["ease-out"], &base_config()),
             ".ease-out {
   transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
 }"
         );
         assert_eq!(
-            testing::generate_css("ease-in-out"),
+            generate(["ease-in-out"], &base_config()),
             ".ease-in-out {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }"
         );
         assert_eq!(
-            testing::generate_css("ease-[steps(4,_jump-end)]"),
+            generate(["ease-[steps(4,_jump-end)]"], &base_config()),
             r".ease-\[steps\(4\,_jump-end\)\] {
   transition-timing-function: steps(4, jump-end);
 }"

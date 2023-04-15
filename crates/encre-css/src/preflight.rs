@@ -7,14 +7,13 @@
 //! or [`Preflight::font_family_mono`].
 //!
 //! ```
-//! use encre_css::{Preflight, Config, EncreGenerator};
+//! use encre_css::{Preflight, Config, generate};
 //!
 //! let mut config = Config::default();
 //! config.preflight = Preflight::new_full()
 //!     .border_color("#444");
 //!
-//! let mut generator = EncreGenerator::new(&config);
-//! assert!(generator.generate().starts_with("*, ::before, ::after {
+//! assert!(generate([], &config).starts_with("*, ::before, ::after {
 //!   box-sizing: border-box;
 //!   border-width: 0;
 //!   border-style: solid;
@@ -25,7 +24,7 @@
 //! You can also use your own default CSS using [`Preflight::new_custom`].
 //!
 //! ```
-//! use encre_css::{Preflight, Config, EncreGenerator};
+//! use encre_css::{Preflight, Config, generate};
 //!
 //! let mut config = Config::default();
 //! config.preflight = Preflight::new_custom("html, body {
@@ -34,8 +33,7 @@
 //!   margin: 0;
 //! }");
 //!
-//! let mut generator = EncreGenerator::new(&config);
-//! assert_eq!(generator.generate(), "html, body {
+//! assert_eq!(generate([], &config), "html, body {
 //!   width: 100vw;
 //!   height: 100vh;
 //!   margin: 0;
@@ -45,13 +43,12 @@
 //! Finally you can disable it using [`Preflight::new_none`].
 //!
 //! ```
-//! use encre_css::{Preflight, Config, EncreGenerator};
+//! use encre_css::{Preflight, Config, generate};
 //!
 //! let mut config = Config::default();
 //! config.preflight = Preflight::new_none();
 //!
-//! let mut generator = EncreGenerator::new(&config);
-//! assert_eq!(generator.generate(), "");
+//! assert_eq!(generate([], &config), "");
 //! ```
 //!
 //! Based on [Tailwind's default preflight](https://tailwindcss.com/docs/preflight).
@@ -469,7 +466,7 @@ ol, ul, menu {
 /// The set of default styles.
 ///
 /// See [`crate::preflight`].
-#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "lowercase")]
 #[serde(tag = "type", content = "css")]
 pub enum Preflight {
@@ -664,25 +661,25 @@ impl Default for Preflight {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{Config, EncreGenerator};
+    use crate::{generate, Config};
 
     use pretty_assertions::assert_eq;
 
     #[test]
+    #[allow(clippy::too_many_lines)]
     fn full_preflight() {
-        let mut config = Config::default();
-        config.preflight = Preflight::new_full()
+        let preflight = Preflight::new_full()
             .ring_color("#f00")
             .border_color("#0f0")
             .placeholder_color("#00f")
             .font_family_sans("sans-serif")
             .font_family_mono("monospace");
+        let config = Config { preflight, ..Default::default() };
 
-        let mut generator = EncreGenerator::new(&config);
-        generator.add_selector("w-full");
+        let generated = generate(["w-full"], &config);
 
         assert_eq!(
-            generator.generate(),
+            generated,
             String::from(
                 r#"*, ::before, ::after {
   box-sizing: border-box;
@@ -1012,8 +1009,7 @@ img, video {
 
     #[test]
     fn custom_preflight() {
-        let mut config = Config::default();
-        config.preflight = Preflight::new_custom(
+        let preflight = Preflight::new_custom(
             "html, body {
   width: 100%;
   height: 100%;
@@ -1022,12 +1018,12 @@ img, video {
   overflow-x: hidden;
 }",
         );
+        let config = Config { preflight, ..Default::default() };
 
-        let mut generator = EncreGenerator::new(&config);
-        generator.add_selector("w-full");
+        let generated = generate(["w-full"], &config);
 
         assert_eq!(
-            generator.generate(),
+            generated,
             "html, body {
   width: 100%;
   height: 100%;
@@ -1044,14 +1040,12 @@ img, video {
 
     #[test]
     fn no_preflight() {
-        let mut config = Config::default();
-        config.preflight = Preflight::new_none();
+        let config = Config { preflight: Preflight::new_none(), ..Default::default() };
 
-        let mut generator = EncreGenerator::new(&config);
-        generator.add_selector("w-full");
+        let generated = generate(["w-full"], &config);
 
         assert_eq!(
-            generator.generate(),
+            generated,
             ".w-full {
   width: 100%;
 }"

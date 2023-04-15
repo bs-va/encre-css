@@ -25,28 +25,28 @@ const CSS_BACKDROP_FILTER: [&str; 2] = ["-webkit-backdrop-filter: var(--en-backd
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::testing;
+    use crate::{generate, utils::testing::base_config};
 
     use pretty_assertions::assert_eq;
 
     #[test]
     fn blur() {
         assert_eq!(
-            testing::generate_css("blur-md"),
+            generate(["blur-md"], &base_config()),
             ".blur-md {
   --en-blur: blur(12px);
   filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
 }"
         );
         assert_eq!(
-            testing::generate_css("blur-none"),
+            generate(["blur-none"], &base_config()),
             ".blur-none {
   --en-blur: blur(0);
   filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
 }"
         );
         assert_eq!(
-            testing::generate_css("blur-[42px]"),
+            generate(["blur-[42px]"], &base_config()),
             r".blur-\[42px\] {
   --en-blur: blur(42px);
   filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
@@ -57,7 +57,7 @@ mod tests {
     #[test]
     fn brightness() {
         assert_eq!(
-            testing::generate_css("brightness-20"),
+            generate(["brightness-20"], &base_config()),
             ".brightness-20 {
   --en-brightness: brightness(0.2);
   filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
@@ -68,7 +68,7 @@ mod tests {
     #[test]
     fn contrast() {
         assert_eq!(
-            testing::generate_css("contrast-20"),
+            generate(["contrast-20"], &base_config()),
             ".contrast-20 {
   --en-contrast: contrast(0.2);
   filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
@@ -79,21 +79,21 @@ mod tests {
     #[test]
     fn drop_shadow() {
         assert_eq!(
-            testing::generate_css("drop-shadow-md"),
+            generate(["drop-shadow-md"], &base_config()),
             ".drop-shadow-md {
   --en-drop-shadow: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));
   filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
 }"
         );
         assert_eq!(
-            testing::generate_css("drop-shadow-none"),
+            generate(["drop-shadow-none"], &base_config()),
             ".drop-shadow-none {
   --en-drop-shadow: drop-shadow(0 0 #0000);
   filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
 }"
         );
         assert_eq!(
-            testing::generate_css("drop-shadow-[42px_12em_#f0f]"),
+            generate(["drop-shadow-[42px_12em_#f0f]"], &base_config()),
             r".drop-shadow-\[42px_12em_\#f0f\] {
   --en-drop-shadow: drop-shadow(42px 12em #f0f);
   filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
@@ -104,14 +104,14 @@ mod tests {
     #[test]
     fn filter_type() {
         assert_eq!(
-            testing::generate_css("filter"),
+            generate(["filter"], &base_config()),
             ".filter {
   filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
 }"
         );
 
         assert_eq!(
-            testing::generate_css("filter-none"),
+            generate(["filter-none"], &base_config()),
             ".filter-none {
   filter: none;
 }"
@@ -121,7 +121,7 @@ mod tests {
     #[test]
     fn grayscale() {
         assert_eq!(
-            testing::generate_css("grayscale-20"),
+            generate(["grayscale-20"], &base_config()),
             ".grayscale-20 {
   --en-grayscale: grayscale(0.2);
   filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
@@ -129,7 +129,7 @@ mod tests {
         );
 
         assert_eq!(
-            testing::generate_css("grayscale"),
+            generate(["grayscale"], &base_config()),
             ".grayscale {
   --en-grayscale: grayscale(100%);
   filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
@@ -140,14 +140,14 @@ mod tests {
     #[test]
     fn hue_rotate() {
         assert_eq!(
-            testing::generate_css("hue-rotate-170"),
+            generate(["hue-rotate-170"], &base_config()),
             ".hue-rotate-170 {
   --en-hue-rotate: hue-rotate(170deg);
   filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
 }"
         );
         assert_eq!(
-            testing::generate_css("-hue-rotate-170"),
+            generate(["-hue-rotate-170"], &base_config()),
             ".-hue-rotate-170 {
   --en-hue-rotate: hue-rotate(-170deg);
   filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
@@ -158,7 +158,7 @@ mod tests {
     #[test]
     fn invert() {
         assert_eq!(
-            testing::generate_css("invert-20"),
+            generate(["invert-20"], &base_config()),
             ".invert-20 {
   --en-invert: invert(0.2);
   filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
@@ -166,7 +166,7 @@ mod tests {
         );
 
         assert_eq!(
-            testing::generate_css("invert"),
+            generate(["invert"], &base_config()),
             ".invert {
   --en-invert: invert(100%);
   filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
@@ -177,7 +177,7 @@ mod tests {
     #[test]
     fn saturate() {
         assert_eq!(
-            testing::generate_css("saturate-20"),
+            generate(["saturate-20"], &base_config()),
             ".saturate-20 {
   --en-saturate: saturate(0.2);
   filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
@@ -188,7 +188,7 @@ mod tests {
     #[test]
     fn sepia() {
         assert_eq!(
-            testing::generate_css("sepia-20"),
+            generate(["sepia-20"], &base_config()),
             ".sepia-20 {
   --en-sepia: sepia(0.2);
   filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
@@ -196,7 +196,7 @@ mod tests {
         );
 
         assert_eq!(
-            testing::generate_css("sepia"),
+            generate(["sepia"], &base_config()),
             ".sepia {
   --en-sepia: sepia(100%);
   filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
@@ -207,7 +207,7 @@ mod tests {
     #[test]
     fn backdrop_blur() {
         assert_eq!(
-            testing::generate_css("backdrop-blur-md"),
+            generate(["backdrop-blur-md"], &base_config()),
 
             ".backdrop-blur-md {
   --en-backdrop-blur: blur(12px);
@@ -216,7 +216,7 @@ mod tests {
 }"
         );
         assert_eq!(
-            testing::generate_css("backdrop-blur-none"),
+            generate(["backdrop-blur-none"], &base_config()),
             ".backdrop-blur-none {
   --en-backdrop-blur: blur(0);
   -webkit-backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
@@ -224,7 +224,7 @@ mod tests {
 }"
         );
         assert_eq!(
-            testing::generate_css("backdrop-blur-[42px]"),
+            generate(["backdrop-blur-[42px]"], &base_config()),
             r".backdrop-blur-\[42px\] {
   --en-backdrop-blur: blur(42px);
   -webkit-backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
@@ -236,7 +236,7 @@ mod tests {
     #[test]
     fn backdrop_brightness() {
         assert_eq!(
-            testing::generate_css("backdrop-brightness-20"),
+            generate(["backdrop-brightness-20"], &base_config()),
             ".backdrop-brightness-20 {
   --en-backdrop-brightness: brightness(0.2);
   -webkit-backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
@@ -248,7 +248,7 @@ mod tests {
     #[test]
     fn backdrop_contrast() {
         assert_eq!(
-            testing::generate_css("backdrop-contrast-20"),
+            generate(["backdrop-contrast-20"], &base_config()),
             ".backdrop-contrast-20 {
   --en-backdrop-contrast: contrast(0.2);
   -webkit-backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
@@ -260,7 +260,7 @@ mod tests {
     #[test]
     fn backdrop_filter() {
         assert_eq!(
-            testing::generate_css("backdrop-filter"),
+            generate(["backdrop-filter"], &base_config()),
             ".backdrop-filter {
   -webkit-backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
   backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
@@ -268,7 +268,7 @@ mod tests {
         );
 
         assert_eq!(
-            testing::generate_css("backdrop-filter-none"),
+            generate(["backdrop-filter-none"], &base_config()),
             ".backdrop-filter-none {
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
@@ -279,7 +279,7 @@ mod tests {
     #[test]
     fn backdrop_grayscale() {
         assert_eq!(
-            testing::generate_css("backdrop-grayscale-20"),
+            generate(["backdrop-grayscale-20"], &base_config()),
             ".backdrop-grayscale-20 {
   --en-backdrop-grayscale: grayscale(0.2);
   -webkit-backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
@@ -288,7 +288,7 @@ mod tests {
         );
 
         assert_eq!(
-            testing::generate_css("backdrop-grayscale"),
+            generate(["backdrop-grayscale"], &base_config()),
             ".backdrop-grayscale {
   --en-backdrop-grayscale: grayscale(100%);
   -webkit-backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
@@ -300,7 +300,7 @@ mod tests {
     #[test]
     fn backdrop_hue_rotate() {
         assert_eq!(
-            testing::generate_css("backdrop-hue-rotate-170"),
+            generate(["backdrop-hue-rotate-170"], &base_config()),
             ".backdrop-hue-rotate-170 {
   --en-backdrop-hue-rotate: hue-rotate(170deg);
   -webkit-backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
@@ -308,7 +308,7 @@ mod tests {
 }"
         );
         assert_eq!(
-            testing::generate_css("-backdrop-hue-rotate-170"),
+            generate(["-backdrop-hue-rotate-170"], &base_config()),
             ".-backdrop-hue-rotate-170 {
   --en-backdrop-hue-rotate: hue-rotate(-170deg);
   -webkit-backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
@@ -320,7 +320,7 @@ mod tests {
     #[test]
     fn backdrop_invert() {
         assert_eq!(
-            testing::generate_css("backdrop-invert-20"),
+            generate(["backdrop-invert-20"], &base_config()),
             ".backdrop-invert-20 {
   --en-backdrop-invert: invert(0.2);
   -webkit-backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
@@ -329,7 +329,7 @@ mod tests {
         );
 
         assert_eq!(
-            testing::generate_css("backdrop-invert"),
+            generate(["backdrop-invert"], &base_config()),
             ".backdrop-invert {
   --en-backdrop-invert: invert(100%);
   -webkit-backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
@@ -341,7 +341,7 @@ mod tests {
     #[test]
     fn backdrop_opacity() {
         assert_eq!(
-            testing::generate_css("backdrop-opacity-12"),
+            generate(["backdrop-opacity-12"], &base_config()),
             ".backdrop-opacity-12 {
   --en-backdrop-opacity: 0.12;
   -webkit-backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
@@ -353,7 +353,7 @@ mod tests {
     #[test]
     fn backdrop_saturate() {
         assert_eq!(
-            testing::generate_css("backdrop-saturate-20"),
+            generate(["backdrop-saturate-20"], &base_config()),
             ".backdrop-saturate-20 {
   --en-backdrop-saturate: saturate(0.2);
   -webkit-backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
@@ -365,7 +365,7 @@ mod tests {
     #[test]
     fn backdrop_sepia() {
         assert_eq!(
-            testing::generate_css("backdrop-sepia-20"),
+            generate(["backdrop-sepia-20"], &base_config()),
             ".backdrop-sepia-20 {
   --en-backdrop-sepia: sepia(0.2);
   -webkit-backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
@@ -374,7 +374,7 @@ mod tests {
         );
 
         assert_eq!(
-            testing::generate_css("backdrop-sepia"),
+            generate(["backdrop-sepia"], &base_config()),
             ".backdrop-sepia {
   --en-backdrop-sepia: sepia(100%);
   -webkit-backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);

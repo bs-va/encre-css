@@ -8,80 +8,80 @@ pub mod width;
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::testing;
+    use crate::{generate, utils::testing::base_config};
 
     use pretty_assertions::assert_eq;
 
     #[test]
     fn height() {
         assert_eq!(
-            testing::generate_css("h-px"),
+            generate(["h-px"], &base_config()),
             ".h-px {
   height: 1px;
 }"
         );
         assert_eq!(
-            testing::generate_css("h-2.5"),
+            generate(["h-2.5"], &base_config()),
             r".h-2\.5 {
   height: 0.625rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("h-60"),
+            generate(["h-60"], &base_config()),
             ".h-60 {
   height: 15rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("-h-60"),
+            generate(["-h-60"], &base_config()),
             ".-h-60 {
   height: -15rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("h-auto"),
+            generate(["h-auto"], &base_config()),
             ".h-auto {
   height: auto;
 }"
         );
         assert_eq!(
-            testing::generate_css("h-1/3"),
+            generate(["h-1/3"], &base_config()),
             r".h-1\/3 {
   height: 33.333333%;
 }"
         );
         assert_eq!(
-            testing::generate_css("-h-2/3"),
+            generate(["-h-2/3"], &base_config()),
             r".-h-2\/3 {
   height: -66.666667%;
 }"
         );
         assert_eq!(
-            testing::generate_css("h-full"),
+            generate(["h-full"], &base_config()),
             ".h-full {
   height: 100%;
 }"
         );
         assert_eq!(
-            testing::generate_css("h-screen"),
+            generate(["h-screen"], &base_config()),
             ".h-screen {
   height: 100vh;
 }"
         );
         assert_eq!(
-            testing::generate_css("h-fit"),
+            generate(["h-fit"], &base_config()),
             ".h-fit {
   height: fit-content;
 }"
         );
         assert_eq!(
-            testing::generate_css("h-[32.555rem]"),
+            generate(["h-[32.555rem]"], &base_config()),
             r".h-\[32\.555rem\] {
   height: 32.555rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("h-[10%]"),
+            generate(["h-[10%]"], &base_config()),
             r".h-\[10\%\] {
   height: 10%;
 }"
@@ -91,79 +91,79 @@ mod tests {
     #[test]
     fn max_height() {
         assert_eq!(
-            testing::generate_css("max-h-px"),
+            generate(["max-h-px"], &base_config()),
             ".max-h-px {
   max-height: 1px;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-h-2.5"),
+            generate(["max-h-2.5"], &base_config()),
             r".max-h-2\.5 {
   max-height: 0.625rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-h-60"),
+            generate(["max-h-60"], &base_config()),
             ".max-h-60 {
   max-height: 15rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("-max-h-60"),
+            generate(["-max-h-60"], &base_config()),
             ".-max-h-60 {
   max-height: -15rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-h-auto"),
+            generate(["max-h-auto"], &base_config()),
             ".max-h-auto {
   max-height: auto;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-h-none"),
+            generate(["max-h-none"], &base_config()),
             ".max-h-none {
   max-height: none;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-h-1/3"),
+            generate(["max-h-1/3"], &base_config()),
             r".max-h-1\/3 {
   max-height: 33.333333%;
 }"
         );
         assert_eq!(
-            testing::generate_css("-max-h-2/3"),
+            generate(["-max-h-2/3"], &base_config()),
             r".-max-h-2\/3 {
   max-height: -66.666667%;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-h-full"),
+            generate(["max-h-full"], &base_config()),
             ".max-h-full {
   max-height: 100%;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-h-screen"),
+            generate(["max-h-screen"], &base_config()),
             ".max-h-screen {
   max-height: 100vh;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-h-fit"),
+            generate(["max-h-fit"], &base_config()),
             ".max-h-fit {
   max-height: fit-content;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-h-[32.555rem]"),
+            generate(["max-h-[32.555rem]"], &base_config()),
             r".max-h-\[32\.555rem\] {
   max-height: 32.555rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-h-[10%]"),
+            generate(["max-h-[10%]"], &base_config()),
             r".max-h-\[10\%\] {
   max-height: 10%;
 }"
@@ -173,91 +173,91 @@ mod tests {
     #[test]
     fn max_width() {
         assert_eq!(
-            testing::generate_css("max-w-6xl"),
+            generate(["max-w-6xl"], &base_config()),
             ".max-w-6xl {
   max-width: 72rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-w-prose"),
+            generate(["max-w-prose"], &base_config()),
             ".max-w-prose {
   max-width: 65ch;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-w-screen-xl"),
+            generate(["max-w-screen-xl"], &base_config()),
             ".max-w-screen-xl {
   max-width: 1280px;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-w-px"),
+            generate(["max-w-px"], &base_config()),
             ".max-w-px {
   max-width: 1px;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-w-2.5"),
+            generate(["max-w-2.5"], &base_config()),
             r".max-w-2\.5 {
   max-width: 0.625rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-w-60"),
+            generate(["max-w-60"], &base_config()),
             ".max-w-60 {
   max-width: 15rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("-max-w-60"),
+            generate(["-max-w-60"], &base_config()),
             ".-max-w-60 {
   max-width: -15rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-w-none"),
+            generate(["max-w-none"], &base_config()),
             ".max-w-none {
   max-width: none;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-w-1/3"),
+            generate(["max-w-1/3"], &base_config()),
             r".max-w-1\/3 {
   max-width: 33.333333%;
 }"
         );
         assert_eq!(
-            testing::generate_css("-max-w-2/3"),
+            generate(["-max-w-2/3"], &base_config()),
             r".-max-w-2\/3 {
   max-width: -66.666667%;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-w-full"),
+            generate(["max-w-full"], &base_config()),
             ".max-w-full {
   max-width: 100%;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-w-screen"),
+            generate(["max-w-screen"], &base_config()),
             ".max-w-screen {
   max-width: 100vw;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-w-fit"),
+            generate(["max-w-fit"], &base_config()),
             ".max-w-fit {
   max-width: fit-content;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-w-[32.555rem]"),
+            generate(["max-w-[32.555rem]"], &base_config()),
             r".max-w-\[32\.555rem\] {
   max-width: 32.555rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("max-w-[10%]"),
+            generate(["max-w-[10%]"], &base_config()),
             r".max-w-\[10\%\] {
   max-width: 10%;
 }"
@@ -267,73 +267,73 @@ mod tests {
     #[test]
     fn min_height() {
         assert_eq!(
-            testing::generate_css("min-h-px"),
+            generate(["min-h-px"], &base_config()),
             ".min-h-px {
   min-height: 1px;
 }"
         );
         assert_eq!(
-            testing::generate_css("min-h-2.5"),
+            generate(["min-h-2.5"], &base_config()),
             r".min-h-2\.5 {
   min-height: 0.625rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("min-h-60"),
+            generate(["min-h-60"], &base_config()),
             ".min-h-60 {
   min-height: 15rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("-min-h-60"),
+            generate(["-min-h-60"], &base_config()),
             ".-min-h-60 {
   min-height: -15rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("min-h-auto"),
+            generate(["min-h-auto"], &base_config()),
             ".min-h-auto {
   min-height: auto;
 }"
         );
         assert_eq!(
-            testing::generate_css("min-h-1/3"),
+            generate(["min-h-1/3"], &base_config()),
             r".min-h-1\/3 {
   min-height: 33.333333%;
 }"
         );
         assert_eq!(
-            testing::generate_css("-min-h-2/3"),
+            generate(["-min-h-2/3"], &base_config()),
             r".-min-h-2\/3 {
   min-height: -66.666667%;
 }"
         );
         assert_eq!(
-            testing::generate_css("min-h-full"),
+            generate(["min-h-full"], &base_config()),
             ".min-h-full {
   min-height: 100%;
 }"
         );
         assert_eq!(
-            testing::generate_css("min-h-screen"),
+            generate(["min-h-screen"], &base_config()),
             ".min-h-screen {
   min-height: 100vh;
 }"
         );
         assert_eq!(
-            testing::generate_css("min-h-fit"),
+            generate(["min-h-fit"], &base_config()),
             ".min-h-fit {
   min-height: fit-content;
 }"
         );
         assert_eq!(
-            testing::generate_css("min-h-[32.555rem]"),
+            generate(["min-h-[32.555rem]"], &base_config()),
             r".min-h-\[32\.555rem\] {
   min-height: 32.555rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("min-h-[10%]"),
+            generate(["min-h-[10%]"], &base_config()),
             r".min-h-\[10\%\] {
   min-height: 10%;
 }"
@@ -343,73 +343,73 @@ mod tests {
     #[test]
     fn min_width() {
         assert_eq!(
-            testing::generate_css("min-w-px"),
+            generate(["min-w-px"], &base_config()),
             ".min-w-px {
   min-width: 1px;
 }"
         );
         assert_eq!(
-            testing::generate_css("min-w-2.5"),
+            generate(["min-w-2.5"], &base_config()),
             r".min-w-2\.5 {
   min-width: 0.625rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("min-w-60"),
+            generate(["min-w-60"], &base_config()),
             ".min-w-60 {
   min-width: 15rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("-min-w-60"),
+            generate(["-min-w-60"], &base_config()),
             ".-min-w-60 {
   min-width: -15rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("min-w-auto"),
+            generate(["min-w-auto"], &base_config()),
             ".min-w-auto {
   min-width: auto;
 }"
         );
         assert_eq!(
-            testing::generate_css("min-w-1/3"),
+            generate(["min-w-1/3"], &base_config()),
             r".min-w-1\/3 {
   min-width: 33.333333%;
 }"
         );
         assert_eq!(
-            testing::generate_css("-min-w-2/3"),
+            generate(["-min-w-2/3"], &base_config()),
             r".-min-w-2\/3 {
   min-width: -66.666667%;
 }"
         );
         assert_eq!(
-            testing::generate_css("min-w-full"),
+            generate(["min-w-full"], &base_config()),
             ".min-w-full {
   min-width: 100%;
 }"
         );
         assert_eq!(
-            testing::generate_css("min-w-screen"),
+            generate(["min-w-screen"], &base_config()),
             ".min-w-screen {
   min-width: 100vw;
 }"
         );
         assert_eq!(
-            testing::generate_css("min-w-fit"),
+            generate(["min-w-fit"], &base_config()),
             ".min-w-fit {
   min-width: fit-content;
 }"
         );
         assert_eq!(
-            testing::generate_css("min-w-[32.555rem]"),
+            generate(["min-w-[32.555rem]"], &base_config()),
             r".min-w-\[32\.555rem\] {
   min-width: 32.555rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("min-w-[10%]"),
+            generate(["min-w-[10%]"], &base_config()),
             r".min-w-\[10\%\] {
   min-width: 10%;
 }"
@@ -419,73 +419,73 @@ mod tests {
     #[test]
     fn width() {
         assert_eq!(
-            testing::generate_css("w-px"),
+            generate(["w-px"], &base_config()),
             ".w-px {
   width: 1px;
 }"
         );
         assert_eq!(
-            testing::generate_css("w-2.5"),
+            generate(["w-2.5"], &base_config()),
             r".w-2\.5 {
   width: 0.625rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("w-60"),
+            generate(["w-60"], &base_config()),
             ".w-60 {
   width: 15rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("-w-60"),
+            generate(["-w-60"], &base_config()),
             ".-w-60 {
   width: -15rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("w-auto"),
+            generate(["w-auto"], &base_config()),
             ".w-auto {
   width: auto;
 }"
         );
         assert_eq!(
-            testing::generate_css("w-1/3"),
+            generate(["w-1/3"], &base_config()),
             r".w-1\/3 {
   width: 33.333333%;
 }"
         );
         assert_eq!(
-            testing::generate_css("-w-2/3"),
+            generate(["-w-2/3"], &base_config()),
             r".-w-2\/3 {
   width: -66.666667%;
 }"
         );
         assert_eq!(
-            testing::generate_css("w-full"),
+            generate(["w-full"], &base_config()),
             ".w-full {
   width: 100%;
 }"
         );
         assert_eq!(
-            testing::generate_css("w-screen"),
+            generate(["w-screen"], &base_config()),
             ".w-screen {
   width: 100vw;
 }"
         );
         assert_eq!(
-            testing::generate_css("w-fit"),
+            generate(["w-fit"], &base_config()),
             ".w-fit {
   width: fit-content;
 }"
         );
         assert_eq!(
-            testing::generate_css("w-[32.555rem]"),
+            generate(["w-[32.555rem]"], &base_config()),
             r".w-\[32\.555rem\] {
   width: 32.555rem;
 }"
         );
         assert_eq!(
-            testing::generate_css("w-[10%]"),
+            generate(["w-[10%]"], &base_config()),
             r".w-\[10\%\] {
   width: 10%;
 }"

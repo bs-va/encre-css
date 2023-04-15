@@ -3,14 +3,14 @@ pub mod screen_reader;
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::testing;
+    use crate::{generate, utils::testing::base_config};
 
     use pretty_assertions::assert_eq;
 
     #[test]
     fn screen_reader() {
         assert_eq!(
-            &testing::generate_css("sr-only"),
+            &generate(["sr-only"], &base_config()),
             ".sr-only {
   position: absolute;
   width: 1px;

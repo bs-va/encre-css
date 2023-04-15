@@ -1226,7 +1226,7 @@ pub fn register(config: &mut Config) {
 
 #[cfg(test)]
 mod tests {
-    use encre_css::{Config, EncreGenerator};
+    use encre_css::{generate, Config};
 
     use std::fs;
 
@@ -1238,9 +1238,7 @@ mod tests {
         let mut config = Config::default();
         super::register(&mut config);
 
-        let mut generator = EncreGenerator::new(&config);
-        generator.scan(&content);
-
-        assert_eq!(generator.generate(), expected.trim_end());
+        let generated = generate([content.as_str()], &config);
+        assert_eq!(generated, expected.trim_end());
     }
 }

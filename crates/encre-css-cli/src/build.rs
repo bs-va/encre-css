@@ -2,7 +2,7 @@ use crate::DEFAULT_CONFIG_FILE;
 
 use encre_css::{
     error::{Error, Result},
-    Config as EncreConfig, EncreGenerator,
+    generate, Config as EncreConfig,
 };
 use notify_debouncer_mini::{new_debouncer, notify::RecursiveMode, DebounceEventResult};
 use serde::Deserialize;
@@ -43,8 +43,12 @@ fn result_equal<T: PartialEq, E>(res1: result::Result<T, E>, res2: result::Resul
     }
 }
 
-fn gen_css<T: AsRef<Path>>(generator: EncreGenerator, output: Option<T>) {
-    let css = generator.generate();
+fn gen_css<'a, T: AsRef<Path>>(
+    sources: impl IntoIterator<Item = &'a str>,
+    config: &EncreConfig,
+    output: Option<T>,
+) {
+    let css = generate(sources, config);
 
     if let Some(file) = output {
         if let Some(parent) = file.as_ref().parent() {
@@ -147,7 +151,6 @@ fn build_single<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, outpu
     };
 
     let mut buffer = String::new();
-    let mut generator = EncreGenerator::new(&config.encre_config);
 
     if let Some(glob_path) = extra_input {
         scan_path(glob_path, &mut buffer);
@@ -157,8 +160,7 @@ fn build_single<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, outpu
         scan_path(glob_path, &mut buffer);
     });
 
-    generator.scan(&buffer);
-    gen_css(generator, output);
+    gen_css([buffer.as_str()], &config.encre_config, output);
 }
 
 #[allow(clippy::too_many_lines)]
@@ -193,15 +195,13 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
             }
         };
 
-        (Arc::new(config.input), Arc::new(config.encre_config))
+        (Arc::new(config.input), config.encre_config)
     };
 
     let mut buffer = String::new();
 
     {
         // Initial generation
-        let mut generator = EncreGenerator::new(&config);
-
         if let Some(ref glob_path) = *extra_input {
             scan_path(glob_path, &mut buffer);
         }
@@ -210,8 +210,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
             scan_path(glob_path, &mut buffer);
         });
 
-        generator.scan(&buffer);
-        gen_css(generator, output.as_ref());
+        gen_css([buffer.as_str()], &config, output.as_ref());
     }
 
     println!("`encre-css` successfully launched in watch mode");
@@ -294,7 +293,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
                                 }
                             };
 
-                            (Arc::new(config.input), Arc::new(config.encre_config))
+                            (Arc::new(config.input), config.encre_config)
                         };
 
                         input = new_input;
@@ -303,7 +302,6 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
                     }
 
                     if need_reloading {
-                        let mut generator = EncreGenerator::new(&config);
                         buffer.clear();
 
                         if let Some(ref glob_path) = *extra_input {
@@ -314,8 +312,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
                             scan_path(glob_path, &mut buffer);
                         });
 
-                        generator.scan(&buffer);
-                        gen_css(generator, output.as_ref());
+                        gen_css([buffer.as_str()], &config, output.as_ref());
                     }
                 }
             }
