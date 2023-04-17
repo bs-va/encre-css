@@ -5,7 +5,7 @@ description = "Quickly add pure CSS icons to your website"
 edition = "2021"
 
 [dependencies]
-directories = "4.0.1"
+directories = "5.0.0"
 encre-css = { path = "../encre-css" }
 once_cell = "1.14.0"
 reqwest = { version = "0.11.11", features = ["json", "blocking"] }
