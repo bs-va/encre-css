@@ -8,7 +8,7 @@ To integrate `encre-css-typography` with `encre-css`, add it in your `Cargo.toml
 
 ```toml
 [dependencies]
-encre-css-typography = { git = "https://gitlab.com/encre-org/encre-css.git", tag = "v0.10.0" }
+encre-css-typography = "0.10.0"
 ```
 
 Then, call the `register` function with a mutable reference to a `Config` structure:

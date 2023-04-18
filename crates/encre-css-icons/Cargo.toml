@@ -2,7 +2,13 @@
 name = "encre-css-icons"
 version = "0.1.0"
 description = "Quickly add pure CSS icons to your website"
+authors = ["nifou <nifou@mailfence.com>"]
+license = "MIT"
 edition = "2021"
+repository = "https://gitlab.com/encre-org/encre-css.git"
+documentation = "https://docs.rs/encre-css-icons"
+keywords = ["tailwind", "css", "compiler", "encre-css"]
+categories = ["web-programming"]
 
 [dependencies]
 directories = "5.0.0"
