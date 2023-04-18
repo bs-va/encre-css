@@ -674,7 +674,10 @@ mod tests {
             .placeholder_color("#00f")
             .font_family_sans("sans-serif")
             .font_family_mono("monospace");
-        let config = Config { preflight, ..Default::default() };
+        let config = Config {
+            preflight,
+            ..Default::default()
+        };
 
         let generated = generate(["w-full"], &config);
 
@@ -1018,7 +1021,10 @@ img, video {
   overflow-x: hidden;
 }",
         );
-        let config = Config { preflight, ..Default::default() };
+        let config = Config {
+            preflight,
+            ..Default::default()
+        };
 
         let generated = generate(["w-full"], &config);
 
@@ -1040,7 +1046,10 @@ img, video {
 
     #[test]
     fn no_preflight() {
-        let config = Config { preflight: Preflight::new_none(), ..Default::default() };
+        let config = Config {
+            preflight: Preflight::new_none(),
+            ..Default::default()
+        };
 
         let generated = generate(["w-full"], &config);
 

@@ -92,7 +92,9 @@ impl Default for Scanner {
                         }
                         _ => {
                             is_dashed = false;
-                            ch == ' ' || (!is_arbitrary && (ch == '\'' || ch == '"' || ch == '`' || ch == '\n'))
+                            ch == ' '
+                                || (!is_arbitrary
+                                    && (ch == '\'' || ch == '"' || ch == '`' || ch == '\n'))
                         }
                     }
                 })
