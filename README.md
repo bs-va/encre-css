@@ -116,7 +116,7 @@ Add `encre-css` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-encre-css = "0.9.3"
+encre-css = "0.10.0"
 ```
 
 Generating styles takes two steps:

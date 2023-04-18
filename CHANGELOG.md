@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.0] - 2023-04-18
+
+### Bug Fixes
+
+- Arbitrary css property containing spaces
+
+### Documentation
+
+- Fix some typos
+
+### Refactor
+
+- [**breaking**] Replace the `EncreGenerator` structure with a single `generate` function
+
+### Styling
+
+- Run rustfmt
+
+### Build
+
+- Update dependencies
+
 ## [0.9.0] - 2023-02-24
 
 ### Bug Fixes
