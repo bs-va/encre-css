@@ -28,7 +28,7 @@ structure and some parameters (all parameters are optional, you can use `None`
 to use the default value):
 
 ```rust
-use encre_css::{Config, generate};
+use encre_css::Config;
 
 let mut config = Config::from_file("encre-css.toml")?;
 // Or let mut config = Config::default();
@@ -36,7 +36,10 @@ let mut config = Config::from_file("encre-css.toml")?;
 encre_css_icons::register(&mut config);
 
 // The convention is <prefix><collection>-<icon>
-let _css = generate([r#"<h1 class="text-xl text-gray-600">Hello <span class="subway-world-1"></span>!</h1><div class="mdi-alarm block"></div><span class="fa-solid-home"></span><span class="openmoji-automobile hover:openmoji-autonomous-car"></span>"#], &config);
+let _css = encre_css::generate(
+    [r#"<h1 class="text-xl text-gray-600">Hello <span class="subway-world-1"></span>!</h1><div class="mdi-alarm block"></div><span class="fa-solid-home"></span><span class="openmoji-automobile hover:openmoji-autonomous-car"></span>"#],
+    &config,
+);
 // Do something with the CSS
 ```
 

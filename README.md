@@ -130,10 +130,13 @@ generate the style needed for each class.
 ### Example
 
 ```rust
-use encre_css::{Config, generate};
+use encre_css::Config;
 
 let config = Config::default();
-let css = generate([r#"<p class="w-auto bg-red-200 rounded-md">Hello world!</p>"#], &config);
+let css = encre_css::generate(
+    [r#"<p class="w-auto bg-red-200 rounded-md">Hello world!</p>"#],
+    &config,
+);
 
 assert!(css.expect("failed to generate the CSS").ends_with(r#"
 .w-auto {

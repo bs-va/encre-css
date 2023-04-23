@@ -15,7 +15,7 @@ use std::{collections::BTreeSet, sync::Arc};
 /// HTML attribute.
 ///
 /// ```
-/// use encre_css::{Config, Scanner, utils::split_ignore_arbitrary, generate};
+/// use encre_css::{Config, Scanner, utils::split_ignore_arbitrary};
 /// use std::collections::BTreeSet;
 ///
 /// let mut config = Config::default();
@@ -24,7 +24,10 @@ use std::{collections::BTreeSet, sync::Arc};
 ///     .flatten()
 ///     .collect::<BTreeSet<&str>>());
 ///
-/// let generated = generate([r#"<h1 data-en="underline"></h1><p data-en="bg-red-200 text-blue-300"></p>"#], &config);
+/// let generated = encre_css::generate(
+///     [r#"<h1 data-en="underline"></h1><p data-en="bg-red-200 text-blue-300"></p>"#],
+///     &config,
+/// );
 ///
 /// assert!(generated.ends_with(".bg-red-200 {
 ///   --en-bg-opacity: 1;

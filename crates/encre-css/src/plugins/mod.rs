@@ -7,7 +7,7 @@
 //! # Example (with `encre-css-typography`)
 //!
 //! ```ignore
-//! use encre_css::{Config, generate};
+//! use encre_css::Config;
 //!
 //! # fn main() -> encre_css::Result<()> {
 //! let mut config = Config::from_file("encre-css.toml")?;
@@ -15,7 +15,10 @@
 //!
 //! encre_css_typography::register(&mut config);
 //!
-//! let _css = generate([r#"<div class="prose prose-headings:text-blue-500 prose-slate lg:prose-lg dark:prose-invert"></div>"#], &config);
+//! let _css = encre_css::generate(
+//!     [r#"<div class="prose prose-headings:text-blue-500 prose-slate lg:prose-lg dark:prose-invert"></div>"#],
+//!     &config,
+//! );
 //! // Do something with the CSS
 //! # Ok(())
 //! # }

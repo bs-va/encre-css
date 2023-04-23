@@ -137,10 +137,13 @@
 //! ### Example
 //!
 //! ```
-//! use encre_css::{Config, generate};
+//! use encre_css::Config;
 //!
 //! let config = Config::default();
-//! let generated = generate([r#"<p class="w-auto bg-red-200 rounded-md">Hello world!</p>"#], &config);
+//! let generated = encre_css::generate(
+//!     [r#"<p class="w-auto bg-red-200 rounded-md">Hello world!</p>"#],
+//!     &config,
+//! );
 //!
 //! assert!(generated.ends_with(".w-auto {
 //!   width: auto;

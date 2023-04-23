@@ -7,13 +7,13 @@
 //! or [`Preflight::font_family_mono`].
 //!
 //! ```
-//! use encre_css::{Preflight, Config, generate};
+//! use encre_css::{Preflight, Config};
 //!
 //! let mut config = Config::default();
 //! config.preflight = Preflight::new_full()
 //!     .border_color("#444");
 //!
-//! assert!(generate([], &config).starts_with("*, ::before, ::after {
+//! assert!(encre_css::generate([], &config).starts_with("*, ::before, ::after {
 //!   box-sizing: border-box;
 //!   border-width: 0;
 //!   border-style: solid;
@@ -24,7 +24,7 @@
 //! You can also use your own default CSS using [`Preflight::new_custom`].
 //!
 //! ```
-//! use encre_css::{Preflight, Config, generate};
+//! use encre_css::{Preflight, Config};
 //!
 //! let mut config = Config::default();
 //! config.preflight = Preflight::new_custom("html, body {
@@ -33,7 +33,7 @@
 //!   margin: 0;
 //! }");
 //!
-//! assert_eq!(generate([], &config), "html, body {
+//! assert_eq!(encre_css::generate([], &config), "html, body {
 //!   width: 100vw;
 //!   height: 100vh;
 //!   margin: 0;
@@ -43,12 +43,12 @@
 //! Finally you can disable it using [`Preflight::new_none`].
 //!
 //! ```
-//! use encre_css::{Preflight, Config, generate};
+//! use encre_css::{Preflight, Config};
 //!
 //! let mut config = Config::default();
 //! config.preflight = Preflight::new_none();
 //!
-//! assert_eq!(generate([], &config), "");
+//! assert_eq!(encre_css::generate([], &config), "");
 //! ```
 //!
 //! Based on [Tailwind's default preflight](https://tailwindcss.com/docs/preflight).

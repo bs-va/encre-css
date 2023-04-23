@@ -4,7 +4,7 @@
 //! # Example
 //!
 //! ```
-//! use encre_css::{Config, config::DarkMode, generate};
+//! use encre_css::{Config, config::DarkMode};
 //!
 //! let mut config = Config::default();
 //!
@@ -21,7 +21,10 @@
 //! config.theme.screens.add("laptop", "1024px");
 //! config.theme.screens.add("desktop", "1280px");
 //!
-//! let generated = generate(["tablet:dark:bg-primary"], &config);
+//! let generated = encre_css::generate(
+//!     ["tablet:dark:bg-primary"],
+//!     &config,
+//! );
 //!
 //! assert!(generated.ends_with(r#"@media (min-width: 640px) {
 //!   .dark .tablet\:dark\:bg-primary {
@@ -868,12 +871,15 @@ pub enum DarkMode {
     /// # Example
     ///
     /// ```
-    /// use encre_css::{Config, config::DarkMode, generate};
+    /// use encre_css::{Config, config::DarkMode};
     ///
     /// let mut config = Config::default();
     /// config.theme.dark_mode = DarkMode::new_class("body.dark");
     ///
-    /// let generated = generate(["dark:text-white"], &config);
+    /// let generated = encre_css::generate(
+    ///     ["dark:text-white"],
+    ///     &config,
+    /// );
     ///
     /// assert!(generated.ends_with(r#"body.dark .dark\:text-white {
     ///   --en-text-opacity: 1;
@@ -888,12 +894,15 @@ pub enum DarkMode {
     /// # Example
     ///
     /// ```
-    /// use encre_css::{Config, config::DarkMode, generate};
+    /// use encre_css::{Config, config::DarkMode};
     ///
     /// let mut config = Config::default();
     /// config.theme.dark_mode = DarkMode::Media;
     ///
-    /// let generated = generate(["dark:text-white"], &config);
+    /// let generated = encre_css::generate(
+    ///     ["dark:text-white"],
+    ///     &config,
+    /// );
     ///
     /// assert!(generated.ends_with(r#"@media (prefers-color-scheme: dark) {
     ///   .dark\:text-white {
@@ -988,12 +997,15 @@ impl Colors {
 /// # Example
 ///
 /// ```
-/// use encre_css::{Config, generate};
+/// use encre_css::Config;
 ///
 /// let mut config = Config::default();
 /// config.shortcuts.add("btn", "border-1 rounded-xl bg-red-500");
 ///
-/// let generated = generate([r#"<button class="btn">Click me</button>"#], &config);
+/// let generated = encre_css::generate(
+///     [r#"<button class="btn">Click me</button>"#],
+///     &config,
+/// );
 ///
 /// assert!(generated.ends_with(r#".btn {
 ///   border-radius: 0.75rem;
@@ -1122,21 +1134,21 @@ pub struct Theme {
 /// - It can be the default one:
 ///
 /// ```
-/// use encre_css::{Config, generate};
+/// use encre_css::Config;
 ///
 /// let config = Config::default();
-/// let _generated = generate([], &config);
+/// let _generated = encre_css::generate([], &config);
 /// ```
 ///
 /// - It can be a customized one:
 ///
 /// ```
-/// use encre_css::{Config, generate};
+/// use encre_css::Config;
 ///
 /// let mut config = Config::default();
 /// config.theme.colors.add("flashy", "#ff2d20");
 ///
-/// let _generated = generate([], &config);
+/// let _generated = encre_css::generate([], &config);
 /// ```
 ///
 /// - It can be loaded from a [TOML](https://toml.io) file:
@@ -1150,11 +1162,11 @@ pub struct Theme {
 /// yellow-400 = <span class="string">"#ffef0e"</span></code></pre></div>
 ///
 /// ```no_run
-/// use encre_css::{Config, generate};
+/// use encre_css::Config;
 ///
 /// # fn main() -> encre_css::Result<()> {
 /// let config = Config::from_file("encre-css.toml")?;
-/// let _generated = generate([], &config);
+/// let _generated = encre_css::generate([], &config);
 /// # Ok(())
 /// # }
 /// ```
@@ -1243,7 +1255,7 @@ impl Config {
     /// # Example
     ///
     /// ```
-    /// use encre_css::{Config, prelude::build_plugin::*, generate};
+    /// use encre_css::{Config, prelude::build_plugin::*};
     ///
     /// #[derive(Debug)]
     /// struct Prose;
@@ -1267,7 +1279,10 @@ impl Config {
     /// let mut config = Config::default();
     /// config.register_plugin("prose", &Prose);
     ///
-    /// let generated = generate(["prose", "prose-invert"], &config);
+    /// let generated = encre_css::generate(
+    ///     ["prose", "prose-invert"],
+    ///     &config,
+    /// );
     ///
     /// assert!(generated.ends_with(".prose {
     ///   color: #333;
@@ -1293,13 +1308,16 @@ impl Config {
     /// # Example
     ///
     /// ```
-    /// use encre_css::{Config, selector::VariantType, generate};
+    /// use encre_css::{Config, selector::VariantType};
     /// use std::borrow::Cow;
     ///
     /// let mut config = Config::default();
     /// config.register_variant("headings", VariantType::WrapClass(Cow::Borrowed("& :where(h1, h2, h3, h4, h5, h6)")));
     ///
-    /// let generated = generate(["headings:text-gray-700"], &config);
+    /// let generated = encre_css::generate(
+    ///     ["headings:text-gray-700"],
+    ///     &config,
+    /// );
     ///
     /// assert!(generated.ends_with(".headings\\:text-gray-700 :where(h1, h2, h3, h4, h5, h6) {
     ///   --en-text-opacity: 1;
@@ -1328,11 +1346,11 @@ impl Config {
     /// yellow-400 = <span class="string">"#ffef0e"</span></code></pre></div>
     ///
     /// ```no_run
-    /// use encre_css::{Config, generate};
+    /// use encre_css::Config;
     ///
     /// # fn main() -> encre_css::Result<()> {
     /// let config = Config::from_file("encre-css.toml")?;
-    /// let _generated = generate([], &config);
+    /// let _generated = encre_css::generate([], &config);
     /// # Ok(())
     /// # }
     /// ```

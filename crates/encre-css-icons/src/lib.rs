@@ -24,7 +24,7 @@
 //! to use the default value):
 //!
 //! ```no_run
-//! use encre_css::{Config, generate};
+//! use encre_css::Config;
 //!
 //! # fn main() -> encre_css::Result<()> {
 //! let mut config = Config::from_file("encre-css.toml")?;
@@ -33,7 +33,10 @@
 //! encre_css_icons::register(&mut config);
 //!
 //! // The convention is <prefix><collection>-<icon>
-//! let _generated = generate([r#"<h1 class="text-xl text-gray-600">Hello <span class="subway-world-1"></span>!</h1><div class="mdi-alarm block"></div><span class="fa-solid-home"></span><span class="openmoji-automobile hover:openmoji-autonomous-car"></span>"#], &config);
+//! let _generated = encre_css::generate(
+//!     [r#"<h1 class="text-xl text-gray-600">Hello <span class="subway-world-1"></span>!</h1><div class="mdi-alarm block"></div><span class="fa-solid-home"></span><span class="openmoji-automobile hover:openmoji-autonomous-car"></span>"#],
+//!     &config,
+//! );
 //!
 //! # Ok(())
 //! # }
@@ -558,7 +561,7 @@ pub fn register(config: &mut Config) {
 
 #[cfg(test)]
 mod tests {
-    use encre_css::{generate, toml, Config};
+    use encre_css::{toml, Config};
     use std::fs;
 
     #[test]
@@ -575,7 +578,7 @@ mod tests {
         );
         super::register(&mut config);
 
-        let generated = generate([content.as_str()], &config);
+        let generated = encre_css::generate([content.as_str()], &config);
         assert_eq!(generated, expected.trim_end());
     }
 }
