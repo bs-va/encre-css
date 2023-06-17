@@ -71,7 +71,6 @@ impl Default for Scanner {
     fn default() -> Self {
         Self {
             scan_fn: Arc::new(|val| {
-                let mut is_dashed = false;
                 let mut is_arbitrary = false;
 
                 val.split(|ch| {
@@ -79,22 +78,15 @@ impl Default for Scanner {
                     // ignoring values in, for example, JS arrays, given that they are defined
                     // using square brackets)
                     match ch {
-                        '-' => {
-                            is_dashed = true;
-                            false
-                        }
-                        '[' if is_dashed => {
+                        '[' => {
                             is_arbitrary = true;
-                            is_dashed = false;
                             false
                         }
                         ']' => {
                             is_arbitrary = false;
-                            is_dashed = false;
                             false
                         }
                         _ => {
-                            is_dashed = false;
                             ch == ' '
                                 || (!is_arbitrary
                                     && (ch == '\'' || ch == '"' || ch == '`' || ch == '\n'))
@@ -166,6 +158,19 @@ mod tests {
                 "bg-red-300",
                 "class=",
                 "content-['hello:>\"']",
+            ])
+        );
+    }
+
+    #[test]
+    fn scan_with_arbitrary_variant() {
+        assert_eq!(
+            Scanner::default().scan(r#"<div class="[input[type='text']]:block"></div>"#),
+            BTreeSet::from([
+                "<div",
+                "></div>",
+                "class=",
+                "[input[type='text']]:block",
             ])
         );
     }
