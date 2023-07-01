@@ -11,7 +11,6 @@ variables:
 
 check:test:
   stage: test
-  image: rustdocker/rust:nightly
   variables:
     RUSTFLAGS: "-Cinstrument-coverage"
     LLVM_PROFILE_FILE: "coverage-%p-%m.profraw"
