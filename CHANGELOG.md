@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.1] - 2023-07-01
+
+### Bug Fixes
+
+- Remove dashed requirement for arbitrary values because it breaks arbitrary variants
+
+### Documentation
+
+- Use a more rusty way of importing generate
+
+### Miscellaneous Tasks
+
+- Prepare `encre-css-icons` and `encre-css-typography` to be published on crates.io
+
+### Ci
+
+- Use Rust stable
+
 ## [0.10.0] - 2023-04-18
 
 ### Bug Fixes
