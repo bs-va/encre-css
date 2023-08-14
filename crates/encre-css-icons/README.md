@@ -12,7 +12,8 @@
 - Icons follow the text size
 - Icons follow the text color
 - Support colorful and monochrome icons
-- No request is issued client-side
+- No request is issued client-side when not using WebAssembly
+- Supports WebAssembly (SVG icons will be directly fetch client-side)
 
 ### Getting started
 
@@ -42,8 +43,6 @@ let _css = encre_css::generate(
 );
 // Do something with the CSS
 ```
-
-Note that this plugin **does not support WebAssembly**.
 
 ### Configuration
 

@@ -10,7 +10,8 @@
 //! - Icons follow the text size
 //! - Icons follow the text color
 //! - Support colorful and monochrome icons
-//! - No request is issued client-side
+//! - No request is issued client-side when not using WebAssembly
+//! - Supports WebAssembly (SVG icons will be directly fetch client-side)
 //!
 //! ### Getting started
 //!
@@ -42,8 +43,6 @@
 //! # }
 //! // Do something with the CSS
 //! ```
-//!
-//! Note that this plugin **does not support WebAssembly**.
 //!
 //! ### Configuration
 //!
@@ -109,16 +108,19 @@
 //! [collections.md](https://github.com/iconify/icon-sets/blob/master/collections.md)
 //! for a list of collections and their licenses.
 
-use directories::BaseDirs;
 use encre_css::{
     generator::{ContextCanHandle, ContextHandle},
     plugins::Plugin,
     selector::Modifier,
     Config,
 };
+
+#[cfg(not(target_arch = "wasm32"))]
+use directories::BaseDirs;
+#[cfg(not(target_arch = "wasm32"))]
 use once_cell::sync::Lazy;
+#[cfg(not(target_arch = "wasm32"))]
 use std::{
-    borrow::Cow,
     collections::BTreeMap,
     env,
     fs::{self, File},
@@ -127,8 +129,12 @@ use std::{
     sync::Mutex,
 };
 
+use std::borrow::Cow;
+
+#[cfg(not(target_arch = "wasm32"))]
 pub mod collection;
 
+#[cfg(not(target_arch = "wasm32"))]
 use collection::{Collection, IconOptional};
 
 const COLLECTIONS: &[&str] = &[
@@ -259,11 +265,18 @@ const COLLECTIONS: &[&str] = &[
     "feather",
     "mono-icons",
 ];
+
+#[cfg(not(target_arch = "wasm32"))]
 const DEFAULT_CDN: &str = "https://esm.sh";
+
+#[cfg(not(target_arch = "wasm32"))]
 const CACHE_SUB_DIR_NAME: &str = "encre-css-icons-cache";
+
+#[cfg(not(target_arch = "wasm32"))]
 static MEM_CACHE: Lazy<Mutex<BTreeMap<&'static str, Collection>>> =
     Lazy::new(|| Mutex::new(BTreeMap::new()));
 
+#[cfg(not(target_arch = "wasm32"))]
 fn get_icon(
     config: &Config,
     collection: &Collection,
@@ -419,6 +432,7 @@ fn get_icon(
     Some(((formatted_width, formatted_height), svg))
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 fn fetch_or_cache_collection(config: &Config, collection: &'static str) {
     if MEM_CACHE.lock().unwrap().get(collection).is_some() {
         // Collection already in the memory cache, use it
@@ -504,12 +518,30 @@ impl Plugin for Icons {
                     .iter()
                     .find_map(|c| value.strip_prefix(c).map(|r| (c, r)))
                     .unwrap();
+
+                let icon = rest.strip_prefix('-').unwrap_or(rest);
+
+                #[cfg(not(target_arch = "wasm32"))]
                 fetch_or_cache_collection(context.config, collection);
 
+                #[cfg(target_arch = "wasm32")]
+                context.buffer.lines([
+                    format_args!(r#"--en-icon: url("https://api.iconify.design/{collection}/{icon}.svg");"#),
+                    format_args!("mask: var(--en-icon) no-repeat;"),
+                    format_args!("mask-size: 100% 100%;"),
+                    format_args!("-webkit-mask: var(--en-icon) no-repeat;"),
+                    format_args!("-webkit-mask-size: 100% 100%;"),
+                    format_args!("background-color: currentColor;"),
+                    format_args!("display: inline-block;"),
+                    format_args!("width: 32px;"),
+                    format_args!("height: 32px;"),
+                ]);
+
+                #[cfg(not(target_arch = "wasm32"))]
                 if let Some(((width, height), icon_data_uri)) = get_icon(
                     context.config,
                     MEM_CACHE.lock().unwrap().get(collection).unwrap(),
-                    rest.strip_prefix('-').unwrap_or(rest),
+                    icon,
                 ) {
                     if icon_data_uri.contains("currentColor") {
                         // From https://codepen.io/noahblon/post/coloring-svgs-in-css-background-images
