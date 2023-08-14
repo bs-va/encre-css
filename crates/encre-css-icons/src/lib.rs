@@ -485,9 +485,10 @@ fn fetch_or_cache_collection(config: &Config, collection: &'static str) {
 
         let url = format!("{}/@iconify-json/{}/icons.json", custom_cdn, collection);
 
-        let content = reqwest::blocking::get(&url)
+        let content = ureq::get(&url)
+            .call()
             .unwrap_or_else(|_| panic!("failed to get the response from `{url}`"))
-            .text()
+            .into_string()
             .expect("failed to deserialize the response body as JSON");
 
         // Write the cached file to the disk
