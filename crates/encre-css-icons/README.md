@@ -48,7 +48,8 @@ Note that this plugin **does not support WebAssembly**.
 ### Configuration
 
 This plugin has some configuration options, to set them simply add an extra field `icons` in
-the configuration with the fields you want to change. For example in TOML:
+the configuration with the fields you want to change. If configuring using Rust, the extra
+configuration must be added **before** registering the plugin. For example in TOML:
 
 ```toml
 [extra.icons]
@@ -63,11 +64,16 @@ Or in Rust:
 use encre_css::{Config, toml};
 
 let mut config = Config::default();
+// Or let mut config = Config::from_file("encre-css.toml")?;
+
 config.extra.add("icons", toml! {
     prefix = "i-"
     custom-cdn = "https://cdn.skypack.dev"
     scale = 1.2
 });
+
+// Then register the plugin
+encre_css_icons::register(&mut config);
 ```
 
 Configuration fields:

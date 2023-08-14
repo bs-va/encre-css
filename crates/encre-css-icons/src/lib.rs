@@ -48,7 +48,8 @@
 //! ### Configuration
 //!
 //! This plugin has some configuration options, to set them simply add an extra field `icons` in
-//! the configuration with the fields you want to change. For example in TOML:
+//! the configuration with the fields you want to change. If configuring using Rust, the extra
+//! configuration must be added **before** registering the plugin. For example in TOML:
 //!
 //! <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">[extra.icons]</span>
 //! prefix = <span class="string">"i-"</span>
@@ -61,11 +62,16 @@
 //! use encre_css::{Config, toml};
 //!
 //! let mut config = Config::default();
+//! // Or let mut config = Config::from_file("encre-css.toml")?;
+//!
 //! config.extra.add("icons", toml! {
 //!     prefix = "i-"
 //!     custom-cdn = "https://cdn.skypack.dev"
 //!     scale = 1.2
 //! });
+//!
+//! // Then register the plugin
+//! encre_css_icons::register(&mut config);
 //! ```
 //!
 //! Configuration fields:
