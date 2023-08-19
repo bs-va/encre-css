@@ -147,7 +147,11 @@ pub enum Modifier<'a> {
 ///
 /// Variant are useful to <i>conditionally</i> apply utility classes.
 ///
+/// See [`config::BUILTIN_VARIANTS`] for a list of all default variants.
+///
 /// See [Tailwind's documentation](https://tailwindcss.com/docs/hover-focus-and-other-states) to learn more about variants.
+///
+/// [`config::BUILTIN_VARIANTS`]: crate::config::BUILTIN_VARIANTS
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum VariantType {
     /// A CSS [pseudo element](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements).

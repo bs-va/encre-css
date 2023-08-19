@@ -531,7 +531,72 @@ pub const BUILTIN_SCREENS: &[(&str, &str)] = &[
     ("2xl", "1536px"),
 ];
 
-/// The list of all default variants.
+/// The list of all default variants (sorted following their importance in the CSS file).
+///
+/// - `first-letter`: applies the [`first-letter`](https://developer.mozilla.org/en-US/docs/Web/CSS/::first-letter) pseudo element
+/// - `first-line`: applies the [`first-line`](https://developer.mozilla.org/en-US/docs/Web/CSS/::first-line) pseudo element
+/// - `marker`: applies the [`marker`](https://developer.mozilla.org/en-US/docs/Web/CSS/::marker) pseudo element to the element **and all of its nested children**
+/// - `selection`: applies the [`selection`](https://developer.mozilla.org/en-US/docs/Web/CSS/::selection) pseudo element to the element **and all of its nested children**
+/// - `file`: applies the [`file-selector-button`](https://developer.mozilla.org/en-US/docs/Web/CSS/::file-selector-button) pseudo element
+/// - `placeholder`: applies the [`placeholder`](https://developer.mozilla.org/en-US/docs/Web/CSS/::placeholder) pseudo element
+/// - `backdrop`: applies the [`backdrop`](https://developer.mozilla.org/en-US/docs/Web/CSS/::backdrop) pseudo element
+/// - `before`: applies the [`before`](https://developer.mozilla.org/en-US/docs/Web/CSS/::before) pseudo element
+/// - `after`: applies the [`before`](https://developer.mozilla.org/en-US/docs/Web/CSS/::before) pseudo element
+/// - `all`: selects all nested children instead of the element itself
+/// - `children`: selects all direct children (only one level deep) instead of the element itself
+/// - `siblings`: selects all siblings of the element using the [general sibling combinator `~`](https://developer.mozilla.org/en-US/docs/Web/CSS/General_sibling_combinator)
+/// - `sibling`: select the sibling next to the element using the [adjacent sibling combinator `+`](https://developer.mozilla.org/en-US/docs/Web/CSS/Adjacent_sibling_combinator)
+/// - `first`: applies the [`first-child`](https://developer.mozilla.org/en-US/docs/Web/CSS/:first-child) pseudo class
+/// - `not-first`: opposite of `first`, applies `:not(:first-child)`
+/// - `last`: applies the [`last-child`](https://developer.mozilla.org/en-US/docs/Web/CSS/:last-child) pseudo class
+/// - `not-last`: opposite of `last`, applies `:not(:last-child)`
+/// - `only`: applies the [`only-child`](https://developer.mozilla.org/en-US/docs/Web/CSS/:only-child) pseudo class
+/// - `not-only`: opposite of `only`, applies `:not(:only-child)`
+/// - `odd`: applies the [`nth-child(odd)`](https://developer.mozilla.org/en-US/docs/Web/CSS/:nth-child) pseudo class
+/// - `even`: opposite of `odd`, applies the [`nth-child(even)`](https://developer.mozilla.org/en-US/docs/Web/CSS/:nth-child) pseudo class
+/// - `first-of-type`: applies the [`first-of-type`](https://developer.mozilla.org/en-US/docs/Web/CSS/:first-of-type) pseudo class
+/// - `last-of-type`: applies the [`last-of-type`](https://developer.mozilla.org/en-US/docs/Web/CSS/:last-of-type) pseudo class
+/// - `only-of-type`: applies the [`only-of-type`](https://developer.mozilla.org/en-US/docs/Web/CSS/:only-of-type) pseudo class
+/// - `not-first-of-type`: opposite of `first-of-type`, applies `:not(:first-of-type)`
+/// - `not-last-of-type`: opposite of `last-of-type`, applies `:not(:last-of-type)`
+/// - `not-only-of-type`: opposite of `only-of-type`, applies `:not(:only-of-type)`
+/// - `visited`: applies the [`visited`](https://developer.mozilla.org/en-US/docs/Web/CSS/:visited) pseudo class
+/// - `target`: applies the [`target`](https://developer.mozilla.org/en-US/docs/Web/CSS/:target) pseudo class
+/// - `open`: selects all elements having the `open` attributes, useful for [`<dialog>` elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog)
+/// - `default`: applies the [`default`](https://developer.mozilla.org/en-US/docs/Web/CSS/:default) pseudo class
+/// - `checked`: applies the [`checked`](https://developer.mozilla.org/en-US/docs/Web/CSS/:checked) pseudo class
+/// - `not-checked`: opposite of `checked`, applies `:not(:checked)`
+/// - `indeterminate`: applies the [`indeterminate`](https://developer.mozilla.org/en-US/docs/Web/CSS/:indeterminate) pseudo class
+/// - `placeholder-shown`: applies the [`placeholder-shown`](https://developer.mozilla.org/en-US/docs/Web/CSS/:placeholder-shown) pseudo class
+/// - `autofill`: applies the [`autofill`](https://developer.mozilla.org/en-US/docs/Web/CSS/:autofill) pseudo class
+/// - `optional`: applies the [`optional`](https://developer.mozilla.org/en-US/docs/Web/CSS/:optional) pseudo class
+/// - `required`: applies the [`required`](https://developer.mozilla.org/en-US/docs/Web/CSS/:required) pseudo class
+/// - `valid`: applies the [`valid`](https://developer.mozilla.org/en-US/docs/Web/CSS/:valid) pseudo class
+/// - `invalid`: applies the [`invalid`](https://developer.mozilla.org/en-US/docs/Web/CSS/:invalid) pseudo class
+/// - `in-range`: applies the [`in-range`](https://developer.mozilla.org/en-US/docs/Web/CSS/:in-range) pseudo class
+/// - `out-of-range`: applies the [`out-of-range`](https://developer.mozilla.org/en-US/docs/Web/CSS/:out-of-range) pseudo class
+/// - `read-only`: applies the [`read-only`](https://developer.mozilla.org/en-US/docs/Web/CSS/:read-only) pseudo class
+/// - `read-write`: applies the [`read-write`](https://developer.mozilla.org/en-US/docs/Web/CSS/:read-write) pseudo class
+/// - `empty`: applies the [`empty`](https://developer.mozilla.org/en-US/docs/Web/CSS/:empty) pseudo class
+/// - `focus-within`: applies the [`focus-within`](https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-within) pseudo class
+/// - `hover`: applies the [`hover`](https://developer.mozilla.org/en-US/docs/Web/CSS/:hover) pseudo class
+/// - `focus`: applies the [`focus`](https://developer.mozilla.org/en-US/docs/Web/CSS/:focus) pseudo class
+/// - `focus-visible`: applies the [`focus-visible`](https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible) pseudo class
+/// - `active`: applies the [`active`](https://developer.mozilla.org/en-US/docs/Web/CSS/:active) pseudo class
+/// - `enabled`: applies the [`enabled`](https://developer.mozilla.org/en-US/docs/Web/CSS/:enabled) pseudo class
+/// - `disabled`: applies the [`disabled`](https://developer.mozilla.org/en-US/docs/Web/CSS/:disabled) pseudo class
+/// - `ltr`: selects all elements having the [`dir="ltr"` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/dir), useful when styling based on writing direction
+/// - `rtl`: selects all elements having the [`dir="rtl"` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/dir), useful when styling based on writing direction
+/// - `motion-safe`: applies the [`@media (prefers-reduced-motion: no-preference)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion) at-rule
+/// - `motion-reduce`: applies the [`@media (prefers-reduced-motion: reduce)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion) at-rule
+/// - `print`: applies the [`@media print`](https://developer.mozilla.org/en-US/docs/Web/Guide/Printing#using_media_queries_to_improve_layout) at-rule
+/// - `portrait`: applies the [`@media (orientation: portrait)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/orientation) at-rule
+/// - `landscape`: applies the [`@media (orientation: landscape)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/orientation) at-rule
+/// - `contrast-more`: applies the [`@media (prefers-contrast: more)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-contrast) at-rule
+/// - `contrast-less`: applies the [`@media (prefers-contrast: less)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-contrast) at-rule
+///
+/// Besides the default variants, some others are auto-generated from the configuration like
+/// breakpoints (see [`BUILTIN_SCREENS`]) and the dark mode (`dark:` variant).
 ///
 /// Based on [Tailwind's default variants](https://tailwindcss.com/docs/hover-focus-and-other-states).
 #[rustfmt::skip]
