@@ -169,7 +169,6 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
 
     let mut debouncer = new_debouncer(
         Duration::from_millis(500),
-        None,
         move |result: DebounceEventResult| {
             tx.send(result).ok();
         },
@@ -316,14 +315,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
                     }
                 }
             }
-            Ok(Err(errors)) => eprintln!(
-                "Watch error: {}",
-                errors
-                    .iter()
-                    .map(|e| format!("{e}"))
-                    .collect::<Vec<String>>()
-                    .join(", ")
-            ),
+            Ok(Err(e)) => eprintln!("Watch error: {e}"),
             Err(e) => eprintln!("MPSC channel error: {e}"),
         }
     }
