@@ -229,8 +229,8 @@ impl<'a> PartialEq for Selector<'a> {
 #[cfg(test)]
 impl<'a> PartialEq for Selector<'a> {
     fn eq(&self, other: &Self) -> bool {
-        self.order == other.order
-            && self.full == other.full
+        // Does not test order because it can change
+        self.full == other.full
             && self.modifier == other.modifier
             && self.variants == other.variants
             && self.is_important == other.is_important

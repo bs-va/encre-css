@@ -24,6 +24,7 @@ pub mod text_transform;
 pub mod text_underline_offset;
 pub mod vertical_align;
 pub mod whitespace;
+pub mod text_wrap;
 pub mod word_break;
 
 #[cfg(test)]
@@ -802,6 +803,22 @@ mod tests {
             generate(["whitespace-pre-wrap"], &base_config()),
             ".whitespace-pre-wrap {
   white-space: pre-wrap;
+}"
+        );
+    }
+
+    #[test]
+    fn text_wrap() {
+        assert_eq!(
+            generate(["text-wrap"], &base_config()),
+            ".text-wrap {
+  text-wrap: wrap;
+}"
+        );
+        assert_eq!(
+            generate(["text-pretty"], &base_config()),
+            ".text-pretty {
+  text-wrap: pretty;
 }"
         );
     }

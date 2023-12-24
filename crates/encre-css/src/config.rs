@@ -796,6 +796,7 @@ pub const BUILTIN_PLUGINS: &[(Cow<'static, str>, &'static (dyn Plugin + Send + S
     (Cow::Borrowed("scroll"), &interactivity::scroll_behavior::PluginDefinition),
     (Cow::Borrowed(""), &typography::text_overflow::PluginDefinition),
     (Cow::Borrowed("whitespace"), &typography::whitespace::PluginDefinition),
+    (Cow::Borrowed("text"), &typography::text_wrap::PluginDefinition),
     (Cow::Borrowed("break"), &typography::word_break::PluginDefinition),
     (Cow::Borrowed("rounded"), &border::border_radius::PluginDefinition),
     (Cow::Borrowed("rounded-s"), &border::border_radius::PluginStartDefinition),
