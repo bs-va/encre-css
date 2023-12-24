@@ -12,7 +12,7 @@ impl Plugin for PluginDefinition {
         match context.modifier {
             Modifier::Builtin { value, .. } => {
                 spacing::is_matching_builtin_spacing(value)
-                    || ["full", "screen", "min", "max", "fit", "auto"].contains(value)
+                    || ["full", "screen", "min", "max", "fit", "auto", "svw", "lvw", "dvw"].contains(value)
             }
             Modifier::Arbitrary { value, .. } => {
                 is_matching_length(value) || is_matching_percentage(value)
@@ -32,6 +32,9 @@ impl Plugin for PluginDefinition {
                         "min" => Cow::Borrowed("min-content"),
                         "max" => Cow::Borrowed("max-content"),
                         "fit" => Cow::Borrowed("fit-content"),
+                        "svw" => Cow::Borrowed("100svw"),
+                        "lvw" => Cow::Borrowed("100lvw"),
+                        "dvw" => Cow::Borrowed("100dvw"),
                         _ => spacing::get(value, *is_negative).unwrap(),
                     },
                 ));

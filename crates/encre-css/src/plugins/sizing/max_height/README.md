@@ -18,6 +18,9 @@ Utilities for setting the maximum height of an element.
     <tr><td>min-h-min</td><td>min-height: min-content;</td></tr>
     <tr><td>min-h-max</td><td>min-height: max-content;</td></tr>
     <tr><td>min-h-fit</td><td>min-height: fit-content</td></tr>
+    <tr><td>max-h-svh</td><td>max-height: 100svh;</td></tr>
+    <tr><td>max-h-lvh</td><td>max-height: 100lvh;</td></tr>
+    <tr><td>max-h-dvh</td><td>max-height: 100dvh;</td></tr>
   </tbody>
 </table>
 

@@ -69,6 +69,12 @@ mod tests {
 }"
         );
         assert_eq!(
+            generate(["h-lvh"], &base_config()),
+            ".h-lvh {
+  height: 100lvh;
+}"
+        );
+        assert_eq!(
             generate(["h-fit"], &base_config()),
             ".h-fit {
   height: fit-content;
@@ -148,6 +154,12 @@ mod tests {
             generate(["max-h-screen"], &base_config()),
             ".max-h-screen {
   max-height: 100vh;
+}"
+        );
+        assert_eq!(
+            generate(["max-h-lvh"], &base_config()),
+            ".max-h-lvh {
+  max-height: 100lvh;
 }"
         );
         assert_eq!(
@@ -321,6 +333,12 @@ mod tests {
 }"
         );
         assert_eq!(
+            generate(["min-h-lvh"], &base_config()),
+            ".min-h-lvh {
+  min-height: 100lvh;
+}"
+        );
+        assert_eq!(
             generate(["min-h-fit"], &base_config()),
             ".min-h-fit {
   min-height: fit-content;
@@ -470,6 +488,12 @@ mod tests {
             generate(["w-screen"], &base_config()),
             ".w-screen {
   width: 100vw;
+}"
+        );
+        assert_eq!(
+            generate(["w-lvw"], &base_config()),
+            ".w-lvw {
+  width: 100lvw;
 }"
         );
         assert_eq!(

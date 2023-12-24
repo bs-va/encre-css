@@ -17,6 +17,9 @@ Utilities for setting the minimum height of an element.
     <tr><td>min-h-min</td><td>min-height: min-content;</td></tr>
     <tr><td>min-h-max</td><td>min-height: max-content;</td></tr>
     <tr><td>min-h-fit</td><td>min-height: fit-content</td></tr>
+    <tr><td>min-h-svh</td><td>min-height: 100svh;</td></tr>
+    <tr><td>min-h-lvh</td><td>min-height: 100lvh;</td></tr>
+    <tr><td>min-h-dvh</td><td>min-height: 100dvh;</td></tr>
   </tbody>
 </table>
 
