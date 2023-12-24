@@ -16,7 +16,7 @@ Utilities for setting the height of an element.
     <tr><td>h-screen</td><td>height: 100vh;</td></tr>
     <tr><td>h-min</td><td>height: min-content;</td></tr>
     <tr><td>h-max</td><td>height: max-content;</td></tr>
-    <tr><td>h-fit</td><td>height: fit-content</td></tr>
+    <tr><td>h-fit</td><td>height: fit-content;</td></tr>
     <tr><td>h-svh</td><td>height: 100svh;</td></tr>
     <tr><td>h-lvh</td><td>height: 100lvh;</td></tr>
     <tr><td>h-dvh</td><td>height: 100dvh;</td></tr>

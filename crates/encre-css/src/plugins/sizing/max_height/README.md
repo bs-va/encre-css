@@ -12,12 +12,12 @@ Utilities for setting the maximum height of an element.
     <tr><td>max-h-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>max-height: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
     <tr><td>max-h-px</td><td>max-height: 1px;</td></tr>
     <tr><td>max-h-none</td><td>max-height: none;</td></tr>
-    <tr><td>min-h-full</td><td>min-height: 100%;</td></tr>
-    <tr><td>min-h-auto</td><td>min-height: auto;</td></tr>
-    <tr><td>min-h-screen</td><td>min-height: 100vh;</td></tr>
-    <tr><td>min-h-min</td><td>min-height: min-content;</td></tr>
-    <tr><td>min-h-max</td><td>min-height: max-content;</td></tr>
-    <tr><td>min-h-fit</td><td>min-height: fit-content</td></tr>
+    <tr><td>max-h-full</td><td>max-height: 100%;</td></tr>
+    <tr><td>max-h-auto</td><td>max-height: auto;</td></tr>
+    <tr><td>max-h-screen</td><td>max-height: 100vh;</td></tr>
+    <tr><td>max-h-min</td><td>max-height: min-content;</td></tr>
+    <tr><td>max-h-max</td><td>max-height: max-content;</td></tr>
+    <tr><td>max-h-fit</td><td>max-height: fit-content;</td></tr>
     <tr><td>max-h-svh</td><td>max-height: 100svh;</td></tr>
     <tr><td>max-h-lvh</td><td>max-height: 100lvh;</td></tr>
     <tr><td>max-h-dvh</td><td>max-height: 100dvh;</td></tr>

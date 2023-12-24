@@ -16,7 +16,7 @@ Utilities for setting the width of an element.
     <tr><td>w-screen</td><td>width: 100vw;</td></tr>
     <tr><td>w-min</td><td>width: min-content;</td></tr>
     <tr><td>w-max</td><td>width: max-content;</td></tr>
-    <tr><td>w-fit</td><td>width: fit-content</td></tr>
+    <tr><td>w-fit</td><td>width: fit-content;</td></tr>
     <tr><td>w-svw</td><td>width: 100svw;</td></tr>
     <tr><td>w-lvw</td><td>width: 100lvw;</td></tr>
     <tr><td>w-dvw</td><td>width: 100dvw;</td></tr>

@@ -16,7 +16,7 @@ Utilities for setting the minimum width of an element.
     <tr><td>min-w-screen</td><td>min-width: 100vw;</td></tr>
     <tr><td>min-w-min</td><td>min-width: min-content;</td></tr>
     <tr><td>min-w-max</td><td>min-width: max-content;</td></tr>
-    <tr><td>min-w-fit</td><td>min-width: fit-content</td></tr>
+    <tr><td>min-w-fit</td><td>min-width: fit-content;</td></tr>
   </tbody>
 </table>
 
