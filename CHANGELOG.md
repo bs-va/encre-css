@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.0] - 2023-12-26
+
+### Bug Fixes
+
+- Support WebAssembly
+- Use `ureq` instead of `reqwest`
+
+### Documentation
+
+- Add note about the order of configuration and registration of the plugin
+- Better documentation for variants
+- Fix some inconsistencies in documentation
+
+### Features
+
+- Add support for dynamic viewport units
+- Support the `text-wrap` CSS property
+
+### Miscellaneous Tasks
+
+- Update dependencies
+- Add `resolver = "2"` to appease Cargo
+- Fix `encre-css-icons` pipeline
+
+### Build
+
+- Update all crates
+
 ## [0.10.1] - 2023-07-01
 
 ### Bug Fixes
@@ -19,6 +47,7 @@ All notable changes to this project will be documented in this file.
 ### Ci
 
 - Use Rust stable
+- Use musl target for grcov because of a glibc version conflict
 
 ## [0.10.0] - 2023-04-18
 
