@@ -681,7 +681,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "marker:xl:hover:text-center",
-                order: 185,
+                order: 186,
                 plugin: &typography::text_align::PluginDefinition,
                 variants: vec![
                     Variant::Builtin(
@@ -689,7 +689,7 @@ mod tests {
                         VariantType::WrapClass(Cow::from("& *::marker, &::marker"))
                     ),
                     Variant::Builtin(
-                        64,
+                        73,
                         VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
                     ),
                     Variant::Builtin(46, VariantType::PseudoClass("hover"))
@@ -726,7 +726,7 @@ mod tests {
                         VariantType::WrapClass(Cow::from("& *::marker, &::marker"))
                     ),
                     Variant::Builtin(
-                        64,
+                        73,
                         VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
                     ),
                     Variant::Builtin(46, VariantType::PseudoClass("hover"))
@@ -811,11 +811,11 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "xl:[&>*]:focus:text-center",
-                order: 185,
+                order: 186,
                 plugin: &typography::text_align::PluginDefinition,
                 variants: vec![
                     Variant::Builtin(
-                        64,
+                        73,
                         VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
                     ),
                     Variant::Arbitrary(Cow::from("&>*")),
@@ -849,7 +849,7 @@ mod tests {
                 plugin: &spacing::margin::PluginDefinition,
                 variants: vec![
                     Variant::Builtin(
-                        64,
+                        73,
                         VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
                     ),
                     Variant::Arbitrary(Cow::from("&>*")),
@@ -963,11 +963,11 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "xl:marker:bg-[#fff]",
-                order: 158,
+                order: 159,
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![
                     Variant::Builtin(
-                        64,
+                        73,
                         VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
                     ),
                     Variant::Builtin(
@@ -1000,11 +1000,11 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "xl:marker:bg-[color:#fff]",
-                order: 158,
+                order: 159,
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![
                     Variant::Builtin(
-                        64,
+                        73,
                         VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
                     ),
                     Variant::Builtin(
@@ -1092,11 +1092,11 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "xl:[&>*]:hover:bg-[#fff]",
-                order: 158,
+                order: 159,
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![
                     Variant::Builtin(
-                        64,
+                        73,
                         VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
                     ),
                     Variant::Arbitrary(Cow::from("&>*")),
@@ -1127,11 +1127,11 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "xl:[&>*]:hover:bg-[color:#fff]",
-                order: 158,
+                order: 159,
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![
                     Variant::Builtin(
-                        64,
+                        73,
                         VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
                     ),
                     Variant::Arbitrary(Cow::from("&>*")),
@@ -1298,15 +1298,15 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: "focus:([&>*]:-m-4,xl:dark:(bg-red-100,rtl:text-[color:black]))",
-                    order: 158,
+                    order: 159,
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(
-                            64,
+                            73,
                             VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
                         ),
                         Variant::Builtin(
-                            66,
+                            75,
                             VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)"))
                         ),
                         Variant::Builtin(47, VariantType::PseudoClass("focus")),
@@ -1319,16 +1319,16 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: "focus:([&>*]:-m-4,xl:dark:(bg-red-100,rtl:text-[color:black]))",
-                    order: 196,
+                    order: 197,
                     plugin: &typography::text_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(53, VariantType::WrapClass(Cow::from("[dir=\"rtl\"] &"))),
                         Variant::Builtin(
-                            64,
+                            73,
                             VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
                         ),
                         Variant::Builtin(
-                            66,
+                            75,
                             VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)"))
                         ),
                         Variant::Builtin(47, VariantType::PseudoClass("focus")),
@@ -1372,16 +1372,16 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: r"focus:([&>*]:-m-4,xl:dark:([\[type='text'\].light_&,.foo]:bg-red-100,text-[color:black,]))",
-                    order: 158,
+                    order: 159,
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Arbitrary(Cow::from(r"[type='text'].light &,.foo")),
                         Variant::Builtin(
-                            64,
+                            73,
                             VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
                         ),
                         Variant::Builtin(
-                            66,
+                            75,
                             VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)"))
                         ),
                         Variant::Builtin(47, VariantType::PseudoClass("focus")),
@@ -1394,15 +1394,15 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: r"focus:([&>*]:-m-4,xl:dark:([\[type='text'\].light_&,.foo]:bg-red-100,text-[color:black,]))",
-                    order: 196,
+                    order: 197,
                     plugin: &typography::text_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(
-                            64,
+                            73,
                             VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
                         ),
                         Variant::Builtin(
-                            66,
+                            75,
                             VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)"))
                         ),
                         Variant::Builtin(47, VariantType::PseudoClass("focus")),
@@ -1432,12 +1432,12 @@ mod tests {
             vec![
                 Ok(Selector {
                     full: r"xl:(focus:(outline,outline-red-200),dark:(bg-black,text-white))",
-                    order: 211,
+                    order: 212,
                     plugin: &border::outline_style::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(47, VariantType::PseudoClass("focus")),
                         Variant::Builtin(
-                            64,
+                            73,
                             VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
                         )
                     ],
@@ -1449,12 +1449,12 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: r"xl:(focus:(outline,outline-red-200),dark:(bg-black,text-white))",
-                    order: 214,
+                    order: 215,
                     plugin: &border::outline_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(47, VariantType::PseudoClass("focus")),
                         Variant::Builtin(
-                            64,
+                            73,
                             VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
                         )
                     ],
@@ -1466,15 +1466,15 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: r"xl:(focus:(outline,outline-red-200),dark:(bg-black,text-white))",
-                    order: 158,
+                    order: 159,
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(
-                            66,
+                            75,
                             VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)"))
                         ),
                         Variant::Builtin(
-                            64,
+                            73,
                             VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
                         ),
                     ],
@@ -1486,15 +1486,15 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: r"xl:(focus:(outline,outline-red-200),dark:(bg-black,text-white))",
-                    order: 196,
+                    order: 197,
                     plugin: &typography::text_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(
-                            66,
+                            75,
                             VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)"))
                         ),
                         Variant::Builtin(
-                            64,
+                            73,
                             VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
                         ),
                     ],
