@@ -667,6 +667,17 @@ pub const BUILTIN_VARIANTS: phf::Map<&'static str, (usize, VariantType)> = phf_m
     "landscape" => (58, VariantType::AtRule(Cow::Borrowed("@media (orientation: landscape)"))),
     "contrast-more" => (59, VariantType::AtRule(Cow::Borrowed("@media (prefers-contrast: more)"))),
     "contrast-less" => (60, VariantType::AtRule(Cow::Borrowed("@media (prefers-contrast: less)"))),
+
+    // --- ARIA states ---
+    "aria-busy" => (61, VariantType::WrapClass(Cow::Borrowed("&[aria-busy=\"true\"]"))),
+    "aria-checked" => (62, VariantType::WrapClass(Cow::Borrowed("&[aria-checked=\"true\"]"))),
+    "aria-disabled" => (63, VariantType::WrapClass(Cow::Borrowed("&[aria-disabled=\"true\"]"))),
+    "aria-expanded" => (64, VariantType::WrapClass(Cow::Borrowed("&[aria-expanded=\"true\"]"))),
+    "aria-hidden" => (65, VariantType::WrapClass(Cow::Borrowed("&[aria-hidden=\"true\"]"))),
+    "aria-pressed" => (66, VariantType::WrapClass(Cow::Borrowed("&[aria-pressed=\"true\"]"))),
+    "aria-readonly" => (67, VariantType::WrapClass(Cow::Borrowed("&[aria-readonly=\"true\"]"))),
+    "aria-required" => (68, VariantType::WrapClass(Cow::Borrowed("&[aria-required=\"true\"]"))),
+    "aria-selected" => (69, VariantType::WrapClass(Cow::Borrowed("&[aria-selected=\"true\"]"))),
 };
 
 /// The list of all default plugins.
@@ -993,6 +1004,35 @@ impl DarkMode {
     }
 }
 
+/// Configuration for the [`Theme::aria`] field.
+///
+/// It defines a list of custom ARIA states.
+#[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize, Clone)]
+pub struct Aria(BTreeMap<Cow<'static, str>, Cow<'static, str>>);
+
+impl Aria {
+    /// Add an ARIA state to the list.
+    #[inline]
+    pub fn add<T1: Into<Cow<'static, str>>, T2: Into<Cow<'static, str>>>(
+        &mut self,
+        key: T1,
+        val: T2,
+    ) {
+        self.0.insert(key.into(), val.into());
+    }
+
+    /// Remove an ARIA state from the list.
+    #[inline]
+    pub fn remove<T: Into<Cow<'static, str>>>(&mut self, key: T) {
+        self.0.remove(&key.into());
+    }
+
+    #[inline]
+    pub(crate) fn iter(&self) -> impl Iterator<Item = (&Cow<'static, str>, &Cow<'static, str>)> {
+        self.0.iter()
+    }
+}
+
 /// Configuration for the [`Theme::screens`] field.
 ///
 /// It defines a list of custom screen breakpoints.
@@ -1191,6 +1231,12 @@ pub struct Theme {
     /// The default value is an empty map.
     #[serde(default)]
     pub colors: Colors,
+
+    /// Custom ARIA states.
+    ///
+    /// The default value is an empty map.
+    #[serde(default)]
+    pub aria: Aria,
 }
 
 /// The configuration of the CSS generation done in the [`generate`] function.
@@ -1298,6 +1344,12 @@ impl Config {
                 (
                     Cow::from(screen.0),
                     VariantType::AtRule(Cow::Owned(format!("@media (min-width: {})", screen.1))),
+                )
+            }))
+            .chain(self.theme.aria.iter().map(|aria| {
+                (
+                    Cow::from(format!("aria-{}", aria.0)),
+                    VariantType::WrapClass(Cow::Owned(format!("&[aria-{}]", aria.1))),
                 )
             }))
             .chain(iter::once(match &self.theme.dark_mode {
@@ -1701,6 +1753,7 @@ mod tests {
         let mut config = base_config();
         config.theme.colors.add("rosa-500", "#e5186a");
         config.theme.colors.add("yellow-400", "#ffef0e");
+        config.theme.aria.add("current", "current=\"page\"");
         config.theme.screens.add("lg", "2000px");
         config.theme.screens.add("3xl", "1600px");
         config.theme.dark_mode = DarkMode::new_class(".dark");
@@ -1722,6 +1775,7 @@ mod tests {
         config.theme.screens.add("lg", "2000px");
         config.theme.colors.add("rosa-500", "#e5186a");
         config.theme.colors.add("yellow-400", "#ffef0e");
+        config.theme.aria.add("current", "current=\"page\"");
 
         let result = toml::to_string(&config).unwrap();
 
