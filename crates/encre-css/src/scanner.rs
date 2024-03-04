@@ -54,7 +54,7 @@ pub struct Scanner {
 }
 
 impl Scanner {
-    /// Build an [`Scanner`] from a closure taking some content and returning a list of possible
+    /// Build a [`Scanner`] from a closure taking some content and returning a list of possible
     /// classes.
     pub fn from_fn<T: 'static + Fn(&str) -> BTreeSet<&str> + Send + Sync>(scan_fn: T) -> Self {
         Self {
