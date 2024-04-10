@@ -6,7 +6,7 @@ use crate::{
     utils::buffer::Buffer,
 };
 
-use std::{collections::BTreeSet, fmt::Write};
+use std::{borrow::Cow, collections::BTreeSet, fmt::Write};
 
 /// The context used in the [`Plugin::can_handle`] method.
 ///
@@ -237,6 +237,32 @@ pub fn generate_wrapper<T: FnOnce(&mut ContextHandle)>(
     });
 }
 
+fn resolve_selector<'a>(
+    selector: &'a str,
+    full_class: Option<&'a str>,
+    selectors: &mut BTreeSet<Selector<'a>>,
+    config: &'a Config,
+    config_derived_variants: &[(Cow<'static, str>, VariantType)],
+) {
+    if let Some(expanded) = config.shortcuts.get(selector) {
+        expanded.split(' ').for_each(|shortcut_target| {
+            resolve_selector(
+                shortcut_target,
+                full_class.or(Some(selector)),
+                selectors,
+                config,
+                config_derived_variants,
+            );
+        });
+    } else {
+        selectors.extend(
+            parse(selector, None, full_class, config, config_derived_variants)
+                .into_iter()
+                .filter_map(Result::ok),
+        );
+    }
+}
+
 /// Generate the CSS styles needed based on the given sources.
 ///
 /// Each source will be scanned in order to extract atomic classes, then CSS will be generated for
@@ -280,27 +306,13 @@ pub fn generate<'a>(sources: impl IntoIterator<Item = &'a str>, config: &Config)
         let new_selectors = config.scanner.scan(source);
 
         for selector in new_selectors {
-            if let Some(expanded) = config.shortcuts.get(selector) {
-                expanded.split(' ').for_each(|shortcut_target| {
-                    selectors.extend(
-                        parse(
-                            shortcut_target,
-                            None,
-                            Some(selector),
-                            config,
-                            &config_derived_variants,
-                        )
-                        .into_iter()
-                        .filter_map(Result::ok),
-                    );
-                });
-            } else {
-                selectors.extend(
-                    parse(selector, None, None, config, &config_derived_variants)
-                        .into_iter()
-                        .filter_map(Result::ok),
-                );
-            }
+            resolve_selector(
+                selector,
+                None,
+                &mut selectors,
+                config,
+                &config_derived_variants,
+            );
         }
     }
 

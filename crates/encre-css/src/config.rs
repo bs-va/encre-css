@@ -1574,6 +1574,37 @@ mod tests {
     }
 
     #[test]
+    fn gen_css_with_nested_shortcuts() {
+        let mut config = base_config();
+        config
+            .shortcuts
+            .add("btn", "bg-red-500 border-1 rounded-xl");
+        config
+            .shortcuts
+            .add("btn-primary", "btn bg-blue-500");
+
+        let generated = generate(["btn-primary"], &config);
+
+        assert_eq!(
+            generated,
+            String::from(
+                ".btn-primary {
+  border-radius: 0.75rem;
+}
+
+.btn-primary {
+  border-width: 1px;
+}
+
+.btn-primary {
+  --en-bg-opacity: 1;
+  background-color: rgb(239 68 68 / var(--en-bg-opacity));
+}"
+            )
+        );
+    }
+
+    #[test]
     fn gen_css_with_safelist() {
         let mut config = base_config();
         config.safelist.add("text-red-500");
