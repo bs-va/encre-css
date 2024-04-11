@@ -1,6 +1,6 @@
 [package]
 name = "encre-css-icons"
-version = "0.1.3"
+version = "0.1.4"
 description = "Quickly add pure CSS icons to your website"
 authors = ["nifou <nifou@mailfence.com>"]
 license = "MIT"
@@ -11,7 +11,7 @@ keywords = ["tailwind", "css", "compiler", "encre-css"]
 categories = ["web-programming"]
 
 [dependencies]
-encre-css = { path = "../encre-css", version = "0.11.0" }
+encre-css = { path = "../encre-css", version = "0.12.0" }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 directories = "5.0.0"

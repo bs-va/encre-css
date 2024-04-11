@@ -1,6 +1,6 @@
 [package]
 name = "encre-css-cli"
-version = "0.11.0"
+version = "0.12.0"
 description = "A TailwindCSS-compatible utility-first CSS generation library written in Rust"
 authors = ["nifou <nifou@mailfence.com>"]
 license = "MIT"
@@ -15,7 +15,7 @@ name = "encrecss"
 path = "src/main.rs"
 
 [dependencies]
-encre-css = { path = "../encre-css", version = "0.11.0" }
+encre-css = { path = "../encre-css", version = "0.12.0" }
 clap = { version = "4.0.18", features = ["derive"] }
 notify-debouncer-mini = "0.4.1"
 rand = "0.8.5"

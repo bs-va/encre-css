@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.0] - 2024-04-11
+
+### Documentation
+
+- Fix a typo
+
+### Features
+
+- Add support for nested shortcuts
+
 ## [0.11.0] - 2023-12-26
 
 ### Bug Fixes
