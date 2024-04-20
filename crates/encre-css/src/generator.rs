@@ -1,6 +1,6 @@
 //! Define the main [`generate`] function used to scan content and to generate CSS styles.
 use crate::{
-    config::Config,
+    config::{Config, MaxShortcutDepth},
     preflight::Preflight,
     selector::{parse, Modifier, Selector, Variant, VariantType},
     utils::buffer::Buffer,
@@ -243,7 +243,12 @@ fn resolve_selector<'a>(
     selectors: &mut BTreeSet<Selector<'a>>,
     config: &'a Config,
     config_derived_variants: &[(Cow<'static, str>, VariantType)],
+    depth: MaxShortcutDepth,
 ) {
+    if depth.get() == 0 {
+        return;
+    }
+
     if let Some(expanded) = config.shortcuts.get(selector) {
         expanded.split(' ').for_each(|shortcut_target| {
             resolve_selector(
@@ -252,6 +257,7 @@ fn resolve_selector<'a>(
                 selectors,
                 config,
                 config_derived_variants,
+                MaxShortcutDepth::new(depth.get() - 1),
             );
         });
     } else {
@@ -312,6 +318,7 @@ pub fn generate<'a>(sources: impl IntoIterator<Item = &'a str>, config: &Config)
                 &mut selectors,
                 config,
                 &config_derived_variants,
+                config.max_shortcut_depth,
             );
         }
     }

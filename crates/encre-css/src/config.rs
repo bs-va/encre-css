@@ -1152,6 +1152,44 @@ impl Shortcuts {
     }
 }
 
+/// The maximum depth at which shortcuts will be resolved.
+///
+/// During the shortcut expansion, if the depth is greater than `max_shortcut_depth`, only the already expanded selectors until the maximum depth will be added.
+///
+/// By default it is set to `5`.
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Clone, Copy)]
+pub struct MaxShortcutDepth(usize);
+
+impl MaxShortcutDepth {
+    /// Create a new `MaxShortcutDepth`.
+    pub fn new(v: usize) -> Self {
+        Self(v)
+    }
+
+    /// Get the inner depth as an `usize`.
+    pub fn get(&self) -> usize {
+        self.0
+    }
+}
+
+impl From<usize> for MaxShortcutDepth {
+    fn from(v: usize) -> Self {
+        Self(v)
+    }
+}
+
+impl Into<usize> for MaxShortcutDepth {
+    fn into(self) -> usize {
+        self.0
+    }
+}
+
+impl Default for MaxShortcutDepth {
+    fn default() -> Self {
+        Self(5)
+    }
+}
+
 /// Configuration for the [`Config::safelist`] field.
 ///
 /// It defines a list of selectors that are manually forced to be present in the generated CSS.
@@ -1303,6 +1341,10 @@ pub struct Config {
     /// Shortcuts configuration.
     #[serde(default)]
     pub shortcuts: Shortcuts,
+
+    /// The maximum depth at which shortcuts will be resolved.
+    #[serde(default)]
+    pub max_shortcut_depth: MaxShortcutDepth,
 
     /// Extra fields configuration.
     #[serde(default)]
@@ -1579,9 +1621,36 @@ mod tests {
         config
             .shortcuts
             .add("btn", "bg-red-500 border-1 rounded-xl");
+        config.shortcuts.add("btn-primary", "btn bg-blue-500");
+
+        let generated = generate(["btn-primary"], &config);
+
+        assert_eq!(
+            generated,
+            String::from(
+                ".btn-primary {
+  border-radius: 0.75rem;
+}
+
+.btn-primary {
+  border-width: 1px;
+}
+
+.btn-primary {
+  --en-bg-opacity: 1;
+  background-color: rgb(239 68 68 / var(--en-bg-opacity));
+}"
+            )
+        );
+    }
+
+    #[test]
+    fn gen_css_with_shortcut_cycle() {
+        let mut config = base_config();
         config
             .shortcuts
-            .add("btn-primary", "btn bg-blue-500");
+            .add("btn", "bg-red-500 border-1 rounded-xl btn-primary");
+        config.shortcuts.add("btn-primary", "btn bg-blue-500");
 
         let generated = generate(["btn-primary"], &config);
 

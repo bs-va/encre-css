@@ -1,4 +1,5 @@
 safelist = []
+max_shortcut_depth = 5
 
 [theme.dark_mode]
 type = "class"
