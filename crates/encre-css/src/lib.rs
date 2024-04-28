@@ -117,7 +117,8 @@
 //! and [Uno CSS](https://uno.antfu.me), but `encre-css` is unique because it is written in Rust and
 //! uses a new architecture, making it **the fastest utility-first framework** (according to the
 //! benchmark [here](https://gitlab.com/encre-org/encre-css-bench) based on
-//! [Uno CSS' benchmark](https://github.com/unocss/unocss/tree/main/bench)).
+//! [Uno CSS' benchmark](https://github.com/unocss/unocss/tree/main/bench)). It is also very
+//! [customizable](crate::plugins).
 //!
 //! ## Getting started
 //!
@@ -218,11 +219,21 @@ pub mod scanner;
 pub mod selector;
 pub mod utils;
 
+#[doc(inline)]
 pub use config::Config;
+
+#[doc(inline)]
 pub use error::{Error, Result};
+
+#[doc(inline)]
 pub use generator::generate;
+
+#[doc(inline)]
 pub use preflight::Preflight;
+
+#[doc(inline)]
 pub use scanner::Scanner;
+
 pub use toml::toml;
 
 /// Various helper preludes.
