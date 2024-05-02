@@ -729,6 +729,7 @@ pub const BUILTIN_PLUGINS: &[(Cow<'static, str>, &'static (dyn Plugin + Send + S
     (Cow::Borrowed("grow"), &flexbox::flex_grow::PluginDefinition),
     (Cow::Borrowed("basis"), &flexbox::flex_basis::PluginDefinition),
     (Cow::Borrowed("table"), &table::table_layout::PluginDefinition),
+    (Cow::Borrowed("caption"), &table::caption_side::PluginDefinition),
     (Cow::Borrowed("border"), &table::border_collapse::PluginDefinition),
     (Cow::Borrowed("border-spacing"), &table::border_spacing::PluginDefinition),
     (Cow::Borrowed("border-spacing-x"), &table::border_spacing::PluginXDefinition),

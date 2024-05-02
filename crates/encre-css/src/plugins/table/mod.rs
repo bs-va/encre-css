@@ -2,6 +2,7 @@
 pub mod border_collapse;
 pub mod border_spacing;
 pub mod table_layout;
+pub mod caption_side;
 
 #[cfg(test)]
 mod tests {
