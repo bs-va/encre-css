@@ -10,7 +10,7 @@ impl Plugin for PluginDefinition {
         matches!(
             context.modifier,
             Modifier::Builtin {
-                value: "normal" | "nowrap" | "pre" | "pre-line" | "pre-wrap",
+                value: "normal" | "nowrap" | "pre" | "pre-line" | "pre-wrap" | "break-spaces",
                 ..
             }
         )

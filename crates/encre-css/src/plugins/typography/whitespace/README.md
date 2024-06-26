@@ -13,6 +13,7 @@ Utilities for controlling an element's white-space property.
     <tr><td>whitespace-pre</td><td>white-space: pre;</td></tr>
     <tr><td>whitespace-pre-line</td><td>white-space: pre-line;</td></tr>
     <tr><td>whitespace-pre-wrap</td><td>white-space: pre-wrap;</td></tr>
+    <tr><td>whitespace-break-spaces</td><td>white-space: break-spaces;</td></tr>
   </tbody>
 </table>
 
