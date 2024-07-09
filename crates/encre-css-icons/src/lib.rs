@@ -11,7 +11,7 @@
 //! - Icons follow the text color
 //! - Support colorful and monochrome icons
 //! - No request is issued client-side when not using WebAssembly
-//! - Supports WebAssembly (SVG icons will be directly fetch client-side)
+//! - Supports WebAssembly (SVG icons will be directly fetched client-side)
 //!
 //! ### Getting started
 //!
