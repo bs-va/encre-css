@@ -11,4 +11,4 @@ keywords = ["tailwind", "css", "compiler", "encre-css"]
 categories = ["web-programming"]
 
 [dependencies]
-encre-css = { path = "../encre-css", version = "0.12.0" }
+encre-css = { path = "../encre-css", version = "0.13.0" }

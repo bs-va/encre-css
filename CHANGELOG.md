@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.0] - 2024-07-09
+
+### Bug Fixes
+
+- Prevent cycles during shortcut expansion by defining a maximum expansion depth
+
+### Documentation
+
+- Update crate documentation
+- Fix typo in `line_clamp` documentation
+- Fix typo
+- Add documentation for ARIA state modifiers
+
+### Features
+
+- Add support for `caption_side`
+- Add support for `whitespace-break-spaces`
+
+### Miscellaneous Tasks
+
+- Update copyright year
+
+### Ci
+
+- Fix failing test due to source change in an Iconify icon
+
 ## [0.12.0] - 2024-04-11
 
 ### Documentation
