@@ -585,8 +585,8 @@ pub const BUILTIN_SCREENS: &[(&str, &str)] = &[
 /// - `active`: applies the [`active`](https://developer.mozilla.org/en-US/docs/Web/CSS/:active) pseudo class
 /// - `enabled`: applies the [`enabled`](https://developer.mozilla.org/en-US/docs/Web/CSS/:enabled) pseudo class
 /// - `disabled`: applies the [`disabled`](https://developer.mozilla.org/en-US/docs/Web/CSS/:disabled) pseudo class
-/// - `ltr`: selects all elements having the [`dir="ltr"` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/dir), useful when styling based on writing direction
-/// - `rtl`: selects all elements having the [`dir="rtl"` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/dir), useful when styling based on writing direction
+/// - `ltr`: selects all elements contained in an element having the [`dir="ltr"` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/dir), useful when styling based on writing direction
+/// - `rtl`: selects all elements contained in an element having the [`dir="rtl"` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/dir), useful when styling based on writing direction
 /// - `motion-safe`: applies the [`@media (prefers-reduced-motion: no-preference)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion) at-rule
 /// - `motion-reduce`: applies the [`@media (prefers-reduced-motion: reduce)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion) at-rule
 /// - `print`: applies the [`@media print`](https://developer.mozilla.org/en-US/docs/Web/Guide/Printing#using_media_queries_to_improve_layout) at-rule
@@ -594,6 +594,15 @@ pub const BUILTIN_SCREENS: &[(&str, &str)] = &[
 /// - `landscape`: applies the [`@media (orientation: landscape)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/orientation) at-rule
 /// - `contrast-more`: applies the [`@media (prefers-contrast: more)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-contrast) at-rule
 /// - `contrast-less`: applies the [`@media (prefers-contrast: less)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-contrast) at-rule
+/// - `aria-busy`: selects all elements having the [`aria-busy="true"` attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-busy)
+/// - `aria-checked`: selects all elements having the [`aria-checked="true"` attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-checked)
+/// - `aria-disabled`: selects all elements having the [`aria-disabled="true"` attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-disabled)
+/// - `aria-expanded`: selects all elements having the [`aria-expanded="true"` attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-expanded)
+/// - `aria-hidden`: selects all elements having the [`aria-hidden="true"` attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-hidden)
+/// - `aria-pressed`: selects all elements having the [`aria-pressed="true"` attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-pressed)
+/// - `aria-readonly`: selects all elements having the [`aria-readonly="true"` attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-readonly)
+/// - `aria-required`: selects all elements having the [`aria-required="true"` attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-required)
+/// - `aria-selected`: selects all elements having the [`aria-selected="true"` attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-selected)
 ///
 /// Besides the default variants, some others are auto-generated from the configuration like
 /// breakpoints (see [`BUILTIN_SCREENS`]) and the dark mode (`dark:` variant).
