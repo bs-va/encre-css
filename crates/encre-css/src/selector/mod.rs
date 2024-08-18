@@ -72,6 +72,12 @@
 //!    same variant), in this case the class will be expanded to `dark:text-white` and
 //!    `dark:bg-gray-500`.
 //!
+//! <p class="with-hints" style="margin-top: 3rem;"><b><span>(hover,focus-visible):bg-blue-400</b></p>
+//!
+//! 9. The **variant group without any namespace or modifier** (used to group together several classes conditionally enabled by the
+//!    same variant but sharing the same modifier), in this case the class will be expanded to `hover:bg-blue-400` and
+//!    `focus-visible:bg-blue-400`.
+//!
 //! As you can see, by default variants are separated by `:`, modifiers by `-` (the dash after the
 //! first modifier can be omitted, e.g. `m1` instead of `m-1`), arbitrary values/variants are surrounded by `[]` and variant
 //! groups are surrounded by `()`.

@@ -155,6 +155,63 @@ pub(crate) fn parse<'a>(
     parse_recursive(val, span, full_class, config, config_derived_variants)
 }
 
+fn push_variant<'a>(
+    is_arbitrary: bool,
+    variant: &'a str,
+    variant_list: &mut Vec<Variant<'a>>,
+    val: &'a str,
+    span: &Range<usize>,
+    config: &Config,
+    config_derived_variants: &[(Cow<'static, str>, VariantType)],
+) -> Result<(), ParseError<'a>> {
+    if is_arbitrary {
+        variant_list.push(Variant::Arbitrary(underscores_to_spaces(unescape(
+            Cow::from(variant),
+        ))));
+    } else if let Some((order, variant)) = BUILTIN_VARIANTS.get(variant) {
+        variant_list.push(Variant::Builtin(*order, variant.clone()));
+    } else if let Some((order, variant)) = config
+        .custom_variants
+        .iter()
+        .chain(config_derived_variants)
+        .enumerate()
+        .find(|(_, v)| v.0 == variant)
+    {
+        variant_list.push(Variant::Builtin(
+            BUILTIN_VARIANTS.len() + order,
+            variant.1.clone(),
+        ));
+    } else {
+        // Maybe a parent or peer variant
+        if let Some(group_variant) = variant.strip_prefix("group-") {
+            if let Some((order, VariantType::PseudoClass(class))) =
+                BUILTIN_VARIANTS.get(group_variant)
+            {
+                variant_list.push(Variant::Builtin(order + 1000, VariantType::Group(class)));
+            }
+        } else if let Some(peer_not_variant) = variant.strip_prefix("peer-not-") {
+            if let Some((order, VariantType::PseudoClass(class))) =
+                BUILTIN_VARIANTS.get(peer_not_variant)
+            {
+                variant_list.push(Variant::Builtin(order + 2000, VariantType::PeerNot(class)));
+            }
+        } else if let Some(peer_variant) = variant.strip_prefix("peer-") {
+            if let Some((order, VariantType::PseudoClass(class))) =
+                BUILTIN_VARIANTS.get(peer_variant)
+            {
+                variant_list.push(Variant::Builtin(order + 3000, VariantType::Peer(class)));
+            }
+        } else {
+            return Err(ParseError::new(
+                span.clone(),
+                ParseErrorKind::UnknownVariant(variant, val),
+            ));
+        }
+    }
+
+    Ok(())
+}
+
 #[allow(clippy::too_many_lines)]
 fn parse_recursive<'a>(
     val: &'a str,
@@ -170,7 +227,7 @@ fn parse_recursive<'a>(
         let mut arbitraries = 0usize;
         let mut groups = 0usize;
         let mut last_index = 0;
-        let mut variants = vec![];
+        let mut variants = vec![vec![]];
 
         for ch in val.char_indices() {
             if last_index > val.len() {
@@ -203,57 +260,76 @@ fn parse_recursive<'a>(
             let mut part = &val[last_index..ch.0];
             last_index = ch.0 + 1;
 
-            let (is_arbitrary, variant) = {
-                if part.starts_with(ARBITRARY_START) && part.ends_with(ARBITRARY_END) {
-                    unwrap_string(&mut part);
-                    (true, part)
-                } else {
-                    (false, part)
-                }
-            };
+            if part.starts_with(GROUP_START) && part.ends_with(GROUP_END) {
+                unwrap_string(&mut part);
 
-            if is_arbitrary {
-                variants.push(Variant::Arbitrary(underscores_to_spaces(unescape(
-                    Cow::from(variant),
-                ))));
-            } else if let Some((order, variant)) = BUILTIN_VARIANTS.get(variant) {
-                variants.push(Variant::Builtin(*order, variant.clone()));
-            } else if let Some((order, variant)) = config
-                .custom_variants
-                .iter()
-                .chain(config_derived_variants)
-                .enumerate()
-                .find(|(_, v)| v.0 == variant)
-            {
-                variants.push(Variant::Builtin(
-                    BUILTIN_VARIANTS.len() + order,
-                    variant.1.clone(),
-                ));
+                let mut errors: Vec<Result<Selector<'a>, ParseError<'a>>> = vec![];
+                let mut new_variants = vec![];
+
+                split_ignore_arbitrary(part, ',', true).for_each(|(_, mut sub_variant)| {
+                    let (is_arbitrary, variant) = {
+                        if sub_variant.starts_with(ARBITRARY_START)
+                            && sub_variant.ends_with(ARBITRARY_END)
+                        {
+                            unwrap_string(&mut sub_variant);
+                            (true, sub_variant)
+                        } else {
+                            (false, sub_variant)
+                        }
+                    };
+
+                    for variant_list in &variants {
+                        // TODO: Maybe use `Cow`s to just reference all the other variants
+                        let mut new_variant_list = variant_list.clone();
+
+                        if let Err(e) = push_variant(
+                            is_arbitrary,
+                            variant,
+                            &mut new_variant_list,
+                            val,
+                            &span,
+                            config,
+                            config_derived_variants,
+                        ) {
+                            errors.push(Err(e));
+                        }
+
+                        new_variants.push(new_variant_list);
+                    }
+                });
+
+                variants = new_variants;
+
+                if !errors.is_empty() {
+                    return errors;
+                }
             } else {
-                // Maybe a parent or peer variant
-                if let Some(group_variant) = variant.strip_prefix("group-") {
-                    if let Some((order, VariantType::PseudoClass(class))) =
-                        BUILTIN_VARIANTS.get(group_variant)
-                    {
-                        variants.push(Variant::Builtin(order + 1000, VariantType::Group(class)));
+                let (is_arbitrary, variant) = {
+                    if part.starts_with(ARBITRARY_START) && part.ends_with(ARBITRARY_END) {
+                        unwrap_string(&mut part);
+                        (true, part)
+                    } else {
+                        (false, part)
                     }
-                } else if let Some(peer_not_variant) = variant.strip_prefix("peer-not-") {
-                    if let Some((order, VariantType::PseudoClass(class))) =
-                        BUILTIN_VARIANTS.get(peer_not_variant)
-                    {
-                        variants.push(Variant::Builtin(order + 2000, VariantType::PeerNot(class)));
+                };
+
+                let mut errors = vec![];
+                for variant_list in &mut variants {
+                    if let Err(e) = push_variant(
+                        is_arbitrary,
+                        variant,
+                        variant_list,
+                        val,
+                        &span,
+                        config,
+                        config_derived_variants,
+                    ) {
+                        errors.push(Err(e));
                     }
-                } else if let Some(peer_variant) = variant.strip_prefix("peer-") {
-                    if let Some((order, VariantType::PseudoClass(class))) =
-                        BUILTIN_VARIANTS.get(peer_variant)
-                    {
-                        variants.push(Variant::Builtin(order + 3000, VariantType::Peer(class)));
-                    }
-                } else {
-                    return vec![Err(ParseError::new(
-                        span,
-                        ParseErrorKind::UnknownVariant(variant, val),
-                    ))];
+                }
+
+                if !errors.is_empty() {
+                    return errors;
                 }
             }
         }
@@ -283,7 +359,7 @@ fn parse_recursive<'a>(
         split_ignore_arbitrary(remaining.1, ',', true)
             .flat_map(|(i, sub_selector)| {
                 #[allow(clippy::range_plus_one)]
-                let mut new_selectors = parse_recursive(
+                let selectors = parse_recursive(
                     sub_selector,
                     Some(
                         span.start + remaining.0 + i + 1
@@ -299,11 +375,24 @@ fn parse_recursive<'a>(
                 );
 
                 // Merge the common variants with each child selector variant list
-                for selector in new_selectors.iter_mut().flatten() {
-                    selector.variants.extend(variants.iter().cloned());
-                }
+                selectors
+                    .into_iter()
+                    .fold(vec![], |mut new_selectors, selector| {
+                        match selector {
+                            Ok(mut selector) => {
+                                let variant_len = selector.variants.len();
 
-                new_selectors
+                                for variant_list in &variants {
+                                    selector.variants.extend(variant_list.iter().cloned());
+                                    new_selectors.push(Ok(selector.clone()));
+                                    selector.variants.truncate(variant_len);
+                                }
+                            }
+                            Err(e) => new_selectors.push(Err(e)),
+                        }
+
+                        new_selectors
+                    })
             })
             .collect()
     } else {
@@ -326,23 +415,28 @@ fn parse_recursive<'a>(
             // Arbitrary CSS property (without namespace)
             let plugin = &CssPropertyPlugin;
 
-            vec![Ok(Selector {
-                // Arbitrary properties will be placed at the end of the CSS
-                order: BUILTIN_PLUGINS.len() + config.custom_plugins.len(),
-                full: if let Some(full_class) = full_class {
-                    full_class
-                } else {
-                    val
-                },
-                modifier: Modifier::Arbitrary {
-                    prefix: "",
-                    hint: "",
-                    value: to_css_value(&remaining.1[1..remaining.1.len() - 1]),
-                },
-                variants,
-                is_important,
-                plugin,
-            })]
+            variants
+                .into_iter()
+                .map(|variants| {
+                    Ok(Selector {
+                        // Arbitrary properties will be placed at the end of the CSS
+                        order: BUILTIN_PLUGINS.len() + config.custom_plugins.len(),
+                        full: if let Some(full_class) = full_class {
+                            full_class
+                        } else {
+                            val
+                        },
+                        modifier: Modifier::Arbitrary {
+                            prefix: "",
+                            hint: "",
+                            value: to_css_value(&remaining.1[1..remaining.1.len() - 1]),
+                        },
+                        variants,
+                        is_important,
+                        plugin,
+                    })
+                })
+                .collect()
         } else {
             // Find the right plugin for handling this selector
             for (order, (namespace, plugin)) in BUILTIN_PLUGINS
@@ -366,18 +460,23 @@ fn parse_recursive<'a>(
                     };
 
                     if plugin.can_handle(context) {
-                        return vec![Ok(Selector {
-                            order,
-                            full: if let Some(full_class) = full_class {
-                                full_class
-                            } else {
-                                val
-                            },
-                            modifier,
-                            variants,
-                            is_important,
-                            plugin: *plugin,
-                        })];
+                        return variants
+                            .into_iter()
+                            .map(|variants| {
+                                Ok(Selector {
+                                    order,
+                                    full: if let Some(full_class) = full_class {
+                                        full_class
+                                    } else {
+                                        val
+                                    },
+                                    modifier: modifier.clone(),
+                                    variants,
+                                    is_important,
+                                    plugin: *plugin,
+                                })
+                            })
+                            .collect();
                     }
                 }
             }
@@ -1501,6 +1600,463 @@ mod tests {
                     modifier: Modifier::Builtin {
                         is_negative: false,
                         value: "white",
+                    },
+                    is_important: false,
+                }),
+            ],
+        );
+    }
+
+    #[test]
+    #[allow(clippy::too_many_lines)]
+    fn variant_grouping_without_modifier() {
+        let config = Config::default();
+        assert_eq!(
+            parse(
+                "(hover,focus):bg-red-400",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants(),
+            ),
+            vec![
+                Ok(Selector {
+                    full: "(hover,focus):bg-red-400",
+                    order: 158,
+                    plugin: &background::background_color::PluginDefinition,
+                    variants: vec![Variant::Builtin(46, VariantType::PseudoClass("hover"))],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "red-400",
+                    },
+                    is_important: false,
+                }),
+                Ok(Selector {
+                    full: "(hover,focus):bg-red-400",
+                    order: 158,
+                    plugin: &background::background_color::PluginDefinition,
+                    variants: vec![Variant::Builtin(47, VariantType::PseudoClass("focus")),],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "red-400",
+                    },
+                    is_important: false,
+                })
+            ],
+        );
+
+        assert_eq!(
+            parse(
+                "([@supports_(display:flex)],focus-visible):flex",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants(),
+            ),
+            vec![
+                Ok(Selector {
+                    full: "([@supports_(display:flex)],focus-visible):flex",
+                    order: 31,
+                    plugin: &flexbox::flex::PluginDefinition,
+                    variants: vec![Variant::Arbitrary(Cow::Borrowed(
+                        "@supports (display:flex)"
+                    ))],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "flex",
+                    },
+                    is_important: false,
+                }),
+                Ok(Selector {
+                    full: "([@supports_(display:flex)],focus-visible):flex",
+                    order: 31,
+                    plugin: &background::background_color::PluginDefinition,
+                    variants: vec![Variant::Builtin(
+                        48,
+                        VariantType::PseudoClass("focus-visible")
+                    ),],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "flex",
+                    },
+                    is_important: false,
+                })
+            ],
+        );
+
+        assert_eq!(
+            parse(
+                "([@supports_(display:flex)],focus-visible):!-m-4",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants(),
+            ),
+            vec![
+                Ok(Selector {
+                    full: "([@supports_(display:flex)],focus-visible):!-m-4",
+                    order: 31,
+                    plugin: &spacing::margin::PluginDefinition,
+                    variants: vec![Variant::Arbitrary(Cow::Borrowed(
+                        "@supports (display:flex)"
+                    ))],
+                    modifier: Modifier::Builtin {
+                        is_negative: true,
+                        value: "4",
+                    },
+                    is_important: true,
+                }),
+                Ok(Selector {
+                    full: "([@supports_(display:flex)],focus-visible):!-m-4",
+                    order: 31,
+                    plugin: &spacing::margin::PluginDefinition,
+                    variants: vec![Variant::Builtin(
+                        48,
+                        VariantType::PseudoClass("focus-visible")
+                    ),],
+                    modifier: Modifier::Builtin {
+                        is_negative: true,
+                        value: "4",
+                    },
+                    is_important: true,
+                })
+            ],
+        );
+
+        assert_eq!(
+            parse(
+                "xl:(hover,focus):bg-red-400",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants(),
+            ),
+            vec![
+                Ok(Selector {
+                    full: "xl:(hover,focus):bg-red-400",
+                    order: 158,
+                    plugin: &background::background_color::PluginDefinition,
+                    variants: vec![
+                        Variant::Builtin(
+                            73,
+                            VariantType::AtRule(Cow::Borrowed("@media (min-width: 1280px)"))
+                        ),
+                        Variant::Builtin(46, VariantType::PseudoClass("hover"))
+                    ],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "red-400",
+                    },
+                    is_important: false,
+                }),
+                Ok(Selector {
+                    full: "xl:(hover,focus):bg-red-400",
+                    order: 158,
+                    plugin: &background::background_color::PluginDefinition,
+                    variants: vec![
+                        Variant::Builtin(
+                            73,
+                            VariantType::AtRule(Cow::Borrowed("@media (min-width: 1280px)"))
+                        ),
+                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
+                    ],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "red-400",
+                    },
+                    is_important: false,
+                })
+            ],
+        );
+
+        // Not a variant without a modifier but we need to make sure it is correctly interpreted as
+        // variants **with** a modifier
+        assert_eq!(
+            parse(
+                "(hover:bg-red-400,focus:bg-green-400)",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants(),
+            ),
+            vec![
+                Ok(Selector {
+                    full: "(hover:bg-red-400,focus:bg-green-400)",
+                    order: 158,
+                    plugin: &background::background_color::PluginDefinition,
+                    variants: vec![Variant::Builtin(46, VariantType::PseudoClass("hover"))],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "red-400",
+                    },
+                    is_important: false,
+                }),
+                Ok(Selector {
+                    full: "(hover:bg-red-400,focus:bg-green-400)",
+                    order: 158,
+                    plugin: &background::background_color::PluginDefinition,
+                    variants: vec![Variant::Builtin(47, VariantType::PseudoClass("focus")),],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "green-400",
+                    },
+                    is_important: false,
+                })
+            ],
+        );
+
+        assert_eq!(
+            parse(
+                "xl:(hover,focus):target:(dark:bg-red-400,bg-green-400)",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants(),
+            ),
+            vec![
+                Ok(Selector {
+                    full: "xl:(hover,focus):target:(dark:bg-red-400,bg-green-400)",
+                    order: 158,
+                    plugin: &background::background_color::PluginDefinition,
+                    variants: vec![
+                        Variant::Builtin(
+                            75,
+                            VariantType::AtRule(Cow::Borrowed(
+                                "@media (prefers-color-scheme: dark)"
+                            ))
+                        ),
+                        Variant::Builtin(
+                            73,
+                            VariantType::AtRule(Cow::Borrowed("@media (min-width: 1280px)"))
+                        ),
+                        Variant::Builtin(46, VariantType::PseudoClass("hover")),
+                        Variant::Builtin(28, VariantType::PseudoClass("target")),
+                    ],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "red-400",
+                    },
+                    is_important: false,
+                }),
+                Ok(Selector {
+                    full: "xl:(hover,focus):target:(dark:bg-red-400,bg-green-400)",
+                    order: 158,
+                    plugin: &background::background_color::PluginDefinition,
+                    variants: vec![
+                        Variant::Builtin(
+                            75,
+                            VariantType::AtRule(Cow::Borrowed(
+                                "@media (prefers-color-scheme: dark)"
+                            ))
+                        ),
+                        Variant::Builtin(
+                            73,
+                            VariantType::AtRule(Cow::Borrowed("@media (min-width: 1280px)"))
+                        ),
+                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
+                        Variant::Builtin(28, VariantType::PseudoClass("target")),
+                    ],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "red-400",
+                    },
+                    is_important: false,
+                }),
+                Ok(Selector {
+                    full: "xl:(hover,focus):target:(dark:bg-red-400,bg-green-400)",
+                    order: 158,
+                    plugin: &background::background_color::PluginDefinition,
+                    variants: vec![
+                        Variant::Builtin(
+                            73,
+                            VariantType::AtRule(Cow::Borrowed("@media (min-width: 1280px)"))
+                        ),
+                        Variant::Builtin(46, VariantType::PseudoClass("hover")),
+                        Variant::Builtin(28, VariantType::PseudoClass("target"))
+                    ],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "green-400",
+                    },
+                    is_important: false,
+                }),
+                Ok(Selector {
+                    full: "xl:(hover,focus):target:(dark:bg-red-400,bg-green-400)",
+                    order: 158,
+                    plugin: &background::background_color::PluginDefinition,
+                    variants: vec![
+                        Variant::Builtin(
+                            73,
+                            VariantType::AtRule(Cow::Borrowed("@media (min-width: 1280px)"))
+                        ),
+                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
+                        Variant::Builtin(28, VariantType::PseudoClass("target"))
+                    ],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "green-400",
+                    },
+                    is_important: false,
+                }),
+            ],
+        );
+
+        assert_eq!(
+            parse(
+                "(hover,focus):(focus-within,target):bg-red-400",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants(),
+            ),
+            vec![
+                Ok(Selector {
+                    full: "(hover,focus):(focus-within,target):bg-red-400",
+                    order: 158,
+                    plugin: &background::background_color::PluginDefinition,
+                    variants: vec![
+                        Variant::Builtin(46, VariantType::PseudoClass("hover")),
+                        Variant::Builtin(45, VariantType::PseudoClass("focus-within")),
+                    ],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "red-400",
+                    },
+                    is_important: false,
+                }),
+                Ok(Selector {
+                    full: "(hover,focus):(focus-within,target):bg-red-400",
+                    order: 158,
+                    plugin: &background::background_color::PluginDefinition,
+                    variants: vec![
+                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
+                        Variant::Builtin(45, VariantType::PseudoClass("focus-within"))
+                    ],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "red-400",
+                    },
+                    is_important: false,
+                }),
+                Ok(Selector {
+                    full: "(hover,focus):(focus-within,target):bg-red-400",
+                    order: 158,
+                    plugin: &background::background_color::PluginDefinition,
+                    variants: vec![
+                        Variant::Builtin(46, VariantType::PseudoClass("hover")),
+                        Variant::Builtin(28, VariantType::PseudoClass("target")),
+                    ],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "red-400",
+                    },
+                    is_important: false,
+                }),
+                Ok(Selector {
+                    full: "(hover,focus):(focus-within,target):bg-red-400",
+                    order: 158,
+                    plugin: &background::background_color::PluginDefinition,
+                    variants: vec![
+                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
+                        Variant::Builtin(28, VariantType::PseudoClass("target"))
+                    ],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "red-400",
+                    },
+                    is_important: false,
+                })
+            ],
+        );
+
+        assert_eq!(
+            parse(
+                "(hover,focus):(bg-red-400,(target,focus-within):bg-green-400)",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants(),
+            ),
+            vec![
+                Ok(Selector {
+                    full: "(hover,focus):(bg-red-400,(target,focus-within):bg-green-400)",
+                    order: 158,
+                    plugin: &background::background_color::PluginDefinition,
+                    variants: vec![
+                        Variant::Builtin(46, VariantType::PseudoClass("hover")),
+                    ],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "red-400",
+                    },
+                    is_important: false,
+                }),
+                Ok(Selector {
+                    full: "(hover,focus):(bg-red-400,(target,focus-within):bg-green-400)",
+                    order: 158,
+                    plugin: &background::background_color::PluginDefinition,
+                    variants: vec![
+                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
+                    ],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "red-400",
+                    },
+                    is_important: false,
+                }),
+                Ok(Selector {
+                    full: "(hover,focus):(bg-red-400,(target,focus-within):bg-green-400)",
+                    order: 158,
+                    plugin: &background::background_color::PluginDefinition,
+                    variants: vec![
+                        Variant::Builtin(28, VariantType::PseudoClass("target")),
+                        Variant::Builtin(46, VariantType::PseudoClass("hover")),
+                    ],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "green-400",
+                    },
+                    is_important: false,
+                }),
+                Ok(Selector {
+                    full: "(hover,focus):(bg-red-400,(target,focus-within):bg-green-400)",
+                    order: 158,
+                    plugin: &background::background_color::PluginDefinition,
+                    variants: vec![
+                        Variant::Builtin(28, VariantType::PseudoClass("target")),
+                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
+                    ],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "green-400",
+                    },
+                    is_important: false,
+                }),
+                Ok(Selector {
+                    full: "(hover,focus):(bg-red-400,(target,focus-within):bg-green-400)",
+                    order: 158,
+                    plugin: &background::background_color::PluginDefinition,
+                    variants: vec![
+                        Variant::Builtin(45, VariantType::PseudoClass("focus-within")),
+                        Variant::Builtin(46, VariantType::PseudoClass("hover"))
+                    ],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "green-400",
+                    },
+                    is_important: false,
+                }),
+                Ok(Selector {
+                    full: "(hover,focus):(bg-red-400,(target,focus-within):bg-green-400)",
+                    order: 158,
+                    plugin: &background::background_color::PluginDefinition,
+                    variants: vec![
+                        Variant::Builtin(45, VariantType::PseudoClass("focus-within")),
+                        Variant::Builtin(47, VariantType::PseudoClass("focus"))
+                    ],
+                    modifier: Modifier::Builtin {
+                        is_negative: false,
+                        value: "green-400",
                     },
                     is_important: false,
                 }),
