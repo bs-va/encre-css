@@ -25,6 +25,8 @@ fn placement_handle(css_properties: &[&str], context: &mut ContextHandle) {
                     css_prop,
                     if *value == "auto" {
                         Cow::from("auto")
+                    } else if *value == "full" && *is_negative {
+                        Cow::from("-100%")
                     } else if *value == "full" {
                         Cow::from("100%")
                     } else {

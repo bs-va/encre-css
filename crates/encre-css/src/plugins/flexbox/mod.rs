@@ -110,6 +110,12 @@ mod tests {
 }"
         );
         assert_eq!(
+            generate(["-basis-full"], &base_config()),
+            ".-basis-full {
+  flex-basis: -100%;
+}"
+        );
+        assert_eq!(
             generate(["-basis-4"], &base_config()),
             ".-basis-4 {
   flex-basis: -1rem;

@@ -336,6 +336,12 @@ mod tests {
 }"
         );
         assert_eq!(
+            generate(["-top-full"], &base_config()),
+            ".-top-full {
+  top: -100%;
+}"
+        );
+        assert_eq!(
             generate(["-left-20"], &base_config()),
             ".-left-20 {
   left: -5rem;

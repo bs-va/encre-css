@@ -78,6 +78,10 @@ mod tests {
   --en-translate-x: 5rem;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
 }");
+        assert_eq!(generate(["-translate-x-full"], &base_config()), ".-translate-x-full {
+  --en-translate-x: -100%;
+  transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
+}");
         assert_eq!(generate(["-translate-x-20"], &base_config()), ".-translate-x-20 {
   --en-translate-x: -5rem;
   transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));

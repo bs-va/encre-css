@@ -23,6 +23,8 @@ impl Plugin for PluginDefinition {
                 "flex-basis: {};",
                 if *value == "auto" {
                     Cow::from("auto")
+                } else if *value == "full" && *is_negative {
+                    Cow::from("-100%")
                 } else if *value == "full" {
                     Cow::from("100%")
                 } else {
