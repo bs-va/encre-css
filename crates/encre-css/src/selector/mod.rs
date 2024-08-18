@@ -72,7 +72,7 @@
 //!    same variant), in this case the class will be expanded to `dark:text-white` and
 //!    `dark:bg-gray-500`.
 //!
-//! <p class="with-hints" style="margin-top: 3rem;"><b><span>(hover,focus-visible):bg-blue-400</b></p>
+//! <p class="with-hints" style="margin-top: 3rem;"><b><span>(hover,focus-visible):bg-blue-400</span></b></p>
 //!
 //! 9. The **variant group without any namespace or modifier** (used to group together several classes conditionally enabled by the
 //!    same variant but sharing the same modifier), in this case the class will be expanded to `hover:bg-blue-400` and
