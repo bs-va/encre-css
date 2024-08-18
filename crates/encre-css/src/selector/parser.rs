@@ -555,7 +555,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "absolute",
-                order: 4,
+                order: Default::default(), // order is not checked in tests
                 plugin: &layout::position::PluginDefinition,
                 variants: vec![],
                 modifier: Modifier::Builtin {
@@ -582,7 +582,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "text-center",
-                order: 185,
+                order: Default::default(),
                 plugin: &typography::text_align::PluginDefinition,
                 variants: vec![],
                 modifier: Modifier::Builtin {
@@ -609,7 +609,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "bg-red-500/25",
-                order: 158,
+                order: Default::default(),
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![],
                 modifier: Modifier::Builtin {
@@ -630,7 +630,7 @@ mod tests {
                 .unwrap(),
             &Selector {
                 full: "!px-4",
-                order: 177,
+                order: Default::default(),
                 plugin: &spacing::padding::PluginDefinition,
                 variants: vec![],
                 modifier: Modifier::Builtin {
@@ -651,7 +651,7 @@ mod tests {
                 .unwrap(),
             &Selector {
                 full: "-px-4",
-                order: 177,
+                order: Default::default(),
                 plugin: &spacing::padding::PluginDefinition,
                 variants: vec![],
                 modifier: Modifier::Builtin {
@@ -678,7 +678,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "!-px-4",
-                order: 177,
+                order: Default::default(),
                 plugin: &spacing::padding::PluginDefinition,
                 variants: vec![],
                 modifier: Modifier::Builtin {
@@ -699,7 +699,7 @@ mod tests {
                 .unwrap(),
             &Selector {
                 full: "px-4",
-                order: 177,
+                order: Default::default(),
                 plugin: &spacing::padding::PluginDefinition,
                 variants: vec![],
                 modifier: Modifier::Builtin {
@@ -726,7 +726,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "px-1.5",
-                order: 177,
+                order: Default::default(),
                 plugin: &spacing::padding::PluginDefinition,
                 variants: vec![],
                 modifier: Modifier::Builtin {
@@ -753,7 +753,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "hover:text-center",
-                order: 185,
+                order: Default::default(),
                 plugin: &typography::text_align::PluginDefinition,
                 variants: vec![Variant::Builtin(46, VariantType::PseudoClass("hover"))],
                 modifier: Modifier::Builtin {
@@ -780,7 +780,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "marker:xl:hover:text-center",
-                order: 186,
+                order: Default::default(),
                 plugin: &typography::text_align::PluginDefinition,
                 variants: vec![
                     Variant::Builtin(
@@ -817,7 +817,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "marker:xl:hover:-mx-4",
-                order: 22,
+                order: Default::default(),
                 plugin: &spacing::margin::PluginXDefinition,
                 variants: vec![
                     Variant::Builtin(
@@ -854,7 +854,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "[&>*]:text-center",
-                order: 185,
+                order: Default::default(),
                 plugin: &typography::text_align::PluginDefinition,
                 variants: vec![Variant::Arbitrary(Cow::from("&>*"))],
                 modifier: Modifier::Builtin {
@@ -881,7 +881,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "[@supports_not_(display:grid)]:grid",
-                order: 31,
+                order: Default::default(),
                 plugin: &layout::display::PluginDefinition,
                 variants: vec![Variant::Arbitrary(Cow::from(
                     "@supports not (display:grid)"
@@ -910,7 +910,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "xl:[&>*]:focus:text-center",
-                order: 186,
+                order: Default::default(),
                 plugin: &typography::text_align::PluginDefinition,
                 variants: vec![
                     Variant::Builtin(
@@ -944,7 +944,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "xl:[&>*]:focus:-m-4",
-                order: 21,
+                order: Default::default(),
                 plugin: &spacing::margin::PluginDefinition,
                 variants: vec![
                     Variant::Builtin(
@@ -978,7 +978,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "mx-[12px]",
-                order: 22,
+                order: Default::default(),
                 plugin: &spacing::margin::PluginDefinition,
                 variants: vec![],
                 modifier: Modifier::Arbitrary {
@@ -1006,7 +1006,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "bg-[url('/hello_world.png')]",
-                order: 160,
+                order: Default::default(),
                 plugin: &background::background_image::PluginDefinition,
                 variants: vec![],
                 modifier: Modifier::Arbitrary {
@@ -1034,7 +1034,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "bg-[color:#fff]",
-                order: 158,
+                order: Default::default(),
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![],
                 modifier: Modifier::Arbitrary {
@@ -1062,7 +1062,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "xl:marker:bg-[#fff]",
-                order: 159,
+                order: Default::default(),
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![
                     Variant::Builtin(
@@ -1099,7 +1099,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "xl:marker:bg-[color:#fff]",
-                order: 159,
+                order: Default::default(),
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![
                     Variant::Builtin(
@@ -1136,7 +1136,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "[&>*]:bg-[#fff]",
-                order: 158,
+                order: Default::default(),
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![Variant::Arbitrary(Cow::from("&>*"))],
                 modifier: Modifier::Arbitrary {
@@ -1164,7 +1164,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: r"[\[type='input'\]_&>:*]:bg-red-300",
-                order: 158,
+                order: Default::default(),
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![Variant::Arbitrary(Cow::from("[type='input'] &>:*"))],
                 modifier: Modifier::Builtin {
@@ -1191,7 +1191,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "xl:[&>*]:hover:bg-[#fff]",
-                order: 159,
+                order: Default::default(),
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![
                     Variant::Builtin(
@@ -1226,7 +1226,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: "xl:[&>*]:hover:bg-[color:#fff]",
-                order: 159,
+                order: Default::default(),
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![
                     Variant::Builtin(
@@ -1261,7 +1261,7 @@ mod tests {
             .unwrap(),
             &Selector {
                 full: r"bg-[url('/url_with_\]\)\'.png')]",
-                order: 160,
+                order: Default::default(),
                 plugin: &background::background_image::PluginDefinition,
                 variants: vec![],
                 modifier: Modifier::Arbitrary {
@@ -1316,7 +1316,7 @@ mod tests {
             vec![
                 Ok(Selector {
                     full: "hover:(focus:bg-gray-500,text-[color:black,])",
-                    order: 158,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(47, VariantType::PseudoClass("focus")),
@@ -1330,7 +1330,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: "hover:(focus:bg-gray-500,text-[color:black,])",
-                    order: 196,
+                    order: Default::default(),
                     plugin: &typography::text_color::PluginDefinition,
                     variants: vec![Variant::Builtin(46, VariantType::PseudoClass("hover"))],
                     modifier: Modifier::Arbitrary {
@@ -1357,7 +1357,7 @@ mod tests {
             ),
             vec![Ok(Selector {
                 full: "hover:(bg-gray-500)",
-                order: 158,
+                order: Default::default(),
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![Variant::Builtin(46, VariantType::PseudoClass("hover"))],
                 modifier: Modifier::Builtin {
@@ -1383,7 +1383,7 @@ mod tests {
             vec![
                 Ok(Selector {
                     full: "focus:([&>*]:-m-4,xl:dark:(bg-red-100,rtl:text-[color:black]))",
-                    order: 21,
+                    order: Default::default(),
                     plugin: &spacing::margin::PluginDefinition,
                     variants: vec![
                         Variant::Arbitrary(Cow::from("&>*")),
@@ -1397,7 +1397,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: "focus:([&>*]:-m-4,xl:dark:(bg-red-100,rtl:text-[color:black]))",
-                    order: 159,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(
@@ -1418,7 +1418,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: "focus:([&>*]:-m-4,xl:dark:(bg-red-100,rtl:text-[color:black]))",
-                    order: 197,
+                    order: Default::default(),
                     plugin: &typography::text_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(53, VariantType::WrapClass(Cow::from("[dir=\"rtl\"] &"))),
@@ -1457,7 +1457,7 @@ mod tests {
             vec![
                 Ok(Selector {
                     full: r"focus:([&>*]:-m-4,xl:dark:([\[type='text'\].light_&,.foo]:bg-red-100,text-[color:black,]))",
-                    order: 21,
+                    order: Default::default(),
                     plugin: &spacing::margin::PluginDefinition,
                     variants: vec![
                         Variant::Arbitrary(Cow::from("&>*")),
@@ -1471,7 +1471,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: r"focus:([&>*]:-m-4,xl:dark:([\[type='text'\].light_&,.foo]:bg-red-100,text-[color:black,]))",
-                    order: 159,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Arbitrary(Cow::from(r"[type='text'].light &,.foo")),
@@ -1493,7 +1493,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: r"focus:([&>*]:-m-4,xl:dark:([\[type='text'\].light_&,.foo]:bg-red-100,text-[color:black,]))",
-                    order: 197,
+                    order: Default::default(),
                     plugin: &typography::text_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(
@@ -1531,7 +1531,7 @@ mod tests {
             vec![
                 Ok(Selector {
                     full: r"xl:(focus:(outline,outline-red-200),dark:(bg-black,text-white))",
-                    order: 212,
+                    order: Default::default(),
                     plugin: &border::outline_style::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(47, VariantType::PseudoClass("focus")),
@@ -1548,7 +1548,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: r"xl:(focus:(outline,outline-red-200),dark:(bg-black,text-white))",
-                    order: 215,
+                    order: Default::default(),
                     plugin: &border::outline_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(47, VariantType::PseudoClass("focus")),
@@ -1565,7 +1565,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: r"xl:(focus:(outline,outline-red-200),dark:(bg-black,text-white))",
-                    order: 159,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(
@@ -1585,7 +1585,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: r"xl:(focus:(outline,outline-red-200),dark:(bg-black,text-white))",
-                    order: 197,
+                    order: Default::default(),
                     plugin: &typography::text_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(
@@ -1622,7 +1622,7 @@ mod tests {
             vec![
                 Ok(Selector {
                     full: "(hover,focus):bg-red-400",
-                    order: 158,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![Variant::Builtin(46, VariantType::PseudoClass("hover"))],
                     modifier: Modifier::Builtin {
@@ -1633,7 +1633,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: "(hover,focus):bg-red-400",
-                    order: 158,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![Variant::Builtin(47, VariantType::PseudoClass("focus")),],
                     modifier: Modifier::Builtin {
@@ -1656,7 +1656,7 @@ mod tests {
             vec![
                 Ok(Selector {
                     full: "([@supports_(display:flex)],focus-visible):flex",
-                    order: 31,
+                    order: Default::default(),
                     plugin: &flexbox::flex::PluginDefinition,
                     variants: vec![Variant::Arbitrary(Cow::Borrowed(
                         "@supports (display:flex)"
@@ -1669,7 +1669,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: "([@supports_(display:flex)],focus-visible):flex",
-                    order: 31,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![Variant::Builtin(
                         48,
@@ -1695,7 +1695,7 @@ mod tests {
             vec![
                 Ok(Selector {
                     full: "([@supports_(display:flex)],focus-visible):!-m-4",
-                    order: 31,
+                    order: Default::default(),
                     plugin: &spacing::margin::PluginDefinition,
                     variants: vec![Variant::Arbitrary(Cow::Borrowed(
                         "@supports (display:flex)"
@@ -1708,7 +1708,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: "([@supports_(display:flex)],focus-visible):!-m-4",
-                    order: 31,
+                    order: Default::default(),
                     plugin: &spacing::margin::PluginDefinition,
                     variants: vec![Variant::Builtin(
                         48,
@@ -1734,7 +1734,7 @@ mod tests {
             vec![
                 Ok(Selector {
                     full: "xl:(hover,focus):bg-red-400",
-                    order: 158,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(
@@ -1751,7 +1751,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: "xl:(hover,focus):bg-red-400",
-                    order: 158,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(
@@ -1782,7 +1782,7 @@ mod tests {
             vec![
                 Ok(Selector {
                     full: "(hover:bg-red-400,focus:bg-green-400)",
-                    order: 158,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![Variant::Builtin(46, VariantType::PseudoClass("hover"))],
                     modifier: Modifier::Builtin {
@@ -1793,7 +1793,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: "(hover:bg-red-400,focus:bg-green-400)",
-                    order: 158,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![Variant::Builtin(47, VariantType::PseudoClass("focus")),],
                     modifier: Modifier::Builtin {
@@ -1816,7 +1816,7 @@ mod tests {
             vec![
                 Ok(Selector {
                     full: "xl:(hover,focus):target:(dark:bg-red-400,bg-green-400)",
-                    order: 158,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(
@@ -1840,7 +1840,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: "xl:(hover,focus):target:(dark:bg-red-400,bg-green-400)",
-                    order: 158,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(
@@ -1864,7 +1864,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: "xl:(hover,focus):target:(dark:bg-red-400,bg-green-400)",
-                    order: 158,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(
@@ -1882,7 +1882,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: "xl:(hover,focus):target:(dark:bg-red-400,bg-green-400)",
-                    order: 158,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(
@@ -1912,7 +1912,7 @@ mod tests {
             vec![
                 Ok(Selector {
                     full: "(hover,focus):(focus-within,target):bg-red-400",
-                    order: 158,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(46, VariantType::PseudoClass("hover")),
@@ -1926,7 +1926,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: "(hover,focus):(focus-within,target):bg-red-400",
-                    order: 158,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(47, VariantType::PseudoClass("focus")),
@@ -1940,7 +1940,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: "(hover,focus):(focus-within,target):bg-red-400",
-                    order: 158,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(46, VariantType::PseudoClass("hover")),
@@ -1954,7 +1954,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: "(hover,focus):(focus-within,target):bg-red-400",
-                    order: 158,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(47, VariantType::PseudoClass("focus")),
@@ -1980,7 +1980,7 @@ mod tests {
             vec![
                 Ok(Selector {
                     full: "(hover,focus):(bg-red-400,(target,focus-within):bg-green-400)",
-                    order: 158,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(46, VariantType::PseudoClass("hover")),
@@ -1993,7 +1993,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: "(hover,focus):(bg-red-400,(target,focus-within):bg-green-400)",
-                    order: 158,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(47, VariantType::PseudoClass("focus")),
@@ -2006,7 +2006,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: "(hover,focus):(bg-red-400,(target,focus-within):bg-green-400)",
-                    order: 158,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(28, VariantType::PseudoClass("target")),
@@ -2020,7 +2020,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: "(hover,focus):(bg-red-400,(target,focus-within):bg-green-400)",
-                    order: 158,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(28, VariantType::PseudoClass("target")),
@@ -2034,7 +2034,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: "(hover,focus):(bg-red-400,(target,focus-within):bg-green-400)",
-                    order: 158,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(45, VariantType::PseudoClass("focus-within")),
@@ -2048,7 +2048,7 @@ mod tests {
                 }),
                 Ok(Selector {
                     full: "(hover,focus):(bg-red-400,(target,focus-within):bg-green-400)",
-                    order: 158,
+                    order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(45, VariantType::PseudoClass("focus-within")),
