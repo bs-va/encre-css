@@ -175,16 +175,6 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
     )
     .unwrap();
 
-    // Due to https://github.com/notify-rs/notify/issues/247, the whole current directory is
-    // watched
-    debouncer
-        .watcher()
-        .watch(
-            &env::current_dir().expect("failed to access the current directory"),
-            RecursiveMode::Recursive,
-        )
-        .unwrap();
-
     let (mut input, mut config) = {
         let config = match Config::from_file(config_file) {
             Ok(config) => config,
@@ -196,6 +186,21 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
 
         (Arc::new(config.input), config.encre_config)
     };
+
+    // Due to https://github.com/notify-rs/notify/issues/247, the whole current directory is
+    // watched
+    debouncer
+        .watcher()
+        .watch(
+            &extra_input
+                .as_ref()
+                .and_then(|i| i.as_ref().parent().map(PathBuf::from))
+                .unwrap_or_else(|| {
+                    env::current_dir().expect("failed to access the current directory")
+                }),
+            RecursiveMode::Recursive,
+        )
+        .unwrap();
 
     let mut buffer = String::new();
 
