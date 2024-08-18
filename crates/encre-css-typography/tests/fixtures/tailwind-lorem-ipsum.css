@@ -1149,6 +1149,26 @@ img, video {
 }
 
 @media (min-width: 1024px) {
+  .lg\:text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:py-12 {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:pt-16 {
+    padding-top: 4rem;
+  }
+}
+
+@media (min-width: 1024px) {
   .lg\:prose-lg {
     font-size: 1.125rem;
     line-height: 1.7777778;
@@ -1330,33 +1350,13 @@ img, video {
 }
 
 @media (min-width: 1024px) {
-  .lg\:max-w-4xl {
-    max-width: 56rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .lg\:py-12 {
-    padding-top: 3rem;
-    padding-bottom: 3rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .lg\:pt-16 {
-    padding-top: 4rem;
-  }
-}
-
-@media (min-width: 1024px) {
   .lg\:pb-28 {
     padding-bottom: 7rem;
   }
 }
 
 @media (min-width: 1024px) {
-  .lg\:text-lg {
-    font-size: 1.125rem;
-    line-height: 1.75rem;
+  .lg\:max-w-4xl {
+    max-width: 56rem;
   }
 }

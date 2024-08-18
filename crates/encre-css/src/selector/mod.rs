@@ -258,15 +258,31 @@ impl<'a> Ord for Selector<'a> {
         } else if !self.variants.is_empty() && other.variants.is_empty() {
             Ordering::Greater
         } else if !self.variants.is_empty() && !other.variants.is_empty() {
-            match self.variants.first().unwrap() {
-                Variant::Builtin(order, _) => order,
-                Variant::Arbitrary(_) => &1_000_000,
+            let mut compared = None;
+
+            // Compare variants in the lexicographic order
+            for variant_i in 0..self.variants.len() {
+                if variant_i >= other.variants.len() {
+                    compared = Some(Ordering::Greater);
+                    break;
+                }
+
+                let res = match self.variants.get(variant_i).as_ref().unwrap() {
+                    Variant::Builtin(order, _) => order,
+                    Variant::Arbitrary(_) => &1_000_000,
+                }
+                .cmp(&match other.variants.get(variant_i).unwrap() {
+                    Variant::Builtin(order, _) => *order,
+                    Variant::Arbitrary(_) => 1_000_001,
+                });
+
+                if res != Ordering::Equal {
+                    compared = Some(res);
+                    break;
+                }
             }
-            .cmp(match other.variants.first().unwrap() {
-                Variant::Builtin(order, _) => order,
-                Variant::Arbitrary(_) => &1_000_001,
-            })
-            .then_with(|| {
+
+            compared.unwrap_or(Ordering::Less).then_with(|| {
                 self.order
                     .cmp(&other.order)
                     .then_with(|| self.full.cmp(other.full))

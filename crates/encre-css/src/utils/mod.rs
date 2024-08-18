@@ -267,7 +267,7 @@ fn sort_selectors_recursive<'a>(
 /// use encre_css::{Config, utils::sort_selectors};
 ///
 /// let value = "foo text-white px-4 sm:px-8 py-2 qux:(bg-green-500,dark:bar:foo) sm:py-3 bar bg-sky-700 foo focus:(md:text-white,lg:text-gray-500) hover:bg-sky-800";
-/// assert_eq!(sort_selectors(value, &Config::default()), "bar foo qux:(bg-green-500,dark:bar:foo) bg-sky-700 px-4 py-2 text-white hover:bg-sky-800 sm:px-8 sm:py-3 focus:(md:text-white,lg:text-gray-500)".to_string());
+/// assert_eq!(sort_selectors(value, &Config::default()), "bar foo qux:(bg-green-500,dark:bar:foo) bg-sky-700 px-4 py-2 text-white hover:bg-sky-800 sm:py-3 sm:px-8 focus:(md:text-white,lg:text-gray-500)".to_string());
 /// ```
 pub fn sort_selectors(val: &str, config: &Config) -> String {
     sort_selectors_recursive(val.split_whitespace(), " ", config)

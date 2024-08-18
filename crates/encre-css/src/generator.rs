@@ -742,16 +742,16 @@ mod tests {
 }
 
 @media (min-width: 640px) {
-  .sm\:hover\:bg-red-400:hover {
-    --en-bg-opacity: 1;
-    background-color: rgb(248 113 113 / var(--en-bg-opacity));
+  .sm\:before\:target\:content-\[\'Hello_world\!\'\]:target::before {
+    --en-content: 'Hello world!';
+    content: var(--en-content);
   }
 }
 
 @media (min-width: 640px) {
-  .sm\:before\:target\:content-\[\'Hello_world\!\'\]:target::before {
-    --en-content: 'Hello world!';
-    content: var(--en-content);
+  .sm\:hover\:bg-red-400:hover {
+    --en-bg-opacity: 1;
+    background-color: rgb(248 113 113 / var(--en-bg-opacity));
   }
 }
 
@@ -877,22 +877,13 @@ mod tests {
             String::from(
                 r"@media (min-width: 1280px) {
   .xl\:\(focus\:\(outline\,outline-red-200\)\,dark\:\(bg-black\,text-white\)\):focus {
-    outline-style: solid;
+    outline-color: rgb(254 202 202);
   }
 }
 
 @media (min-width: 1280px) {
   .xl\:\(focus\:\(outline\,outline-red-200\)\,dark\:\(bg-black\,text-white\)\):focus {
-    outline-color: rgb(254 202 202);
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  @media (min-width: 1280px) {
-    .xl\:\(focus\:\(outline\,outline-red-200\)\,dark\:\(bg-black\,text-white\)\) {
-      --en-bg-opacity: 1;
-      background-color: rgb(0 0 0 / var(--en-bg-opacity));
-    }
+    outline-style: solid;
   }
 }
 
@@ -901,6 +892,15 @@ mod tests {
     .xl\:\(focus\:\(outline\,outline-red-200\)\,dark\:\(bg-black\,text-white\)\) {
       --en-text-opacity: 1;
       color: rgb(255 255 255 / var(--en-text-opacity));
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  @media (min-width: 1280px) {
+    .xl\:\(focus\:\(outline\,outline-red-200\)\,dark\:\(bg-black\,text-white\)\) {
+      --en-bg-opacity: 1;
+      background-color: rgb(0 0 0 / var(--en-bg-opacity));
     }
   }
 }"
@@ -1035,6 +1035,13 @@ mod tests {
             generated,
             String::from(
                 r"@media (min-width: 768px) {
+  .md\:mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (min-width: 768px) {
   .md\:container {
     width: 100%;
   }
@@ -1070,13 +1077,6 @@ mod tests {
       max-width: 1536px;
     }
   }
-}
-
-@media (min-width: 768px) {
-  .md\:mx-auto {
-    margin-left: auto;
-    margin-right: auto;
-  }
 }"
             )
         );
@@ -1097,24 +1097,24 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r".before\:bg-red-500::before {
+                r".before\:content-\[\'Hello_world\!\'\]::before {
+  --en-content: 'Hello world!';
+  content: var(--en-content);
+}
+
+.before\:bg-red-500::before {
   --en-bg-opacity: 1;
   background-color: rgb(239 68 68 / var(--en-bg-opacity));
   content: var(--en-content);
 }
 
-.before\:content-\[\'Hello_world\!\'\]::before {
-  --en-content: 'Hello world!';
+.after\:content-\[counter\(foo\)\]::after {
+  --en-content: counter(foo);
   content: var(--en-content);
 }
 
 .after\:rounded-full::after {
   border-radius: 9999px;
-  content: var(--en-content);
-}
-
-.after\:content-\[counter\(foo\)\]::after {
-  --en-content: counter(foo);
   content: var(--en-content);
 }"
             )
