@@ -64,7 +64,7 @@
 //! <p class="with-hints" style="margin-top: 3rem;"><b><span>[mask-type:luminance]</span></b></p>
 //!
 //! 7. The **arbitrary CSS property** (used to use a CSS property not supported by `encre-css`), in
-//! this case the rule content will be `.\[mask-type\:luminance\] { mask-type: luminance; }`.
+//!    this case the rule content will be `.\[mask-type\:luminance\] { mask-type: luminance; }`.
 //!
 //! <p class="with-hints" style="margin-top: 3rem;"><b><span>dark:(text-white,bg-gray-500)</span></b></p>
 //!
@@ -258,11 +258,11 @@ impl<'a> Ord for Selector<'a> {
         } else if !self.variants.is_empty() && other.variants.is_empty() {
             Ordering::Greater
         } else if !self.variants.is_empty() && !other.variants.is_empty() {
-            match self.variants.get(0).unwrap() {
+            match self.variants.first().unwrap() {
                 Variant::Builtin(order, _) => order,
                 Variant::Arbitrary(_) => &1_000_000,
             }
-            .cmp(match other.variants.get(0).unwrap() {
+            .cmp(match other.variants.first().unwrap() {
                 Variant::Builtin(order, _) => order,
                 Variant::Arbitrary(_) => &1_000_001,
             })

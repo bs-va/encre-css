@@ -91,8 +91,6 @@ impl Plugin for PluginDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        let context = context;
-
         match context.modifier {
             Modifier::Builtin { value, .. } => {
                 let animation = match *value {

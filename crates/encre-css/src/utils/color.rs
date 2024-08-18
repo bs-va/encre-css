@@ -71,9 +71,9 @@ pub fn is_matching_builtin_color(config: &Config, mut modifier: &str) -> bool {
 ///
 /// The third argument is used to set the opacity type used:
 ///
-/// - [`Option::None`] will not use opacity (except if the opacity syntax is used, for example in `bg-red-500/25`);
+/// - [`Option::None`] won't use opacity (except if the opacity syntax is used, for example in `bg-red-500/25`);
 /// - [`Option::Some`] contains a variable which will be added as the opacity of the color, used to
-/// dynamically change the opacity.
+///   dynamically change the opacity.
 pub fn get<'a>(
     config: &Config,
     modifier: &'a str,

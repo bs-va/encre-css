@@ -374,7 +374,7 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#".space-x-2 > :not([hidden]) ~ :not([hidden]) {
+                r".space-x-2 > :not([hidden]) ~ :not([hidden]) {
   --en-space-x-reverse: 0;
   margin-right: calc(0.5rem * var(--en-space-x-reverse));
   margin-left: calc(0.5rem * calc(1 - var(--en-space-x-reverse)));
@@ -413,7 +413,7 @@ mod tests {
   --en-space-y-reverse: 0;
   margin-top: calc(0.75rem * calc(1 - var(--en-space-y-reverse)));
   margin-bottom: calc(0.75rem * var(--en-space-y-reverse));
-}"#
+}"
             )
         );
     }
@@ -443,7 +443,7 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#".-top-2 {
+                r".-top-2 {
   top: -0.5rem;
 }
 
@@ -508,7 +508,7 @@ mod tests {
 .hover\:-hue-rotate-60:hover {
   --en-hue-rotate: hue-rotate(-60deg);
   filter: var(--en-blur) var(--en-brightness) var(--en-contrast) var(--en-grayscale) var(--en-hue-rotate) var(--en-invert) var(--en-saturate) var(--en-sepia) var(--en-drop-shadow);
-}"#
+}"
             )
         );
     }
@@ -520,9 +520,9 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#".text-current {
+                ".text-current {
   color: currentColor;
-}"#,
+}"
             )
         );
     }
@@ -544,7 +544,7 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#".\!-mb-8 {
+                r".\!-mb-8 {
   margin-bottom: -2rem !important;
 }
 
@@ -569,7 +569,7 @@ mod tests {
 
 .focus\:\!w-2:focus {
   width: 0.5rem !important;
-}"#,
+}",
             )
         );
     }
@@ -581,7 +581,7 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#"@-webkit-keyframes pulse {
+                "@-webkit-keyframes pulse {
   50% {
     opacity: .5;
   }
@@ -599,7 +599,7 @@ mod tests {
 .animate-pulse {
   -webkit-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}"#
+}"
             )
         );
     }
@@ -620,7 +620,7 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#".mt-\[calc\(100\%-10px\)\] {
+                r".mt-\[calc\(100\%-10px\)\] {
   margin-top: calc(100% - 10px);
 }
 
@@ -640,7 +640,7 @@ mod tests {
   .\32xl\:pb-\[calc\(\(100\%\/2\)-10px\+2rem\)\] {
     padding-bottom: calc((100% / 2) - 10px + 2rem);
   }
-}"#
+}"
             )
         );
     }
@@ -652,13 +652,13 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#".bg-\[color\:red\] {
+                r".bg-\[color\:red\] {
   background-color: red;
 }
 
 .hover\:bg-\[color\:red\]:hover {
   background-color: red;
-}"#
+}"
             )
         );
     }
@@ -670,9 +670,9 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#".focus\:w-full:focus {
+                r".focus\:w-full:focus {
   width: 100%;
-}"#
+}"
             )
         );
     }
@@ -803,10 +803,10 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#".bg-red-500 {
+                ".bg-red-500 {
   --en-bg-opacity: 1;
   background-color: rgb(239 68 68 / var(--en-bg-opacity));
-}"#
+}"
             )
         );
     }
@@ -818,9 +818,9 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#".hover\:\[mask-type\:luminance\]:hover {
+                r".hover\:\[mask-type\:luminance\]:hover {
   mask-type: luminance;
-}"#
+}"
             )
         );
     }
@@ -840,7 +840,7 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#"@supports not (display:grid) {
+                r"@supports not (display:grid) {
   .\[\@supports_not_\(display\:grid\)\]\:float-right {
     float: right;
   }
@@ -860,7 +860,7 @@ mod tests {
 .\[\&_\>_\*\]\:before\:content-\[\'hello-\'\]::before > * {
   --en-content: 'hello-';
   content: var(--en-content);
-}"#
+}"
             )
         );
     }
@@ -875,7 +875,7 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#"@media (min-width: 1280px) {
+                r"@media (min-width: 1280px) {
   .xl\:\(focus\:\(outline\,outline-red-200\)\,dark\:\(bg-black\,text-white\)\):focus {
     outline-style: solid;
   }
@@ -903,7 +903,7 @@ mod tests {
       color: rgb(255 255 255 / var(--en-text-opacity));
     }
   }
-}"#
+}"
             )
         );
     }
@@ -917,7 +917,7 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#".rounded {
+                ".rounded {
   border-radius: 0.25rem;
 }
 
@@ -957,7 +957,7 @@ mod tests {
 
 .border-t-2 {
   border-top-width: 2px;
-}"#
+}"
             )
         );
     }
@@ -975,13 +975,13 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#".font-\[\'Times_New_Roman\'\,Helvetica\,serif\] {
+                r".font-\[\'Times_New_Roman\'\,Helvetica\,serif\] {
   font-family: 'Times New Roman',Helvetica,serif;
 }
 
 .font-\[Roboto\,\'Open_Sans\'\,sans-serif\] {
   font-family: Roboto,'Open Sans',sans-serif;
-}"#
+}"
             )
         );
     }
@@ -993,7 +993,7 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#".container {
+                ".container {
   width: 100%;
 }
 
@@ -1025,7 +1025,7 @@ mod tests {
   .container {
     max-width: 1536px;
   }
-}"#
+}"
             )
         );
 
@@ -1034,7 +1034,7 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#"@media (min-width: 768px) {
+                r"@media (min-width: 768px) {
   .md\:container {
     width: 100%;
   }
@@ -1077,7 +1077,7 @@ mod tests {
     margin-left: auto;
     margin-right: auto;
   }
-}"#
+}"
             )
         );
     }
@@ -1097,7 +1097,7 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#".before\:bg-red-500::before {
+                r".before\:bg-red-500::before {
   --en-bg-opacity: 1;
   background-color: rgb(239 68 68 / var(--en-bg-opacity));
   content: var(--en-content);
@@ -1116,7 +1116,7 @@ mod tests {
 .after\:content-\[counter\(foo\)\]::after {
   --en-content: counter(foo);
   content: var(--en-content);
-}"#
+}"
             )
         );
     }
@@ -1128,11 +1128,11 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#"@media (prefers-color-scheme: dark) {
+                r"@media (prefers-color-scheme: dark) {
   .dark\:mt-px {
     margin-top: 1px;
   }
-}"#
+}"
             )
         );
 
@@ -1144,9 +1144,9 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#".dark .dark\:mt-px {
+                r".dark .dark\:mt-px {
   margin-top: 1px;
-}"#
+}"
             )
         );
     }

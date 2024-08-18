@@ -64,7 +64,7 @@ fn gen_css<'a, T: AsRef<Path>>(
 }
 
 fn scan_path<T: AsRef<Path>>(glob_path: T, buffer: &mut String) {
-    let (prefix, glob) = match wax::Glob::new(
+    let (prefix, glob) = match Glob::new(
         glob_path
             .as_ref()
             .to_str()

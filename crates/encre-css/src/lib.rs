@@ -129,11 +129,11 @@
 //!
 //! Generating styles takes two steps:
 //! - You need to _configure_ the CSS generation by making a [`Config`] structure.
-//! It can be created by reading a [TOML](https://toml.io) file using
-//! [`Config::from_file`] or by using the default values with [`Config::default`];
+//!   It can be created by reading a [TOML](https://toml.io) file using
+//!   [`Config::from_file`] or by using the default values with [`Config::default`];
 //! - Then, you need to _generate the styles_ based on some sources using the [`generate`]
-//! function. This function will scan the content of the sources, extract atomic classes and
-//! generate the style needed for each class.
+//!   function. This function will scan the content of the sources, extract atomic classes and
+//!   generate the style needed for each class.
 //!
 //! ### Example
 //!

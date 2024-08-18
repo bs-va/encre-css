@@ -1188,9 +1188,9 @@ impl From<usize> for MaxShortcutDepth {
     }
 }
 
-impl Into<usize> for MaxShortcutDepth {
-    fn into(self) -> usize {
-        self.0
+impl From<MaxShortcutDepth> for usize {
+    fn from(val: MaxShortcutDepth) -> Self {
+        val.0
     }
 }
 
@@ -1544,6 +1544,7 @@ impl PartialEq for Config {
             && self.theme == other.theme
             && self.preflight == other.preflight
             && self.shortcuts == other.shortcuts
+            && self.max_shortcut_depth == other.max_shortcut_depth
             && self.extra == other.extra
             && self.custom_variants == other.custom_variants
     }
@@ -1556,10 +1557,11 @@ impl fmt::Debug for Config {
             .field("theme", &self.theme)
             .field("preflight", &self.preflight)
             .field("shortcuts", &self.shortcuts)
+            .field("max_shortcut_depth", &self.max_shortcut_depth)
             .field("extra", &self.extra)
             .field("custom_plugins", &self.custom_plugins)
             .field("custom_variants", &self.custom_variants)
-            .finish()
+            .finish_non_exhaustive()
     }
 }
 
@@ -1581,12 +1583,12 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#"@media (min-width: 1600px) {
+                r"@media (min-width: 1600px) {
   .\33xl\:text-rosa-500 {
     --en-text-opacity: 1;
     color: rgb(229 24 106 / var(--en-text-opacity));
   }
-}"#
+}"
             )
         );
     }
@@ -1604,7 +1606,7 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#".btn {
+                ".btn {
   border-radius: 0.75rem;
 }
 
@@ -1620,7 +1622,7 @@ mod tests {
 .btn {
   --en-bg-opacity: 1;
   background-color: rgb(239 68 68 / var(--en-bg-opacity));
-}"#
+}"
             )
         );
     }
@@ -1695,7 +1697,7 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#".bg-red-300 {
+                ".bg-red-300 {
   --en-bg-opacity: 1;
   background-color: rgb(252 165 165 / var(--en-bg-opacity));
 }
@@ -1708,7 +1710,7 @@ mod tests {
 .text-red-500 {
   --en-text-opacity: 1;
   color: rgb(239 68 68 / var(--en-text-opacity));
-}"#
+}"
             )
         );
     }
@@ -1826,7 +1828,7 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#".bg-rosa-500 {
+                r".bg-rosa-500 {
   --en-bg-opacity: 1;
   background-color: rgb(229 24 106 / var(--en-bg-opacity));
 }
@@ -1853,7 +1855,7 @@ mod tests {
     --en-text-opacity: 1;
     color: rgb(229 24 106 / var(--en-text-opacity));
   }
-}"#
+}"
             )
         );
     }
