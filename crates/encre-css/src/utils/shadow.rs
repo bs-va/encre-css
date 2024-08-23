@@ -244,6 +244,10 @@ impl<'a> ShadowList<'a> {
             }
         }
 
+        if value.is_empty() {
+            return None;
+        }
+
         // Add the last part (not suffixed by `,`)
         if last_index != value.len() - 1 {
             // Find the index of the first free part
@@ -344,5 +348,13 @@ mod tests {
         let shadow = "20px 35px 60px -15px rgba(0,0,0,0.3),0 72px rgba(0,2,42,0.2),inset 23px 42em rgba(255,0,0,1)";
         let result = ShadowList::parse(shadow).unwrap();
         assert_eq!(&result.to_string(), shadow);
+    }
+
+    #[test]
+    fn empty_shadow_should_not_panic() {
+        let shadow = "";
+        let None = ShadowList::parse(shadow) else {
+            unreachable!("an empty shadow should not be parsed correctly");
+        };
     }
 }
