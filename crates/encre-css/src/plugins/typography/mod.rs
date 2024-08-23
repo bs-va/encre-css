@@ -72,6 +72,12 @@ mod tests {
   font-family: 'Open Sans',Roboto,sans-serif;
 }"
         );
+        assert_eq!(
+            generate(["font-[\u{fb17}\u{fb17}]"], &base_config()),
+            ".font-\\[\u{fb17}\u{fb17}\\] {
+  font-family: \u{fb17}\u{fb17};
+}"
+        );
     }
 
     #[test]
