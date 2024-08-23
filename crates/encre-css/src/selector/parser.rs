@@ -463,6 +463,15 @@ fn parse_recursive<'a>(
                         modifier: &modifier,
                     };
 
+                    if let Modifier::Arbitrary { prefix, .. } = modifier {
+                        if !prefix.is_empty() {
+                            // If the modifier is arbitrary, the namespace must be strictly parsed
+                            // to avoid accepting too much selectors, e.g `flex-test-[]` being
+                            // parsed as a `flex` selector
+                            continue;
+                        }
+                    }
+
                     if plugin.can_handle(context) {
                         return variants
                             .into_iter()

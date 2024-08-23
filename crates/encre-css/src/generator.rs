@@ -357,6 +357,12 @@ mod tests {
     use pretty_assertions::assert_eq;
 
     #[test]
+    fn not_parsing_too_loosely() {
+        let generated = generate(["flex-test-[]"], &base_config());
+        assert!(generated.is_empty());
+    }
+
+    #[test]
     fn divide_and_space_between_special_class() {
         let generated = generate(
             [
