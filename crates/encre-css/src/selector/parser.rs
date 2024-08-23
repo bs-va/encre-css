@@ -72,10 +72,14 @@ pub(crate) fn underscores_to_spaces(mut val: Cow<str>) -> Cow<str> {
         // For the `CursorPlugin`, `ContentPlugin` and `ImagePlugin` plugins, we need to keep underscores in URLs
         val.split("url(")
             .map(|p| {
+                if p.is_empty() {
+                    return String::new();
+                }
+
                 let result = if let Some(sub) = p.strip_prefix('\'') {
-                    sub.find('\'').map(|index| p.split_at(index + 3))
+                    sub.find("')").map(|index| p.split_at(index + 2))
                 } else if let Some(sub) = p.strip_prefix('"') {
-                    sub.find('"').map(|index| p.split_at(index + 3))
+                    sub.find("\")").map(|index| p.split_at(index + 2))
                 } else {
                     p.find(')').map(|index| p.split_at(index + 1))
                 };
@@ -83,7 +87,7 @@ pub(crate) fn underscores_to_spaces(mut val: Cow<str>) -> Cow<str> {
                 if let Some((before, after)) = result {
                     format!("url({}{}", before, after.replace('_', " "))
                 } else {
-                    p.replace('_', " ")
+                    format!("url({}", p.replace('_', " "))
                 }
             })
             .collect()
@@ -539,6 +543,20 @@ mod tests {
     use crate::{config::Config, plugins::*, selector::Selector};
 
     use pretty_assertions::assert_eq;
+
+    #[test]
+    fn underscores_to_spaces_test() {
+        assert_eq!(
+            underscores_to_spaces(Cow::Borrowed(
+                "url('/hello_world.png'),url(\"some__text.txt\")"
+            )),
+            "url('/hello_world.png'),url(\"some__text.txt\")",
+        );
+        assert_eq!(
+            underscores_to_spaces(Cow::Borrowed(r#"url("[l8""#)),
+            r#"url("[l8""#
+        );
+    }
 
     #[test]
     fn basic_single() {
@@ -1982,9 +2000,7 @@ mod tests {
                     full: "(hover,focus):(bg-red-400,(target,focus-within):bg-green-400)",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![
-                        Variant::Builtin(46, VariantType::PseudoClass("hover")),
-                    ],
+                    variants: vec![Variant::Builtin(46, VariantType::PseudoClass("hover")),],
                     modifier: Modifier::Builtin {
                         is_negative: false,
                         value: "red-400",
@@ -1995,9 +2011,7 @@ mod tests {
                     full: "(hover,focus):(bg-red-400,(target,focus-within):bg-green-400)",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![
-                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
-                    ],
+                    variants: vec![Variant::Builtin(47, VariantType::PseudoClass("focus")),],
                     modifier: Modifier::Builtin {
                         is_negative: false,
                         value: "red-400",
