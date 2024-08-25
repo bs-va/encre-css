@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.14.0] - 2024-08-25
+
+### Bug Fixes
+
+- Support negative `full` values for the rules that accepts them
+- Bad selector ordering resulting in selectors being ignored
+- Avoid panicking when encountering a `shadow` without any modifier
+- Avoid panicking when encountering UTF-8 characters in the `font-family` utility
+- Avoid panicking when a bracket is not closed in a `url` arbitrary value
+- Strictly parse arbitrary modifiers
+
+### Documentation
+
+- Fix badly closed HTML tag
+
+### Features
+
+- Support variant groups without any namespace or modifier
+- Support watching another directory following the extra input argument
+
+### Miscellaneous Tasks
+
+- Add fuzzing
+
+### Styling
+
+- Fix all Clippy warnings
+
+### Testing
+
+- Set default order on all rules because it is not checked in tests
+
 ## [0.13.0] - 2024-07-09
 
 ### Bug Fixes
