@@ -57,7 +57,7 @@ impl<'a> Shadow<'a> {
                 return None;
             }
 
-            let len = shadow.iter().position(|p| p.is_empty()).unwrap_or(6);
+            let len = shadow.iter().position(|p| p.is_empty()).unwrap_or(5);
             if len == 1 {
                 // Keyword value
                 if SHADOW_KEYWORDS.contains(&shadow[0]) {
@@ -340,6 +340,18 @@ mod tests {
         assert_eq!(
             ShadowList::parse("none").unwrap(),
             ShadowList(vec![Shadow::Keyword("none")])
+        );
+
+        assert_eq!(
+            ShadowList::parse("inset 0 5px 90px 40px rgba(0,0,0,0.2)").unwrap(),
+            ShadowList(vec![Shadow::Full {
+                is_inset: true,
+                offset_x: "0",
+                offset_y: "5px",
+                blur_radius: "90px",
+                spread_radius: "40px",
+                color: "rgba(0,0,0,0.2)"
+            }])
         );
     }
 
