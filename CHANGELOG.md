@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.14.1] - 2024-09-01
+
+### Bug Fixes
+
+- Shadows using the full syntax not working
+
 ## [0.14.0] - 2024-08-25
 
 ### Bug Fixes
