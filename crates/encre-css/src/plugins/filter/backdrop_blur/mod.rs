@@ -10,7 +10,7 @@ impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         match context.modifier {
             Modifier::Builtin { value, .. } => {
-                ["", "sm", "md", "lg", "xl", "2xl", "3xl", "none"].contains(&&**value)
+                ["xs", "sm", "md", "lg", "xl", "2xl", "3xl", "none"].contains(&&**value)
             }
             Modifier::Arbitrary { value, .. } => is_matching_length(value),
         }
@@ -19,8 +19,8 @@ impl Plugin for PluginDefinition {
     fn handle(&self, context: &mut ContextHandle) {
         match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "" => context.buffer.line("--en-backdrop-blur: blur(8px);"),
-                "sm" => context.buffer.line("--en-backdrop-blur: blur(4px);"),
+                "xs" => context.buffer.line("--en-backdrop-blur: blur(4px);"),
+                "sm" => context.buffer.line("--en-backdrop-blur: blur(8px);"),
                 "md" => context.buffer.line("--en-backdrop-blur: blur(12px);"),
                 "lg" => context.buffer.line("--en-backdrop-blur: blur(16px);"),
                 "xl" => context.buffer.line("--en-backdrop-blur: blur(24px);"),
