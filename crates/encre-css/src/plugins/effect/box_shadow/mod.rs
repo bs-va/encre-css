@@ -9,7 +9,7 @@ impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         match context.modifier {
             Modifier::Builtin { value, .. } => {
-                ["", "sm", "md", "lg", "xl", "2xl", "inner", "none"].contains(&&**value)
+                ["2xs", "xs", "sm", "md", "lg", "xl", "2xl", "inner", "none"].contains(&&**value)
             }
             Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "shadow" || (hint.is_empty() && is_matching_shadow(value))
@@ -20,17 +20,23 @@ impl Plugin for PluginDefinition {
     fn handle(&self, context: &mut ContextHandle) {
         match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
-                "" => {
+                "2xs" => {
+                    context.buffer.lines([
+                        "--en-shadow: 0 1px rgb(0 0 0 / 0.05);",
+                        "--en-shadow-colored: 0 1px var(--en-shadow-color);",
+                    ]);
+                }
+                "xs" => {
+                    context.buffer.lines([
+                        "--en-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);",
+                        "--en-shadow-colored: 0 1px 2px 0 var(--en-shadow-color);",
+                    ]);
+                }
+                "sm" => {
                     context.buffer.lines([
                         "--en-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);",
                         "--en-shadow-colored: 0 1px 3px 0 var(--en-shadow-color), 0 1px 2px -1px var(--en-shadow-color);",
                     ]);
-                }
-                "sm" => {
-                    context
-                        .buffer
-                        .lines(["--en-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-                        --en-shadow-colored: 0 1px 2px 0 var(--en-shadow-color);"]);
                 }
                 "md" => {
                     context.buffer.lines([

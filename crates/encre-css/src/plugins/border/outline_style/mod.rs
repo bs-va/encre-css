@@ -20,14 +20,14 @@ impl Plugin for PluginDefinition {
         match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
                 "" => context.buffer.line("outline-style: solid;"),
-                "none" => {
+                "none" => context.buffer.line("outline-style: none;"),
+                "hidden" => {
                     context.buffer.line("outline: 2px solid transparent;");
                     context.buffer.line("outline-offset: 2px;");
                 }
                 "dashed" => context.buffer.line("outline-style: dashed;"),
                 "dotted" => context.buffer.line("outline-style: dotted;"),
                 "double" => context.buffer.line("outline-style: double;"),
-                "hidden" => context.buffer.line("outline-style: hidden;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { .. } => unreachable!(),

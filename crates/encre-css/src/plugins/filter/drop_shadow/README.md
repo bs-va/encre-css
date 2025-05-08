@@ -8,8 +8,8 @@ Utilities for applying drop-shadow filters to an element.
     </tr>
   </thead>
   <tbody>
-    <tr><td>drop-shadow-sm</td><td>filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.05));</td></tr>
-    <tr><td>drop-shadow</td><td>filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));</td></tr>
+    <tr><td>drop-shadow-xs</td><td>filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.05));</td></tr>
+    <tr><td>drop-shadow-sm</td><td>filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));</td></tr>
     <tr><td>drop-shadow-md</td><td>filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));</td></tr>
     <tr><td>drop-shadow-lg</td><td>filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));</td></tr>
     <tr><td>drop-shadow-xl</td><td>filter: drop-shadow(0 20px 13px rgb(0 0 0 / 0.03)) drop-shadow(0 8px 5px rgb(0 0 0 / 0.08));</td></tr>

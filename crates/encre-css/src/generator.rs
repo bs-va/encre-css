@@ -539,7 +539,7 @@ mod tests {
             [
                 "!w-full",
                 "!-mb-8",
-                "!shadow",
+                "!shadow-sm",
                 "!-hue-rotate-60",
                 "focus:!w-2",
                 "focus:!-mb-2",
@@ -558,7 +558,7 @@ mod tests {
   width: 100% !important;
 }
 
-.\!shadow {
+.\!shadow-sm {
   --en-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1) !important;
   --en-shadow-colored: 0 1px 3px 0 var(--en-shadow-color), 0 1px 2px -1px var(--en-shadow-color) !important;
   box-shadow: var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow) !important;
@@ -917,31 +917,31 @@ mod tests {
     #[test]
     fn default_modifier_values_for_rounded() {
         let generated = generate([
-            "rounded-tr rounded-tr-md rounded rounded-md rounded-t-sm rounded-bl-xl border-x border border-4 border-t-2",
+            "rounded-tr-sm rounded-tr-md rounded-sm rounded-md rounded-t-sm rounded-bl-xl border-x border border-4 border-t-2",
         ], &base_config());
 
         assert_eq!(
             generated,
             String::from(
-                ".rounded {
-  border-radius: 0.25rem;
-}
-
-.rounded-md {
+                ".rounded-md {
   border-radius: 0.375rem;
 }
 
-.rounded-t-sm {
-  border-top-left-radius: 0.125rem;
-  border-top-right-radius: 0.125rem;
+.rounded-sm {
+  border-radius: 0.25rem;
 }
 
-.rounded-tr {
+.rounded-t-sm {
+  border-top-left-radius: 0.25rem;
   border-top-right-radius: 0.25rem;
 }
 
 .rounded-tr-md {
   border-top-right-radius: 0.375rem;
+}
+
+.rounded-tr-sm {
+  border-top-right-radius: 0.25rem;
 }
 
 .rounded-bl-xl {

@@ -5,8 +5,7 @@ use crate::prelude::build_plugin::*;
 fn radius_can_handle(context: &ContextCanHandle) -> bool {
     match context.modifier {
         Modifier::Builtin { value, .. } => {
-            value.is_empty()
-                || ["sm", "md", "lg", "xl", "2xl", "3xl", "full", "none"].contains(&&**value)
+            ["xs", "sm", "md", "lg", "xl", "2xl", "3xl", "full", "none"].contains(&&**value)
         }
         Modifier::Arbitrary { value, prefix, .. } => {
             prefix.is_empty()
@@ -25,9 +24,9 @@ fn radius_handle(css_properties: &[&str], context: &mut ContextHandle) {
                     "{}: {};",
                     css_prop,
                     match *value {
-                        "" => "0.25rem",
                         "none" => "0",
-                        "sm" => "0.125rem",
+                        "xs" => "0.125rem",
+                        "sm" => "0.25rem",
                         "md" => "0.375rem",
                         "lg" => "0.5rem",
                         "xl" => "0.75rem",

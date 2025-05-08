@@ -165,8 +165,8 @@ mod tests {
     #[test]
     fn border_radius() {
         assert_eq!(
-            generate(["rounded"], &base_config()),
-            ".rounded {
+            generate(["rounded-sm"], &base_config()),
+            ".rounded-sm {
   border-radius: 0.25rem;
 }"
         );
@@ -177,21 +177,21 @@ mod tests {
 }"
         );
         assert_eq!(
-            generate(["rounded-bl"], &base_config()),
-            ".rounded-bl {
+            generate(["rounded-bl-sm"], &base_config()),
+            ".rounded-bl-sm {
   border-bottom-left-radius: 0.25rem;
 }"
         );
         assert_eq!(
-            generate(["rounded-t"], &base_config()),
-            ".rounded-t {
+            generate(["rounded-t-sm"], &base_config()),
+            ".rounded-t-sm {
   border-top-left-radius: 0.25rem;
   border-top-right-radius: 0.25rem;
 }"
         );
         assert_eq!(
-            generate(["rounded-s"], &base_config()),
-            ".rounded-s {
+            generate(["rounded-s-sm"], &base_config()),
+            ".rounded-s-sm {
   border-start-start-radius: 0.25rem;
   border-end-start-radius: 0.25rem;
 }"
@@ -204,8 +204,8 @@ mod tests {
         );
 
         assert_eq!(
-            generate(["rounded-sm"], &base_config()),
-            ".rounded-sm {
+            generate(["rounded-xs"], &base_config()),
+            ".rounded-xs {
   border-radius: 0.125rem;
 }"
         );
@@ -330,8 +330,8 @@ mod tests {
     #[test]
     fn outline_style() {
         assert_eq!(
-            generate(["outline-none"], &base_config()),
-            ".outline-none {
+            generate(["outline-hidden"], &base_config()),
+            ".outline-hidden {
   outline: 2px solid transparent;
   outline-offset: 2px;
 }"
@@ -403,7 +403,7 @@ mod tests {
         assert_eq!(
             generate(["ring"], &base_config()),
             ".ring {
-  --en-ring-shadow: var(--en-ring-inset) 0 0 0 calc(3px + var(--en-ring-offset-width)) var(--en-ring-color);
+  --en-ring-shadow: var(--en-ring-inset) 0 0 0 calc(1px + var(--en-ring-offset-width)) var(--en-ring-color);
   box-shadow: var(--en-ring-offset-shadow), var(--en-ring-shadow), var(--en-shadow, 0 0 #0000);
 }"
         );
