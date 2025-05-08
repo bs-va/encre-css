@@ -46,6 +46,9 @@
   </a>
 </div>
 
+> Support for TailwindCSS v4 is in progress!
+> Follow this guide to know what changed: https://tailwindcss.com/docs/upgrade-guide
+
 ## Table of contents
 
 - [A brief introduction to utility-first CSS frameworks](#a-brief-introduction-to-utility-first-css-frameworks)
