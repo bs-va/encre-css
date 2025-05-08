@@ -9,8 +9,8 @@ Utilities for applying backdrop blur filters to an element.
   </thead>
   <tbody>
     <tr><td>backdrop-blur-none</td><td>backdrop-filter: blur(0);</td></tr>
-    <tr><td>backdrop-blur-sm</td><td>backdrop-filter: blur(4px);</td></tr>
-    <tr><td>backdrop-blur</td><td>backdrop-filter: blur(8px);</td></tr>
+    <tr><td>backdrop-blur-xs</td><td>backdrop-filter: blur(4px);</td></tr>
+    <tr><td>backdrop-blur-sm</td><td>backdrop-filter: blur(8px);</td></tr>
     <tr><td>backdrop-blur-md</td><td>backdrop-filter: blur(12px);</td></tr>
     <tr><td>backdrop-blur-lg</td><td>backdrop-filter: blur(16px);</td></tr>
     <tr><td>backdrop-blur-xl</td><td>backdrop-filter: blur(24px);</td></tr>

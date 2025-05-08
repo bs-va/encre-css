@@ -9,8 +9,8 @@ Utilities for applying blur filters to an element.
   </thead>
   <tbody>
     <tr><td>blur-none</td><td>filter: blur(0);</td></tr>
-    <tr><td>blur-sm</td><td>filter: blur(4px);</td></tr>
-    <tr><td>blur</td><td>filter: blur(8px);</td></tr>
+    <tr><td>blur-xs</td><td>filter: blur(4px);</td></tr>
+    <tr><td>blur-sm</td><td>filter: blur(8px);</td></tr>
     <tr><td>blur-md</td><td>filter: blur(12px);</td></tr>
     <tr><td>blur-lg</td><td>filter: blur(16px);</td></tr>
     <tr><td>blur-xl</td><td>filter: blur(24px);</td></tr>
