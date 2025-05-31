@@ -101,6 +101,11 @@
 //! elements. If you need to turn them into block elements, you can use the `block`
 //! utility class on each icon, e.g. `<div class="fa-pencil block"></div>`.
 //!
+//! ### Cargo features
+//!
+//! - `fs-cache` (enabled by default): store all fetched icons in the cache directory of the system
+//!   to avoid requesting them each time from the CDN
+//!
 //! ### License
 //!
 //! The code itself is under the [MIT License](../../LICENSE).
@@ -115,18 +120,22 @@ use encre_css::{
     Config,
 };
 
+#[cfg(feature = "fs-cache")]
 #[cfg(not(target_arch = "wasm32"))]
 use directories::BaseDirs;
+
 #[cfg(not(target_arch = "wasm32"))]
 use once_cell::sync::Lazy;
+
+use std::{collections::BTreeMap, sync::Mutex};
+
+#[cfg(feature = "fs-cache")]
 #[cfg(not(target_arch = "wasm32"))]
 use std::{
-    collections::BTreeMap,
     env,
     fs::{self, File},
     io::BufReader,
     path::PathBuf,
-    sync::Mutex,
 };
 
 use std::borrow::Cow;
@@ -269,6 +278,7 @@ const COLLECTIONS: &[&str] = &[
 #[cfg(not(target_arch = "wasm32"))]
 const DEFAULT_CDN: &str = "https://esm.sh";
 
+#[cfg(feature = "fs-cache")]
 #[cfg(not(target_arch = "wasm32"))]
 const CACHE_SUB_DIR_NAME: &str = "encre-css-icons-cache";
 
@@ -439,6 +449,7 @@ fn fetch_or_cache_collection(config: &Config, collection: &'static str) {
         return;
     }
 
+    #[cfg(feature = "fs-cache")]
     let cache_dir = match BaseDirs::new() {
         Some(dirs) => PathBuf::from(dirs.cache_dir()),
         None => {
@@ -447,11 +458,13 @@ fn fetch_or_cache_collection(config: &Config, collection: &'static str) {
         }
     };
 
+    #[cfg(feature = "fs-cache")]
     let collection_file = cache_dir
         .join(CACHE_SUB_DIR_NAME)
         .join(collection)
         .with_extension("json");
 
+    #[cfg(feature = "fs-cache")]
     if collection_file.exists() {
         // File already in cache, use it
         let file = File::open(&collection_file).expect("failed to open the collection file");
@@ -461,47 +474,50 @@ fn fetch_or_cache_collection(config: &Config, collection: &'static str) {
             serde_json::from_reader(reader)
                 .expect("failed to deserialize the response body as JSON"),
         );
-    } else {
-        // Fetch the file
-        let custom_cdn = if let Some(icons_config) = config.extra.get("icons") {
-            if let Some(table) = icons_config.as_table() {
-                if let Some(cdn_value) = table.get("custom-cdn") {
-                    if let Some(cdn) = cdn_value.as_str() {
-                        Cow::Owned(cdn.trim_end_matches('/').to_string())
-                    } else {
-                        println!("Bad type for the `custom-cdn` extra field (in the `icons` field): expected `String`, found `{}`. Using the default CDN instead.", cdn_value.type_str());
-                        Cow::Borrowed(DEFAULT_CDN)
-                    }
+        return;
+    }
+
+    // Fetch the file
+    let custom_cdn = if let Some(icons_config) = config.extra.get("icons") {
+        if let Some(table) = icons_config.as_table() {
+            if let Some(cdn_value) = table.get("custom-cdn") {
+                if let Some(cdn) = cdn_value.as_str() {
+                    Cow::Owned(cdn.trim_end_matches('/').to_string())
                 } else {
+                    println!("Bad type for the `custom-cdn` extra field (in the `icons` field): expected `String`, found `{}`. Using the default CDN instead.", cdn_value.type_str());
                     Cow::Borrowed(DEFAULT_CDN)
                 }
             } else {
-                println!("Bad type for the `icons` extra field: expected `Table`, found `{}`. Using the default CDN instead.", icons_config.type_str());
                 Cow::Borrowed(DEFAULT_CDN)
             }
         } else {
+            println!("Bad type for the `icons` extra field: expected `Table`, found `{}`. Using the default CDN instead.", icons_config.type_str());
             Cow::Borrowed(DEFAULT_CDN)
-        };
+        }
+    } else {
+        Cow::Borrowed(DEFAULT_CDN)
+    };
 
-        let url = format!("{}/@iconify-json/{}/icons.json", custom_cdn, collection);
+    let url = format!("{}/@iconify-json/{}/icons.json", custom_cdn, collection);
 
-        let content = ureq::get(&url)
-            .call()
-            .unwrap_or_else(|_| panic!("failed to get the response from `{url}`"))
-            .into_string()
-            .expect("failed to deserialize the response body as JSON");
+    let content = ureq::get(&url)
+        .call()
+        .unwrap_or_else(|_| panic!("failed to get the response from `{url}`"))
+        .into_string()
+        .expect("failed to deserialize the response body as JSON");
 
+    #[cfg(feature = "fs-cache")]
+    {
         // Write the cached file to the disk
         fs::create_dir_all(collection_file.with_file_name(""))
             .expect("failed to create cache directory");
         fs::write(collection_file, &content).expect("failed to write the collection file");
-
-        MEM_CACHE.lock().unwrap().insert(
-            collection,
-            serde_json::from_str(&content)
-                .expect("failed to deserialize the response body as JSON"),
-        );
     }
+
+    MEM_CACHE.lock().unwrap().insert(
+        collection,
+        serde_json::from_str(&content).expect("failed to deserialize the response body as JSON"),
+    );
 }
 
 #[derive(Debug)]
@@ -527,7 +543,9 @@ impl Plugin for Icons {
 
                 #[cfg(target_arch = "wasm32")]
                 context.buffer.lines([
-                    format_args!(r#"--en-icon: url("https://api.iconify.design/{collection}/{icon}.svg");"#),
+                    format_args!(
+                        r#"--en-icon: url("https://api.iconify.design/{collection}/{icon}.svg");"#
+                    ),
                     format_args!("mask: var(--en-icon) no-repeat;"),
                     format_args!("mask-size: 100% 100%;"),
                     format_args!("-webkit-mask: var(--en-icon) no-repeat;"),
