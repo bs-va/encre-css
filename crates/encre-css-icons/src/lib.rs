@@ -105,6 +105,9 @@
 //!
 //! - `fs-cache` (enabled by default): store all fetched icons in the cache directory of the system
 //!   to avoid requesting them each time from the CDN
+//! - `embed-icons`: embed all the JSON files of icons in a directory into the binary to avoid
+//!   requesting them online. The `register` function takes a second argument of type
+//!   `include_dir::Dir` when this feature is enabled
 //!
 //! ### License
 //!
@@ -127,6 +130,8 @@ use directories::BaseDirs;
 #[cfg(not(target_arch = "wasm32"))]
 use once_cell::sync::Lazy;
 
+#[cfg(feature = "embed-icons")]
+use std::sync::OnceLock;
 use std::{collections::BTreeMap, sync::Mutex};
 
 #[cfg(feature = "fs-cache")]
@@ -275,7 +280,7 @@ const COLLECTIONS: &[&str] = &[
     "mono-icons",
 ];
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(not(any(target_arch = "wasm32", feature = "embed-icons")))]
 const DEFAULT_CDN: &str = "https://esm.sh";
 
 #[cfg(feature = "fs-cache")]
@@ -285,6 +290,9 @@ const CACHE_SUB_DIR_NAME: &str = "encre-css-icons-cache";
 #[cfg(not(target_arch = "wasm32"))]
 static MEM_CACHE: Lazy<Mutex<BTreeMap<&'static str, Collection>>> =
     Lazy::new(|| Mutex::new(BTreeMap::new()));
+
+#[cfg(feature = "embed-icons")]
+static EMBEDDED_ICONS: OnceLock<include_dir::Dir> = OnceLock::new();
 
 #[cfg(not(target_arch = "wasm32"))]
 fn get_icon(
@@ -442,7 +450,7 @@ fn get_icon(
     Some(((formatted_width, formatted_height), svg))
 }
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(not(any(target_arch = "wasm32", feature = "embed-icons")))]
 fn fetch_or_cache_collection(config: &Config, collection: &'static str) {
     if MEM_CACHE.lock().unwrap().get(collection).is_some() {
         // Collection already in the memory cache, use it
@@ -538,7 +546,7 @@ impl Plugin for Icons {
 
                 let icon = rest.strip_prefix('-').unwrap_or(rest);
 
-                #[cfg(not(target_arch = "wasm32"))]
+                #[cfg(not(any(target_arch = "wasm32", feature = "embed-icons")))]
                 fetch_or_cache_collection(context.config, collection);
 
                 #[cfg(target_arch = "wasm32")]
@@ -555,6 +563,19 @@ impl Plugin for Icons {
                     format_args!("width: 32px;"),
                     format_args!("height: 32px;"),
                 ]);
+
+                #[cfg(feature = "embed-icons")]
+                if let Some(content) = EMBEDDED_ICONS
+                    .get()
+                    .and_then(|i| i.get_file(format!("{collection}.json")))
+                    .and_then(|f| f.contents_utf8())
+                {
+                    MEM_CACHE.lock().unwrap().insert(
+                        collection,
+                        serde_json::from_str(&content)
+                            .expect("failed to deserialize the icon collection file as JSON"),
+                    );
+                }
 
                 #[cfg(not(target_arch = "wasm32"))]
                 if let Some(((width, height), icon_data_uri)) = get_icon(
@@ -592,6 +613,7 @@ impl Plugin for Icons {
     }
 }
 
+#[cfg(not(feature = "embed-icons"))]
 pub fn register(config: &mut Config) {
     let prefix = if let Some(icons_config) = config.extra.get("icons") {
         if let Some(table) = icons_config.as_table() {
@@ -613,6 +635,32 @@ pub fn register(config: &mut Config) {
         Cow::Borrowed("")
     };
 
+    config.register_plugin(prefix, &Icons);
+}
+
+#[cfg(feature = "embed-icons")]
+pub fn register(config: &mut Config, embedded_dir: include_dir::Dir<'static>) {
+    let prefix = if let Some(icons_config) = config.extra.get("icons") {
+        if let Some(table) = icons_config.as_table() {
+            if let Some(prefix_value) = table.get("prefix") {
+                if let Some(prefix) = prefix_value.as_str() {
+                    Cow::Owned(prefix.trim_end_matches('-').to_string())
+                } else {
+                    println!("Bad type for the `prefix` extra field (in the `icons` field): expected `String`, found `{}`. Using the default prefix instead.", prefix_value.type_str());
+                    Cow::Borrowed("")
+                }
+            } else {
+                Cow::Borrowed("")
+            }
+        } else {
+            println!("Bad type for the `icons` extra field: expected `Table`, found `{}`. Using the default prefix instead.", icons_config.type_str());
+            Cow::Borrowed("")
+        }
+    } else {
+        Cow::Borrowed("")
+    };
+
+    EMBEDDED_ICONS.set(embedded_dir).unwrap();
     config.register_plugin(prefix, &Icons);
 }
 
