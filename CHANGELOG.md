@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.15.0] - 2025-07-04
+
+### Documentation
+
+- Update readme to tell about the upgrade to TailwindCSS v4
+
+### Features
+
+- Add a Cargo feature to disable the filesystem cache
+- Support embedding icons in the binary
+
 ## [0.14.1] - 2024-09-01
 
 ### Bug Fixes

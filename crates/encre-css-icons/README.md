@@ -21,7 +21,7 @@ To integrate `encre-css-icons` with `encre-css`, add it in your `Cargo.toml`:
 
 ```toml
 [dependencies]
-encre-css-icons = "0.1.4"
+encre-css-icons = "0.2.0"
 ```
 
 Then, call the `register` function with a mutable reference to a `Config`
