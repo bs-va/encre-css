@@ -73,7 +73,7 @@ mod tests {
     fn space_between() {
         assert_eq!(
             generate(["space-x-42"], &base_config()),
-            ".space-x-42 > :not([hidden]) ~ :not([hidden]) {
+            ".space-x-42 > :not(:last-child) {
   --en-space-x-reverse: 0;
   margin-right: calc(10.5rem * var(--en-space-x-reverse));
   margin-left: calc(10.5rem * calc(1 - var(--en-space-x-reverse)));
@@ -81,7 +81,7 @@ mod tests {
         );
         assert_eq!(
             generate(["space-x-[42px]"], &base_config()),
-            r".space-x-\[42px\] > :not([hidden]) ~ :not([hidden]) {
+            r".space-x-\[42px\] > :not(:last-child) {
   --en-space-x-reverse: 0;
   margin-right: calc(42px * var(--en-space-x-reverse));
   margin-left: calc(42px * calc(1 - var(--en-space-x-reverse)));
@@ -89,19 +89,19 @@ mod tests {
         );
         assert_eq!(
             generate(["space-x-reverse"], &base_config()),
-            ".space-x-reverse > :not([hidden]) ~ :not([hidden]) {
+            ".space-x-reverse > :not(:last-child) {
   --en-space-x-reverse: 1;
 }"
         );
         assert_eq!(
             generate(["space-y-reverse"], &base_config()),
-            ".space-y-reverse > :not([hidden]) ~ :not([hidden]) {
+            ".space-y-reverse > :not(:last-child) {
   --en-space-y-reverse: 1;
 }"
         );
         assert_eq!(
             generate(["space-y-[12%]"], &base_config()),
-            r".space-y-\[12\%\] > :not([hidden]) ~ :not([hidden]) {
+            r".space-y-\[12\%\] > :not(:last-child) {
   --en-space-y-reverse: 0;
   margin-top: calc(12% * calc(1 - var(--en-space-y-reverse)));
   margin-bottom: calc(12% * var(--en-space-y-reverse));

@@ -50,7 +50,7 @@ impl Plugin for PluginXDefinition {
                         ]);
                     }
                 },
-                " > :not([hidden]) ~ :not([hidden])",
+                " > :not(:last-child)",
             );
         });
     }
@@ -108,7 +108,7 @@ impl Plugin for PluginYDefinition {
                         ]);
                     }
                 },
-                " > :not([hidden]) ~ :not([hidden])",
+                " > :not(:last-child)",
             );
         });
     }

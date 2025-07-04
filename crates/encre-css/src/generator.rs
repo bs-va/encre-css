@@ -380,7 +380,7 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r".space-x-2 > :not([hidden]) ~ :not([hidden]) {
+                r".space-x-2 > :not(:last-child) {
   --en-space-x-reverse: 0;
   margin-right: calc(0.5rem * var(--en-space-x-reverse));
   margin-left: calc(0.5rem * calc(1 - var(--en-space-x-reverse)));
@@ -401,7 +401,7 @@ mod tests {
   border-color: rgb(254 226 226 / var(--en-divide-opacity));
 }
 
-.hover\:space-x-1:hover > :not([hidden]) ~ :not([hidden]) {
+.hover\:space-x-1:hover > :not(:last-child) {
   --en-space-x-reverse: 0;
   margin-right: calc(0.25rem * var(--en-space-x-reverse));
   margin-left: calc(0.25rem * calc(1 - var(--en-space-x-reverse)));
@@ -415,7 +415,7 @@ mod tests {
   }
 }
 
-.\[\&\:has\(\.class\)_\>_\*\]\:space-y-3:has(.class) > * > :not([hidden]) ~ :not([hidden]) {
+.\[\&\:has\(\.class\)_\>_\*\]\:space-y-3:has(.class) > * > :not(:last-child) {
   --en-space-y-reverse: 0;
   margin-top: calc(0.75rem * calc(1 - var(--en-space-y-reverse)));
   margin-bottom: calc(0.75rem * var(--en-space-y-reverse));
@@ -490,7 +490,7 @@ mod tests {
   scroll-margin-top: -0.5rem;
 }
 
-.-space-x-2 > :not([hidden]) ~ :not([hidden]) {
+.-space-x-2 > :not(:last-child) {
   --en-space-x-reverse: 0;
   margin-right: calc(-0.5rem * var(--en-space-x-reverse));
   margin-left: calc(-0.5rem * calc(1 - var(--en-space-x-reverse)));
