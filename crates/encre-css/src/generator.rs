@@ -125,10 +125,12 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle)>(
     });
 
     if !selector.variants.is_empty() {
+        // Variants are applied from right to left
+        // (https://tailwindcss.com/docs/upgrade-guide#variant-stacking-order),
+        // so no need to reverse the variants
         selector
             .variants
             .iter()
-            .rev()
             .for_each(|variant| match variant {
                 Variant::Builtin(_, variant) => match variant {
                     VariantType::PseudoElement(element) => {
@@ -705,19 +707,19 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r#".marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection *::marker, .marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection::marker {
+                r#".marker\:selection\:hover\:bg-green-200 *::marker, .marker\:selection\:hover\:bg-green-200::marker *::selection, .marker\:selection\:hover\:bg-green-200 *::marker, .marker\:selection\:hover\:bg-green-200::marker::selection:hover {
   background-color: oklch(92.5% .084 155.995);
 }
 
-.file\:hover\:bg-pink-600:hover::file-selector-button, .file\:hover\:bg-pink-600:hover::-webkit-file-upload-button {
+.file\:hover\:bg-pink-600::file-selector-button, .file\:hover\:bg-pink-600::-webkit-file-upload-button:hover {
   background-color: oklch(59.2% .249 .584);
 }
 
-.hover\:file\:bg-pink-600::file-selector-button, .hover\:file\:bg-pink-600::-webkit-file-upload-button:hover {
+.hover\:file\:bg-pink-600:hover::file-selector-button, .hover\:file\:bg-pink-600:hover::-webkit-file-upload-button {
   background-color: oklch(59.2% .249 .584);
 }
 
-.focus\:hover\:bg-red-600:hover:focus {
+.focus\:hover\:bg-red-600:focus:hover {
   background-color: oklch(57.7% .245 27.325);
 }
 
@@ -726,7 +728,7 @@ mod tests {
 }
 
 @media (width >= 64rem) {
-  [dir="rtl"] .rtl\:active\:focus\:lg\:underline:focus:active {
+  [dir="rtl"] .rtl\:active\:focus\:lg\:underline:active:focus {
     -webkit-text-decoration-line: underline;
     text-decoration-line: underline;
   }
@@ -734,14 +736,14 @@ mod tests {
 
 @media print {
   @media (width >= 80rem) {
-    [dir="ltr"] .print\:ltr\:xl\:hover\:focus\:active\:text-yellow-300:active:focus:hover {
+    [dir="ltr"] .print\:ltr\:xl\:hover\:focus\:active\:text-yellow-300:hover:focus:active {
       color: oklch(90.5% .182 98.111);
     }
   }
 }
 
 @media (width >= 40rem) {
-  .sm\:before\:target\:content-\[\'Hello_world\!\'\]:target::before {
+  .sm\:before\:target\:content-\[\'Hello_world\!\'\]::before:target {
     --en-content: 'Hello world!';
     content: var(--en-content);
   }
@@ -754,7 +756,7 @@ mod tests {
 }
 
 @media (width >= 48rem) {
-  .md\:focus\:selection\:bg-blue-100 *::selection, .md\:focus\:selection\:bg-blue-100::selection:focus {
+  .md\:focus\:selection\:bg-blue-100:focus *::selection, .md\:focus\:selection\:bg-blue-100:focus::selection {
     background-color: oklch(93.2% .032 255.585);
   }
 }
@@ -762,7 +764,7 @@ mod tests {
 @media (width >= 96rem) {
   @media (prefers-reduced-motion: no-preference) {
     @media (orientation: landscape) {
-      [dir="rtl"] .\32xl\:motion-safe\:landscape\:focus-within\:visited\:first\:odd\:checked\:open\:rtl\:bg-purple-100[open]:checked:nth-child(odd):first-child:visited:focus-within {
+      [dir="rtl"] .\32xl\:motion-safe\:landscape\:focus-within\:visited\:first\:odd\:checked\:open\:rtl\:bg-purple-100:focus-within:visited:first-child:nth-child(odd):checked[open] {
         background-color: oklch(94.6% .033 307.174);
       }
     }
@@ -847,7 +849,7 @@ mod tests {
   background-color: oklch(62.3% .214 259.815);
 }
 
-.\[\&_\>_\*\]\:before\:content-\[\'hello-\'\]::before > * {
+.\[\&_\>_\*\]\:before\:content-\[\'hello-\'\] > *::before {
   --en-content: 'hello-';
   content: var(--en-content);
 }"
@@ -1119,6 +1121,34 @@ mod tests {
   .dark\:mt-px {
     margin-top: 1px;
   }
+}"
+            )
+        );
+
+        let mut config = base_config();
+        config.theme.dark_mode = DarkMode::new_class(".dark");
+
+        let generated = generate(["dark:mt-px"], &config);
+
+        assert_eq!(
+            generated,
+            String::from(
+                r".dark .dark\:mt-px {
+  margin-top: 1px;
+}"
+            )
+        );
+    }
+
+    #[test]
+    fn variant_ordering() {
+        let generated = generate(["*:first:text-green-400"], &base_config());
+
+        assert_eq!(
+            generated,
+            String::from(
+                r".\*\:first\:text-green-400 > *:first-child {
+  color: oklch(79.2% .209 151.711);
 }"
             )
         );
