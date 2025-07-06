@@ -30,24 +30,25 @@
   <br>
 
   <a href="https://gitlab.com/encre-org/encre-css">
-    <img alt="Number of files" src="https://tokei.ekzhang.com/b1/gitlab/encre-org/encre-css?category=files" />
+    <img alt="Number of files" src="https://tokei.rs/b1/gitlab/encre-org/encre-css?category=files" />
   </a>
 
   <a href="https://gitlab.com/encre-org/encre-css">
-    <img alt="Number of lines of code" src="https://tokei.ekzhang.com/b1/gitlab/encre-org/encre-css?category=code" />
+    <img alt="Number of lines of code" src="https://tokei.rs/b1/gitlab/encre-org/encre-css?category=code" />
   </a>
 
   <a href="https://gitlab.com/encre-org/encre-css">
-    <img alt="Number of lines of comments" src="https://tokei.ekzhang.com/b1/gitlab/encre-org/encre-css?category=comments" />
+    <img alt="Number of lines of comments" src="https://tokei.rs/b1/gitlab/encre-org/encre-css?category=comments" />
   </a>
 
   <a href="https://gitlab.com/encre-org/encre-css">
-    <img alt="Total number of lines" src="https://tokei.ekzhang.com/b1/gitlab/encre-org/encre-css" />
+    <img alt="Total number of lines" src="https://tokei.rs/b1/gitlab/encre-org/encre-css" />
   </a>
 </div>
 
-> Support for TailwindCSS v4 is in progress!
-> Follow this guide to know what changed: https://tailwindcss.com/docs/upgrade-guide
+> Since v0.16.0, this library only supports Tailwind v4.0.
+> If you used Tailwind v3.0, check the upgrade guide at
+> https://tailwindcss.com/docs/upgrade-guide or pin `encre-css` to v0.15.0.
 
 ## Table of contents
 
