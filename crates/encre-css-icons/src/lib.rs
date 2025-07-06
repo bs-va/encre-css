@@ -416,7 +416,7 @@ fn get_icon(
         1.
     };
     let formatted_width = format!("{}em", (width / height) * scale as f32);
-    let formatted_height = format!("{}em", scale);
+    let formatted_height = format!("{scale}em");
 
     let svg = {
         let body = if !before_transforms.is_empty() || !after_transforms.is_empty() {
@@ -506,7 +506,7 @@ fn fetch_or_cache_collection(config: &Config, collection: &'static str) {
         Cow::Borrowed(DEFAULT_CDN)
     };
 
-    let url = format!("{}/@iconify-json/{}/icons.json", custom_cdn, collection);
+    let url = format!("{custom_cdn}/@iconify-json/{collection}/icons.json");
 
     let content = ureq::get(&url)
         .call()

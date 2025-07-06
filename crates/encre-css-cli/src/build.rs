@@ -164,7 +164,7 @@ fn build_single<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, outpu
 }
 
 #[allow(clippy::too_many_lines)]
-fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Option<String>) {
+fn watch<T: AsRef<Path>>(config_file: &str, extra_input: Option<&T>, output: Option<&String>) {
     let (tx, rx) = channel();
 
     let mut debouncer = new_debouncer(
@@ -206,7 +206,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
 
     {
         // Initial generation
-        if let Some(ref glob_path) = *extra_input {
+        if let Some(ref glob_path) = extra_input.as_ref() {
             scan_path(glob_path, &mut buffer);
         }
 
@@ -244,7 +244,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
                         }
                     });
 
-                    let extra_input_files = if let Some(ref extra_input) = *extra_input {
+                    let extra_input_files = if let Some(ref extra_input) = extra_input.as_ref() {
                         let (prefix, glob) = match Glob::new(
                             extra_input
                                 .as_ref()
@@ -308,7 +308,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
                     if need_reloading {
                         buffer.clear();
 
-                        if let Some(ref glob_path) = *extra_input {
+                        if let Some(ref glob_path) = extra_input.as_ref() {
                             scan_path(glob_path, &mut buffer);
                         }
 
@@ -327,19 +327,19 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: &Option<T>, output: &Op
 }
 
 pub(crate) fn build<T: AsRef<Path>>(
-    config: &Option<String>,
+    config: Option<&String>,
     extra_input: Option<T>,
     output: Option<String>,
     need_watch: bool,
 ) {
-    let config_file = if let Some(ref config_file) = *config {
+    let config_file = if let Some(config_file) = config {
         config_file
     } else {
         DEFAULT_CONFIG_FILE
     };
 
     if need_watch {
-        watch(config_file, &extra_input, &output);
+        watch(config_file, extra_input.as_ref(), output.as_ref());
     } else {
         build_single(config_file, extra_input, output);
     }

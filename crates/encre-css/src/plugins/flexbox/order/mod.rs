@@ -8,7 +8,7 @@ pub(crate) struct PluginDefinition;
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         matches!(context.modifier, Modifier::Builtin { value, .. } if ["first", "last", "none"].contains(&&**value)
-                    || value.parse::<usize>().map_or(false, |v| v != 0))
+                    || value.parse::<usize>().is_ok_and(|v| v != 0))
     }
 
     fn handle(&self, context: &mut ContextHandle) {

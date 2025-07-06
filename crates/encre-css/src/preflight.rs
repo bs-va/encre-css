@@ -54,8 +54,8 @@ use std::borrow::Cow;
 
 const DEFAULT_FONT_FEATURE_SETTINGS: &str = "normal";
 const DEFAULT_FONT_VARIATION_SETTINGS: &str = "normal";
-const DEFAULT_FONT_FAMILY_SANS: &str = r#"ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'"#;
-const DEFAULT_FONT_FAMILY_MONO: &str = r#"ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace"#;
+const DEFAULT_FONT_FAMILY_SANS: &str = "ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'";
+const DEFAULT_FONT_FAMILY_MONO: &str = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace";
 
 const DEFAULT_PREFLIGHT: &str = concat!(
     /*

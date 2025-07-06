@@ -33,7 +33,7 @@ enum Shadow<'a> {
     },
 }
 
-impl<'a> Shadow<'a> {
+impl Shadow<'_> {
     fn new_raw() -> Self {
         Self::Raw([""; 6])
     }
@@ -127,7 +127,7 @@ impl<'a> Shadow<'a> {
     }
 }
 
-impl<'a> fmt::Display for Shadow<'a> {
+impl fmt::Display for Shadow<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Shadow::Raw(s) => write!(f, "{}", s.join(" ")),
@@ -278,7 +278,7 @@ impl<'a> ShadowList<'a> {
     }
 }
 
-impl<'a> fmt::Display for ShadowList<'a> {
+impl fmt::Display for ShadowList<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for (i, v) in self.0.iter().enumerate() {
             write!(f, "{}{}", v, if i == self.0.len() - 1 { "" } else { "," })?;

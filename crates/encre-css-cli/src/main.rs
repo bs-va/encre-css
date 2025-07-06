@@ -93,7 +93,7 @@ fn main() -> Result<(), Report> {
             input: extra_input,
             output,
             watch,
-        } => build(&config, extra_input, output, watch),
+        } => build(config.as_ref(), extra_input, output, watch),
     }
 
     Ok(())

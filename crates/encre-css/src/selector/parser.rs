@@ -515,7 +515,7 @@ fn parse_modifier(mut modifier: &str, is_negative: bool) -> Option<Modifier> {
     }
 
     if let Some((prefix, mut value)) = modifier.split_once(ARBITRARY_START) {
-        if value.chars().last().map_or(false, |v| v == ARBITRARY_END) {
+        if value.chars().last().is_some_and(|v| v == ARBITRARY_END) {
             value = &value[..value.len() - 1];
         } else {
             return None;

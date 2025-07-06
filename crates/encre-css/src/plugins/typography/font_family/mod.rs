@@ -17,7 +17,7 @@ impl Plugin for PluginDefinition {
                             v.is_empty()
                                 || v.chars()
                                     .next()
-                                    .map_or(true, |ch| !ch.is_ascii_digit())
+                                    .is_some_and(|ch| !ch.is_ascii_digit())
                         }))
             }
         }

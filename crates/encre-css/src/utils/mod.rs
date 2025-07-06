@@ -51,6 +51,7 @@ impl Pattern for char {
 
 impl Pattern for &[char] {
     fn is_matching(&self, val: char) -> bool {
+        #[allow(clippy::manual_contains)]
         self.iter().any(|ch| val == *ch)
     }
 }
@@ -305,7 +306,7 @@ pub fn check_selectors<'a>(val: &'a str, config: &Config) -> Vec<ParseError<'a>>
         })
         .filter(|(_, v)| !v.is_empty())
         .flat_map(|(span, v)| parse(v.trim(), Some(span), None, config, &config_derived_variants))
-        .filter_map(|s| if let Err(e) = s { Some(e) } else { None })
+        .filter_map(Result::err)
         .collect::<Vec<ParseError>>()
 }
 

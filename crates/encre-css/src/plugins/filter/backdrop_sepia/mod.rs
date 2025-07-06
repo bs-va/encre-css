@@ -20,7 +20,7 @@ impl Plugin for PluginDefinition {
                     "--en-backdrop-sepia: sepia({});",
                     value.parse::<usize>().unwrap() as f32 / 100.
                 )),
-            };
+            }
 
             context.buffer.lines(CSS_BACKDROP_FILTER);
         }

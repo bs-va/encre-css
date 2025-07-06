@@ -12,13 +12,13 @@ impl Plugin for PluginDefinition {
                 *value == "auto"
                     || value
                         .strip_prefix("span-")
-                        .map_or(false, |v| v == "full" || v.parse::<usize>().is_ok())
+                        .is_some_and(|v| v == "full" || v.parse::<usize>().is_ok())
                     || value
                         .strip_prefix("start-")
-                        .map_or(false, |v| v == "auto" || v.parse::<usize>().is_ok())
+                        .is_some_and(|v| v == "auto" || v.parse::<usize>().is_ok())
                     || value
                         .strip_prefix("end-")
-                        .map_or(false, |v| v == "auto" || v.parse::<usize>().is_ok())
+                        .is_some_and(|v| v == "auto" || v.parse::<usize>().is_ok())
             }
             Modifier::Arbitrary { value, .. } => is_matching_all(value),
         }

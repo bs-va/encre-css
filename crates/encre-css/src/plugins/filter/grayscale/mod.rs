@@ -20,7 +20,7 @@ impl Plugin for PluginDefinition {
                     "--en-grayscale: grayscale({});",
                     value.parse::<usize>().unwrap() as f32 / 100.
                 )),
-            };
+            }
 
             context.buffer.line(CSS_FILTER);
         }

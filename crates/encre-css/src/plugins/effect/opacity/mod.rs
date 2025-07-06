@@ -7,7 +7,7 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        matches!(context.modifier, Modifier::Builtin { value, .. } if value.parse::<usize>().map_or(false, |v| v <= 100))
+        matches!(context.modifier, Modifier::Builtin { value, .. } if value.parse::<usize>().is_ok_and(|v| v <= 100))
     }
 
     fn handle(&self, context: &mut ContextHandle) {

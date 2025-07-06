@@ -45,7 +45,7 @@
 //!    if hovered;
 //! 2. The **namespace** (basically the name of the plugin), in this case `bg` for changing the background;
 //! 3. The **[modifier](crate::selector::Modifier)** (used to clarify the CSS needed to be generated), in this case the
-//!       background color will become `rgb(239 68 68)` (see [`BUILTIN_COLORS`]).
+//!    background color will become `rgb(239 68 68)` (see [`BUILTIN_COLORS`]).
 //!
 //! <p class="with-hints" style="margin-top: 3rem;"><b><span style="counter-set: hints 3;">[&>*]</span><span>:</span><span style="counter-set: hints 4;">[@supports_(display:flex)]</span><span>:</span><span style="counter-set: hints 1;">flex</span><span>-</span><span style="counter-set: hints 5;">[2_2_10%]</span></b></p>
 //!
@@ -211,7 +211,7 @@ pub(crate) enum Variant<'a> {
     Arbitrary(Cow<'a, str>),
 }
 
-impl<'a> PartialEq for Variant<'a> {
+impl PartialEq for Variant<'_> {
     fn eq(&self, other: &Self) -> bool {
         // Does not test order because it can change
         match (self, other) {
@@ -236,7 +236,7 @@ pub(crate) struct Selector<'a> {
 }
 
 #[cfg(not(test))]
-impl<'a> PartialEq for Selector<'a> {
+impl PartialEq for Selector<'_> {
     fn eq(&self, other: &Self) -> bool {
         self.full == other.full
     }
@@ -244,7 +244,7 @@ impl<'a> PartialEq for Selector<'a> {
 
 // Use a stricter implementation when testing
 #[cfg(test)]
-impl<'a> PartialEq for Selector<'a> {
+impl PartialEq for Selector<'_> {
     fn eq(&self, other: &Self) -> bool {
         // Does not test order because it can change
         self.full == other.full
@@ -254,15 +254,15 @@ impl<'a> PartialEq for Selector<'a> {
     }
 }
 
-impl<'a> Eq for Selector<'a> {}
+impl Eq for Selector<'_> {}
 
-impl<'a> PartialOrd for Selector<'a> {
+impl PartialOrd for Selector<'_> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl<'a> Ord for Selector<'a> {
+impl Ord for Selector<'_> {
     fn cmp(&self, other: &Self) -> Ordering {
         if self.variants.is_empty() && !other.variants.is_empty() {
             Ordering::Less

@@ -5,7 +5,7 @@ use crate::prelude::build_plugin::*;
 
 fn skew_can_handle(context: &ContextCanHandle) -> bool {
     match context.modifier {
-        Modifier::Builtin { value, .. } => value.parse::<usize>().map_or(false, |v| v <= 360),
+        Modifier::Builtin { value, .. } => value.parse::<usize>().is_ok_and(|v| v <= 360),
         Modifier::Arbitrary { value, .. } => is_matching_angle(value),
     }
 }

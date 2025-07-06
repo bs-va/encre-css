@@ -9,7 +9,7 @@ use std::borrow::Cow;
 pub fn is_matching_builtin_spacing(value: &str) -> bool {
     value == "px"
         || value.parse::<f64>().is_ok()
-        || value.split_once('/').map_or(false, |(a, b)| {
+        || value.split_once('/').is_some_and(|(a, b)| {
             a.parse::<usize>().is_ok() && b.parse::<usize>().is_ok()
         })
 }

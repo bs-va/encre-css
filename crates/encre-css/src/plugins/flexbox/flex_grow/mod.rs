@@ -12,11 +12,10 @@ impl Plugin for PluginDefinition {
 
     fn handle(&self, context: &mut ContextHandle) {
         if let Modifier::Builtin { value, .. } = context.modifier {
-            #[allow(clippy::cast_precision_loss)]
             match *value {
                 "" => context.buffer.line("flex-grow: 1;"),
                 _ => context.buffer.line(format_args!("flex-grow: {value};")),
-            };
+            }
         }
     }
 }

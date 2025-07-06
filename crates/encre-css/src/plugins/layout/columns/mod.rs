@@ -7,7 +7,7 @@ pub(crate) struct PluginDefinition;
 
 impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
-        matches!(context.modifier, Modifier::Builtin { value, .. } if value.parse::<usize>().map_or(false, |v| v <= 12)
+        matches!(context.modifier, Modifier::Builtin { value, .. } if value.parse::<usize>().is_ok_and(|v| v <= 12)
             || [
                 "auto", "3xs", "2xs", "xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl",
                 "5xl", "6xl", "7xl",
