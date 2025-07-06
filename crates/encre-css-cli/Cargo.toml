@@ -17,9 +17,9 @@ path = "src/main.rs"
 [dependencies]
 encre-css = { path = "../encre-css", version = "0.15.0" }
 clap = { version = "4.0.18", features = ["derive"] }
-notify-debouncer-mini = "0.4.1"
-rand = "0.8.5"
+notify-debouncer-mini = "0.6.0"
+rand = "0.9.1"
 wax = "0.6.0"
-color-eyre = "0.6.1"
-toml = "0.8.8"
-serde = { version = "1.0.137", features = ["derive"] }
+color-eyre = "0.6.5"
+toml = "0.8.23"
+serde = { version = "1.0.219", features = ["derive"] }

@@ -16,7 +16,7 @@ rosa-500 = "#e5186a"
 yellow-400 = "#ffef0e"
 
 [theme.aria]
-current = "current=\"page\""
+current = 'current="page"'
 
 [preflight]
 type = "none"

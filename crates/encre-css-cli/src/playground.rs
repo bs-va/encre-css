@@ -1,6 +1,6 @@
 use crate::DEFAULT_CONFIG_FILE;
 
-use rand::distributions::{Alphanumeric, DistString};
+use rand::distr::{Alphanumeric, SampleString};
 use std::{fs, path::PathBuf};
 
 const RANDOM_NAME_LENGTH: usize = 10;
@@ -25,7 +25,7 @@ pub fn launch(name: Option<String>) {
     let name = name.unwrap_or_else(|| {
         format!(
             "playground-{}",
-            Alphanumeric.sample_string(&mut rand::thread_rng(), RANDOM_NAME_LENGTH)
+            Alphanumeric.sample_string(&mut rand::rng(), RANDOM_NAME_LENGTH)
         )
     });
     let dir_path = PathBuf::from(&name);

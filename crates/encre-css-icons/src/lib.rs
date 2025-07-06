@@ -511,7 +511,8 @@ fn fetch_or_cache_collection(config: &Config, collection: &'static str) {
     let content = ureq::get(&url)
         .call()
         .unwrap_or_else(|_| panic!("failed to get the response from `{url}`"))
-        .into_string()
+        .body_mut()
+        .read_to_string()
         .expect("failed to deserialize the response body as JSON");
 
     #[cfg(feature = "fs-cache")]
