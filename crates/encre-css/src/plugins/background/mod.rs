@@ -104,7 +104,7 @@ mod tests {
         assert_eq!(
             generate(["bg-gradient-to-b"], &base_config()),
             ".bg-gradient-to-b {
-  background-image: linear-gradient(to bottom, var(--en-gradient-stops));
+  background-image: linear-gradient(to bottom in oklab, var(--en-gradient-stops));
 }"
         );
         assert_eq!(

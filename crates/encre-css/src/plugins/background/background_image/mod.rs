@@ -32,27 +32,27 @@ impl Plugin for PluginDefinition {
                 "none" => context.buffer.line("background-image: none;"),
                 "gradient-to-t" => context
                     .buffer
-                    .line("background-image: linear-gradient(to top, var(--en-gradient-stops));"),
+                    .line("background-image: linear-gradient(to top in oklab, var(--en-gradient-stops));"),
                 "gradient-to-tr" => context.buffer.line(
-                    "background-image: linear-gradient(to top right, var(--en-gradient-stops));",
+                    "background-image: linear-gradient(to top right in oklab, var(--en-gradient-stops));",
                 ),
                 "gradient-to-r" => context
                     .buffer
-                    .line("background-image: linear-gradient(to right, var(--en-gradient-stops));"),
+                    .line("background-image: linear-gradient(to right in oklab, var(--en-gradient-stops));"),
                 "gradient-to-br" => context.buffer.line(
-                    "background-image: linear-gradient(to bottom right, var(--en-gradient-stops));",
+                    "background-image: linear-gradient(to bottom right in oklab, var(--en-gradient-stops));",
                 ),
                 "gradient-to-b" => context.buffer.line(
-                    "background-image: linear-gradient(to bottom, var(--en-gradient-stops));",
+                    "background-image: linear-gradient(to bottom in oklab, var(--en-gradient-stops));",
                 ),
                 "gradient-to-bl" => context.buffer.line(
-                    "background-image: linear-gradient(to bottom left, var(--en-gradient-stops));",
+                    "background-image: linear-gradient(to bottom left in oklab, var(--en-gradient-stops));",
                 ),
                 "gradient-to-l" => context
                     .buffer
-                    .line("background-image: linear-gradient(to left, var(--en-gradient-stops));"),
+                    .line("background-image: linear-gradient(to left in oklab, var(--en-gradient-stops));"),
                 "gradient-to-tl" => context.buffer.line(
-                    "background-image: linear-gradient(to top left, var(--en-gradient-stops));",
+                    "background-image: linear-gradient(to top left in oklab, var(--en-gradient-stops));",
                 ),
                 _ => unreachable!(),
             },
