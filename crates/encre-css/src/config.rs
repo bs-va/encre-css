@@ -1014,6 +1014,7 @@ pub const BUILTIN_PLUGINS: &[(Cow<'static, str>, &'static (dyn Plugin + Send + S
     (Cow::Borrowed("will-change"), &interactivity::will_change::PluginDefinition),
     (Cow::Borrowed("content"), &typography::content::PluginDefinition),
     (Cow::Borrowed("line-clamp"), &typography::line_clamp::PluginDefinition),
+    (Cow::Borrowed("@container"), &layout::at_container::PluginDefinition),
 ];
 
 /// Configuration for the [`Theme::dark_mode`] field.

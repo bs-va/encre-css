@@ -19,6 +19,7 @@ pub mod placement;
 pub mod position;
 pub mod visibility;
 pub mod z_index;
+pub mod at_container;
 
 #[cfg(test)]
 mod tests {
@@ -403,6 +404,22 @@ mod tests {
             generate(["z-22"], &base_config()),
             ".z-22 {
   z-index: 22;
+}"
+        );
+    }
+
+    #[test]
+    fn at_container() {
+        assert_eq!(
+            generate(["@container @md:bg-red-300"], &base_config()),
+            ".\\@container {
+  container-type: inline-size;
+}
+
+@container (width >= 28rem) {
+  .\\@md\\:bg-red-300 {
+    background-color: oklch(80.8% .114 19.571);
+  }
 }"
         );
     }
