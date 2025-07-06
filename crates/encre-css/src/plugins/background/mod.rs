@@ -3,7 +3,6 @@ pub mod background_attachment;
 pub mod background_clip;
 pub mod background_color;
 pub mod background_image;
-pub mod background_opacity;
 pub mod background_origin;
 pub mod background_position;
 pub mod background_repeat;
@@ -141,22 +140,6 @@ mod tests {
             generate(["bg-[purple]"], &base_config()),
             r".bg-\[purple\] {
   background-color: purple;
-}"
-        );
-    }
-
-    #[test]
-    fn background_opacity() {
-        assert_eq!(
-            generate(["bg-red-400/12"], &base_config()),
-            r".bg-red-400\/12 {
-  background-color: rgb(248 113 113 / 0.12);
-}"
-        );
-        assert_eq!(
-            generate(["bg-opacity-12"], &base_config()),
-            ".bg-opacity-12 {
-  --en-bg-opacity: 0.12;
 }"
         );
     }

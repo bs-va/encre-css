@@ -387,7 +387,6 @@ const DEFAULT_PREFLIGHT: &str = concat!(
   --en-backdrop-grayscale: ;
   --en-backdrop-hue-rotate: ;
   --en-backdrop-invert: ;
-  --en-backdrop-opacity: ;
   --en-backdrop-saturate: ;
   --en-backdrop-sepia: ;
 }
@@ -434,7 +433,6 @@ const DEFAULT_PREFLIGHT: &str = concat!(
   --en-backdrop-grayscale: ;
   --en-backdrop-hue-rotate: ;
   --en-backdrop-invert: ;
-  --en-backdrop-opacity: ;
   --en-backdrop-saturate: ;
   --en-backdrop-sepia: ;
 }
@@ -481,7 +479,6 @@ const DEFAULT_PREFLIGHT: &str = concat!(
   --en-backdrop-grayscale: ;
   --en-backdrop-hue-rotate: ;
   --en-backdrop-invert: ;
-  --en-backdrop-opacity: ;
   --en-backdrop-saturate: ;
   --en-backdrop-sepia: ;
 }"#
@@ -968,7 +965,6 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   --en-backdrop-grayscale: ;
   --en-backdrop-hue-rotate: ;
   --en-backdrop-invert: ;
-  --en-backdrop-opacity: ;
   --en-backdrop-saturate: ;
   --en-backdrop-sepia: ;
 }
@@ -1015,7 +1011,6 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   --en-backdrop-grayscale: ;
   --en-backdrop-hue-rotate: ;
   --en-backdrop-invert: ;
-  --en-backdrop-opacity: ;
   --en-backdrop-saturate: ;
   --en-backdrop-sepia: ;
 }
@@ -1062,7 +1057,6 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   --en-backdrop-grayscale: ;
   --en-backdrop-hue-rotate: ;
   --en-backdrop-invert: ;
-  --en-backdrop-opacity: ;
   --en-backdrop-saturate: ;
   --en-backdrop-sepia: ;
 }

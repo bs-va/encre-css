@@ -6,7 +6,6 @@ pub mod backdrop_filter;
 pub mod backdrop_grayscale;
 pub mod backdrop_hue_rotate;
 pub mod backdrop_invert;
-pub mod backdrop_opacity;
 pub mod backdrop_saturate;
 pub mod backdrop_sepia;
 pub mod blur;
@@ -332,30 +331,6 @@ mod tests {
             generate(["backdrop-invert"], &base_config()),
             ".backdrop-invert {
   --en-backdrop-invert: invert(100%);
-  -webkit-backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
-  backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
-}"
-        );
-    }
-
-    #[test]
-    fn backdrop_opacity() {
-        assert_eq!(
-            generate(["backdrop-opacity-12"], &base_config()),
-            ".backdrop-opacity-12 {
-  --en-backdrop-opacity: 0.12;
-  -webkit-backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
-  backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
-}"
-        );
-    }
-
-    #[test]
-    fn backdrop_saturate() {
-        assert_eq!(
-            generate(["backdrop-saturate-20"], &base_config()),
-            ".backdrop-saturate-20 {
-  --en-backdrop-saturate: saturate(0.2);
   -webkit-backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
   backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
 }"

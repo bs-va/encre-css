@@ -18,7 +18,6 @@ pub mod text_decoration_color;
 pub mod text_decoration_style;
 pub mod text_decoration_thickness;
 pub mod text_indent;
-pub mod text_opacity;
 pub mod text_overflow;
 pub mod text_transform;
 pub mod text_underline_offset;
@@ -693,22 +692,6 @@ mod tests {
             generate(["indent-[20px]"], &base_config()),
             r".indent-\[20px\] {
   text-indent: 20px;
-}"
-        );
-    }
-
-    #[test]
-    fn text_opacity() {
-        assert_eq!(
-            generate(["text-red-400/12"], &base_config()),
-            r".text-red-400\/12 {
-  color: rgb(248 113 113 / 0.12);
-}"
-        );
-        assert_eq!(
-            generate(["text-opacity-12"], &base_config()),
-            ".text-opacity-12 {
-  --en-text-opacity: 0.12;
 }"
         );
     }

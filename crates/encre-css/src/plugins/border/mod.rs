@@ -1,11 +1,9 @@
 //! Border utilities
 pub mod border_color;
-pub mod border_opacity;
 pub mod border_radius;
 pub mod border_style;
 pub mod border_width;
 pub mod divide_color;
-pub mod divide_opacity;
 pub mod divide_style;
 pub mod divide_width;
 pub mod outline_color;
@@ -15,7 +13,6 @@ pub mod outline_width;
 pub mod ring_color;
 pub mod ring_offset_color;
 pub mod ring_offset_width;
-pub mod ring_opacity;
 pub mod ring_width;
 
 #[cfg(test)]
@@ -57,22 +54,6 @@ mod tests {
             generate(["border-e-blue-400/10"], &base_config()),
             r".border-e-blue-400\/10 {
   border-inline-end-color: rgb(96 165 250 / 0.1);
-}"
-        );
-    }
-
-    #[test]
-    fn border_opacity() {
-        assert_eq!(
-            generate(["border-red-400/12"], &base_config()),
-            r".border-red-400\/12 {
-  border-color: rgb(248 113 113 / 0.12);
-}"
-        );
-        assert_eq!(
-            generate(["border-opacity-12"], &base_config()),
-            ".border-opacity-12 {
-  --en-border-opacity: 0.12;
 }"
         );
     }
@@ -271,23 +252,6 @@ mod tests {
     }
 
     #[test]
-    fn divide_opacity() {
-        assert_eq!(
-            generate(["divide-red-400/42"], &base_config()),
-            r".divide-red-400\/42 > :not([hidden]) ~ :not([hidden]) {
-  border-color: rgb(248 113 113 / 0.42);
-}"
-        );
-
-        assert_eq!(
-            generate(["divide-opacity-42"], &base_config()),
-            ".divide-opacity-42 > :not([hidden]) ~ :not([hidden]) {
-  --en-divide-opacity: 0.42;
-}"
-        );
-    }
-
-    #[test]
     fn divide_width() {
         assert_eq!(
             generate(["divide-x"], &base_config()),
@@ -435,23 +399,6 @@ mod tests {
             generate(["ring-[rgb(12,12,12)]"], &base_config()),
             r".ring-\[rgb\(12\,12\,12\)\] {
   --en-ring-color: rgb(12,12,12);
-}"
-        );
-    }
-
-    #[test]
-    fn ring_opacity() {
-        assert_eq!(
-            generate(["ring-red-400/42"], &base_config()),
-            r".ring-red-400\/42 {
-  --en-ring-color: rgb(248 113 113 / 0.42);
-}"
-        );
-
-        assert_eq!(
-            generate(["ring-opacity-42"], &base_config()),
-            ".ring-opacity-42 {
-  --en-ring-opacity: 0.42;
 }"
         );
     }
