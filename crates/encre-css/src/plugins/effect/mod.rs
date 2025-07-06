@@ -74,7 +74,7 @@ mod tests {
         assert_eq!(
             generate(["shadow-red-400"], &base_config()),
             ".shadow-red-400 {
-  --en-shadow-color: rgb(248 113 113);
+  --en-shadow-color: oklch(70.4% .191 22.216);
   --en-shadow: var(--en-shadow-colored);
 }"
         );

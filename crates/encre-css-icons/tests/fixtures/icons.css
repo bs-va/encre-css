@@ -370,8 +370,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 }
 
 .text-zinc-600 {
-  --en-text-opacity: 1;
-  color: rgb(82 82 91 / var(--en-text-opacity));
+  color: oklch(44.2% .017 285.786);
 }
 
 .hover\:i-openmoji-autonomous-car:hover {

@@ -28,8 +28,7 @@
 //!
 //! assert!(generated.ends_with(r#"@media (min-width: 640px) {
 //!   .dark .tablet\:dark\:bg-primary {
-//!     --en-bg-opacity: 1;
-//!     background-color: rgb(211 25 140 / var(--en-bg-opacity));
+//!     background-color: #d3198c;
 //!   }
 //! }"#));
 //! ```
@@ -73,451 +72,499 @@ use std::{
 ///         </tr>
 ///     </thead>
 ///     <tbody>
-///         <tr><td>slate-50</td><td>rgb(248 250 252)</td><td style="background-color: rgb(248 250 252);"></td></tr>
-///         <tr><td>slate-100</td><td>rgb(241 245 249)</td><td style="background-color: rgb(241 245 249);"></td></tr>
-///         <tr><td>slate-200</td><td>rgb(226 232 240)</td><td style="background-color: rgb(226 232 240);"></td></tr>
-///         <tr><td>slate-300</td><td>rgb(203 213 225)</td><td style="background-color: rgb(203 213 225);"></td></tr>
-///         <tr><td>slate-400</td><td>rgb(148 163 184)</td><td style="background-color: rgb(148 163 184);"></td></tr>
-///         <tr><td>slate-500</td><td>rgb(100 116 139)</td><td style="background-color: rgb(100 116 139);"></td></tr>
-///         <tr><td>slate-600</td><td>rgb(71 85 105)</td><td style="background-color: rgb(71 85 105);"></td></tr>
-///         <tr><td>slate-700</td><td>rgb(51 65 85)</td><td style="background-color: rgb(51 65 85);"></td></tr>
-///         <tr><td>slate-800</td><td>rgb(30 41 59)</td><td style="background-color: rgb(30 41 59);"></td></tr>
-///         <tr><td>slate-900</td><td>rgb(15 23 42)</td><td style="background-color: rgb(15 23 42);"></td></tr>
-///         <tr><td>gray-50</td><td>rgb(249 250 251)</td><td style="background-color: rgb(249 250 251);"></td></tr>
-///         <tr><td>gray-100</td><td>rgb(243 244 246)</td><td style="background-color: rgb(243 244 246);"></td></tr>
-///         <tr><td>gray-200</td><td>rgb(229 231 235)</td><td style="background-color: rgb(229 231 235);"></td></tr>
-///         <tr><td>gray-300</td><td>rgb(209 213 219)</td><td style="background-color: rgb(209 213 219);"></td></tr>
-///         <tr><td>gray-400</td><td>rgb(156 163 175)</td><td style="background-color: rgb(156 163 175);"></td></tr>
-///         <tr><td>gray-500</td><td>rgb(107 114 128)</td><td style="background-color: rgb(107 114 128);"></td></tr>
-///         <tr><td>gray-600</td><td>rgb(75 85 99)</td><td style="background-color: rgb(75 85 99);"></td></tr>
-///         <tr><td>gray-700</td><td>rgb(55 65 81)</td><td style="background-color: rgb(55 65 81);"></td></tr>
-///         <tr><td>gray-800</td><td>rgb(31 41 55)</td><td style="background-color: rgb(31 41 55);"></td></tr>
-///         <tr><td>gray-900</td><td>rgb(17 24 39)</td><td style="background-color: rgb(17 24 39);"></td></tr>
-///         <tr><td>zinc-50</td><td>rgb(250 250 250)</td><td style="background-color: rgb(250 250 250);"></td></tr>
-///         <tr><td>zinc-100</td><td>rgb(244 244 245)</td><td style="background-color: rgb(244 244 245);"></td></tr>
-///         <tr><td>zinc-200</td><td>rgb(228 228 231)</td><td style="background-color: rgb(228 228 231);"></td></tr>
-///         <tr><td>zinc-300</td><td>rgb(212 212 216)</td><td style="background-color: rgb(212 212 216);"></td></tr>
-///         <tr><td>zinc-400</td><td>rgb(161 161 170)</td><td style="background-color: rgb(161 161 170);"></td></tr>
-///         <tr><td>zinc-500</td><td>rgb(113 113 122)</td><td style="background-color: rgb(113 113 122);"></td></tr>
-///         <tr><td>zinc-600</td><td>rgb(82 82 91)</td><td style="background-color: rgb(82 82 91);"></td></tr>
-///         <tr><td>zinc-700</td><td>rgb(63 63 70)</td><td style="background-color: rgb(63 63 70);"></td></tr>
-///         <tr><td>zinc-800</td><td>rgb(39 39 42)</td><td style="background-color: rgb(39 39 42);"></td></tr>
-///         <tr><td>zinc-900</td><td>rgb(24 24 27)</td><td style="background-color: rgb(24 24 27);"></td></tr>
-///         <tr><td>neutral-50</td><td>rgb(250 250 250)</td><td style="background-color: rgb(250 250 250);"></td></tr>
-///         <tr><td>neutral-100</td><td>rgb(245 245 245)</td><td style="background-color: rgb(245 245 245);"></td></tr>
-///         <tr><td>neutral-200</td><td>rgb(229 229 229)</td><td style="background-color: rgb(229 229 229);"></td></tr>
-///         <tr><td>neutral-300</td><td>rgb(212 212 212)</td><td style="background-color: rgb(212 212 212);"></td></tr>
-///         <tr><td>neutral-400</td><td>rgb(163 163 163)</td><td style="background-color: rgb(163 163 163);"></td></tr>
-///         <tr><td>neutral-500</td><td>rgb(115 115 115)</td><td style="background-color: rgb(115 115 115);"></td></tr>
-///         <tr><td>neutral-600</td><td>rgb(82 82 82)</td><td style="background-color: rgb(82 82 82);"></td></tr>
-///         <tr><td>neutral-700</td><td>rgb(64 64 64)</td><td style="background-color: rgb(64 64 64);"></td></tr>
-///         <tr><td>neutral-800</td><td>rgb(38 38 38)</td><td style="background-color: rgb(38 38 38);"></td></tr>
-///         <tr><td>neutral-900</td><td>rgb(23 23 23)</td><td style="background-color: rgb(23 23 23);"></td></tr>
-///         <tr><td>stone-50</td><td>rgb(250 250 249)</td><td style="background-color: rgb(250 250 249);"></td></tr>
-///         <tr><td>stone-100</td><td>rgb(245 245 244)</td><td style="background-color: rgb(245 245 244);"></td></tr>
-///         <tr><td>stone-200</td><td>rgb(231 229 228)</td><td style="background-color: rgb(231 229 228);"></td></tr>
-///         <tr><td>stone-300</td><td>rgb(214 211 209)</td><td style="background-color: rgb(214 211 209);"></td></tr>
-///         <tr><td>stone-400</td><td>rgb(168 162 158)</td><td style="background-color: rgb(168 162 158);"></td></tr>
-///         <tr><td>stone-500</td><td>rgb(120 113 108)</td><td style="background-color: rgb(120 113 108);"></td></tr>
-///         <tr><td>stone-600</td><td>rgb(87 83 78)</td><td style="background-color: rgb(87 83 78);"></td></tr>
-///         <tr><td>stone-700</td><td>rgb(68 64 60)</td><td style="background-color: rgb(68 64 60);"></td></tr>
-///         <tr><td>stone-800</td><td>rgb(41 37 36)</td><td style="background-color: rgb(41 37 36);"></td></tr>
-///         <tr><td>stone-900</td><td>rgb(28 25 23)</td><td style="background-color: rgb(28 25 23);"></td></tr>
-///         <tr><td>red-50</td><td>rgb(254 242 242)</td><td style="background-color: rgb(254 242 242);"></td></tr>
-///         <tr><td>red-100</td><td>rgb(254 226 226)</td><td style="background-color: rgb(254 226 226);"></td></tr>
-///         <tr><td>red-200</td><td>rgb(254 202 202)</td><td style="background-color: rgb(254 202 202);"></td></tr>
-///         <tr><td>red-300</td><td>rgb(252 165 165)</td><td style="background-color: rgb(252 165 165);"></td></tr>
-///         <tr><td>red-400</td><td>rgb(248 113 113)</td><td style="background-color: rgb(248 113 113);"></td></tr>
-///         <tr><td>red-500</td><td>rgb(239 68 68)</td><td style="background-color: rgb(239 68 68);"></td></tr>
-///         <tr><td>red-600</td><td>rgb(220 38 38)</td><td style="background-color: rgb(220 38 38);"></td></tr>
-///         <tr><td>red-700</td><td>rgb(185 28 28)</td><td style="background-color: rgb(185 28 28);"></td></tr>
-///         <tr><td>red-800</td><td>rgb(153 27 27)</td><td style="background-color: rgb(153 27 27);"></td></tr>
-///         <tr><td>red-900</td><td>rgb(127 29 29)</td><td style="background-color: rgb(127 29 29);"></td></tr>
-///         <tr><td>orange-50</td><td>rgb(255 247 237)</td><td style="background-color: rgb(255 247 237);"></td></tr>
-///         <tr><td>orange-100</td><td>rgb(255 237 213)</td><td style="background-color: rgb(255 237 213);"></td></tr>
-///         <tr><td>orange-200</td><td>rgb(254 215 170)</td><td style="background-color: rgb(254 215 170);"></td></tr>
-///         <tr><td>orange-300</td><td>rgb(253 186 116)</td><td style="background-color: rgb(253 186 116);"></td></tr>
-///         <tr><td>orange-400</td><td>rgb(251 146 60)</td><td style="background-color: rgb(251 146 60);"></td></tr>
-///         <tr><td>orange-500</td><td>rgb(249 115 22)</td><td style="background-color: rgb(249 115 22);"></td></tr>
-///         <tr><td>orange-600</td><td>rgb(234 88 12)</td><td style="background-color: rgb(234 88 12);"></td></tr>
-///         <tr><td>orange-700</td><td>rgb(194 65 12)</td><td style="background-color: rgb(194 65 12);"></td></tr>
-///         <tr><td>orange-800</td><td>rgb(154 52 18)</td><td style="background-color: rgb(154 52 18);"></td></tr>
-///         <tr><td>orange-900</td><td>rgb(124 45 18)</td><td style="background-color: rgb(124 45 18);"></td></tr>
-///         <tr><td>amber-50</td><td>rgb(255 251 235)</td><td style="background-color: rgb(255 251 235);"></td></tr>
-///         <tr><td>amber-100</td><td>rgb(254 243 199)</td><td style="background-color: rgb(254 243 199);"></td></tr>
-///         <tr><td>amber-200</td><td>rgb(253 230 138)</td><td style="background-color: rgb(253 230 138);"></td></tr>
-///         <tr><td>amber-300</td><td>rgb(252 211 77)</td><td style="background-color: rgb(252 211 77);"></td></tr>
-///         <tr><td>amber-400</td><td>rgb(251 191 36)</td><td style="background-color: rgb(251 191 36);"></td></tr>
-///         <tr><td>amber-500</td><td>rgb(245 158 11)</td><td style="background-color: rgb(245 158 11);"></td></tr>
-///         <tr><td>amber-600</td><td>rgb(217 119 6)</td><td style="background-color: rgb(217 119 6);"></td></tr>
-///         <tr><td>amber-700</td><td>rgb(180 83 9)</td><td style="background-color: rgb(180 83 9);"></td></tr>
-///         <tr><td>amber-800</td><td>rgb(146 64 14)</td><td style="background-color: rgb(146 64 14);"></td></tr>
-///         <tr><td>amber-900</td><td>rgb(120 53 15)</td><td style="background-color: rgb(120 53 15);"></td></tr>
-///         <tr><td>yellow-50</td><td>rgb(254 252 232)</td><td style="background-color: rgb(254 252 232);"></td></tr>
-///         <tr><td>yellow-100</td><td>rgb(254 249 195)</td><td style="background-color: rgb(254 249 195);"></td></tr>
-///         <tr><td>yellow-200</td><td>rgb(254 240 138)</td><td style="background-color: rgb(254 240 138);"></td></tr>
-///         <tr><td>yellow-300</td><td>rgb(253 224 71)</td><td style="background-color: rgb(253 224 71);"></td></tr>
-///         <tr><td>yellow-400</td><td>rgb(250 204 21)</td><td style="background-color: rgb(250 204 21);"></td></tr>
-///         <tr><td>yellow-500</td><td>rgb(234 179 8)</td><td style="background-color: rgb(234 179 8);"></td></tr>
-///         <tr><td>yellow-600</td><td>rgb(202 138 4)</td><td style="background-color: rgb(202 138 4);"></td></tr>
-///         <tr><td>yellow-700</td><td>rgb(161 98 7)</td><td style="background-color: rgb(161 98 7);"></td></tr>
-///         <tr><td>yellow-800</td><td>rgb(133 77 14)</td><td style="background-color: rgb(133 77 14);"></td></tr>
-///         <tr><td>yellow-900</td><td>rgb(113 63 18)</td><td style="background-color: rgb(113 63 18);"></td></tr>
-///         <tr><td>lime-50</td><td>rgb(247 254 231)</td><td style="background-color: rgb(247 254 231);"></td></tr>
-///         <tr><td>lime-100</td><td>rgb(236 252 203)</td><td style="background-color: rgb(236 252 203);"></td></tr>
-///         <tr><td>lime-200</td><td>rgb(217 249 157)</td><td style="background-color: rgb(217 249 157);"></td></tr>
-///         <tr><td>lime-300</td><td>rgb(190 242 100)</td><td style="background-color: rgb(190 242 100);"></td></tr>
-///         <tr><td>lime-400</td><td>rgb(163 230 53)</td><td style="background-color: rgb(163 230 53);"></td></tr>
-///         <tr><td>lime-500</td><td>rgb(132 204 22)</td><td style="background-color: rgb(132 204 22);"></td></tr>
-///         <tr><td>lime-600</td><td>rgb(101 163 13)</td><td style="background-color: rgb(101 163 13);"></td></tr>
-///         <tr><td>lime-700</td><td>rgb(77 124 15)</td><td style="background-color: rgb(77 124 15);"></td></tr>
-///         <tr><td>lime-800</td><td>rgb(63 98 18)</td><td style="background-color: rgb(63 98 18);"></td></tr>
-///         <tr><td>lime-900</td><td>rgb(54 83 20)</td><td style="background-color: rgb(54 83 20);"></td></tr>
-///         <tr><td>green-50</td><td>rgb(240 253 244)</td><td style="background-color: rgb(240 253 244);"></td></tr>
-///         <tr><td>green-100</td><td>rgb(220 252 231)</td><td style="background-color: rgb(220 252 231);"></td></tr>
-///         <tr><td>green-200</td><td>rgb(187 247 208)</td><td style="background-color: rgb(187 247 208);"></td></tr>
-///         <tr><td>green-300</td><td>rgb(134 239 172)</td><td style="background-color: rgb(134 239 172);"></td></tr>
-///         <tr><td>green-400</td><td>rgb(74 222 128)</td><td style="background-color: rgb(74 222 128);"></td></tr>
-///         <tr><td>green-500</td><td>rgb(34 197 94)</td><td style="background-color: rgb(34 197 94);"></td></tr>
-///         <tr><td>green-600</td><td>rgb(22 163 74)</td><td style="background-color: rgb(22 163 74);"></td></tr>
-///         <tr><td>green-700</td><td>rgb(21 128 61)</td><td style="background-color: rgb(21 128 61);"></td></tr>
-///         <tr><td>green-800</td><td>rgb(22 101 52)</td><td style="background-color: rgb(22 101 52);"></td></tr>
-///         <tr><td>green-900</td><td>rgb(20 83 45)</td><td style="background-color: rgb(20 83 45);"></td></tr>
-///         <tr><td>emerald-50</td><td>rgb(236 253 245)</td><td style="background-color: rgb(236 253 245);"></td></tr>
-///         <tr><td>emerald-100</td><td>rgb(209 250 229)</td><td style="background-color: rgb(209 250 229);"></td></tr>
-///         <tr><td>emerald-200</td><td>rgb(167 243 208)</td><td style="background-color: rgb(167 243 208);"></td></tr>
-///         <tr><td>emerald-300</td><td>rgb(110 231 183)</td><td style="background-color: rgb(110 231 183);"></td></tr>
-///         <tr><td>emerald-400</td><td>rgb(52 211 153)</td><td style="background-color: rgb(52 211 153);"></td></tr>
-///         <tr><td>emerald-500</td><td>rgb(16 185 129)</td><td style="background-color: rgb(16 185 129);"></td></tr>
-///         <tr><td>emerald-600</td><td>rgb(5 150 105)</td><td style="background-color: rgb(5 150 105);"></td></tr>
-///         <tr><td>emerald-700</td><td>rgb(4 120 87)</td><td style="background-color: rgb(4 120 87);"></td></tr>
-///         <tr><td>emerald-800</td><td>rgb(6 95 70)</td><td style="background-color: rgb(6 95 70);"></td></tr>
-///         <tr><td>emerald-900</td><td>rgb(6 78 59)</td><td style="background-color: rgb(6 78 59);"></td></tr>
-///         <tr><td>teal-50</td><td>rgb(240 253 250)</td><td style="background-color: rgb(240 253 250);"></td></tr>
-///         <tr><td>teal-100</td><td>rgb(204 251 241)</td><td style="background-color: rgb(204 251 241);"></td></tr>
-///         <tr><td>teal-200</td><td>rgb(153 246 228)</td><td style="background-color: rgb(153 246 228);"></td></tr>
-///         <tr><td>teal-300</td><td>rgb(94 234 212)</td><td style="background-color: rgb(94 234 212);"></td></tr>
-///         <tr><td>teal-400</td><td>rgb(45 212 191)</td><td style="background-color: rgb(45 212 191);"></td></tr>
-///         <tr><td>teal-500</td><td>rgb(20 184 166)</td><td style="background-color: rgb(20 184 166);"></td></tr>
-///         <tr><td>teal-600</td><td>rgb(13 148 136)</td><td style="background-color: rgb(13 148 136);"></td></tr>
-///         <tr><td>teal-700</td><td>rgb(15 118 110)</td><td style="background-color: rgb(15 118 110);"></td></tr>
-///         <tr><td>teal-800</td><td>rgb(17 94 89)</td><td style="background-color: rgb(17 94 89);"></td></tr>
-///         <tr><td>teal-900</td><td>rgb(19 78 74)</td><td style="background-color: rgb(19 78 74);"></td></tr>
-///         <tr><td>cyan-50</td><td>rgb(236 254 255)</td><td style="background-color: rgb(236 254 255);"></td></tr>
-///         <tr><td>cyan-100</td><td>rgb(207 250 254)</td><td style="background-color: rgb(207 250 254);"></td></tr>
-///         <tr><td>cyan-200</td><td>rgb(165 243 252)</td><td style="background-color: rgb(165 243 252);"></td></tr>
-///         <tr><td>cyan-300</td><td>rgb(103 232 249)</td><td style="background-color: rgb(103 232 249);"></td></tr>
-///         <tr><td>cyan-400</td><td>rgb(34 211 238)</td><td style="background-color: rgb(34 211 238);"></td></tr>
-///         <tr><td>cyan-500</td><td>rgb(6 182 212)</td><td style="background-color: rgb(6 182 212);"></td></tr>
-///         <tr><td>cyan-600</td><td>rgb(8 145 178)</td><td style="background-color: rgb(8 145 178);"></td></tr>
-///         <tr><td>cyan-700</td><td>rgb(14 116 144)</td><td style="background-color: rgb(14 116 144);"></td></tr>
-///         <tr><td>cyan-800</td><td>rgb(21 94 117)</td><td style="background-color: rgb(21 94 117);"></td></tr>
-///         <tr><td>cyan-900</td><td>rgb(22 78 99)</td><td style="background-color: rgb(22 78 99);"></td></tr>
-///         <tr><td>sky-50</td><td>rgb(240 249 255)</td><td style="background-color: rgb(240 249 255);"></td></tr>
-///         <tr><td>sky-100</td><td>rgb(224 242 254)</td><td style="background-color: rgb(224 242 254);"></td></tr>
-///         <tr><td>sky-200</td><td>rgb(186 230 253)</td><td style="background-color: rgb(186 230 253);"></td></tr>
-///         <tr><td>sky-300</td><td>rgb(125 211 252)</td><td style="background-color: rgb(125 211 252);"></td></tr>
-///         <tr><td>sky-400</td><td>rgb(56 189 248)</td><td style="background-color: rgb(56 189 248);"></td></tr>
-///         <tr><td>sky-500</td><td>rgb(14 165 233)</td><td style="background-color: rgb(14 165 233);"></td></tr>
-///         <tr><td>sky-600</td><td>rgb(2 132 199)</td><td style="background-color: rgb(2 132 199);"></td></tr>
-///         <tr><td>sky-700</td><td>rgb(3 105 161)</td><td style="background-color: rgb(3 105 161);"></td></tr>
-///         <tr><td>sky-800</td><td>rgb(7 89 133)</td><td style="background-color: rgb(7 89 133);"></td></tr>
-///         <tr><td>sky-900</td><td>rgb(12 74 110)</td><td style="background-color: rgb(12 74 110);"></td></tr>
-///         <tr><td>blue-50</td><td>rgb(239 246 255)</td><td style="background-color: rgb(239 246 255);"></td></tr>
-///         <tr><td>blue-100</td><td>rgb(219 234 254)</td><td style="background-color: rgb(219 234 254);"></td></tr>
-///         <tr><td>blue-200</td><td>rgb(191 219 254)</td><td style="background-color: rgb(191 219 254);"></td></tr>
-///         <tr><td>blue-300</td><td>rgb(147 197 253)</td><td style="background-color: rgb(147 197 253);"></td></tr>
-///         <tr><td>blue-400</td><td>rgb(96 165 250)</td><td style="background-color: rgb(96 165 250);"></td></tr>
-///         <tr><td>blue-500</td><td>rgb(59 130 246)</td><td style="background-color: rgb(59 130 246);"></td></tr>
-///         <tr><td>blue-600</td><td>rgb(37 99 235)</td><td style="background-color: rgb(37 99 235);"></td></tr>
-///         <tr><td>blue-700</td><td>rgb(29 78 216)</td><td style="background-color: rgb(29 78 216);"></td></tr>
-///         <tr><td>blue-800</td><td>rgb(30 64 175)</td><td style="background-color: rgb(30 64 175);"></td></tr>
-///         <tr><td>blue-900</td><td>rgb(30 58 138)</td><td style="background-color: rgb(30 58 138);"></td></tr>
-///         <tr><td>indigo-50</td><td>rgb(238 242 255)</td><td style="background-color: rgb(238 242 255);"></td></tr>
-///         <tr><td>indigo-100</td><td>rgb(224 231 255)</td><td style="background-color: rgb(224 231 255);"></td></tr>
-///         <tr><td>indigo-200</td><td>rgb(199 210 254)</td><td style="background-color: rgb(199 210 254);"></td></tr>
-///         <tr><td>indigo-300</td><td>rgb(165 180 252)</td><td style="background-color: rgb(165 180 252);"></td></tr>
-///         <tr><td>indigo-400</td><td>rgb(129 140 248)</td><td style="background-color: rgb(129 140 248);"></td></tr>
-///         <tr><td>indigo-500</td><td>rgb(99 102 241)</td><td style="background-color: rgb(99 102 241);"></td></tr>
-///         <tr><td>indigo-600</td><td>rgb(79 70 229)</td><td style="background-color: rgb(79 70 229);"></td></tr>
-///         <tr><td>indigo-700</td><td>rgb(67 56 202)</td><td style="background-color: rgb(67 56 202);"></td></tr>
-///         <tr><td>indigo-800</td><td>rgb(55 48 163)</td><td style="background-color: rgb(55 48 163);"></td></tr>
-///         <tr><td>indigo-900</td><td>rgb(49 46 129)</td><td style="background-color: rgb(49 46 129);"></td></tr>
-///         <tr><td>violet-50</td><td>rgb(245 243 255)</td><td style="background-color: rgb(245 243 255);"></td></tr>
-///         <tr><td>violet-100</td><td>rgb(237 233 254)</td><td style="background-color: rgb(237 233 254);"></td></tr>
-///         <tr><td>violet-200</td><td>rgb(221 214 254)</td><td style="background-color: rgb(221 214 254);"></td></tr>
-///         <tr><td>violet-300</td><td>rgb(196 181 253)</td><td style="background-color: rgb(196 181 253);"></td></tr>
-///         <tr><td>violet-400</td><td>rgb(167 139 250)</td><td style="background-color: rgb(167 139 250);"></td></tr>
-///         <tr><td>violet-500</td><td>rgb(139 92 246)</td><td style="background-color: rgb(139 92 246);"></td></tr>
-///         <tr><td>violet-600</td><td>rgb(124 58 237)</td><td style="background-color: rgb(124 58 237);"></td></tr>
-///         <tr><td>violet-700</td><td>rgb(109 40 217)</td><td style="background-color: rgb(109 40 217);"></td></tr>
-///         <tr><td>violet-800</td><td>rgb(91 33 182)</td><td style="background-color: rgb(91 33 182);"></td></tr>
-///         <tr><td>violet-900</td><td>rgb(76 29 149)</td><td style="background-color: rgb(76 29 149);"></td></tr>
-///         <tr><td>purple-50</td><td>rgb(250 245 255)</td><td style="background-color: rgb(250 245 255);"></td></tr>
-///         <tr><td>purple-100</td><td>rgb(243 232 255)</td><td style="background-color: rgb(243 232 255);"></td></tr>
-///         <tr><td>purple-200</td><td>rgb(233 213 255)</td><td style="background-color: rgb(233 213 255);"></td></tr>
-///         <tr><td>purple-300</td><td>rgb(216 180 254)</td><td style="background-color: rgb(216 180 254);"></td></tr>
-///         <tr><td>purple-400</td><td>rgb(192 132 252)</td><td style="background-color: rgb(192 132 252);"></td></tr>
-///         <tr><td>purple-500</td><td>rgb(168 85 247)</td><td style="background-color: rgb(168 85 247);"></td></tr>
-///         <tr><td>purple-600</td><td>rgb(147 51 234)</td><td style="background-color: rgb(147 51 234);"></td></tr>
-///         <tr><td>purple-700</td><td>rgb(126 34 206)</td><td style="background-color: rgb(126 34 206);"></td></tr>
-///         <tr><td>purple-800</td><td>rgb(107 33 168)</td><td style="background-color: rgb(107 33 168);"></td></tr>
-///         <tr><td>purple-900</td><td>rgb(88 28 135)</td><td style="background-color: rgb(88 28 135);"></td></tr>
-///         <tr><td>fuchsia-50</td><td>rgb(253 244 255)</td><td style="background-color: rgb(253 244 255);"></td></tr>
-///         <tr><td>fuchsia-100</td><td>rgb(250 232 255)</td><td style="background-color: rgb(250 232 255);"></td></tr>
-///         <tr><td>fuchsia-200</td><td>rgb(245 208 254)</td><td style="background-color: rgb(245 208 254);"></td></tr>
-///         <tr><td>fuchsia-300</td><td>rgb(240 171 252)</td><td style="background-color: rgb(240 171 252);"></td></tr>
-///         <tr><td>fuchsia-400</td><td>rgb(232 121 249)</td><td style="background-color: rgb(232 121 249);"></td></tr>
-///         <tr><td>fuchsia-500</td><td>rgb(217 70 239)</td><td style="background-color: rgb(217 70 239);"></td></tr>
-///         <tr><td>fuchsia-600</td><td>rgb(192 38 211)</td><td style="background-color: rgb(192 38 211);"></td></tr>
-///         <tr><td>fuchsia-700</td><td>rgb(162 28 175)</td><td style="background-color: rgb(162 28 175);"></td></tr>
-///         <tr><td>fuchsia-800</td><td>rgb(134 25 143)</td><td style="background-color: rgb(134 25 143);"></td></tr>
-///         <tr><td>fuchsia-900</td><td>rgb(112 26 117)</td><td style="background-color: rgb(112 26 117);"></td></tr>
-///         <tr><td>pink-50</td><td>rgb(253 242 248)</td><td style="background-color: rgb(253 242 248);"></td></tr>
-///         <tr><td>pink-100</td><td>rgb(252 231 243)</td><td style="background-color: rgb(252 231 243);"></td></tr>
-///         <tr><td>pink-200</td><td>rgb(251 207 232)</td><td style="background-color: rgb(251 207 232);"></td></tr>
-///         <tr><td>pink-300</td><td>rgb(249 168 212)</td><td style="background-color: rgb(249 168 212);"></td></tr>
-///         <tr><td>pink-400</td><td>rgb(244 114 182)</td><td style="background-color: rgb(244 114 182);"></td></tr>
-///         <tr><td>pink-500</td><td>rgb(236 72 153)</td><td style="background-color: rgb(236 72 153);"></td></tr>
-///         <tr><td>pink-600</td><td>rgb(219 39 119)</td><td style="background-color: rgb(219 39 119);"></td></tr>
-///         <tr><td>pink-700</td><td>rgb(190 24 93)</td><td style="background-color: rgb(190 24 93);"></td></tr>
-///         <tr><td>pink-800</td><td>rgb(157 23 77)</td><td style="background-color: rgb(157 23 77);"></td></tr>
-///         <tr><td>pink-900</td><td>rgb(131 24 67)</td><td style="background-color: rgb(131 24 67);"></td></tr>
-///         <tr><td>rose-50</td><td>rgb(255 241 242)</td><td style="background-color: rgb(255 241 242);"></td></tr>
-///         <tr><td>rose-100</td><td>rgb(255 228 230)</td><td style="background-color: rgb(255 228 230);"></td></tr>
-///         <tr><td>rose-200</td><td>rgb(254 205 211)</td><td style="background-color: rgb(254 205 211);"></td></tr>
-///         <tr><td>rose-300</td><td>rgb(253 164 175)</td><td style="background-color: rgb(253 164 175);"></td></tr>
-///         <tr><td>rose-400</td><td>rgb(251 113 133)</td><td style="background-color: rgb(251 113 133);"></td></tr>
-///         <tr><td>rose-500</td><td>rgb(244 63 94)</td><td style="background-color: rgb(244 63 94);"></td></tr>
-///         <tr><td>rose-600</td><td>rgb(225 29 72)</td><td style="background-color: rgb(225 29 72);"></td></tr>
-///         <tr><td>rose-700</td><td>rgb(190 18 60)</td><td style="background-color: rgb(190 18 60);"></td></tr>
-///         <tr><td>rose-800</td><td>rgb(159 18 57)</td><td style="background-color: rgb(159 18 57);"></td></tr>
-///         <tr><td>rose-900</td><td>rgb(136 19 55)</td><td style="background-color: rgb(136 19 55);"></td></tr>
+///         <tr><td>red-50</td><td>oklch(97.1% .013 17.38)</td><td style="background-color: oklch(97.1% .013 17.38);"></td></tr>
+///         <tr><td>red-100</td><td>oklch(93.6% .032 17.717)</td><td style="background-color: oklch(93.6% .032 17.717);"></td></tr>
+///         <tr><td>red-200</td><td>oklch(88.5% .062 18.334)</td><td style="background-color: oklch(88.5% .062 18.334);"></td></tr>
+///         <tr><td>red-300</td><td>oklch(80.8% .114 19.571)</td><td style="background-color: oklch(80.8% .114 19.571);"></td></tr>
+///         <tr><td>red-400</td><td>oklch(70.4% .191 22.216)</td><td style="background-color: oklch(70.4% .191 22.216);"></td></tr>
+///         <tr><td>red-500</td><td>oklch(63.7% .237 25.331)</td><td style="background-color: oklch(63.7% .237 25.331);"></td></tr>
+///         <tr><td>red-600</td><td>oklch(57.7% .245 27.325)</td><td style="background-color: oklch(57.7% .245 27.325);"></td></tr>
+///         <tr><td>red-700</td><td>oklch(50.5% .213 27.518)</td><td style="background-color: oklch(50.5% .213 27.518);"></td></tr>
+///         <tr><td>red-800</td><td>oklch(44.4% .177 26.899)</td><td style="background-color: oklch(44.4% .177 26.899);"></td></tr>
+///         <tr><td>red-900</td><td>oklch(39.6% .141 25.723)</td><td style="background-color: oklch(39.6% .141 25.723);"></td></tr>
+///         <tr><td>red-950</td><td>oklch(25.8% .092 26.042)</td><td style="background-color: oklch(25.8% .092 26.042);"></td></tr>
+///         <tr><td>orange-50</td><td>oklch(98% .016 73.684)</td><td style="background-color: oklch(98% .016 73.684);"></td></tr>
+///         <tr><td>orange-100</td><td>oklch(95.4% .038 75.164)</td><td style="background-color: oklch(95.4% .038 75.164);"></td></tr>
+///         <tr><td>orange-200</td><td>oklch(90.1% .076 70.697)</td><td style="background-color: oklch(90.1% .076 70.697);"></td></tr>
+///         <tr><td>orange-300</td><td>oklch(83.7% .128 66.29)</td><td style="background-color: oklch(83.7% .128 66.29);"></td></tr>
+///         <tr><td>orange-400</td><td>oklch(75% .183 55.934)</td><td style="background-color: oklch(75% .183 55.934);"></td></tr>
+///         <tr><td>orange-500</td><td>oklch(70.5% .213 47.604)</td><td style="background-color: oklch(70.5% .213 47.604);"></td></tr>
+///         <tr><td>orange-600</td><td>oklch(64.6% .222 41.116)</td><td style="background-color: oklch(64.6% .222 41.116);"></td></tr>
+///         <tr><td>orange-700</td><td>oklch(55.3% .195 38.402)</td><td style="background-color: oklch(55.3% .195 38.402);"></td></tr>
+///         <tr><td>orange-800</td><td>oklch(47% .157 37.304)</td><td style="background-color: oklch(47% .157 37.304);"></td></tr>
+///         <tr><td>orange-900</td><td>oklch(40.8% .123 38.172)</td><td style="background-color: oklch(40.8% .123 38.172);"></td></tr>
+///         <tr><td>orange-950</td><td>oklch(26.6% .079 36.259)</td><td style="background-color: oklch(26.6% .079 36.259);"></td></tr>
+///         <tr><td>amber-50</td><td>oklch(98.7% .022 95.277)</td><td style="background-color: oklch(98.7% .022 95.277);"></td></tr>
+///         <tr><td>amber-100</td><td>oklch(96.2% .059 95.617)</td><td style="background-color: oklch(96.2% .059 95.617);"></td></tr>
+///         <tr><td>amber-200</td><td>oklch(92.4% .12 95.746)</td><td style="background-color: oklch(92.4% .12 95.746);"></td></tr>
+///         <tr><td>amber-300</td><td>oklch(87.9% .169 91.605)</td><td style="background-color: oklch(87.9% .169 91.605);"></td></tr>
+///         <tr><td>amber-400</td><td>oklch(82.8% .189 84.429)</td><td style="background-color: oklch(82.8% .189 84.429);"></td></tr>
+///         <tr><td>amber-500</td><td>oklch(76.9% .188 70.08)</td><td style="background-color: oklch(76.9% .188 70.08);"></td></tr>
+///         <tr><td>amber-600</td><td>oklch(66.6% .179 58.318)</td><td style="background-color: oklch(66.6% .179 58.318);"></td></tr>
+///         <tr><td>amber-700</td><td>oklch(55.5% .163 48.998)</td><td style="background-color: oklch(55.5% .163 48.998);"></td></tr>
+///         <tr><td>amber-800</td><td>oklch(47.3% .137 46.201)</td><td style="background-color: oklch(47.3% .137 46.201);"></td></tr>
+///         <tr><td>amber-900</td><td>oklch(41.4% .112 45.904)</td><td style="background-color: oklch(41.4% .112 45.904);"></td></tr>
+///         <tr><td>amber-950</td><td>oklch(27.9% .077 45.635)</td><td style="background-color: oklch(27.9% .077 45.635);"></td></tr>
+///         <tr><td>yellow-50</td><td>oklch(98.7% .026 102.212)</td><td style="background-color: oklch(98.7% .026 102.212);"></td></tr>
+///         <tr><td>yellow-100</td><td>oklch(97.3% .071 103.193)</td><td style="background-color: oklch(97.3% .071 103.193);"></td></tr>
+///         <tr><td>yellow-200</td><td>oklch(94.5% .129 101.54)</td><td style="background-color: oklch(94.5% .129 101.54);"></td></tr>
+///         <tr><td>yellow-300</td><td>oklch(90.5% .182 98.111)</td><td style="background-color: oklch(90.5% .182 98.111);"></td></tr>
+///         <tr><td>yellow-400</td><td>oklch(85.2% .199 91.936)</td><td style="background-color: oklch(85.2% .199 91.936);"></td></tr>
+///         <tr><td>yellow-500</td><td>oklch(79.5% .184 86.047)</td><td style="background-color: oklch(79.5% .184 86.047);"></td></tr>
+///         <tr><td>yellow-600</td><td>oklch(68.1% .162 75.834)</td><td style="background-color: oklch(68.1% .162 75.834);"></td></tr>
+///         <tr><td>yellow-700</td><td>oklch(55.4% .135 66.442)</td><td style="background-color: oklch(55.4% .135 66.442);"></td></tr>
+///         <tr><td>yellow-800</td><td>oklch(47.6% .114 61.907)</td><td style="background-color: oklch(47.6% .114 61.907);"></td></tr>
+///         <tr><td>yellow-900</td><td>oklch(42.1% .095 57.708)</td><td style="background-color: oklch(42.1% .095 57.708);"></td></tr>
+///         <tr><td>yellow-950</td><td>oklch(28.6% .066 53.813)</td><td style="background-color: oklch(28.6% .066 53.813);"></td></tr>
+///         <tr><td>lime-50</td><td>oklch(98.6% .031 120.757)</td><td style="background-color: oklch(98.6% .031 120.757);"></td></tr>
+///         <tr><td>lime-100</td><td>oklch(96.7% .067 122.328)</td><td style="background-color: oklch(96.7% .067 122.328);"></td></tr>
+///         <tr><td>lime-200</td><td>oklch(93.8% .127 124.321)</td><td style="background-color: oklch(93.8% .127 124.321);"></td></tr>
+///         <tr><td>lime-300</td><td>oklch(89.7% .196 126.665)</td><td style="background-color: oklch(89.7% .196 126.665);"></td></tr>
+///         <tr><td>lime-400</td><td>oklch(84.1% .238 128.85)</td><td style="background-color: oklch(84.1% .238 128.85);"></td></tr>
+///         <tr><td>lime-500</td><td>oklch(76.8% .233 130.85)</td><td style="background-color: oklch(76.8% .233 130.85);"></td></tr>
+///         <tr><td>lime-600</td><td>oklch(64.8% .2 131.684)</td><td style="background-color: oklch(64.8% .2 131.684);"></td></tr>
+///         <tr><td>lime-700</td><td>oklch(53.2% .157 131.589)</td><td style="background-color: oklch(53.2% .157 131.589);"></td></tr>
+///         <tr><td>lime-800</td><td>oklch(45.3% .124 130.933)</td><td style="background-color: oklch(45.3% .124 130.933);"></td></tr>
+///         <tr><td>lime-900</td><td>oklch(40.5% .101 131.063)</td><td style="background-color: oklch(40.5% .101 131.063);"></td></tr>
+///         <tr><td>lime-950</td><td>oklch(27.4% .072 132.109)</td><td style="background-color: oklch(27.4% .072 132.109);"></td></tr>
+///         <tr><td>green-50</td><td>oklch(98.2% .018 155.826)</td><td style="background-color: oklch(98.2% .018 155.826);"></td></tr>
+///         <tr><td>green-100</td><td>oklch(96.2% .044 156.743)</td><td style="background-color: oklch(96.2% .044 156.743);"></td></tr>
+///         <tr><td>green-200</td><td>oklch(92.5% .084 155.995)</td><td style="background-color: oklch(92.5% .084 155.995);"></td></tr>
+///         <tr><td>green-300</td><td>oklch(87.1% .15 154.449)</td><td style="background-color: oklch(87.1% .15 154.449);"></td></tr>
+///         <tr><td>green-400</td><td>oklch(79.2% .209 151.711)</td><td style="background-color: oklch(79.2% .209 151.711);"></td></tr>
+///         <tr><td>green-500</td><td>oklch(72.3% .219 149.579)</td><td style="background-color: oklch(72.3% .219 149.579);"></td></tr>
+///         <tr><td>green-600</td><td>oklch(62.7% .194 149.214)</td><td style="background-color: oklch(62.7% .194 149.214);"></td></tr>
+///         <tr><td>green-700</td><td>oklch(52.7% .154 150.069)</td><td style="background-color: oklch(52.7% .154 150.069);"></td></tr>
+///         <tr><td>green-800</td><td>oklch(44.8% .119 151.328)</td><td style="background-color: oklch(44.8% .119 151.328);"></td></tr>
+///         <tr><td>green-900</td><td>oklch(39.3% .095 152.535)</td><td style="background-color: oklch(39.3% .095 152.535);"></td></tr>
+///         <tr><td>green-950</td><td>oklch(26.6% .065 152.934)</td><td style="background-color: oklch(26.6% .065 152.934);"></td></tr>
+///         <tr><td>emerald-50</td><td>oklch(97.9% .021 166.113)</td><td style="background-color: oklch(97.9% .021 166.113);"></td></tr>
+///         <tr><td>emerald-100</td><td>oklch(95% .052 163.051)</td><td style="background-color: oklch(95% .052 163.051);"></td></tr>
+///         <tr><td>emerald-200</td><td>oklch(90.5% .093 164.15)</td><td style="background-color: oklch(90.5% .093 164.15);"></td></tr>
+///         <tr><td>emerald-300</td><td>oklch(84.5% .143 164.978)</td><td style="background-color: oklch(84.5% .143 164.978);"></td></tr>
+///         <tr><td>emerald-400</td><td>oklch(76.5% .177 163.223)</td><td style="background-color: oklch(76.5% .177 163.223);"></td></tr>
+///         <tr><td>emerald-500</td><td>oklch(69.6% .17 162.48)</td><td style="background-color: oklch(69.6% .17 162.48);"></td></tr>
+///         <tr><td>emerald-600</td><td>oklch(59.6% .145 163.225)</td><td style="background-color: oklch(59.6% .145 163.225);"></td></tr>
+///         <tr><td>emerald-700</td><td>oklch(50.8% .118 165.612)</td><td style="background-color: oklch(50.8% .118 165.612);"></td></tr>
+///         <tr><td>emerald-800</td><td>oklch(43.2% .095 166.913)</td><td style="background-color: oklch(43.2% .095 166.913);"></td></tr>
+///         <tr><td>emerald-900</td><td>oklch(37.8% .077 168.94)</td><td style="background-color: oklch(37.8% .077 168.94);"></td></tr>
+///         <tr><td>emerald-950</td><td>oklch(26.2% .051 172.552)</td><td style="background-color: oklch(26.2% .051 172.552);"></td></tr>
+///         <tr><td>teal-50</td><td>oklch(98.4% .014 180.72)</td><td style="background-color: oklch(98.4% .014 180.72);"></td></tr>
+///         <tr><td>teal-100</td><td>oklch(95.3% .051 180.801)</td><td style="background-color: oklch(95.3% .051 180.801);"></td></tr>
+///         <tr><td>teal-200</td><td>oklch(91% .096 180.426)</td><td style="background-color: oklch(91% .096 180.426);"></td></tr>
+///         <tr><td>teal-300</td><td>oklch(85.5% .138 181.071)</td><td style="background-color: oklch(85.5% .138 181.071);"></td></tr>
+///         <tr><td>teal-400</td><td>oklch(77.7% .152 181.912)</td><td style="background-color: oklch(77.7% .152 181.912);"></td></tr>
+///         <tr><td>teal-500</td><td>oklch(70.4% .14 182.503)</td><td style="background-color: oklch(70.4% .14 182.503);"></td></tr>
+///         <tr><td>teal-600</td><td>oklch(60% .118 184.704)</td><td style="background-color: oklch(60% .118 184.704);"></td></tr>
+///         <tr><td>teal-700</td><td>oklch(51.1% .096 186.391)</td><td style="background-color: oklch(51.1% .096 186.391);"></td></tr>
+///         <tr><td>teal-800</td><td>oklch(43.7% .078 188.216)</td><td style="background-color: oklch(43.7% .078 188.216);"></td></tr>
+///         <tr><td>teal-900</td><td>oklch(38.6% .063 188.416)</td><td style="background-color: oklch(38.6% .063 188.416);"></td></tr>
+///         <tr><td>teal-950</td><td>oklch(27.7% .046 192.524)</td><td style="background-color: oklch(27.7% .046 192.524);"></td></tr>
+///         <tr><td>cyan-50</td><td>oklch(98.4% .019 200.873)</td><td style="background-color: oklch(98.4% .019 200.873);"></td></tr>
+///         <tr><td>cyan-100</td><td>oklch(95.6% .045 203.388)</td><td style="background-color: oklch(95.6% .045 203.388);"></td></tr>
+///         <tr><td>cyan-200</td><td>oklch(91.7% .08 205.041)</td><td style="background-color: oklch(91.7% .08 205.041);"></td></tr>
+///         <tr><td>cyan-300</td><td>oklch(86.5% .127 207.078)</td><td style="background-color: oklch(86.5% .127 207.078);"></td></tr>
+///         <tr><td>cyan-400</td><td>oklch(78.9% .154 211.53)</td><td style="background-color: oklch(78.9% .154 211.53);"></td></tr>
+///         <tr><td>cyan-500</td><td>oklch(71.5% .143 215.221)</td><td style="background-color: oklch(71.5% .143 215.221);"></td></tr>
+///         <tr><td>cyan-600</td><td>oklch(60.9% .126 221.723)</td><td style="background-color: oklch(60.9% .126 221.723);"></td></tr>
+///         <tr><td>cyan-700</td><td>oklch(52% .105 223.128)</td><td style="background-color: oklch(52% .105 223.128);"></td></tr>
+///         <tr><td>cyan-800</td><td>oklch(45% .085 224.283)</td><td style="background-color: oklch(45% .085 224.283);"></td></tr>
+///         <tr><td>cyan-900</td><td>oklch(39.8% .07 227.392)</td><td style="background-color: oklch(39.8% .07 227.392);"></td></tr>
+///         <tr><td>cyan-950</td><td>oklch(30.2% .056 229.695)</td><td style="background-color: oklch(30.2% .056 229.695);"></td></tr>
+///         <tr><td>sky-50</td><td>oklch(97.7% .013 236.62)</td><td style="background-color: oklch(97.7% .013 236.62);"></td></tr>
+///         <tr><td>sky-100</td><td>oklch(95.1% .026 236.824)</td><td style="background-color: oklch(95.1% .026 236.824);"></td></tr>
+///         <tr><td>sky-200</td><td>oklch(90.1% .058 230.902)</td><td style="background-color: oklch(90.1% .058 230.902);"></td></tr>
+///         <tr><td>sky-300</td><td>oklch(82.8% .111 230.318)</td><td style="background-color: oklch(82.8% .111 230.318);"></td></tr>
+///         <tr><td>sky-400</td><td>oklch(74.6% .16 232.661)</td><td style="background-color: oklch(74.6% .16 232.661);"></td></tr>
+///         <tr><td>sky-500</td><td>oklch(68.5% .169 237.323)</td><td style="background-color: oklch(68.5% .169 237.323);"></td></tr>
+///         <tr><td>sky-600</td><td>oklch(58.8% .158 241.966)</td><td style="background-color: oklch(58.8% .158 241.966);"></td></tr>
+///         <tr><td>sky-700</td><td>oklch(50% .134 242.749)</td><td style="background-color: oklch(50% .134 242.749);"></td></tr>
+///         <tr><td>sky-800</td><td>oklch(44.3% .11 240.79)</td><td style="background-color: oklch(44.3% .11 240.79);"></td></tr>
+///         <tr><td>sky-900</td><td>oklch(39.1% .09 240.876)</td><td style="background-color: oklch(39.1% .09 240.876);"></td></tr>
+///         <tr><td>sky-950</td><td>oklch(29.3% .066 243.157)</td><td style="background-color: oklch(29.3% .066 243.157);"></td></tr>
+///         <tr><td>blue-50</td><td>oklch(97% .014 254.604)</td><td style="background-color: oklch(97% .014 254.604);"></td></tr>
+///         <tr><td>blue-100</td><td>oklch(93.2% .032 255.585)</td><td style="background-color: oklch(93.2% .032 255.585);"></td></tr>
+///         <tr><td>blue-200</td><td>oklch(88.2% .059 254.128)</td><td style="background-color: oklch(88.2% .059 254.128);"></td></tr>
+///         <tr><td>blue-300</td><td>oklch(80.9% .105 251.813)</td><td style="background-color: oklch(80.9% .105 251.813);"></td></tr>
+///         <tr><td>blue-400</td><td>oklch(70.7% .165 254.624)</td><td style="background-color: oklch(70.7% .165 254.624);"></td></tr>
+///         <tr><td>blue-500</td><td>oklch(62.3% .214 259.815)</td><td style="background-color: oklch(62.3% .214 259.815);"></td></tr>
+///         <tr><td>blue-600</td><td>oklch(54.6% .245 262.881)</td><td style="background-color: oklch(54.6% .245 262.881);"></td></tr>
+///         <tr><td>blue-700</td><td>oklch(48.8% .243 264.376)</td><td style="background-color: oklch(48.8% .243 264.376);"></td></tr>
+///         <tr><td>blue-800</td><td>oklch(42.4% .199 265.638)</td><td style="background-color: oklch(42.4% .199 265.638);"></td></tr>
+///         <tr><td>blue-900</td><td>oklch(37.9% .146 265.522)</td><td style="background-color: oklch(37.9% .146 265.522);"></td></tr>
+///         <tr><td>blue-950</td><td>oklch(28.2% .091 267.935)</td><td style="background-color: oklch(28.2% .091 267.935);"></td></tr>
+///         <tr><td>indigo-50</td><td>oklch(96.2% .018 272.314)</td><td style="background-color: oklch(96.2% .018 272.314);"></td></tr>
+///         <tr><td>indigo-100</td><td>oklch(93% .034 272.788)</td><td style="background-color: oklch(93% .034 272.788);"></td></tr>
+///         <tr><td>indigo-200</td><td>oklch(87% .065 274.039)</td><td style="background-color: oklch(87% .065 274.039);"></td></tr>
+///         <tr><td>indigo-300</td><td>oklch(78.5% .115 274.713)</td><td style="background-color: oklch(78.5% .115 274.713);"></td></tr>
+///         <tr><td>indigo-400</td><td>oklch(67.3% .182 276.935)</td><td style="background-color: oklch(67.3% .182 276.935);"></td></tr>
+///         <tr><td>indigo-500</td><td>oklch(58.5% .233 277.117)</td><td style="background-color: oklch(58.5% .233 277.117);"></td></tr>
+///         <tr><td>indigo-600</td><td>oklch(51.1% .262 276.966)</td><td style="background-color: oklch(51.1% .262 276.966);"></td></tr>
+///         <tr><td>indigo-700</td><td>oklch(45.7% .24 277.023)</td><td style="background-color: oklch(45.7% .24 277.023);"></td></tr>
+///         <tr><td>indigo-800</td><td>oklch(39.8% .195 277.366)</td><td style="background-color: oklch(39.8% .195 277.366);"></td></tr>
+///         <tr><td>indigo-900</td><td>oklch(35.9% .144 278.697)</td><td style="background-color: oklch(35.9% .144 278.697);"></td></tr>
+///         <tr><td>indigo-950</td><td>oklch(25.7% .09 281.288)</td><td style="background-color: oklch(25.7% .09 281.288);"></td></tr>
+///         <tr><td>violet-50</td><td>oklch(96.9% .016 293.756)</td><td style="background-color: oklch(96.9% .016 293.756);"></td></tr>
+///         <tr><td>violet-100</td><td>oklch(94.3% .029 294.588)</td><td style="background-color: oklch(94.3% .029 294.588);"></td></tr>
+///         <tr><td>violet-200</td><td>oklch(89.4% .057 293.283)</td><td style="background-color: oklch(89.4% .057 293.283);"></td></tr>
+///         <tr><td>violet-300</td><td>oklch(81.1% .111 293.571)</td><td style="background-color: oklch(81.1% .111 293.571);"></td></tr>
+///         <tr><td>violet-400</td><td>oklch(70.2% .183 293.541)</td><td style="background-color: oklch(70.2% .183 293.541);"></td></tr>
+///         <tr><td>violet-500</td><td>oklch(60.6% .25 292.717)</td><td style="background-color: oklch(60.6% .25 292.717);"></td></tr>
+///         <tr><td>violet-600</td><td>oklch(54.1% .281 293.009)</td><td style="background-color: oklch(54.1% .281 293.009);"></td></tr>
+///         <tr><td>violet-700</td><td>oklch(49.1% .27 292.581)</td><td style="background-color: oklch(49.1% .27 292.581);"></td></tr>
+///         <tr><td>violet-800</td><td>oklch(43.2% .232 292.759)</td><td style="background-color: oklch(43.2% .232 292.759);"></td></tr>
+///         <tr><td>violet-900</td><td>oklch(38% .189 293.745)</td><td style="background-color: oklch(38% .189 293.745);"></td></tr>
+///         <tr><td>violet-950</td><td>oklch(28.3% .141 291.089)</td><td style="background-color: oklch(28.3% .141 291.089);"></td></tr>
+///         <tr><td>purple-50</td><td>oklch(97.7% .014 308.299)</td><td style="background-color: oklch(97.7% .014 308.299);"></td></tr>
+///         <tr><td>purple-100</td><td>oklch(94.6% .033 307.174)</td><td style="background-color: oklch(94.6% .033 307.174);"></td></tr>
+///         <tr><td>purple-200</td><td>oklch(90.2% .063 306.703)</td><td style="background-color: oklch(90.2% .063 306.703);"></td></tr>
+///         <tr><td>purple-300</td><td>oklch(82.7% .119 306.383)</td><td style="background-color: oklch(82.7% .119 306.383);"></td></tr>
+///         <tr><td>purple-400</td><td>oklch(71.4% .203 305.504)</td><td style="background-color: oklch(71.4% .203 305.504);"></td></tr>
+///         <tr><td>purple-500</td><td>oklch(62.7% .265 303.9)</td><td style="background-color: oklch(62.7% .265 303.9);"></td></tr>
+///         <tr><td>purple-600</td><td>oklch(55.8% .288 302.321)</td><td style="background-color: oklch(55.8% .288 302.321);"></td></tr>
+///         <tr><td>purple-700</td><td>oklch(49.6% .265 301.924)</td><td style="background-color: oklch(49.6% .265 301.924);"></td></tr>
+///         <tr><td>purple-800</td><td>oklch(43.8% .218 303.724)</td><td style="background-color: oklch(43.8% .218 303.724);"></td></tr>
+///         <tr><td>purple-900</td><td>oklch(38.1% .176 304.987)</td><td style="background-color: oklch(38.1% .176 304.987);"></td></tr>
+///         <tr><td>purple-950</td><td>oklch(29.1% .149 302.717)</td><td style="background-color: oklch(29.1% .149 302.717);"></td></tr>
+///         <tr><td>fuchsia-50</td><td>oklch(97.7% .017 320.058)</td><td style="background-color: oklch(97.7% .017 320.058);"></td></tr>
+///         <tr><td>fuchsia-100</td><td>oklch(95.2% .037 318.852)</td><td style="background-color: oklch(95.2% .037 318.852);"></td></tr>
+///         <tr><td>fuchsia-200</td><td>oklch(90.3% .076 319.62)</td><td style="background-color: oklch(90.3% .076 319.62);"></td></tr>
+///         <tr><td>fuchsia-300</td><td>oklch(83.3% .145 321.434)</td><td style="background-color: oklch(83.3% .145 321.434);"></td></tr>
+///         <tr><td>fuchsia-400</td><td>oklch(74% .238 322.16)</td><td style="background-color: oklch(74% .238 322.16);"></td></tr>
+///         <tr><td>fuchsia-500</td><td>oklch(66.7% .295 322.15)</td><td style="background-color: oklch(66.7% .295 322.15);"></td></tr>
+///         <tr><td>fuchsia-600</td><td>oklch(59.1% .293 322.896)</td><td style="background-color: oklch(59.1% .293 322.896);"></td></tr>
+///         <tr><td>fuchsia-700</td><td>oklch(51.8% .253 323.949)</td><td style="background-color: oklch(51.8% .253 323.949);"></td></tr>
+///         <tr><td>fuchsia-800</td><td>oklch(45.2% .211 324.591)</td><td style="background-color: oklch(45.2% .211 324.591);"></td></tr>
+///         <tr><td>fuchsia-900</td><td>oklch(40.1% .17 325.612)</td><td style="background-color: oklch(40.1% .17 325.612);"></td></tr>
+///         <tr><td>fuchsia-950</td><td>oklch(29.3% .136 325.661)</td><td style="background-color: oklch(29.3% .136 325.661);"></td></tr>
+///         <tr><td>pink-50</td><td>oklch(97.1% .014 343.198)</td><td style="background-color: oklch(97.1% .014 343.198);"></td></tr>
+///         <tr><td>pink-100</td><td>oklch(94.8% .028 342.258)</td><td style="background-color: oklch(94.8% .028 342.258);"></td></tr>
+///         <tr><td>pink-200</td><td>oklch(89.9% .061 343.231)</td><td style="background-color: oklch(89.9% .061 343.231);"></td></tr>
+///         <tr><td>pink-300</td><td>oklch(82.3% .12 346.018)</td><td style="background-color: oklch(82.3% .12 346.018);"></td></tr>
+///         <tr><td>pink-400</td><td>oklch(71.8% .202 349.761)</td><td style="background-color: oklch(71.8% .202 349.761);"></td></tr>
+///         <tr><td>pink-500</td><td>oklch(65.6% .241 354.308)</td><td style="background-color: oklch(65.6% .241 354.308);"></td></tr>
+///         <tr><td>pink-600</td><td>oklch(59.2% .249 .584)</td><td style="background-color: oklch(59.2% .249 .584);"></td></tr>
+///         <tr><td>pink-700</td><td>oklch(52.5% .223 3.958)</td><td style="background-color: oklch(52.5% .223 3.958);"></td></tr>
+///         <tr><td>pink-800</td><td>oklch(45.9% .187 3.815)</td><td style="background-color: oklch(45.9% .187 3.815);"></td></tr>
+///         <tr><td>pink-900</td><td>oklch(40.8% .153 2.432)</td><td style="background-color: oklch(40.8% .153 2.432);"></td></tr>
+///         <tr><td>pink-950</td><td>oklch(28.4% .109 3.907)</td><td style="background-color: oklch(28.4% .109 3.907);"></td></tr>
+///         <tr><td>rose-50</td><td>oklch(96.9% .015 12.422)</td><td style="background-color: oklch(96.9% .015 12.422);"></td></tr>
+///         <tr><td>rose-100</td><td>oklch(94.1% .03 12.58)</td><td style="background-color: oklch(94.1% .03 12.58);"></td></tr>
+///         <tr><td>rose-200</td><td>oklch(89.2% .058 10.001)</td><td style="background-color: oklch(89.2% .058 10.001);"></td></tr>
+///         <tr><td>rose-300</td><td>oklch(81% .117 11.638)</td><td style="background-color: oklch(81% .117 11.638);"></td></tr>
+///         <tr><td>rose-400</td><td>oklch(71.2% .194 13.428)</td><td style="background-color: oklch(71.2% .194 13.428);"></td></tr>
+///         <tr><td>rose-500</td><td>oklch(64.5% .246 16.439)</td><td style="background-color: oklch(64.5% .246 16.439);"></td></tr>
+///         <tr><td>rose-600</td><td>oklch(58.6% .253 17.585)</td><td style="background-color: oklch(58.6% .253 17.585);"></td></tr>
+///         <tr><td>rose-700</td><td>oklch(51.4% .222 16.935)</td><td style="background-color: oklch(51.4% .222 16.935);"></td></tr>
+///         <tr><td>rose-800</td><td>oklch(45.5% .188 13.697)</td><td style="background-color: oklch(45.5% .188 13.697);"></td></tr>
+///         <tr><td>rose-900</td><td>oklch(41% .159 10.272)</td><td style="background-color: oklch(41% .159 10.272);"></td></tr>
+///         <tr><td>rose-950</td><td>oklch(27.1% .105 12.094)</td><td style="background-color: oklch(27.1% .105 12.094);"></td></tr>
+///         <tr><td>slate-50</td><td>oklch(98.4% .003 247.858)</td><td style="background-color: oklch(98.4% .003 247.858);"></td></tr>
+///         <tr><td>slate-100</td><td>oklch(96.8% .007 247.896)</td><td style="background-color: oklch(96.8% .007 247.896);"></td></tr>
+///         <tr><td>slate-200</td><td>oklch(92.9% .013 255.508)</td><td style="background-color: oklch(92.9% .013 255.508);"></td></tr>
+///         <tr><td>slate-300</td><td>oklch(86.9% .022 252.894)</td><td style="background-color: oklch(86.9% .022 252.894);"></td></tr>
+///         <tr><td>slate-400</td><td>oklch(70.4% .04 256.788)</td><td style="background-color: oklch(70.4% .04 256.788);"></td></tr>
+///         <tr><td>slate-500</td><td>oklch(55.4% .046 257.417)</td><td style="background-color: oklch(55.4% .046 257.417);"></td></tr>
+///         <tr><td>slate-600</td><td>oklch(44.6% .043 257.281)</td><td style="background-color: oklch(44.6% .043 257.281);"></td></tr>
+///         <tr><td>slate-700</td><td>oklch(37.2% .044 257.287)</td><td style="background-color: oklch(37.2% .044 257.287);"></td></tr>
+///         <tr><td>slate-800</td><td>oklch(27.9% .041 260.031)</td><td style="background-color: oklch(27.9% .041 260.031);"></td></tr>
+///         <tr><td>slate-900</td><td>oklch(20.8% .042 265.755)</td><td style="background-color: oklch(20.8% .042 265.755);"></td></tr>
+///         <tr><td>slate-950</td><td>oklch(12.9% .042 264.695)</td><td style="background-color: oklch(12.9% .042 264.695);"></td></tr>
+///         <tr><td>gray-50</td><td>oklch(98.5% .002 247.839)</td><td style="background-color: oklch(98.5% .002 247.839);"></td></tr>
+///         <tr><td>gray-100</td><td>oklch(96.7% .003 264.542)</td><td style="background-color: oklch(96.7% .003 264.542);"></td></tr>
+///         <tr><td>gray-200</td><td>oklch(92.8% .006 264.531)</td><td style="background-color: oklch(92.8% .006 264.531);"></td></tr>
+///         <tr><td>gray-300</td><td>oklch(87.2% .01 258.338)</td><td style="background-color: oklch(87.2% .01 258.338);"></td></tr>
+///         <tr><td>gray-400</td><td>oklch(70.7% .022 261.325)</td><td style="background-color: oklch(70.7% .022 261.325);"></td></tr>
+///         <tr><td>gray-500</td><td>oklch(55.1% .027 264.364)</td><td style="background-color: oklch(55.1% .027 264.364);"></td></tr>
+///         <tr><td>gray-600</td><td>oklch(44.6% .03 256.802)</td><td style="background-color: oklch(44.6% .03 256.802);"></td></tr>
+///         <tr><td>gray-700</td><td>oklch(37.3% .034 259.733)</td><td style="background-color: oklch(37.3% .034 259.733);"></td></tr>
+///         <tr><td>gray-800</td><td>oklch(27.8% .033 256.848)</td><td style="background-color: oklch(27.8% .033 256.848);"></td></tr>
+///         <tr><td>gray-900</td><td>oklch(21% .034 264.665)</td><td style="background-color: oklch(21% .034 264.665);"></td></tr>
+///         <tr><td>gray-950</td><td>oklch(13% .028 261.692)</td><td style="background-color: oklch(13% .028 261.692);"></td></tr>
+///         <tr><td>zinc-50</td><td>oklch(98.5% 0 0)</td><td style="background-color: oklch(98.5% 0 0);"></td></tr>
+///         <tr><td>zinc-100</td><td>oklch(96.7% .001 286.375)</td><td style="background-color: oklch(96.7% .001 286.375);"></td></tr>
+///         <tr><td>zinc-200</td><td>oklch(92% .004 286.32)</td><td style="background-color: oklch(92% .004 286.32);"></td></tr>
+///         <tr><td>zinc-300</td><td>oklch(87.1% .006 286.286)</td><td style="background-color: oklch(87.1% .006 286.286);"></td></tr>
+///         <tr><td>zinc-400</td><td>oklch(70.5% .015 286.067)</td><td style="background-color: oklch(70.5% .015 286.067);"></td></tr>
+///         <tr><td>zinc-500</td><td>oklch(55.2% .016 285.938)</td><td style="background-color: oklch(55.2% .016 285.938);"></td></tr>
+///         <tr><td>zinc-600</td><td>oklch(44.2% .017 285.786)</td><td style="background-color: oklch(44.2% .017 285.786);"></td></tr>
+///         <tr><td>zinc-700</td><td>oklch(37% .013 285.805)</td><td style="background-color: oklch(37% .013 285.805);"></td></tr>
+///         <tr><td>zinc-800</td><td>oklch(27.4% .006 286.033)</td><td style="background-color: oklch(27.4% .006 286.033);"></td></tr>
+///         <tr><td>zinc-900</td><td>oklch(21% .006 285.885)</td><td style="background-color: oklch(21% .006 285.885);"></td></tr>
+///         <tr><td>zinc-950</td><td>oklch(14.1% .005 285.823)</td><td style="background-color: oklch(14.1% .005 285.823);"></td></tr>
+///         <tr><td>neutral-50</td><td>oklch(98.5% 0 0)</td><td style="background-color: oklch(98.5% 0 0);"></td></tr>
+///         <tr><td>neutral-100</td><td>oklch(97% 0 0)</td><td style="background-color: oklch(97% 0 0);"></td></tr>
+///         <tr><td>neutral-200</td><td>oklch(92.2% 0 0)</td><td style="background-color: oklch(92.2% 0 0);"></td></tr>
+///         <tr><td>neutral-300</td><td>oklch(87% 0 0)</td><td style="background-color: oklch(87% 0 0);"></td></tr>
+///         <tr><td>neutral-400</td><td>oklch(70.8% 0 0)</td><td style="background-color: oklch(70.8% 0 0);"></td></tr>
+///         <tr><td>neutral-500</td><td>oklch(55.6% 0 0)</td><td style="background-color: oklch(55.6% 0 0);"></td></tr>
+///         <tr><td>neutral-600</td><td>oklch(43.9% 0 0)</td><td style="background-color: oklch(43.9% 0 0);"></td></tr>
+///         <tr><td>neutral-700</td><td>oklch(37.1% 0 0)</td><td style="background-color: oklch(37.1% 0 0);"></td></tr>
+///         <tr><td>neutral-800</td><td>oklch(26.9% 0 0)</td><td style="background-color: oklch(26.9% 0 0);"></td></tr>
+///         <tr><td>neutral-900</td><td>oklch(20.5% 0 0)</td><td style="background-color: oklch(20.5% 0 0);"></td></tr>
+///         <tr><td>neutral-950</td><td>oklch(14.5% 0 0)</td><td style="background-color: oklch(14.5% 0 0);"></td></tr>
+///         <tr><td>stone-50</td><td>oklch(98.5% .001 106.423)</td><td style="background-color: oklch(98.5% .001 106.423);"></td></tr>
+///         <tr><td>stone-100</td><td>oklch(97% .001 106.424)</td><td style="background-color: oklch(97% .001 106.424);"></td></tr>
+///         <tr><td>stone-200</td><td>oklch(92.3% .003 48.717)</td><td style="background-color: oklch(92.3% .003 48.717);"></td></tr>
+///         <tr><td>stone-300</td><td>oklch(86.9% .005 56.366)</td><td style="background-color: oklch(86.9% .005 56.366);"></td></tr>
+///         <tr><td>stone-400</td><td>oklch(70.9% .01 56.259)</td><td style="background-color: oklch(70.9% .01 56.259);"></td></tr>
+///         <tr><td>stone-500</td><td>oklch(55.3% .013 58.071)</td><td style="background-color: oklch(55.3% .013 58.071);"></td></tr>
+///         <tr><td>stone-600</td><td>oklch(44.4% .011 73.639)</td><td style="background-color: oklch(44.4% .011 73.639);"></td></tr>
+///         <tr><td>stone-700</td><td>oklch(37.4% .01 67.558)</td><td style="background-color: oklch(37.4% .01 67.558);"></td></tr>
+///         <tr><td>stone-800</td><td>oklch(26.8% .007 34.298)</td><td style="background-color: oklch(26.8% .007 34.298);"></td></tr>
+///         <tr><td>stone-900</td><td>oklch(21.6% .006 56.043)</td><td style="background-color: oklch(21.6% .006 56.043);"></td></tr>
+///         <tr><td>stone-950</td><td>oklch(14.7% .004 49.25)</td><td style="background-color: oklch(14.7% .004 49.25);"></td></tr>
+///         <tr><td>black</td><td>#000</td><td style="background-color: #000;"></td></tr>
+///         <tr><td>white</td><td>#fff</td><td style="background-color: #fff;"></td></tr>
 ///     </tbody>
 /// </table>
 ///
 /// Based on [Tailwind's default color palette](https://tailwindcss.com/docs/customizing-colors).
-pub const BUILTIN_COLORS: phf::Map<&str, (u8, u8, u8)> = phf_map! {
-    "slate-50" => (248, 250, 252),
-    "slate-100" => (241, 245, 249),
-    "slate-200" => (226, 232, 240),
-    "slate-300" => (203, 213, 225),
-    "slate-400" => (148, 163, 184),
-    "slate-500" => (100, 116, 139),
-    "slate-600" => (71, 85, 105),
-    "slate-700" => (51, 65, 85),
-    "slate-800" => (30, 41, 59),
-    "slate-900" => (15, 23, 42),
-    "gray-50" => (249, 250, 251),
-    "gray-100" => (243, 244, 246),
-    "gray-200" => (229, 231, 235),
-    "gray-300" => (209, 213, 219),
-    "gray-400" => (156, 163, 175),
-    "gray-500" => (107, 114, 128),
-    "gray-600" => (75, 85, 99),
-    "gray-700" => (55, 65, 81),
-    "gray-800" => (31, 41, 55),
-    "gray-900" => (17, 24, 39),
-    "zinc-50" => (250, 250, 250),
-    "zinc-100" => (244, 244, 245),
-    "zinc-200" => (228, 228, 231),
-    "zinc-300" => (212, 212, 216),
-    "zinc-400" => (161, 161, 170),
-    "zinc-500" => (113, 113, 122),
-    "zinc-600" => (82, 82, 91),
-    "zinc-700" => (63, 63, 70),
-    "zinc-800" => (39, 39, 42),
-    "zinc-900" => (24, 24, 27),
-    "neutral-50" => (250, 250, 250),
-    "neutral-100" => (245, 245, 245),
-    "neutral-200" => (229, 229, 229),
-    "neutral-300" => (212, 212, 212),
-    "neutral-400" => (163, 163, 163),
-    "neutral-500" => (115, 115, 115),
-    "neutral-600" => (82, 82, 82),
-    "neutral-700" => (64, 64, 64),
-    "neutral-800" => (38, 38, 38),
-    "neutral-900" => (23, 23, 23),
-    "stone-50" => (250, 250, 249),
-    "stone-100" => (245, 245, 244),
-    "stone-200" => (231, 229, 228),
-    "stone-300" => (214, 211, 209),
-    "stone-400" => (168, 162, 158),
-    "stone-500" => (120, 113, 108),
-    "stone-600" => (87, 83, 78),
-    "stone-700" => (68, 64, 60),
-    "stone-800" => (41, 37, 36),
-    "stone-900" => (28, 25, 23),
-    "red-50" => (254, 242, 242),
-    "red-100" => (254, 226, 226),
-    "red-200" => (254, 202, 202),
-    "red-300" => (252, 165, 165),
-    "red-400" => (248, 113, 113),
-    "red-500" => (239, 68, 68),
-    "red-600" => (220, 38, 38),
-    "red-700" => (185, 28, 28),
-    "red-800" => (153, 27, 27),
-    "red-900" => (127, 29, 29),
-    "orange-50" => (255, 247, 237),
-    "orange-100" => (255, 237, 213),
-    "orange-200" => (254, 215, 170),
-    "orange-300" => (253, 186, 116),
-    "orange-400" => (251, 146, 60),
-    "orange-500" => (249, 115, 22),
-    "orange-600" => (234, 88, 12),
-    "orange-700" => (194, 65, 12),
-    "orange-800" => (154, 52, 18),
-    "orange-900" => (124, 45, 18),
-    "amber-50" => (255, 251, 235),
-    "amber-100" => (254, 243, 199),
-    "amber-200" => (253, 230, 138),
-    "amber-300" => (252, 211, 77),
-    "amber-400" => (251, 191, 36),
-    "amber-500" => (245, 158, 11),
-    "amber-600" => (217, 119, 6),
-    "amber-700" => (180, 83, 9),
-    "amber-800" => (146, 64, 14),
-    "amber-900" => (120, 53, 15),
-    "yellow-50" => (254, 252, 232),
-    "yellow-100" => (254, 249, 195),
-    "yellow-200" => (254, 240, 138),
-    "yellow-300" => (253, 224, 71),
-    "yellow-400" => (250, 204, 21),
-    "yellow-500" => (234, 179, 8),
-    "yellow-600" => (202, 138, 4),
-    "yellow-700" => (161, 98, 7),
-    "yellow-800" => (133, 77, 14),
-    "yellow-900" => (113, 63, 18),
-    "lime-50" => (247, 254, 231),
-    "lime-100" => (236, 252, 203),
-    "lime-200" => (217, 249, 157),
-    "lime-300" => (190, 242, 100),
-    "lime-400" => (163, 230, 53),
-    "lime-500" => (132, 204, 22),
-    "lime-600" => (101, 163, 13),
-    "lime-700" => (77, 124, 15),
-    "lime-800" => (63, 98, 18),
-    "lime-900" => (54, 83, 20),
-    "green-50" => (240, 253, 244),
-    "green-100" => (220, 252, 231),
-    "green-200" => (187, 247, 208),
-    "green-300" => (134, 239, 172),
-    "green-400" => (74, 222, 128),
-    "green-500" => (34, 197, 94),
-    "green-600" => (22, 163, 74),
-    "green-700" => (21, 128, 61),
-    "green-800" => (22, 101, 52),
-    "green-900" => (20, 83, 45),
-    "emerald-50" => (236, 253, 245),
-    "emerald-100" => (209, 250, 229),
-    "emerald-200" => (167, 243, 208),
-    "emerald-300" => (110, 231, 183),
-    "emerald-400" => (52, 211, 153),
-    "emerald-500" => (16, 185, 129),
-    "emerald-600" => (5, 150, 105),
-    "emerald-700" => (4, 120, 87),
-    "emerald-800" => (6, 95, 70),
-    "emerald-900" => (6, 78, 59),
-    "teal-50" => (240, 253, 250),
-    "teal-100" => (204, 251, 241),
-    "teal-200" => (153, 246, 228),
-    "teal-300" => (94, 234, 212),
-    "teal-400" => (45, 212, 191),
-    "teal-500" => (20, 184, 166),
-    "teal-600" => (13, 148, 136),
-    "teal-700" => (15, 118, 110),
-    "teal-800" => (17, 94, 89),
-    "teal-900" => (19, 78, 74),
-    "cyan-50" => (236, 254, 255),
-    "cyan-100" => (207, 250, 254),
-    "cyan-200" => (165, 243, 252),
-    "cyan-300" => (103, 232, 249),
-    "cyan-400" => (34, 211, 238),
-    "cyan-500" => (6, 182, 212),
-    "cyan-600" => (8, 145, 178),
-    "cyan-700" => (14, 116, 144),
-    "cyan-800" => (21, 94, 117),
-    "cyan-900" => (22, 78, 99),
-    "sky-50" => (240, 249, 255),
-    "sky-100" => (224, 242, 254),
-    "sky-200" => (186, 230, 253),
-    "sky-300" => (125, 211, 252),
-    "sky-400" => (56, 189, 248),
-    "sky-500" => (14, 165, 233),
-    "sky-600" => (2, 132, 199),
-    "sky-700" => (3, 105, 161),
-    "sky-800" => (7, 89, 133),
-    "sky-900" => (12, 74, 110),
-    "blue-50" => (239, 246, 255),
-    "blue-100" => (219, 234, 254),
-    "blue-200" => (191, 219, 254),
-    "blue-300" => (147, 197, 253),
-    "blue-400" => (96, 165, 250),
-    "blue-500" => (59, 130, 246),
-    "blue-600" => (37, 99, 235),
-    "blue-700" => (29, 78, 216),
-    "blue-800" => (30, 64, 175),
-    "blue-900" => (30, 58, 138),
-    "indigo-50" => (238, 242, 255),
-    "indigo-100" => (224, 231, 255),
-    "indigo-200" => (199, 210, 254),
-    "indigo-300" => (165, 180, 252),
-    "indigo-400" => (129, 140, 248),
-    "indigo-500" => (99, 102, 241),
-    "indigo-600" => (79, 70, 229),
-    "indigo-700" => (67, 56, 202),
-    "indigo-800" => (55, 48, 163),
-    "indigo-900" => (49, 46, 129),
-    "violet-50" => (245, 243, 255),
-    "violet-100" => (237, 233, 254),
-    "violet-200" => (221, 214, 254),
-    "violet-300" => (196, 181, 253),
-    "violet-400" => (167, 139, 250),
-    "violet-500" => (139, 92, 246),
-    "violet-600" => (124, 58, 237),
-    "violet-700" => (109, 40, 217),
-    "violet-800" => (91, 33, 182),
-    "violet-900" => (76, 29, 149),
-    "purple-50" => (250, 245, 255),
-    "purple-100" => (243, 232, 255),
-    "purple-200" => (233, 213, 255),
-    "purple-300" => (216, 180, 254),
-    "purple-400" => (192, 132, 252),
-    "purple-500" => (168, 85, 247),
-    "purple-600" => (147, 51, 234),
-    "purple-700" => (126, 34, 206),
-    "purple-800" => (107, 33, 168),
-    "purple-900" => (88, 28, 135),
-    "fuchsia-50" => (253, 244, 255),
-    "fuchsia-100" => (250, 232, 255),
-    "fuchsia-200" => (245, 208, 254),
-    "fuchsia-300" => (240, 171, 252),
-    "fuchsia-400" => (232, 121, 249),
-    "fuchsia-500" => (217, 70, 239),
-    "fuchsia-600" => (192, 38, 211),
-    "fuchsia-700" => (162, 28, 175),
-    "fuchsia-800" => (134, 25, 143),
-    "fuchsia-900" => (112, 26, 117),
-    "pink-50" => (253, 242, 248),
-    "pink-100" => (252, 231, 243),
-    "pink-200" => (251, 207, 232),
-    "pink-300" => (249, 168, 212),
-    "pink-400" => (244, 114, 182),
-    "pink-500" => (236, 72, 153),
-    "pink-600" => (219, 39, 119),
-    "pink-700" => (190, 24, 93),
-    "pink-800" => (157, 23, 77),
-    "pink-900" => (131, 24, 67),
-    "rose-50" => (255, 241, 242),
-    "rose-100" => (255, 228, 230),
-    "rose-200" => (254, 205, 211),
-    "rose-300" => (253, 164, 175),
-    "rose-400" => (251, 113, 133),
-    "rose-500" => (244, 63, 94),
-    "rose-600" => (225, 29, 72),
-    "rose-700" => (190, 18, 60),
-    "rose-800" => (159, 18, 57),
-    "rose-900" => (136, 19, 55),
+pub const BUILTIN_COLORS: phf::Map<&str, &'static str> = phf_map! {
+    "red-50" => "oklch(97.1% .013 17.38)",
+    "red-100" => "oklch(93.6% .032 17.717)",
+    "red-200" => "oklch(88.5% .062 18.334)",
+    "red-300" => "oklch(80.8% .114 19.571)",
+    "red-400" => "oklch(70.4% .191 22.216)",
+    "red-500" => "oklch(63.7% .237 25.331)",
+    "red-600" => "oklch(57.7% .245 27.325)",
+    "red-700" => "oklch(50.5% .213 27.518)",
+    "red-800" => "oklch(44.4% .177 26.899)",
+    "red-900" => "oklch(39.6% .141 25.723)",
+    "red-950" => "oklch(25.8% .092 26.042)",
+    "orange-50" => "oklch(98% .016 73.684)",
+    "orange-100" => "oklch(95.4% .038 75.164)",
+    "orange-200" => "oklch(90.1% .076 70.697)",
+    "orange-300" => "oklch(83.7% .128 66.29)",
+    "orange-400" => "oklch(75% .183 55.934)",
+    "orange-500" => "oklch(70.5% .213 47.604)",
+    "orange-600" => "oklch(64.6% .222 41.116)",
+    "orange-700" => "oklch(55.3% .195 38.402)",
+    "orange-800" => "oklch(47% .157 37.304)",
+    "orange-900" => "oklch(40.8% .123 38.172)",
+    "orange-950" => "oklch(26.6% .079 36.259)",
+    "amber-50" => "oklch(98.7% .022 95.277)",
+    "amber-100" => "oklch(96.2% .059 95.617)",
+    "amber-200" => "oklch(92.4% .12 95.746)",
+    "amber-300" => "oklch(87.9% .169 91.605)",
+    "amber-400" => "oklch(82.8% .189 84.429)",
+    "amber-500" => "oklch(76.9% .188 70.08)",
+    "amber-600" => "oklch(66.6% .179 58.318)",
+    "amber-700" => "oklch(55.5% .163 48.998)",
+    "amber-800" => "oklch(47.3% .137 46.201)",
+    "amber-900" => "oklch(41.4% .112 45.904)",
+    "amber-950" => "oklch(27.9% .077 45.635)",
+    "yellow-50" => "oklch(98.7% .026 102.212)",
+    "yellow-100" => "oklch(97.3% .071 103.193)",
+    "yellow-200" => "oklch(94.5% .129 101.54)",
+    "yellow-300" => "oklch(90.5% .182 98.111)",
+    "yellow-400" => "oklch(85.2% .199 91.936)",
+    "yellow-500" => "oklch(79.5% .184 86.047)",
+    "yellow-600" => "oklch(68.1% .162 75.834)",
+    "yellow-700" => "oklch(55.4% .135 66.442)",
+    "yellow-800" => "oklch(47.6% .114 61.907)",
+    "yellow-900" => "oklch(42.1% .095 57.708)",
+    "yellow-950" => "oklch(28.6% .066 53.813)",
+    "lime-50" => "oklch(98.6% .031 120.757)",
+    "lime-100" => "oklch(96.7% .067 122.328)",
+    "lime-200" => "oklch(93.8% .127 124.321)",
+    "lime-300" => "oklch(89.7% .196 126.665)",
+    "lime-400" => "oklch(84.1% .238 128.85)",
+    "lime-500" => "oklch(76.8% .233 130.85)",
+    "lime-600" => "oklch(64.8% .2 131.684)",
+    "lime-700" => "oklch(53.2% .157 131.589)",
+    "lime-800" => "oklch(45.3% .124 130.933)",
+    "lime-900" => "oklch(40.5% .101 131.063)",
+    "lime-950" => "oklch(27.4% .072 132.109)",
+    "green-50" => "oklch(98.2% .018 155.826)",
+    "green-100" => "oklch(96.2% .044 156.743)",
+    "green-200" => "oklch(92.5% .084 155.995)",
+    "green-300" => "oklch(87.1% .15 154.449)",
+    "green-400" => "oklch(79.2% .209 151.711)",
+    "green-500" => "oklch(72.3% .219 149.579)",
+    "green-600" => "oklch(62.7% .194 149.214)",
+    "green-700" => "oklch(52.7% .154 150.069)",
+    "green-800" => "oklch(44.8% .119 151.328)",
+    "green-900" => "oklch(39.3% .095 152.535)",
+    "green-950" => "oklch(26.6% .065 152.934)",
+    "emerald-50" => "oklch(97.9% .021 166.113)",
+    "emerald-100" => "oklch(95% .052 163.051)",
+    "emerald-200" => "oklch(90.5% .093 164.15)",
+    "emerald-300" => "oklch(84.5% .143 164.978)",
+    "emerald-400" => "oklch(76.5% .177 163.223)",
+    "emerald-500" => "oklch(69.6% .17 162.48)",
+    "emerald-600" => "oklch(59.6% .145 163.225)",
+    "emerald-700" => "oklch(50.8% .118 165.612)",
+    "emerald-800" => "oklch(43.2% .095 166.913)",
+    "emerald-900" => "oklch(37.8% .077 168.94)",
+    "emerald-950" => "oklch(26.2% .051 172.552)",
+    "teal-50" => "oklch(98.4% .014 180.72)",
+    "teal-100" => "oklch(95.3% .051 180.801)",
+    "teal-200" => "oklch(91% .096 180.426)",
+    "teal-300" => "oklch(85.5% .138 181.071)",
+    "teal-400" => "oklch(77.7% .152 181.912)",
+    "teal-500" => "oklch(70.4% .14 182.503)",
+    "teal-600" => "oklch(60% .118 184.704)",
+    "teal-700" => "oklch(51.1% .096 186.391)",
+    "teal-800" => "oklch(43.7% .078 188.216)",
+    "teal-900" => "oklch(38.6% .063 188.416)",
+    "teal-950" => "oklch(27.7% .046 192.524)",
+    "cyan-50" => "oklch(98.4% .019 200.873)",
+    "cyan-100" => "oklch(95.6% .045 203.388)",
+    "cyan-200" => "oklch(91.7% .08 205.041)",
+    "cyan-300" => "oklch(86.5% .127 207.078)",
+    "cyan-400" => "oklch(78.9% .154 211.53)",
+    "cyan-500" => "oklch(71.5% .143 215.221)",
+    "cyan-600" => "oklch(60.9% .126 221.723)",
+    "cyan-700" => "oklch(52% .105 223.128)",
+    "cyan-800" => "oklch(45% .085 224.283)",
+    "cyan-900" => "oklch(39.8% .07 227.392)",
+    "cyan-950" => "oklch(30.2% .056 229.695)",
+    "sky-50" => "oklch(97.7% .013 236.62)",
+    "sky-100" => "oklch(95.1% .026 236.824)",
+    "sky-200" => "oklch(90.1% .058 230.902)",
+    "sky-300" => "oklch(82.8% .111 230.318)",
+    "sky-400" => "oklch(74.6% .16 232.661)",
+    "sky-500" => "oklch(68.5% .169 237.323)",
+    "sky-600" => "oklch(58.8% .158 241.966)",
+    "sky-700" => "oklch(50% .134 242.749)",
+    "sky-800" => "oklch(44.3% .11 240.79)",
+    "sky-900" => "oklch(39.1% .09 240.876)",
+    "sky-950" => "oklch(29.3% .066 243.157)",
+    "blue-50" => "oklch(97% .014 254.604)",
+    "blue-100" => "oklch(93.2% .032 255.585)",
+    "blue-200" => "oklch(88.2% .059 254.128)",
+    "blue-300" => "oklch(80.9% .105 251.813)",
+    "blue-400" => "oklch(70.7% .165 254.624)",
+    "blue-500" => "oklch(62.3% .214 259.815)",
+    "blue-600" => "oklch(54.6% .245 262.881)",
+    "blue-700" => "oklch(48.8% .243 264.376)",
+    "blue-800" => "oklch(42.4% .199 265.638)",
+    "blue-900" => "oklch(37.9% .146 265.522)",
+    "blue-950" => "oklch(28.2% .091 267.935)",
+    "indigo-50" => "oklch(96.2% .018 272.314)",
+    "indigo-100" => "oklch(93% .034 272.788)",
+    "indigo-200" => "oklch(87% .065 274.039)",
+    "indigo-300" => "oklch(78.5% .115 274.713)",
+    "indigo-400" => "oklch(67.3% .182 276.935)",
+    "indigo-500" => "oklch(58.5% .233 277.117)",
+    "indigo-600" => "oklch(51.1% .262 276.966)",
+    "indigo-700" => "oklch(45.7% .24 277.023)",
+    "indigo-800" => "oklch(39.8% .195 277.366)",
+    "indigo-900" => "oklch(35.9% .144 278.697)",
+    "indigo-950" => "oklch(25.7% .09 281.288)",
+    "violet-50" => "oklch(96.9% .016 293.756)",
+    "violet-100" => "oklch(94.3% .029 294.588)",
+    "violet-200" => "oklch(89.4% .057 293.283)",
+    "violet-300" => "oklch(81.1% .111 293.571)",
+    "violet-400" => "oklch(70.2% .183 293.541)",
+    "violet-500" => "oklch(60.6% .25 292.717)",
+    "violet-600" => "oklch(54.1% .281 293.009)",
+    "violet-700" => "oklch(49.1% .27 292.581)",
+    "violet-800" => "oklch(43.2% .232 292.759)",
+    "violet-900" => "oklch(38% .189 293.745)",
+    "violet-950" => "oklch(28.3% .141 291.089)",
+    "purple-50" => "oklch(97.7% .014 308.299)",
+    "purple-100" => "oklch(94.6% .033 307.174)",
+    "purple-200" => "oklch(90.2% .063 306.703)",
+    "purple-300" => "oklch(82.7% .119 306.383)",
+    "purple-400" => "oklch(71.4% .203 305.504)",
+    "purple-500" => "oklch(62.7% .265 303.9)",
+    "purple-600" => "oklch(55.8% .288 302.321)",
+    "purple-700" => "oklch(49.6% .265 301.924)",
+    "purple-800" => "oklch(43.8% .218 303.724)",
+    "purple-900" => "oklch(38.1% .176 304.987)",
+    "purple-950" => "oklch(29.1% .149 302.717)",
+    "fuchsia-50" => "oklch(97.7% .017 320.058)",
+    "fuchsia-100" => "oklch(95.2% .037 318.852)",
+    "fuchsia-200" => "oklch(90.3% .076 319.62)",
+    "fuchsia-300" => "oklch(83.3% .145 321.434)",
+    "fuchsia-400" => "oklch(74% .238 322.16)",
+    "fuchsia-500" => "oklch(66.7% .295 322.15)",
+    "fuchsia-600" => "oklch(59.1% .293 322.896)",
+    "fuchsia-700" => "oklch(51.8% .253 323.949)",
+    "fuchsia-800" => "oklch(45.2% .211 324.591)",
+    "fuchsia-900" => "oklch(40.1% .17 325.612)",
+    "fuchsia-950" => "oklch(29.3% .136 325.661)",
+    "pink-50" => "oklch(97.1% .014 343.198)",
+    "pink-100" => "oklch(94.8% .028 342.258)",
+    "pink-200" => "oklch(89.9% .061 343.231)",
+    "pink-300" => "oklch(82.3% .12 346.018)",
+    "pink-400" => "oklch(71.8% .202 349.761)",
+    "pink-500" => "oklch(65.6% .241 354.308)",
+    "pink-600" => "oklch(59.2% .249 .584)",
+    "pink-700" => "oklch(52.5% .223 3.958)",
+    "pink-800" => "oklch(45.9% .187 3.815)",
+    "pink-900" => "oklch(40.8% .153 2.432)",
+    "pink-950" => "oklch(28.4% .109 3.907)",
+    "rose-50" => "oklch(96.9% .015 12.422)",
+    "rose-100" => "oklch(94.1% .03 12.58)",
+    "rose-200" => "oklch(89.2% .058 10.001)",
+    "rose-300" => "oklch(81% .117 11.638)",
+    "rose-400" => "oklch(71.2% .194 13.428)",
+    "rose-500" => "oklch(64.5% .246 16.439)",
+    "rose-600" => "oklch(58.6% .253 17.585)",
+    "rose-700" => "oklch(51.4% .222 16.935)",
+    "rose-800" => "oklch(45.5% .188 13.697)",
+    "rose-900" => "oklch(41% .159 10.272)",
+    "rose-950" => "oklch(27.1% .105 12.094)",
+    "slate-50" => "oklch(98.4% .003 247.858)",
+    "slate-100" => "oklch(96.8% .007 247.896)",
+    "slate-200" => "oklch(92.9% .013 255.508)",
+    "slate-300" => "oklch(86.9% .022 252.894)",
+    "slate-400" => "oklch(70.4% .04 256.788)",
+    "slate-500" => "oklch(55.4% .046 257.417)",
+    "slate-600" => "oklch(44.6% .043 257.281)",
+    "slate-700" => "oklch(37.2% .044 257.287)",
+    "slate-800" => "oklch(27.9% .041 260.031)",
+    "slate-900" => "oklch(20.8% .042 265.755)",
+    "slate-950" => "oklch(12.9% .042 264.695)",
+    "gray-50" => "oklch(98.5% .002 247.839)",
+    "gray-100" => "oklch(96.7% .003 264.542)",
+    "gray-200" => "oklch(92.8% .006 264.531)",
+    "gray-300" => "oklch(87.2% .01 258.338)",
+    "gray-400" => "oklch(70.7% .022 261.325)",
+    "gray-500" => "oklch(55.1% .027 264.364)",
+    "gray-600" => "oklch(44.6% .03 256.802)",
+    "gray-700" => "oklch(37.3% .034 259.733)",
+    "gray-800" => "oklch(27.8% .033 256.848)",
+    "gray-900" => "oklch(21% .034 264.665)",
+    "gray-950" => "oklch(13% .028 261.692)",
+    "zinc-50" => "oklch(98.5% 0 0)",
+    "zinc-100" => "oklch(96.7% .001 286.375)",
+    "zinc-200" => "oklch(92% .004 286.32)",
+    "zinc-300" => "oklch(87.1% .006 286.286)",
+    "zinc-400" => "oklch(70.5% .015 286.067)",
+    "zinc-500" => "oklch(55.2% .016 285.938)",
+    "zinc-600" => "oklch(44.2% .017 285.786)",
+    "zinc-700" => "oklch(37% .013 285.805)",
+    "zinc-800" => "oklch(27.4% .006 286.033)",
+    "zinc-900" => "oklch(21% .006 285.885)",
+    "zinc-950" => "oklch(14.1% .005 285.823)",
+    "neutral-50" => "oklch(98.5% 0 0)",
+    "neutral-100" => "oklch(97% 0 0)",
+    "neutral-200" => "oklch(92.2% 0 0)",
+    "neutral-300" => "oklch(87% 0 0)",
+    "neutral-400" => "oklch(70.8% 0 0)",
+    "neutral-500" => "oklch(55.6% 0 0)",
+    "neutral-600" => "oklch(43.9% 0 0)",
+    "neutral-700" => "oklch(37.1% 0 0)",
+    "neutral-800" => "oklch(26.9% 0 0)",
+    "neutral-900" => "oklch(20.5% 0 0)",
+    "neutral-950" => "oklch(14.5% 0 0)",
+    "stone-50" => "oklch(98.5% .001 106.423)",
+    "stone-100" => "oklch(97% .001 106.424)",
+    "stone-200" => "oklch(92.3% .003 48.717)",
+    "stone-300" => "oklch(86.9% .005 56.366)",
+    "stone-400" => "oklch(70.9% .01 56.259)",
+    "stone-500" => "oklch(55.3% .013 58.071)",
+    "stone-600" => "oklch(44.4% .011 73.639)",
+    "stone-700" => "oklch(37.4% .01 67.558)",
+    "stone-800" => "oklch(26.8% .007 34.298)",
+    "stone-900" => "oklch(21.6% .006 56.043)",
+    "stone-950" => "oklch(14.7% .004 49.25)",
+    "black" => "#000",
+    "white" => "#fff",
 };
 
 /// The list of all default screen breakpoints.
@@ -963,8 +1010,7 @@ pub enum DarkMode {
     /// );
     ///
     /// assert!(generated.ends_with(r#"body.dark .dark\:text-white {
-    ///   --en-text-opacity: 1;
-    ///   color: rgb(255 255 255 / var(--en-text-opacity));
+    ///   color: #fff;
     /// }"#));
     /// ```
     Class(Cow<'static, str>),
@@ -987,8 +1033,7 @@ pub enum DarkMode {
     ///
     /// assert!(generated.ends_with(r#"@media (prefers-color-scheme: dark) {
     ///   .dark\:text-white {
-    ///     --en-text-opacity: 1;
-    ///     color: rgb(255 255 255 / var(--en-text-opacity));
+    ///     color: #fff;
     ///   }
     /// }"#));
     /// ```
@@ -1126,8 +1171,7 @@ impl Colors {
 /// }
 ///
 /// .btn {
-///   --en-bg-opacity: 1;
-///   background-color: rgb(239 68 68 / var(--en-bg-opacity));
+///   background-color: oklch(63.7% .237 25.331);
 /// }"#));
 /// ```
 #[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize, Clone)]
@@ -1484,8 +1528,7 @@ impl Config {
     /// );
     ///
     /// assert!(generated.ends_with(".headings\\:text-gray-700 :where(h1, h2, h3, h4, h5, h6) {
-    ///   --en-text-opacity: 1;
-    ///   color: rgb(55 65 81 / var(--en-text-opacity));
+    ///   color: oklch(37.3% .034 259.733);
     /// }"));
     /// ```
     pub fn register_variant<T: Into<Cow<'static, str>>>(
@@ -1579,8 +1622,7 @@ mod tests {
             String::from(
                 r"@media (min-width: 1600px) {
   .\33xl\:text-rosa-500 {
-    --en-text-opacity: 1;
-    color: rgb(229 24 106 / var(--en-text-opacity));
+    color: #e5186a;
   }
 }"
             )
@@ -1609,13 +1651,11 @@ mod tests {
 }
 
 .bg-yellow-500 {
-  --en-bg-opacity: 1;
-  background-color: rgb(234 179 8 / var(--en-bg-opacity));
+  background-color: oklch(79.5% .184 86.047);
 }
 
 .btn {
-  --en-bg-opacity: 1;
-  background-color: rgb(239 68 68 / var(--en-bg-opacity));
+  background-color: oklch(63.7% .237 25.331);
 }"
             )
         );
@@ -1643,8 +1683,7 @@ mod tests {
 }
 
 .btn-primary {
-  --en-bg-opacity: 1;
-  background-color: rgb(239 68 68 / var(--en-bg-opacity));
+  background-color: oklch(63.7% .237 25.331);
 }"
             )
         );
@@ -1672,8 +1711,7 @@ mod tests {
 }
 
 .btn-primary {
-  --en-bg-opacity: 1;
-  background-color: rgb(239 68 68 / var(--en-bg-opacity));
+  background-color: oklch(63.7% .237 25.331);
 }"
             )
         );
@@ -1692,18 +1730,15 @@ mod tests {
             generated,
             String::from(
                 ".bg-red-300 {
-  --en-bg-opacity: 1;
-  background-color: rgb(252 165 165 / var(--en-bg-opacity));
+  background-color: oklch(80.8% .114 19.571);
 }
 
 .btn {
-  --en-text-opacity: 1;
-  color: rgb(248 113 113 / var(--en-text-opacity));
+  color: oklch(70.4% .191 22.216);
 }
 
 .text-red-500 {
-  --en-text-opacity: 1;
-  color: rgb(239 68 68 / var(--en-text-opacity));
+  color: oklch(63.7% .237 25.331);
 }"
             )
         );
@@ -1823,18 +1858,15 @@ mod tests {
             generated,
             String::from(
                 r".bg-rosa-500 {
-  --en-bg-opacity: 1;
-  background-color: rgb(229 24 106 / var(--en-bg-opacity));
+  background-color: #e5186a;
 }
 
 .bg-yellow-100 {
-  --en-bg-opacity: 1;
-  background-color: rgb(254 249 195 / var(--en-bg-opacity));
+  background-color: oklch(97.3% .071 103.193);
 }
 
 .bg-yellow-400 {
-  --en-bg-opacity: 1;
-  background-color: rgb(255 239 14 / var(--en-bg-opacity));
+  background-color: #ffef0e;
 }
 
 @media (min-width: 1600px) {
@@ -1846,8 +1878,7 @@ mod tests {
 
 @media (min-width: 2000px) {
   .lg\:text-rosa-500 {
-    --en-text-opacity: 1;
-    color: rgb(229 24 106 / var(--en-text-opacity));
+    color: #e5186a;
   }
 }"
             )

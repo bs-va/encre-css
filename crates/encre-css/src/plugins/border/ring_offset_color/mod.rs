@@ -23,7 +23,7 @@ impl Plugin for PluginDefinition {
         match context.modifier {
             Modifier::Builtin { value, .. } => context.buffer.line(format_args!(
                 "--en-ring-offset-color: {};",
-                color::get(context.config, value, None).unwrap()
+                color::get(context.config, value).unwrap()
             )),
             Modifier::Arbitrary { value, .. } => {
                 context

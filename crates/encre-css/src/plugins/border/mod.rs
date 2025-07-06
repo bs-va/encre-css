@@ -26,8 +26,7 @@ mod tests {
         assert_eq!(
             generate(["border-red-400"], &base_config()),
             ".border-red-400 {
-  --en-border-opacity: 1;
-  border-color: rgb(248 113 113 / var(--en-border-opacity));
+  border-color: oklch(70.4% .191 22.216);
 }"
         );
         assert_eq!(
@@ -46,14 +45,13 @@ mod tests {
         assert_eq!(
             generate(["border-s-blue-400"], &base_config()),
             ".border-s-blue-400 {
-  --en-border-opacity: 1;
-  border-inline-start-color: rgb(96 165 250 / var(--en-border-opacity));
+  border-inline-start-color: oklch(70.7% .165 254.624);
 }"
         );
         assert_eq!(
             generate(["border-e-blue-400/10"], &base_config()),
             r".border-e-blue-400\/10 {
-  border-inline-end-color: rgb(96 165 250 / 0.1);
+  border-inline-end-color: color-mix(in oklab, oklch(70.7% .165 254.624) 10%, transparent);
 }"
         );
     }
@@ -239,8 +237,7 @@ mod tests {
         assert_eq!(
             generate(["divide-red-400"], &base_config()),
             ".divide-red-400 > :not([hidden]) ~ :not([hidden]) {
-  --en-divide-opacity: 1;
-  border-color: rgb(248 113 113 / var(--en-divide-opacity));
+  border-color: oklch(70.4% .191 22.216);
 }"
         );
         assert_eq!(
@@ -335,7 +332,7 @@ mod tests {
         assert_eq!(
             generate(["outline-red-400"], &base_config()),
             ".outline-red-400 {
-  outline-color: rgb(248 113 113);
+  outline-color: oklch(70.4% .191 22.216);
 }"
         );
         assert_eq!(
@@ -391,8 +388,7 @@ mod tests {
         assert_eq!(
             generate(["ring-red-400"], &base_config()),
             ".ring-red-400 {
-  --en-ring-opacity: 1;
-  --en-ring-color: rgb(248 113 113 / var(--en-ring-opacity));
+  --en-ring-color: oklch(70.4% .191 22.216);
 }"
         );
         assert_eq!(
@@ -427,7 +423,7 @@ mod tests {
             generate(["ring-offset-red-400"], &base_config()),
             ".ring-offset-red-400 {
   --en-ring-offset-shadow: var(--en-ring-inset) 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color);
-  --en-ring-offset-color: rgb(248 113 113);
+  --en-ring-offset-color: oklch(70.4% .191 22.216);
 }"
         );
         assert_eq!(

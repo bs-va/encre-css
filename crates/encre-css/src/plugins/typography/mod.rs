@@ -569,8 +569,7 @@ mod tests {
         assert_eq!(
             generate(["text-red-400"], &base_config()),
             ".text-red-400 {
-  --en-text-opacity: 1;
-  color: rgb(248 113 113 / var(--en-text-opacity));
+  color: oklch(70.4% .191 22.216);
 }"
         );
         assert_eq!(
@@ -610,8 +609,8 @@ mod tests {
         assert_eq!(
             generate(["decoration-red-400"], &base_config()),
             ".decoration-red-400 {
-  -webkit-text-decoration-color: rgb(248 113 113);
-  text-decoration-color: rgb(248 113 113);
+  -webkit-text-decoration-color: oklch(70.4% .191 22.216);
+  text-decoration-color: oklch(70.4% .191 22.216);
 }"
         );
         assert_eq!(

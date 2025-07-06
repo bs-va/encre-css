@@ -28,10 +28,7 @@ impl Plugin for PluginDefinition {
                 |context: &mut ContextHandle| match context.modifier {
                     Modifier::Builtin { value, .. } => {
                         let color =
-                            color::get(context.config, value, Some("--en-divide-opacity")).unwrap();
-                        if color.contains("--en-divide-opacity") {
-                            context.buffer.line("--en-divide-opacity: 1;");
-                        }
+                            color::get(context.config, value).unwrap();
 
                         context.buffer.line(format_args!("border-color: {color};"));
                     }

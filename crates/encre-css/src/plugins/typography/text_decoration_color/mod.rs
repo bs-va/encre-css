@@ -20,7 +20,7 @@ impl Plugin for PluginDefinition {
     fn handle(&self, context: &mut ContextHandle) {
         match context.modifier {
             Modifier::Builtin { value, .. } => {
-                let value = color::get(context.config, value, None).unwrap();
+                let value = color::get(context.config, value).unwrap();
                 context.buffer.lines([
                     format_args!("-webkit-text-decoration-color: {value};"),
                     format_args!("text-decoration-color: {value};"),

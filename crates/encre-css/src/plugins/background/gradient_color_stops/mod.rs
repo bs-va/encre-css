@@ -2,8 +2,6 @@
 #![doc(alias("background", "bg", "gradient"))]
 use crate::prelude::build_plugin::*;
 
-use std::borrow::Cow;
-
 #[derive(Debug)]
 pub(crate) struct PluginFromDefinition;
 
@@ -21,24 +19,15 @@ impl Plugin for PluginFromDefinition {
 
     fn handle(&self, context: &mut ContextHandle) {
         let value = match context.modifier {
-            Modifier::Builtin { value, .. } => color::get(context.config, value, None).unwrap(),
+            Modifier::Builtin { value, .. } => color::get(context.config, value).unwrap(),
             Modifier::Arbitrary { value, .. } => value.clone(),
-        };
-
-        let default_to = if value == "inherit" || value == "currentColor" {
-            Cow::from("rgb(255 255 255 / 0)")
-        } else {
-            let mut default = value.to_string();
-            default.pop(); // Remove the last `)`
-            default += "/ 0)";
-            Cow::from(default)
         };
 
         context
             .buffer
             .line(format_args!("--en-gradient-from: {value};"));
         context.buffer.line(format_args!(
-            "--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to, {default_to});"
+            "--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to, transparent);"
         ));
     }
 }
@@ -60,21 +49,12 @@ impl Plugin for PluginViaDefinition {
 
     fn handle(&self, context: &mut ContextHandle) {
         let value = match context.modifier {
-            Modifier::Builtin { value, .. } => color::get(context.config, value, None).unwrap(),
+            Modifier::Builtin { value, .. } => color::get(context.config, value).unwrap(),
             Modifier::Arbitrary { value, .. } => value.clone(),
         };
 
-        let default_to = if value == "inherit" || value == "currentColor" {
-            Cow::from("rgb(255 255 255 / 0)")
-        } else {
-            let mut default = value.to_string();
-            default.pop(); // Remove the last `)`
-            default += "/ 0)";
-            Cow::from(default)
-        };
-
         context.buffer.line(format_args!(
-            "--en-gradient-stops: var(--en-gradient-from), {value}, var(--en-gradient-to, {default_to});",
+            "--en-gradient-stops: var(--en-gradient-from), {value}, var(--en-gradient-to, transparent);",
         ));
     }
 }
@@ -98,7 +78,7 @@ impl Plugin for PluginToDefinition {
         match context.modifier {
             Modifier::Builtin { value, .. } => context.buffer.line(format_args!(
                 "--en-gradient-to: {};",
-                color::get(context.config, value, None).unwrap()
+                color::get(context.config, value).unwrap()
             )),
             Modifier::Arbitrary { value, .. } => {
                 context

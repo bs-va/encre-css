@@ -26,7 +26,7 @@ mod tests {
         assert_eq!(
             generate(["accent-red-400"], &base_config()),
             ".accent-red-400 {
-  accent-color: rgb(248 113 113);
+  accent-color: oklch(70.4% .191 22.216);
 }"
         );
         assert_eq!(
@@ -54,7 +54,7 @@ mod tests {
         assert_eq!(
             generate(["caret-red-400"], &base_config()),
             ".caret-red-400 {
-  caret-color: rgb(248 113 113);
+  caret-color: oklch(70.4% .191 22.216);
 }"
         );
         assert_eq!(

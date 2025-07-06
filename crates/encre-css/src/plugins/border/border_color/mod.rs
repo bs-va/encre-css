@@ -18,10 +18,7 @@ fn color_can_handle(context: &ContextCanHandle) -> bool {
 fn color_handle(css_props: &[&str], context: &mut ContextHandle) {
     match context.modifier {
         Modifier::Builtin { value, .. } => {
-            let color = color::get(context.config, value, Some("--en-border-opacity")).unwrap();
-            if color.contains("--en-border-opacity") {
-                context.buffer.line("--en-border-opacity: 1;");
-            }
+            let color = color::get(context.config, value).unwrap();
 
             for css_prop in css_props {
                 context.buffer.line(format_args!("{css_prop}: {color};"));

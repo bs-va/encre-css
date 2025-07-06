@@ -20,10 +20,7 @@ impl Plugin for PluginDefinition {
     fn handle(&self, context: &mut ContextHandle) {
         match context.modifier {
             Modifier::Builtin { value, .. } => {
-                let color = color::get(context.config, value, Some("--en-bg-opacity")).unwrap();
-                if color.contains("--en-bg-opacity") {
-                    context.buffer.line("--en-bg-opacity: 1;");
-                }
+                let color = color::get(context.config, value).unwrap();
 
                 context
                     .buffer

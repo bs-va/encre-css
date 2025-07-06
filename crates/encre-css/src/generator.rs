@@ -397,8 +397,7 @@ mod tests {
 }
 
 .divide-red-100 > :not([hidden]) ~ :not([hidden]) {
-  --en-divide-opacity: 1;
-  border-color: rgb(254 226 226 / var(--en-divide-opacity));
+  border-color: oklch(93.6% .032 17.717);
 }
 
 .hover\:space-x-1:hover > :not(:last-child) {
@@ -707,28 +706,23 @@ mod tests {
             generated,
             String::from(
                 r#".marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection *::marker, .marker\:selection\:hover\:bg-green-200:hover *::selection, .marker\:selection\:hover\:bg-green-200:hover::selection::marker {
-  --en-bg-opacity: 1;
-  background-color: rgb(187 247 208 / var(--en-bg-opacity));
+  background-color: oklch(92.5% .084 155.995);
 }
 
 .file\:hover\:bg-pink-600:hover::file-selector-button, .file\:hover\:bg-pink-600:hover::-webkit-file-upload-button {
-  --en-bg-opacity: 1;
-  background-color: rgb(219 39 119 / var(--en-bg-opacity));
+  background-color: oklch(59.2% .249 .584);
 }
 
 .hover\:file\:bg-pink-600::file-selector-button, .hover\:file\:bg-pink-600::-webkit-file-upload-button:hover {
-  --en-bg-opacity: 1;
-  background-color: rgb(219 39 119 / var(--en-bg-opacity));
+  background-color: oklch(59.2% .249 .584);
 }
 
 .focus\:hover\:bg-red-600:hover:focus {
-  --en-bg-opacity: 1;
-  background-color: rgb(220 38 38 / var(--en-bg-opacity));
+  background-color: oklch(57.7% .245 27.325);
 }
 
 [dir="rtl"] .active\:rtl\:bg-red-800:active {
-  --en-bg-opacity: 1;
-  background-color: rgb(153 27 27 / var(--en-bg-opacity));
+  background-color: oklch(44.4% .177 26.899);
 }
 
 @media (min-width: 1024px) {
@@ -741,8 +735,7 @@ mod tests {
 @media print {
   @media (min-width: 1280px) {
     [dir="ltr"] .print\:ltr\:xl\:hover\:focus\:active\:text-yellow-300:active:focus:hover {
-      --en-text-opacity: 1;
-      color: rgb(253 224 71 / var(--en-text-opacity));
+      color: oklch(90.5% .182 98.111);
     }
   }
 }
@@ -756,15 +749,13 @@ mod tests {
 
 @media (min-width: 640px) {
   .sm\:hover\:bg-red-400:hover {
-    --en-bg-opacity: 1;
-    background-color: rgb(248 113 113 / var(--en-bg-opacity));
+    background-color: oklch(70.4% .191 22.216);
   }
 }
 
 @media (min-width: 768px) {
   .md\:focus\:selection\:bg-blue-100 *::selection, .md\:focus\:selection\:bg-blue-100::selection:focus {
-    --en-bg-opacity: 1;
-    background-color: rgb(219 234 254 / var(--en-bg-opacity));
+    background-color: oklch(93.2% .032 255.585);
   }
 }
 
@@ -772,31 +763,26 @@ mod tests {
   @media (prefers-reduced-motion: no-preference) {
     @media (orientation: landscape) {
       [dir="rtl"] .\32xl\:motion-safe\:landscape\:focus-within\:visited\:first\:odd\:checked\:open\:rtl\:bg-purple-100[open]:checked:nth-child(odd):first-child:visited:focus-within {
-        --en-bg-opacity: 1;
-        background-color: rgb(243 232 255 / var(--en-bg-opacity));
+        background-color: oklch(94.6% .033 307.174);
       }
     }
   }
 }
 
 .group:hover .group-hover\:bg-green-300 {
-  --en-bg-opacity: 1;
-  background-color: rgb(134 239 172 / var(--en-bg-opacity));
+  background-color: oklch(87.1% .15 154.449);
 }
 
 .group:focus .group-focus\:bg-green-400 {
-  --en-bg-opacity: 1;
-  background-color: rgb(74 222 128 / var(--en-bg-opacity));
+  background-color: oklch(79.2% .209 151.711);
 }
 
 .peer:not(:invalid) ~ .peer-not-invalid\:bg-green-500 {
-  --en-bg-opacity: 1;
-  background-color: rgb(34 197 94 / var(--en-bg-opacity));
+  background-color: oklch(72.3% .219 149.579);
 }
 
 .peer:invalid ~ .peer-invalid\:bg-red-500 {
-  --en-bg-opacity: 1;
-  background-color: rgb(239 68 68 / var(--en-bg-opacity));
+  background-color: oklch(63.7% .237 25.331);
 }"#
             )
         );
@@ -810,8 +796,7 @@ mod tests {
             generated,
             String::from(
                 ".bg-red-500 {
-  --en-bg-opacity: 1;
-  background-color: rgb(239 68 68 / var(--en-bg-opacity));
+  background-color: oklch(63.7% .237 25.331);
 }"
             )
         );
@@ -859,8 +844,7 @@ mod tests {
 }
 
 .\[\&\:has\(\.active\)\]\:bg-blue-500:has(.active) {
-  --en-bg-opacity: 1;
-  background-color: rgb(59 130 246 / var(--en-bg-opacity));
+  background-color: oklch(62.3% .214 259.815);
 }
 
 .\[\&_\>_\*\]\:before\:content-\[\'hello-\'\]::before > * {
@@ -883,7 +867,7 @@ mod tests {
             String::from(
                 r"@media (min-width: 1280px) {
   .xl\:\(focus\:\(outline\,outline-red-200\)\,dark\:\(bg-black\,text-white\)\):focus {
-    outline-color: rgb(254 202 202);
+    outline-color: oklch(88.5% .062 18.334);
   }
 }
 
@@ -896,8 +880,7 @@ mod tests {
 @media (prefers-color-scheme: dark) {
   @media (min-width: 1280px) {
     .xl\:\(focus\:\(outline\,outline-red-200\)\,dark\:\(bg-black\,text-white\)\) {
-      --en-text-opacity: 1;
-      color: rgb(255 255 255 / var(--en-text-opacity));
+      color: #fff;
     }
   }
 }
@@ -905,8 +888,7 @@ mod tests {
 @media (prefers-color-scheme: dark) {
   @media (min-width: 1280px) {
     .xl\:\(focus\:\(outline\,outline-red-200\)\,dark\:\(bg-black\,text-white\)\) {
-      --en-bg-opacity: 1;
-      background-color: rgb(0 0 0 / var(--en-bg-opacity));
+      background-color: #000;
     }
   }
 }"
@@ -1109,8 +1091,7 @@ mod tests {
 }
 
 .before\:bg-red-500::before {
-  --en-bg-opacity: 1;
-  background-color: rgb(239 68 68 / var(--en-bg-opacity));
+  background-color: oklch(63.7% .237 25.331);
   content: var(--en-content);
 }
 

@@ -14,7 +14,7 @@ mod tests {
         assert_eq!(
             generate(["fill-red-400"], &base_config()),
             ".fill-red-400 {
-  fill: rgb(248 113 113);
+  fill: oklch(70.4% .191 22.216);
 }"
         );
         assert_eq!(
@@ -36,7 +36,7 @@ mod tests {
         assert_eq!(
             generate(["stroke-red-400"], &base_config()),
             ".stroke-red-400 {
-  stroke: rgb(248 113 113);
+  stroke: oklch(70.4% .191 22.216);
 }"
         );
         assert_eq!(

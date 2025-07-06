@@ -126,8 +126,7 @@ mod tests {
         assert_eq!(
             generate(["bg-red-400"], &base_config()),
             ".bg-red-400 {
-  --en-bg-opacity: 1;
-  background-color: rgb(248 113 113 / var(--en-bg-opacity));
+  background-color: oklch(70.4% .191 22.216);
 }"
         );
         assert_eq!(

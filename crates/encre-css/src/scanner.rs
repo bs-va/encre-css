@@ -30,13 +30,11 @@ use std::{collections::BTreeSet, sync::Arc};
 /// );
 ///
 /// assert!(generated.ends_with(".bg-red-200 {
-///   --en-bg-opacity: 1;
-///   background-color: rgb(254 202 202 / var(--en-bg-opacity));
+///   background-color: oklch(88.5% .062 18.334);
 /// }
 ///
 /// .text-blue-300 {
-///   --en-text-opacity: 1;
-///   color: rgb(147 197 253 / var(--en-text-opacity));
+///   color: oklch(80.9% .105 251.813);
 /// }
 ///
 /// .underline {

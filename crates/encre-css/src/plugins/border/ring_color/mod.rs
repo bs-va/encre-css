@@ -25,10 +25,7 @@ impl Plugin for PluginDefinition {
     fn handle(&self, context: &mut ContextHandle) {
         match context.modifier {
             Modifier::Builtin { value, .. } => {
-                let color = color::get(context.config, value, Some("--en-ring-opacity")).unwrap();
-                if color.contains("--en-ring-opacity") {
-                    context.buffer.line("--en-ring-opacity: 1;");
-                }
+                let color = color::get(context.config, value).unwrap();
 
                 context
                     .buffer

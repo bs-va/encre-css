@@ -1064,13 +1064,11 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 }
 
 .bg-gray-50 {
-  --en-bg-opacity: 1;
-  background-color: rgb(249 250 251 / var(--en-bg-opacity));
+  background-color: oklch(98.5% .002 247.839);
 }
 
 .bg-white {
-  --en-bg-opacity: 1;
-  background-color: rgb(255 255 255 / var(--en-bg-opacity));
+  background-color: #fff;
 }
 
 .bg-\[url\(\/img\/grid\.svg\)\] {
@@ -1082,11 +1080,11 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 }
 
 .fill-sky-400 {
-  fill: rgb(56 189 248);
+  fill: oklch(74.6% .16 232.661);
 }
 
 .fill-slate-900 {
-  fill: rgb(15 23 42);
+  fill: oklch(20.8% .042 265.755);
 }
 
 .px-6 {
@@ -1116,7 +1114,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 }
 
 .shadow-slate-700\/10 {
-  --en-shadow-color: rgb(51 65 85 / 0.1);
+  --en-shadow-color: color-mix(in oklab, oklch(37.2% .044 257.287) 10%, transparent);
   --en-shadow: var(--en-shadow-colored);
 }
 
@@ -1126,7 +1124,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 }
 
 .ring-gray-900\/5 {
-  --en-ring-color: rgb(17 24 39 / 0.05);
+  --en-ring-color: color-mix(in oklab, oklch(21% .034 264.665) 5%, transparent);
 }
 
 .\[mask-image\:linear-gradient\(180deg\,white\,rgba\(255\,255\,255\,0\)\)\] {
