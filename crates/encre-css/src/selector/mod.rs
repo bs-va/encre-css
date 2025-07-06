@@ -205,10 +205,21 @@ pub enum VariantType {
     PeerNot(&'static str),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Eq)]
 pub(crate) enum Variant<'a> {
     Builtin(usize, VariantType),
     Arbitrary(Cow<'a, str>),
+}
+
+impl<'a> PartialEq for Variant<'a> {
+    fn eq(&self, other: &Self) -> bool {
+        // Does not test order because it can change
+        match (self, other) {
+            (Self::Builtin(_, v1), Self::Builtin(_, v2)) => v1 == v2,
+            (Self::Arbitrary(s1), Self::Arbitrary(s2)) => s1 == s2,
+            _ => false,
+        }
+    }
 }
 
 /// A parsed selector, aka a utility class, containing the variants, the namespace and the modifier.

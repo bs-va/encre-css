@@ -1131,40 +1131,40 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   mask-image: linear-gradient(180deg,white,rgba(255,255,255,0));
 }
 
-@media (min-width: 768px) {
+@media (width >= 48rem) {
   .md\:mx-auto {
     margin-left: auto;
     margin-right: auto;
   }
 }
 
-@media (min-width: 768px) {
+@media (width >= 48rem) {
   .md\:max-w-3xl {
     max-width: 48rem;
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 64rem) {
   .lg\:text-lg {
     font-size: 1.125rem;
     line-height: 1.75rem;
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 64rem) {
   .lg\:py-12 {
     padding-top: 3rem;
     padding-bottom: 3rem;
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 64rem) {
   .lg\:pt-16 {
     padding-top: 4rem;
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 64rem) {
   .lg\:prose-lg {
     font-size: 1.125rem;
     line-height: 1.7777778;
@@ -1345,13 +1345,13 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 64rem) {
   .lg\:pb-28 {
     padding-bottom: 7rem;
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 64rem) {
   .lg\:max-w-4xl {
     max-width: 56rem;
   }

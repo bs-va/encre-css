@@ -156,33 +156,33 @@ mod tests {
   width: 100%;
 }
 
-@media (min-width: 640px) {
+@media (width >= 40rem) {
   .container {
-    max-width: 640px;
+    max-width: 40rem;
   }
 }
 
-@media (min-width: 768px) {
+@media (width >= 48rem) {
   .container {
-    max-width: 768px;
+    max-width: 48rem;
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 64rem) {
   .container {
-    max-width: 1024px;
+    max-width: 64rem;
   }
 }
 
-@media (min-width: 1280px) {
+@media (width >= 80rem) {
   .container {
-    max-width: 1280px;
+    max-width: 80rem;
   }
 }
 
-@media (min-width: 1536px) {
+@media (width >= 96rem) {
   .container {
-    max-width: 1536px;
+    max-width: 96rem;
   }
 }"
         );

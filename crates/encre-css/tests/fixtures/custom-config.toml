@@ -9,6 +9,8 @@ class = ".dark"
 3xl = "1600px"
 lg = "2000px"
 
+[theme.containers]
+
 [theme.colors]
 rosa-500 = "#e5186a"
 yellow-400 = "#ffef0e"

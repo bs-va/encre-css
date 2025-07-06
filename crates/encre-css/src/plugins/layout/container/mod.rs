@@ -80,7 +80,7 @@ impl Plugin for PluginDefinition {
 
                     context
                         .buffer
-                        .line(format_args!("@media (min-width: {screen}) {{"));
+                        .line(format_args!("@media (width >= {screen}) {{"));
                     context.buffer.indent();
 
                     generate_class(

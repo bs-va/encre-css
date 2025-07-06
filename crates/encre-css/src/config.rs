@@ -26,7 +26,7 @@
 //!     &config,
 //! );
 //!
-//! assert!(generated.ends_with(r#"@media (min-width: 640px) {
+//! assert!(generated.ends_with(r#"@media (width >= 640px) {
 //!   .dark .tablet\:dark\:bg-primary {
 //!     background-color: #d3198c;
 //!   }
@@ -569,13 +569,32 @@ pub const BUILTIN_COLORS: phf::Map<&str, &'static str> = phf_map! {
 
 /// The list of all default screen breakpoints.
 ///
-/// Based on [Tailwind's default screen breakpoints](https://tailwindcss.com/docs/screens).
+/// Based on [Tailwind's default screen breakpoints](https://tailwindcss.com/docs/hover-focus-and-other-states#quick-reference).
 pub const BUILTIN_SCREENS: &[(&str, &str)] = &[
-    ("sm", "640px"),
-    ("md", "768px"),
-    ("lg", "1024px"),
-    ("xl", "1280px"),
-    ("2xl", "1536px"),
+    ("sm", "40rem"),
+    ("md", "48rem"),
+    ("lg", "64rem"),
+    ("xl", "80rem"),
+    ("2xl", "96rem"),
+];
+
+/// The list of all default container size breakpoints.
+///
+/// Based on [Tailwind's default container size breakpoints](https://tailwindcss.com/docs/hover-focus-and-other-states#quick-reference).
+pub const BUILTIN_CONTAINERS: &[(&str, &str)] = &[
+    ("3xs", "16rem"),
+    ("2xs", "18rem"),
+    ("xs", "20rem"),
+    ("sm", "24rem"),
+    ("md", "28rem"),
+    ("lg", "32rem"),
+    ("xl", "36rem"),
+    ("2xl", "42rem"),
+    ("3xl", "48rem"),
+    ("4xl", "56rem"),
+    ("5xl", "64rem"),
+    ("6xl", "72rem"),
+    ("7xl", "80rem"),
 ];
 
 /// The list of all default variants (sorted following their importance in the CSS file).
@@ -590,7 +609,7 @@ pub const BUILTIN_SCREENS: &[(&str, &str)] = &[
 /// - `before`: applies the [`before`](https://developer.mozilla.org/en-US/docs/Web/CSS/::before) pseudo element
 /// - `after`: applies the [`before`](https://developer.mozilla.org/en-US/docs/Web/CSS/::before) pseudo element
 /// - `all`: selects all nested children instead of the element itself
-/// - `children`: selects all direct children (only one level deep) instead of the element itself
+/// - `children`, `*`: selects all direct children (only one level deep) instead of the element itself
 /// - `siblings`: selects all siblings of the element using the [general sibling combinator `~`](https://developer.mozilla.org/en-US/docs/Web/CSS/General_sibling_combinator)
 /// - `sibling`: select the sibling next to the element using the [adjacent sibling combinator `+`](https://developer.mozilla.org/en-US/docs/Web/CSS/Adjacent_sibling_combinator)
 /// - `first`: applies the [`first-child`](https://developer.mozilla.org/en-US/docs/Web/CSS/:first-child) pseudo class
@@ -669,6 +688,7 @@ pub const BUILTIN_VARIANTS: phf::Map<&'static str, (usize, VariantType)> = phf_m
     "after" => (8, VariantType::PseudoElement("after")),
     "all" => (9, VariantType::WrapClass(Cow::Borrowed("& *"))),
     "children" => (10, VariantType::WrapClass(Cow::Borrowed("& > *"))),
+    "*" => (10, VariantType::WrapClass(Cow::Borrowed("& > *"))),
     "siblings" => (11, VariantType::WrapClass(Cow::Borrowed("& ~ *"))),
     "sibling" => (12, VariantType::WrapClass(Cow::Borrowed("& + *"))),
 
@@ -718,22 +738,32 @@ pub const BUILTIN_VARIANTS: phf::Map<&'static str, (usize, VariantType)> = phf_m
     // --- At rules ---
     "motion-safe" => (54, VariantType::AtRule(Cow::Borrowed("@media (prefers-reduced-motion: no-preference)"))),
     "motion-reduce" => (55, VariantType::AtRule(Cow::Borrowed("@media (prefers-reduced-motion: reduce)"))),
-    "print" => (56, VariantType::AtRule(Cow::Borrowed("@media print"))),
-    "portrait" => (57, VariantType::AtRule(Cow::Borrowed("@media (orientation: portrait)"))),
-    "landscape" => (58, VariantType::AtRule(Cow::Borrowed("@media (orientation: landscape)"))),
-    "contrast-more" => (59, VariantType::AtRule(Cow::Borrowed("@media (prefers-contrast: more)"))),
-    "contrast-less" => (60, VariantType::AtRule(Cow::Borrowed("@media (prefers-contrast: less)"))),
+    "contrast-more" => (56, VariantType::AtRule(Cow::Borrowed("@media (prefers-contrast: more)"))),
+    "contrast-less" => (57, VariantType::AtRule(Cow::Borrowed("@media (prefers-contrast: less)"))),
+    "portrait" => (58, VariantType::AtRule(Cow::Borrowed("@media (orientation: portrait)"))),
+    "landscape" => (59, VariantType::AtRule(Cow::Borrowed("@media (orientation: landscape)"))),
+    "starting" => (60, VariantType::AtRule(Cow::Borrowed("@starting-style"))),
+    "print" => (61, VariantType::AtRule(Cow::Borrowed("@media print"))),
+    "forced-colors" => (62, VariantType::AtRule(Cow::Borrowed("@media (forced-colors: active)"))),
+    "inverted-colors" => (63, VariantType::AtRule(Cow::Borrowed("@media (inverted-colors: inverted)"))),
+    "pointer-none" => (64, VariantType::AtRule(Cow::Borrowed("@media (pointer: none)"))),
+    "pointer-coarse" => (65, VariantType::AtRule(Cow::Borrowed("@media (pointer: coarse)"))),
+    "pointer-fine" => (66, VariantType::AtRule(Cow::Borrowed("@media (pointer: fine)"))),
+    "any-pointer-none" => (67, VariantType::AtRule(Cow::Borrowed("@media (any-pointer: none)"))),
+    "any-pointer-coarse" => (68, VariantType::AtRule(Cow::Borrowed("@media (any-pointer: coarse)"))),
+    "any-pointer-fine" => (69, VariantType::AtRule(Cow::Borrowed("@media (any-pointer: fine)"))),
+    "noscript" => (70, VariantType::AtRule(Cow::Borrowed("@media (scripting: none)"))),
 
     // --- ARIA states ---
-    "aria-busy" => (61, VariantType::WrapClass(Cow::Borrowed("&[aria-busy=\"true\"]"))),
-    "aria-checked" => (62, VariantType::WrapClass(Cow::Borrowed("&[aria-checked=\"true\"]"))),
-    "aria-disabled" => (63, VariantType::WrapClass(Cow::Borrowed("&[aria-disabled=\"true\"]"))),
-    "aria-expanded" => (64, VariantType::WrapClass(Cow::Borrowed("&[aria-expanded=\"true\"]"))),
-    "aria-hidden" => (65, VariantType::WrapClass(Cow::Borrowed("&[aria-hidden=\"true\"]"))),
-    "aria-pressed" => (66, VariantType::WrapClass(Cow::Borrowed("&[aria-pressed=\"true\"]"))),
-    "aria-readonly" => (67, VariantType::WrapClass(Cow::Borrowed("&[aria-readonly=\"true\"]"))),
-    "aria-required" => (68, VariantType::WrapClass(Cow::Borrowed("&[aria-required=\"true\"]"))),
-    "aria-selected" => (69, VariantType::WrapClass(Cow::Borrowed("&[aria-selected=\"true\"]"))),
+    "aria-busy" => (71, VariantType::WrapClass(Cow::Borrowed("&[aria-busy=\"true\"]"))),
+    "aria-checked" => (72, VariantType::WrapClass(Cow::Borrowed("&[aria-checked=\"true\"]"))),
+    "aria-disabled" => (73, VariantType::WrapClass(Cow::Borrowed("&[aria-disabled=\"true\"]"))),
+    "aria-expanded" => (74, VariantType::WrapClass(Cow::Borrowed("&[aria-expanded=\"true\"]"))),
+    "aria-hidden" => (75, VariantType::WrapClass(Cow::Borrowed("&[aria-hidden=\"true\"]"))),
+    "aria-pressed" => (76, VariantType::WrapClass(Cow::Borrowed("&[aria-pressed=\"true\"]"))),
+    "aria-readonly" => (77, VariantType::WrapClass(Cow::Borrowed("&[aria-readonly=\"true\"]"))),
+    "aria-required" => (78, VariantType::WrapClass(Cow::Borrowed("&[aria-required=\"true\"]"))),
+    "aria-selected" => (79, VariantType::WrapClass(Cow::Borrowed("&[aria-selected=\"true\"]"))),
 };
 
 /// The list of all default plugins.
@@ -1111,6 +1141,35 @@ impl Screens {
     }
 }
 
+/// Configuration for the [`Theme::containers`] field.
+///
+/// It defines a list of custom container size breakpoints.
+#[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize, Clone)]
+pub struct Containers(BTreeMap<Cow<'static, str>, Cow<'static, str>>);
+
+impl Containers {
+    /// Add a custom container size breakpoint to the list.
+    #[inline]
+    pub fn add<T1: Into<Cow<'static, str>>, T2: Into<Cow<'static, str>>>(
+        &mut self,
+        key: T1,
+        val: T2,
+    ) {
+        self.0.insert(key.into(), val.into());
+    }
+
+    /// Remove a custom container size breakpoint from the list.
+    #[inline]
+    pub fn remove<T: Into<Cow<'static, str>>>(&mut self, key: T) {
+        self.0.remove(&key.into());
+    }
+
+    #[inline]
+    pub(crate) fn iter(&self) -> impl Iterator<Item = (&Cow<'static, str>, &Cow<'static, str>)> {
+        self.0.iter()
+    }
+}
+
 /// Configuration for the [`Theme::colors`] field.
 ///
 /// It defines a list of custom colors.
@@ -1312,6 +1371,12 @@ pub struct Theme {
     #[serde(default)]
     pub screens: Screens,
 
+    /// Custom container size breakpoints configuration.
+    ///
+    /// The default value is an empty map.
+    #[serde(default)]
+    pub containers: Containers,
+
     /// Custom colors configuration.
     ///
     /// The default value is an empty map.
@@ -1427,15 +1492,56 @@ impl Config {
             .map(|screen| {
                 (
                     screen.0.clone(),
-                    VariantType::AtRule(Cow::Owned(format!("@media (min-width: {})", screen.1))),
+                    VariantType::AtRule(Cow::Owned(format!("@media (width >= {})", screen.1))),
                 )
             })
             .chain(BUILTIN_SCREENS.iter().map(|screen| {
                 (
                     Cow::from(screen.0),
-                    VariantType::AtRule(Cow::Owned(format!("@media (min-width: {})", screen.1))),
+                    VariantType::AtRule(Cow::Owned(format!("@media (width >= {})", screen.1))),
                 )
             }))
+            .chain(self.theme.screens.iter().map(|screen| {
+
+                (
+                    Cow::from(format!("max-{}", screen.0)),
+                    VariantType::AtRule(Cow::Owned(format!("@media (width < {})", screen.1))),
+                )
+            }))
+            .chain(BUILTIN_SCREENS.iter().map(|screen| {
+                (
+                    Cow::from(format!("max-{}", screen.0)),
+                    VariantType::AtRule(Cow::Owned(format!("@media (width < {})", screen.1))),
+                )
+            }))
+
+            .chain(self.theme.containers.iter().map(|container| {
+
+                (
+                    Cow::from(format!("@{}", container.0)),
+                    VariantType::AtRule(Cow::Owned(format!("@container (width >= {})", container.1))),
+                )
+            }))
+            .chain(BUILTIN_CONTAINERS.iter().map(|container| {
+                (
+                    Cow::from(format!("@{}", container.0)),
+                    VariantType::AtRule(Cow::Owned(format!("@container (width >= {})", container.1))),
+                )
+            }))
+            .chain(self.theme.containers.iter().map(|container| {
+
+                (
+                    Cow::from(format!("@max-{}", container.0)),
+                    VariantType::AtRule(Cow::Owned(format!("@container (width < {})", container.1))),
+                )
+            }))
+            .chain(BUILTIN_CONTAINERS.iter().map(|container| {
+                (
+                    Cow::from(format!("@max-{}", container.0)),
+                    VariantType::AtRule(Cow::Owned(format!("@container (width < {})", container.1))),
+                )
+            }))
+
             .chain(self.theme.aria.iter().map(|aria| {
                 (
                     Cow::from(format!("aria-{}", aria.0)),
@@ -1620,7 +1726,7 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r"@media (min-width: 1600px) {
+                r"@media (width >= 1600px) {
   .\33xl\:text-rosa-500 {
     color: #e5186a;
   }
@@ -1869,14 +1975,14 @@ mod tests {
   background-color: #ffef0e;
 }
 
-@media (min-width: 1600px) {
+@media (width >= 1600px) {
   .\33xl\:underline {
     -webkit-text-decoration-line: underline;
     text-decoration-line: underline;
   }
 }
 
-@media (min-width: 2000px) {
+@media (width >= 2000px) {
   .lg\:text-rosa-500 {
     color: #e5186a;
   }

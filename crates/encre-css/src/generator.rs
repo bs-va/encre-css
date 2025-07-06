@@ -406,7 +406,7 @@ mod tests {
   margin-left: calc(0.25rem * calc(1 - var(--en-space-x-reverse)));
 }
 
-@media (min-width: 1280px) {
+@media (width >= 80rem) {
   .xl\:\[\&_\>_\*\]\:divide-y-2 > * > :not([hidden]) ~ :not([hidden]) {
     --en-divide-y-reverse: 0;
     border-top-width: calc(2px * calc(1 - var(--en-divide-y-reverse)));
@@ -641,7 +641,7 @@ mod tests {
   background-image: url('../img/image_with_underscores.png');
 }
 
-@media (min-width: 1536px) {
+@media (width >= 96rem) {
   .\32xl\:pb-\[calc\(\(100\%\/2\)-10px\+2rem\)\] {
     padding-bottom: calc((100% / 2) - 10px + 2rem);
   }
@@ -725,7 +725,7 @@ mod tests {
   background-color: oklch(44.4% .177 26.899);
 }
 
-@media (min-width: 1024px) {
+@media (width >= 64rem) {
   [dir="rtl"] .rtl\:active\:focus\:lg\:underline:focus:active {
     -webkit-text-decoration-line: underline;
     text-decoration-line: underline;
@@ -733,33 +733,33 @@ mod tests {
 }
 
 @media print {
-  @media (min-width: 1280px) {
+  @media (width >= 80rem) {
     [dir="ltr"] .print\:ltr\:xl\:hover\:focus\:active\:text-yellow-300:active:focus:hover {
       color: oklch(90.5% .182 98.111);
     }
   }
 }
 
-@media (min-width: 640px) {
+@media (width >= 40rem) {
   .sm\:before\:target\:content-\[\'Hello_world\!\'\]:target::before {
     --en-content: 'Hello world!';
     content: var(--en-content);
   }
 }
 
-@media (min-width: 640px) {
+@media (width >= 40rem) {
   .sm\:hover\:bg-red-400:hover {
     background-color: oklch(70.4% .191 22.216);
   }
 }
 
-@media (min-width: 768px) {
+@media (width >= 48rem) {
   .md\:focus\:selection\:bg-blue-100 *::selection, .md\:focus\:selection\:bg-blue-100::selection:focus {
     background-color: oklch(93.2% .032 255.585);
   }
 }
 
-@media (min-width: 1536px) {
+@media (width >= 96rem) {
   @media (prefers-reduced-motion: no-preference) {
     @media (orientation: landscape) {
       [dir="rtl"] .\32xl\:motion-safe\:landscape\:focus-within\:visited\:first\:odd\:checked\:open\:rtl\:bg-purple-100[open]:checked:nth-child(odd):first-child:visited:focus-within {
@@ -865,20 +865,20 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r"@media (min-width: 1280px) {
+                r"@media (width >= 80rem) {
   .xl\:\(focus\:\(outline\,outline-red-200\)\,dark\:\(bg-black\,text-white\)\):focus {
     outline-color: oklch(88.5% .062 18.334);
   }
 }
 
-@media (min-width: 1280px) {
+@media (width >= 80rem) {
   .xl\:\(focus\:\(outline\,outline-red-200\)\,dark\:\(bg-black\,text-white\)\):focus {
     outline-style: solid;
   }
 }
 
 @media (prefers-color-scheme: dark) {
-  @media (min-width: 1280px) {
+  @media (width >= 80rem) {
     .xl\:\(focus\:\(outline\,outline-red-200\)\,dark\:\(bg-black\,text-white\)\) {
       color: #fff;
     }
@@ -886,7 +886,7 @@ mod tests {
 }
 
 @media (prefers-color-scheme: dark) {
-  @media (min-width: 1280px) {
+  @media (width >= 80rem) {
     .xl\:\(focus\:\(outline\,outline-red-200\)\,dark\:\(bg-black\,text-white\)\) {
       background-color: #000;
     }
@@ -985,33 +985,33 @@ mod tests {
   width: 100%;
 }
 
-@media (min-width: 640px) {
+@media (width >= 40rem) {
   .container {
-    max-width: 640px;
+    max-width: 40rem;
   }
 }
 
-@media (min-width: 768px) {
+@media (width >= 48rem) {
   .container {
-    max-width: 768px;
+    max-width: 48rem;
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 64rem) {
   .container {
-    max-width: 1024px;
+    max-width: 64rem;
   }
 }
 
-@media (min-width: 1280px) {
+@media (width >= 80rem) {
   .container {
-    max-width: 1280px;
+    max-width: 80rem;
   }
 }
 
-@media (min-width: 1536px) {
+@media (width >= 96rem) {
   .container {
-    max-width: 1536px;
+    max-width: 96rem;
   }
 }"
             )
@@ -1022,47 +1022,47 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r"@media (min-width: 768px) {
+                r"@media (width >= 48rem) {
   .md\:mx-auto {
     margin-left: auto;
     margin-right: auto;
   }
 }
 
-@media (min-width: 768px) {
+@media (width >= 48rem) {
   .md\:container {
     width: 100%;
   }
 }
 
-@media (min-width: 768px) {
-  @media (min-width: 640px) {
+@media (width >= 48rem) {
+  @media (width >= 40rem) {
     .md\:container {
-      max-width: 640px;
+      max-width: 40rem;
     }
   }
 
-  @media (min-width: 768px) {
+  @media (width >= 48rem) {
     .md\:container {
-      max-width: 768px;
+      max-width: 48rem;
     }
   }
 
-  @media (min-width: 1024px) {
+  @media (width >= 64rem) {
     .md\:container {
-      max-width: 1024px;
+      max-width: 64rem;
     }
   }
 
-  @media (min-width: 1280px) {
+  @media (width >= 80rem) {
     .md\:container {
-      max-width: 1280px;
+      max-width: 80rem;
     }
   }
 
-  @media (min-width: 1536px) {
+  @media (width >= 96rem) {
     .md\:container {
-      max-width: 1536px;
+      max-width: 96rem;
     }
   }
 }"

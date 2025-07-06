@@ -546,6 +546,9 @@ fn parse_modifier(mut modifier: &str, is_negative: bool) -> Option<Modifier> {
 
 #[cfg(test)]
 mod tests {
+    // NOTE: In these tests, the order value of the selectors and variants are arbitrary because
+    // the implementation of PartialEq does not take them into account, so instead they are written
+    // as Default::default()
     use super::*;
 
     #[allow(clippy::wildcard_imports)]
@@ -782,7 +785,7 @@ mod tests {
                 full: "hover:text-center",
                 order: Default::default(),
                 plugin: &typography::text_align::PluginDefinition,
-                variants: vec![Variant::Builtin(46, VariantType::PseudoClass("hover"))],
+                variants: vec![Variant::Builtin(Default::default(), VariantType::PseudoClass("hover"))],
                 modifier: Modifier::Builtin {
                     is_negative: false,
                     value: "center",
@@ -811,14 +814,14 @@ mod tests {
                 plugin: &typography::text_align::PluginDefinition,
                 variants: vec![
                     Variant::Builtin(
-                        2,
+                        Default::default(),
                         VariantType::WrapClass(Cow::from("& *::marker, &::marker"))
                     ),
                     Variant::Builtin(
-                        73,
-                        VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                        Default::default(),
+                        VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
                     ),
-                    Variant::Builtin(46, VariantType::PseudoClass("hover"))
+                    Variant::Builtin(Default::default(), VariantType::PseudoClass("hover"))
                 ],
                 modifier: Modifier::Builtin {
                     is_negative: false,
@@ -848,14 +851,14 @@ mod tests {
                 plugin: &spacing::margin::PluginXDefinition,
                 variants: vec![
                     Variant::Builtin(
-                        2,
+                        Default::default(),
                         VariantType::WrapClass(Cow::from("& *::marker, &::marker"))
                     ),
                     Variant::Builtin(
-                        73,
-                        VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                        Default::default(),
+                        VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
                     ),
-                    Variant::Builtin(46, VariantType::PseudoClass("hover"))
+                    Variant::Builtin(Default::default(), VariantType::PseudoClass("hover"))
                 ],
                 modifier: Modifier::Builtin {
                     is_negative: true,
@@ -941,11 +944,11 @@ mod tests {
                 plugin: &typography::text_align::PluginDefinition,
                 variants: vec![
                     Variant::Builtin(
-                        73,
-                        VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                        Default::default(),
+                        VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
                     ),
                     Variant::Arbitrary(Cow::from("&>*")),
-                    Variant::Builtin(47, VariantType::PseudoClass("focus"))
+                    Variant::Builtin(Default::default(), VariantType::PseudoClass("focus"))
                 ],
                 modifier: Modifier::Builtin {
                     is_negative: false,
@@ -975,11 +978,11 @@ mod tests {
                 plugin: &spacing::margin::PluginDefinition,
                 variants: vec![
                     Variant::Builtin(
-                        73,
-                        VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                        Default::default(),
+                        VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
                     ),
                     Variant::Arbitrary(Cow::from("&>*")),
-                    Variant::Builtin(47, VariantType::PseudoClass("focus"))
+                    Variant::Builtin(Default::default(), VariantType::PseudoClass("focus"))
                 ],
                 modifier: Modifier::Builtin {
                     is_negative: true,
@@ -1093,11 +1096,11 @@ mod tests {
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![
                     Variant::Builtin(
-                        73,
-                        VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                        Default::default(),
+                        VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
                     ),
                     Variant::Builtin(
-                        2,
+                        Default::default(),
                         VariantType::WrapClass(Cow::from("& *::marker, &::marker"))
                     ),
                 ],
@@ -1130,11 +1133,11 @@ mod tests {
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![
                     Variant::Builtin(
-                        73,
-                        VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                        Default::default(),
+                        VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
                     ),
                     Variant::Builtin(
-                        2,
+                        Default::default(),
                         VariantType::WrapClass(Cow::from("& *::marker, &::marker"))
                     ),
                 ],
@@ -1222,11 +1225,11 @@ mod tests {
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![
                     Variant::Builtin(
-                        73,
-                        VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                        Default::default(),
+                        VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
                     ),
                     Variant::Arbitrary(Cow::from("&>*")),
-                    Variant::Builtin(46, VariantType::PseudoClass("hover"))
+                    Variant::Builtin(Default::default(), VariantType::PseudoClass("hover"))
                 ],
                 modifier: Modifier::Arbitrary {
                     prefix: "",
@@ -1257,11 +1260,11 @@ mod tests {
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![
                     Variant::Builtin(
-                        73,
-                        VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                        Default::default(),
+                        VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
                     ),
                     Variant::Arbitrary(Cow::from("&>*")),
-                    Variant::Builtin(46, VariantType::PseudoClass("hover"))
+                    Variant::Builtin(Default::default(), VariantType::PseudoClass("hover"))
                 ],
                 modifier: Modifier::Arbitrary {
                     prefix: "",
@@ -1318,7 +1321,7 @@ mod tests {
                 full: "hover:[mask-type:luminance]",
                 order: BUILTIN_PLUGINS.len(),
                 plugin: &CssPropertyPlugin,
-                variants: vec![Variant::Builtin(46, VariantType::PseudoClass("hover"))],
+                variants: vec![Variant::Builtin(Default::default(), VariantType::PseudoClass("hover"))],
                 modifier: Modifier::Arbitrary {
                     prefix: "",
                     hint: "",
@@ -1346,8 +1349,8 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
-                        Variant::Builtin(46, VariantType::PseudoClass("hover"))
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("hover"))
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -1359,7 +1362,7 @@ mod tests {
                     full: "hover:(focus:bg-gray-500,text-[color:black,])",
                     order: Default::default(),
                     plugin: &typography::text_color::PluginDefinition,
-                    variants: vec![Variant::Builtin(46, VariantType::PseudoClass("hover"))],
+                    variants: vec![Variant::Builtin(Default::default(), VariantType::PseudoClass("hover"))],
                     modifier: Modifier::Arbitrary {
                         prefix: "",
                         hint: "color",
@@ -1386,7 +1389,7 @@ mod tests {
                 full: "hover:(bg-gray-500)",
                 order: Default::default(),
                 plugin: &background::background_color::PluginDefinition,
-                variants: vec![Variant::Builtin(46, VariantType::PseudoClass("hover"))],
+                variants: vec![Variant::Builtin(Default::default(), VariantType::PseudoClass("hover"))],
                 modifier: Modifier::Builtin {
                     is_negative: false,
                     value: "gray-500",
@@ -1414,7 +1417,7 @@ mod tests {
                     plugin: &spacing::margin::PluginDefinition,
                     variants: vec![
                         Variant::Arbitrary(Cow::from("&>*")),
-                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: true,
@@ -1429,13 +1432,13 @@ mod tests {
                     variants: vec![
                         Variant::Builtin(
                             73,
-                            VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                            VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
                         ),
                         Variant::Builtin(
                             75,
                             VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)"))
                         ),
-                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -1448,16 +1451,16 @@ mod tests {
                     order: Default::default(),
                     plugin: &typography::text_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin(53, VariantType::WrapClass(Cow::from("[dir=\"rtl\"] &"))),
+                        Variant::Builtin(Default::default(), VariantType::WrapClass(Cow::from("[dir=\"rtl\"] &"))),
                         Variant::Builtin(
                             73,
-                            VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                            VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
                         ),
                         Variant::Builtin(
                             75,
                             VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)"))
                         ),
-                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),
                     ],
                     modifier: Modifier::Arbitrary {
                         prefix: "",
@@ -1488,7 +1491,7 @@ mod tests {
                     plugin: &spacing::margin::PluginDefinition,
                     variants: vec![
                         Variant::Arbitrary(Cow::from("&>*")),
-                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: true,
@@ -1504,13 +1507,13 @@ mod tests {
                         Variant::Arbitrary(Cow::from(r"[type='text'].light &,.foo")),
                         Variant::Builtin(
                             73,
-                            VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                            VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
                         ),
                         Variant::Builtin(
                             75,
                             VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)"))
                         ),
-                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -1525,13 +1528,13 @@ mod tests {
                     variants: vec![
                         Variant::Builtin(
                             73,
-                            VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                            VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
                         ),
                         Variant::Builtin(
                             75,
                             VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)"))
                         ),
-                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),
                     ],
                     modifier: Modifier::Arbitrary {
                         prefix: "",
@@ -1561,10 +1564,10 @@ mod tests {
                     order: Default::default(),
                     plugin: &border::outline_style::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),
                         Variant::Builtin(
                             73,
-                            VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                            VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
                         )
                     ],
                     modifier: Modifier::Builtin {
@@ -1578,10 +1581,10 @@ mod tests {
                     order: Default::default(),
                     plugin: &border::outline_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),
                         Variant::Builtin(
                             73,
-                            VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                            VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
                         )
                     ],
                     modifier: Modifier::Builtin {
@@ -1601,7 +1604,7 @@ mod tests {
                         ),
                         Variant::Builtin(
                             73,
-                            VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                            VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
                         ),
                     ],
                     modifier: Modifier::Builtin {
@@ -1621,7 +1624,7 @@ mod tests {
                         ),
                         Variant::Builtin(
                             73,
-                            VariantType::AtRule(Cow::from("@media (min-width: 1280px)"))
+                            VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
                         ),
                     ],
                     modifier: Modifier::Builtin {
@@ -1651,7 +1654,7 @@ mod tests {
                     full: "(hover,focus):bg-red-400",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![Variant::Builtin(46, VariantType::PseudoClass("hover"))],
+                    variants: vec![Variant::Builtin(Default::default(), VariantType::PseudoClass("hover"))],
                     modifier: Modifier::Builtin {
                         is_negative: false,
                         value: "red-400",
@@ -1662,7 +1665,7 @@ mod tests {
                     full: "(hover,focus):bg-red-400",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![Variant::Builtin(47, VariantType::PseudoClass("focus")),],
+                    variants: vec![Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),],
                     modifier: Modifier::Builtin {
                         is_negative: false,
                         value: "red-400",
@@ -1766,9 +1769,9 @@ mod tests {
                     variants: vec![
                         Variant::Builtin(
                             73,
-                            VariantType::AtRule(Cow::Borrowed("@media (min-width: 1280px)"))
+                            VariantType::AtRule(Cow::Borrowed("@media (width >= 80rem)"))
                         ),
-                        Variant::Builtin(46, VariantType::PseudoClass("hover"))
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("hover"))
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -1783,9 +1786,9 @@ mod tests {
                     variants: vec![
                         Variant::Builtin(
                             73,
-                            VariantType::AtRule(Cow::Borrowed("@media (min-width: 1280px)"))
+                            VariantType::AtRule(Cow::Borrowed("@media (width >= 80rem)"))
                         ),
-                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -1811,7 +1814,7 @@ mod tests {
                     full: "(hover:bg-red-400,focus:bg-green-400)",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![Variant::Builtin(46, VariantType::PseudoClass("hover"))],
+                    variants: vec![Variant::Builtin(Default::default(), VariantType::PseudoClass("hover"))],
                     modifier: Modifier::Builtin {
                         is_negative: false,
                         value: "red-400",
@@ -1822,7 +1825,7 @@ mod tests {
                     full: "(hover:bg-red-400,focus:bg-green-400)",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![Variant::Builtin(47, VariantType::PseudoClass("focus")),],
+                    variants: vec![Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),],
                     modifier: Modifier::Builtin {
                         is_negative: false,
                         value: "green-400",
@@ -1854,10 +1857,10 @@ mod tests {
                         ),
                         Variant::Builtin(
                             73,
-                            VariantType::AtRule(Cow::Borrowed("@media (min-width: 1280px)"))
+                            VariantType::AtRule(Cow::Borrowed("@media (width >= 80rem)"))
                         ),
-                        Variant::Builtin(46, VariantType::PseudoClass("hover")),
-                        Variant::Builtin(28, VariantType::PseudoClass("target")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("hover")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("target")),
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -1878,10 +1881,10 @@ mod tests {
                         ),
                         Variant::Builtin(
                             73,
-                            VariantType::AtRule(Cow::Borrowed("@media (min-width: 1280px)"))
+                            VariantType::AtRule(Cow::Borrowed("@media (width >= 80rem)"))
                         ),
-                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
-                        Variant::Builtin(28, VariantType::PseudoClass("target")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("target")),
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -1896,10 +1899,10 @@ mod tests {
                     variants: vec![
                         Variant::Builtin(
                             73,
-                            VariantType::AtRule(Cow::Borrowed("@media (min-width: 1280px)"))
+                            VariantType::AtRule(Cow::Borrowed("@media (width >= 80rem)"))
                         ),
-                        Variant::Builtin(46, VariantType::PseudoClass("hover")),
-                        Variant::Builtin(28, VariantType::PseudoClass("target"))
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("hover")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("target"))
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -1914,10 +1917,10 @@ mod tests {
                     variants: vec![
                         Variant::Builtin(
                             73,
-                            VariantType::AtRule(Cow::Borrowed("@media (min-width: 1280px)"))
+                            VariantType::AtRule(Cow::Borrowed("@media (width >= 80rem)"))
                         ),
-                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
-                        Variant::Builtin(28, VariantType::PseudoClass("target"))
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("target"))
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -1942,8 +1945,8 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin(46, VariantType::PseudoClass("hover")),
-                        Variant::Builtin(45, VariantType::PseudoClass("focus-within")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("hover")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus-within")),
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -1956,8 +1959,8 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
-                        Variant::Builtin(45, VariantType::PseudoClass("focus-within"))
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus-within"))
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -1970,8 +1973,8 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin(46, VariantType::PseudoClass("hover")),
-                        Variant::Builtin(28, VariantType::PseudoClass("target")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("hover")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("target")),
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -1984,8 +1987,8 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
-                        Variant::Builtin(28, VariantType::PseudoClass("target"))
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("target"))
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -2009,7 +2012,7 @@ mod tests {
                     full: "(hover,focus):(bg-red-400,(target,focus-within):bg-green-400)",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![Variant::Builtin(46, VariantType::PseudoClass("hover")),],
+                    variants: vec![Variant::Builtin(Default::default(), VariantType::PseudoClass("hover")),],
                     modifier: Modifier::Builtin {
                         is_negative: false,
                         value: "red-400",
@@ -2020,7 +2023,7 @@ mod tests {
                     full: "(hover,focus):(bg-red-400,(target,focus-within):bg-green-400)",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![Variant::Builtin(47, VariantType::PseudoClass("focus")),],
+                    variants: vec![Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),],
                     modifier: Modifier::Builtin {
                         is_negative: false,
                         value: "red-400",
@@ -2032,8 +2035,8 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin(28, VariantType::PseudoClass("target")),
-                        Variant::Builtin(46, VariantType::PseudoClass("hover")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("target")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("hover")),
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -2046,8 +2049,8 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin(28, VariantType::PseudoClass("target")),
-                        Variant::Builtin(47, VariantType::PseudoClass("focus")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("target")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -2060,8 +2063,8 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin(45, VariantType::PseudoClass("focus-within")),
-                        Variant::Builtin(46, VariantType::PseudoClass("hover"))
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus-within")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("hover"))
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -2074,8 +2077,8 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin(45, VariantType::PseudoClass("focus-within")),
-                        Variant::Builtin(47, VariantType::PseudoClass("focus"))
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus-within")),
+                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus"))
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
