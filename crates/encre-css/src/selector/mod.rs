@@ -148,121 +148,111 @@ pub enum Modifier<'a> {
     },
 }
 
-/// Structure used to add pseudo-selectors, pseudo-elements, pseudo classes and media queries to
-/// CSS rules.
-///
-/// Variant are useful to <i>conditionally</i> apply utility classes.
-///
-/// See [`config::BUILTIN_VARIANTS`] for a list of all default variants.
-///
-/// See [Tailwind's documentation](https://tailwindcss.com/docs/hover-focus-and-other-states) to learn more about variants.
-///
-/// [`config::BUILTIN_VARIANTS`]: crate::config::BUILTIN_VARIANTS
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum VariantType {
-    /// A CSS [pseudo element](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements).
-    ///
-    /// # Example
-    ///
-    /// If the variant is `VariantType::PseudoClass("before")` and the original class is `".bg-red-500"`, the class will become `".bg-red-500::before"`).
-    PseudoElement(&'static str),
-
-    /// A CSS [pseudo class](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes).
-    ///
-    /// # Example
-    ///
-    /// If the variant is `VariantType::PseudoClass("hover")` and the original class is `".bg-red-500"`, the class will become `".bg-red-500:hover"`).
-    PseudoClass(&'static str),
-
-    /// Wrap the original class to make another one.
-    ///
-    /// # Example
-    ///
-    /// If the variant is `VariantType::WrapClass("&[open]")` and the original class is `".bg-red-500"`, the class will become `".bg-red-500[open]"`).
-    WrapClass(Cow<'static, str>),
-
-    /// Add a `@` CSS rule (like `@media`, `@supports`).
-    ///
-    /// # Example
-    ///
-    /// If the variant is `VariantType::AtRule("@media (orientation: portrait)")` and the original
-    /// class is `".bg-red-500"`, the class will become `"@media (orientation: portrait) { .bg-red-500 { ... } }"`).
-    AtRule(Cow<'static, str>),
-
-    /// A variant applied to a group element like `group-hover`.
-    ///
-    /// This variant should not be built manually.
-    Group {
-        /// The name of the group if it's specified.
-        ///
-        /// It's parsed as the part after the slash, e.g `item` in `group-hover/item:block`
-        name: Option<String>,
-
-        /// The pseudo class to apply to the group elements.
-        class: &'static str,
-    },
-
-    /// A variant applied to a peer element like `peer-focus`.
-    ///
-    /// This variant should not be built manually.
-    Peer {
-        /// The name of the peer if it's specified.
-        ///
-        /// It's parsed as the part after the slash, e.g `item` in `peer-hover/item:block`
-        name: Option<String>,
-
-        /// The pseudo class to apply to the peer elements.
-        class: &'static str,
-    },
-
-    /// A negated variant applied to a peer element like `peer-not-hover`.
-    ///
-    /// This variant should not be built manually.
-    PeerNot {
-        /// The name of the peer if it's specified.
-        ///
-        /// It's parsed as the part after the slash, e.g `item` in `peer-not-hover/item:block`
-        name: Option<String>,
-
-        /// The pseudo class to apply to the peer elements.
-        class: &'static str
-    },
-}
-
 /// A selector variant.
 #[derive(Debug, Clone, Eq)]
-pub enum Variant<'a> {
-    /// A known variant with a static variant type.
-    Builtin {
-        /// The order of the variant among other variants.
-        ///
-        /// It's used to decide where the generated class having this variant will be placed in
-        /// the generated CSS.
-        order: usize,
+pub struct Variant<'a> {
+    pub(crate) order: usize,
 
-        /// Whether the variant is a prefix followed by an arbitrary value, e.g
-        /// `supports-[display:flex]` or a common variant like `hover`.
-        prefixed: bool,
+    pub(crate) prefixed: bool,
 
-        /// The variant type.
-        variant: VariantType
-    },
+    pub(crate) template: Cow<'a, str>,
+}
 
-    /// A dynamic variant having an arbitrary contents.
+impl<'a> Variant<'a> {
+    pub(crate) const fn new_const(counter: &mut usize, template: &'static str) -> Self {
+        *counter += 1;
+
+        Self {
+            order: *counter - 1,
+            prefixed: false,
+            template: Cow::Borrowed(template),
+        }
+    }
+
+    /// Create a new variant.
     ///
-    /// The inner string follows a specific syntax where `&` specifies
-    /// a placeholder where the rest of the selector is injected.
-    Arbitrary(Cow<'a, str>),
+    /// The order is used to decide where the generated class having this variant will be placed in
+    /// the generated CSS. [`Config::last_variant_order`] can be used to insert a variant after all
+    /// the others.
+    ///
+    /// The template is a string which defines how the class will be modified. If it starts with `@`,
+    /// a CSS block will wrap the inner class (like media queries), otherwise just the class name will
+    /// be modified.
+    ///
+    /// The template should contain `&` which will be replaced by the complete class name.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use encre_css::{Config, selector::Variant};
+    /// use std::borrow::Cow;
+    ///
+    /// let mut config = Config::default();
+    /// config.register_variant(
+    ///     "headings",
+    ///     // Insert the classes having this variant after all the other variants
+    ///     Variant::new(config.last_variant_order(), "& :where(h1, h2, h3, h4, h5, h6)")
+    /// );
+    ///
+    /// let generated = encre_css::generate(
+    ///     ["headings:text-gray-700"],
+    ///     &config,
+    /// );
+    ///
+    /// assert!(generated.ends_with(".headings\\:text-gray-700 :where(h1, h2, h3, h4, h5, h6) {
+    ///   color: oklch(37.3% .034 259.733);
+    /// }"));
+    /// ```
+    ///
+    /// [`Config::last_variant_order`]: crate::Config::last_variant_order
+    pub fn new<T: Into<Cow<'a, str>>>(order: usize, template: T) -> Self {
+        Self {
+            order,
+            prefixed: false,
+            template: template.into(),
+        }
+    }
+
+    /// Defines a prefixed variant which is composed of a prefix and an arbitrary value which will
+    /// be inserted into the variant template.
+    ///
+    /// A prefixed variant can have `{}` in its template which will be replaced by the arbitrary
+    /// value.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use encre_css::{Config, selector::Variant};
+    /// use std::borrow::Cow;
+    ///
+    /// let mut config = Config::default();
+    /// config.register_variant(
+    ///     "media",
+    ///     // Insert the classes having this variant after all the other variants
+    ///     Variant::new(config.last_variant_order(), "@media {}").with_prefixed()
+    /// );
+    ///
+    /// let generated = encre_css::generate(
+    ///     ["media-[print]:flex"],
+    ///     &config,
+    /// );
+    ///
+    /// assert!(generated.ends_with(r"@media print {
+    ///   .media-\[print\]\:flex {
+    ///     display: flex;
+    ///   }
+    /// }"));
+    /// ```
+    pub const fn with_prefixed(mut self) -> Self {
+        self.prefixed = true;
+        self
+    }
 }
 
 impl PartialEq for Variant<'_> {
     fn eq(&self, other: &Self) -> bool {
         // Does not test order because it can change
-        match (self, other) {
-            (Self::Builtin { variant: v1, .. }, Self::Builtin { variant: v2, .. }) => v1 == v2,
-            (Self::Arbitrary(s1), Self::Arbitrary(s2)) => s1 == s2,
-            _ => false,
-        }
+        self.template == other.template
     }
 }
 
@@ -317,14 +307,13 @@ impl Ord for Selector<'_> {
                     break;
                 }
 
-                let res = match self.variants.get(variant_i).as_ref().unwrap() {
-                    Variant::Builtin { order, .. } => order,
-                    Variant::Arbitrary(_) => &1_000_000,
-                }
-                .cmp(&match other.variants.get(variant_i).unwrap() {
-                    Variant::Builtin { order, .. } => *order,
-                    Variant::Arbitrary(_) => 1_000_001,
-                });
+                let res = self
+                    .variants
+                    .get(variant_i)
+                    .as_ref()
+                    .unwrap()
+                    .order
+                    .cmp(&other.variants.get(variant_i).unwrap().order);
 
                 if res != Ordering::Equal {
                     compared = Some(res);

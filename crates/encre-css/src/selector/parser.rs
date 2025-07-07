@@ -1,4 +1,4 @@
-use super::{Modifier, Selector, Variant, VariantType};
+use super::{Modifier, Selector, Variant};
 use crate::{
     config::{Config, BUILTIN_PLUGINS, BUILTIN_VARIANTS},
     error::{ParseError, ParseErrorKind},
@@ -161,7 +161,7 @@ pub(crate) fn parse<'a>(
 
 fn push_variant<'a>(
     is_arbitrary: bool,
-    variant: &'a str,
+    full_variant: &'a str,
     variant_list: &mut Vec<Variant<'a>>,
     val: &'a str,
     span: &Range<usize>,
@@ -169,14 +169,16 @@ fn push_variant<'a>(
     config_derived_variants: &[(Cow<'static, str>, Variant<'static>)],
 ) -> Result<(), ParseError<'a>> {
     if is_arbitrary {
-        variant_list.push(Variant::Arbitrary(underscores_to_spaces(unescape(
-            Cow::from(variant),
-        ))));
+        variant_list.push(Variant {
+            order: config.last_variant_order(),
+            prefixed: false,
+            template: underscores_to_spaces(unescape(Cow::from(full_variant))),
+        });
         return Ok(());
-    } else if let Some(variant) = BUILTIN_VARIANTS.get(variant) {
+    } else if let Some(variant) = BUILTIN_VARIANTS.get(full_variant) {
         if matches!(
             variant,
-            Variant::Builtin {
+            Variant {
                 prefixed: false,
                 ..
             }
@@ -188,59 +190,38 @@ fn push_variant<'a>(
         .custom_variants
         .iter()
         .chain(config_derived_variants)
-        .find(|(n, _)| n == variant)
+        .find(|(n, _)| n == full_variant)
     {
         variant_list.push(variant.1.clone());
         return Ok(());
-    } else if let Some((prefix, value)) = variant.split_once(ARBITRARY_START) {
+    } else if let Some((prefix, value)) = full_variant.split_once(ARBITRARY_START) {
         if let Some(prefix) = prefix.strip_suffix("-") {
             if let Some(value) = value.strip_suffix(ARBITRARY_END) {
                 let value = underscores_to_spaces(unescape(Cow::Borrowed(value)));
-                let builtin_variant = if let Some(variant) = BUILTIN_VARIANTS.get(prefix) {
+                let mut variant = if let Some(variant) = BUILTIN_VARIANTS.get(prefix).cloned() {
                     variant
-                } else if let Some(variant) =
-                    config.custom_variants.iter().find(|(n, _)| n == prefix)
+                } else if let Some(variant) = config
+                    .custom_variants
+                    .iter()
+                    .find(|(n, _)| n == prefix)
+                    .cloned()
                 {
-                    &variant.1
+                    variant.1
                 } else {
                     return Err(ParseError::new(
                         span.clone(),
-                        ParseErrorKind::UnknownVariant(variant, val),
+                        ParseErrorKind::UnknownVariant(full_variant, val),
                     ));
                 };
 
-                if let Variant::Builtin {
-                    order,
-                    prefixed: true,
-                    variant: inner_variant,
-                } = builtin_variant
-                {
-                    variant_list.push(match inner_variant {
-                        VariantType::WrapClass(s) => Variant::Builtin {
-                            order: *order,
-                            prefixed: false,
-                            variant: VariantType::WrapClass(Cow::Owned(s.replace("{}", &*value))),
-                        },
-                        VariantType::AtRule(s) => Variant::Builtin {
-                            order: *order,
-                            prefixed: false,
-                            variant: VariantType::AtRule(Cow::Owned(s.replace("{}", &*value))),
-                        },
-                        _ => {
-                            // Pseudo elements and classes cannot be used as prefixed variants
-                            return Err(ParseError::new(
-                                span.clone(),
-                                ParseErrorKind::UnknownVariant(variant, val),
-                            ));
-                        }
-                    });
-                    return Ok(());
-                }
+                variant.template = Cow::Owned(variant.template.replace("{}", &*value));
+                variant_list.push(variant.clone());
+                return Ok(());
             }
         }
     } else {
         // Maybe a group or peer variant
-        if let Some(group_variant) = variant.strip_prefix("group-") {
+        if let Some(group_variant) = full_variant.strip_prefix("group-") {
             let (group_variant, name) = if let Some((variant, name)) = group_variant.split_once("/")
             {
                 (variant, Some(name.to_string()))
@@ -248,20 +229,25 @@ fn push_variant<'a>(
                 (group_variant, None)
             };
 
-            if let Some(Variant::Builtin {
-                order,
-                prefixed: false,
-                variant: VariantType::PseudoClass(class),
-            }) = BUILTIN_VARIANTS.get(group_variant)
-            {
-                variant_list.push(Variant::Builtin {
-                    order: order + 1000,
-                    prefixed: false,
-                    variant: VariantType::Group { name, class },
-                });
-                return Ok(());
+            if let Some(mut variant) = BUILTIN_VARIANTS.get(group_variant).cloned() {
+                if !variant.template.starts_with('@') {
+                    variant.order += 1000;
+
+                    let suffix = if let Some(name) = name {
+                        Cow::Owned(format!("\\/{name}"))
+                    } else {
+                        Cow::Borrowed("")
+                    };
+
+                    variant.template = Cow::Owned(format!(
+                        "{} &",
+                        variant.template.replace('&', &format!(".group{suffix}"))
+                    ));
+                    variant_list.push(variant.clone());
+                    return Ok(());
+                }
             }
-        } else if let Some(peer_not_variant) = variant.strip_prefix("peer-not-") {
+        } else if let Some(peer_not_variant) = full_variant.strip_prefix("peer-not-") {
             let (peer_not_variant, name) =
                 if let Some((variant, name)) = peer_not_variant.split_once("/") {
                     (variant, Some(name.to_string()))
@@ -269,45 +255,57 @@ fn push_variant<'a>(
                     (peer_not_variant, None)
                 };
 
-            if let Some(Variant::Builtin {
-                order,
-                prefixed: false,
-                variant: VariantType::PseudoClass(class),
-            }) = BUILTIN_VARIANTS.get(peer_not_variant)
-            {
-                variant_list.push(Variant::Builtin {
-                    order: order + 2000,
-                    prefixed: false,
-                    variant: VariantType::PeerNot { name, class },
-                });
-                return Ok(());
+            if let Some(mut variant) = BUILTIN_VARIANTS.get(peer_not_variant).cloned() {
+                if !variant.template.starts_with('@') {
+                    variant.order += 2000;
+
+                    let suffix = if let Some(name) = name {
+                        Cow::Owned(format!("\\/{name}"))
+                    } else {
+                        Cow::Borrowed("")
+                    };
+
+                    variant.template = Cow::Owned(format!(
+                        "{}) ~ &",
+                        variant
+                            .template
+                            .replace('&', &format!(".peer{suffix}:not("))
+                    ));
+                    variant_list.push(variant.clone());
+                    return Ok(());
+                }
             }
-        } else if let Some(peer_variant) = variant.strip_prefix("peer-") {
+        } else if let Some(peer_variant) = full_variant.strip_prefix("peer-") {
             let (peer_variant, name) = if let Some((variant, name)) = peer_variant.split_once("/") {
                 (variant, Some(name.to_string()))
             } else {
                 (peer_variant, None)
             };
 
-            if let Some(Variant::Builtin {
-                order,
-                prefixed: false,
-                variant: VariantType::PseudoClass(class),
-            }) = BUILTIN_VARIANTS.get(peer_variant)
-            {
-                variant_list.push(Variant::Builtin {
-                    order: order + 3000,
-                    prefixed: false,
-                    variant: VariantType::Peer { name, class },
-                });
-                return Ok(());
+            if let Some(mut variant) = BUILTIN_VARIANTS.get(peer_variant).cloned() {
+                if !variant.template.starts_with('@') {
+                    variant.order += 3000;
+
+                    let suffix = if let Some(name) = name {
+                        Cow::Owned(format!("\\/{name}"))
+                    } else {
+                        Cow::Borrowed("")
+                    };
+
+                    variant.template = Cow::Owned(format!(
+                        "{} ~ &",
+                        variant.template.replace('&', &format!(".peer{suffix}"))
+                    ));
+                    variant_list.push(variant.clone());
+                    return Ok(());
+                }
             }
         }
     }
 
     Err(ParseError::new(
         span.clone(),
-        ParseErrorKind::UnknownVariant(variant, val),
+        ParseErrorKind::UnknownVariant(full_variant, val),
     ))
 }
 
@@ -880,10 +878,10 @@ mod tests {
                 full: "hover:text-center",
                 order: Default::default(),
                 plugin: &typography::text_align::PluginDefinition,
-                variants: vec![Variant::Builtin {
+                variants: vec![Variant {
                     order: Default::default(),
                     prefixed: false,
-                    variant: VariantType::PseudoClass("hover")
+                    template: Cow::Borrowed("&:hover")
                 }],
                 modifier: Modifier::Builtin {
                     is_negative: false,
@@ -912,20 +910,20 @@ mod tests {
                 order: Default::default(),
                 plugin: &typography::text_align::PluginDefinition,
                 variants: vec![
-                    Variant::Builtin {
+                    Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::WrapClass(Cow::from("& *::marker, &::marker"))
+                        template: Cow::from("& *::marker, &::marker")
                     },
-                    Variant::Builtin {
+                    Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
+                        template: Cow::from("@media (width >= 80rem)"),
                     },
-                    Variant::Builtin {
+                    Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::PseudoClass("hover")
+                        template: Cow::Borrowed("&:hover")
                     }
                 ],
                 modifier: Modifier::Builtin {
@@ -955,20 +953,20 @@ mod tests {
                 order: Default::default(),
                 plugin: &spacing::margin::PluginXDefinition,
                 variants: vec![
-                    Variant::Builtin {
+                    Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::WrapClass(Cow::from("& *::marker, &::marker"))
+                        template: Cow::from("& *::marker, &::marker")
                     },
-                    Variant::Builtin {
+                    Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
+                        template: Cow::from("@media (width >= 80rem)"),
                     },
-                    Variant::Builtin {
+                    Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::PseudoClass("hover")
+                        template: Cow::Borrowed("&:hover")
                     }
                 ],
                 modifier: Modifier::Builtin {
@@ -997,7 +995,11 @@ mod tests {
                 full: "[&>*]:text-center",
                 order: Default::default(),
                 plugin: &typography::text_align::PluginDefinition,
-                variants: vec![Variant::Arbitrary(Cow::from("&>*"))],
+                variants: vec![Variant {
+                    order: Default::default(),
+                    prefixed: false,
+                    template: Cow::from("&>*")
+                }],
                 modifier: Modifier::Builtin {
                     is_negative: false,
                     value: "center",
@@ -1024,13 +1026,10 @@ mod tests {
                 full: "group-checked:block",
                 order: Default::default(),
                 plugin: &layout::display::PluginDefinition,
-                variants: vec![Variant::Builtin {
+                variants: vec![Variant {
                     order: Default::default(),
                     prefixed: false,
-                    variant: VariantType::Group {
-                        name: None,
-                        class: "checked",
-                    }
+                    template: Cow::from(".group:checked &"),
                 }],
                 modifier: Modifier::Builtin {
                     is_negative: false,
@@ -1054,13 +1053,10 @@ mod tests {
                 full: "peer-checked:block",
                 order: Default::default(),
                 plugin: &layout::display::PluginDefinition,
-                variants: vec![Variant::Builtin {
+                variants: vec![Variant {
                     order: Default::default(),
                     prefixed: false,
-                    variant: VariantType::Peer {
-                        name: None,
-                        class: "checked",
-                    }
+                    template: Cow::from(".peer:checked ~ &"),
                 }],
                 modifier: Modifier::Builtin {
                     is_negative: false,
@@ -1084,13 +1080,10 @@ mod tests {
                 full: "peer-not-checked:block",
                 order: Default::default(),
                 plugin: &layout::display::PluginDefinition,
-                variants: vec![Variant::Builtin {
+                variants: vec![Variant {
                     order: Default::default(),
                     prefixed: false,
-                    variant: VariantType::PeerNot {
-                        name: None,
-                        class: "checked",
-                    }
+                    template: Cow::from(".peer:not(:checked) ~ &"),
                 }],
                 modifier: Modifier::Builtin {
                     is_negative: false,
@@ -1118,13 +1111,10 @@ mod tests {
                 full: "group-checked/item:block",
                 order: Default::default(),
                 plugin: &layout::display::PluginDefinition,
-                variants: vec![Variant::Builtin {
+                variants: vec![Variant {
                     order: Default::default(),
                     prefixed: false,
-                    variant: VariantType::Group {
-                        name: Some(String::from("item")),
-                        class: "checked",
-                    }
+                    template: Cow::from(r".group\/item:checked &"),
                 }],
                 modifier: Modifier::Builtin {
                     is_negative: false,
@@ -1148,13 +1138,10 @@ mod tests {
                 full: "peer-checked/item:block",
                 order: Default::default(),
                 plugin: &layout::display::PluginDefinition,
-                variants: vec![Variant::Builtin {
+                variants: vec![Variant {
                     order: Default::default(),
                     prefixed: false,
-                    variant: VariantType::Peer {
-                        name: Some(String::from("item")),
-                        class: "checked",
-                    }
+                    template: Cow::from(r".peer\/item:checked ~ &"),
                 }],
                 modifier: Modifier::Builtin {
                     is_negative: false,
@@ -1178,13 +1165,10 @@ mod tests {
                 full: "peer-not-checked/item:block",
                 order: Default::default(),
                 plugin: &layout::display::PluginDefinition,
-                variants: vec![Variant::Builtin {
+                variants: vec![Variant {
                     order: Default::default(),
                     prefixed: false,
-                    variant: VariantType::PeerNot {
-                        name: Some(String::from("item")),
-                        class: "checked",
-                    }
+                    template: Cow::from(r".peer\/item:not(:checked) ~ &"),
                 }],
                 modifier: Modifier::Builtin {
                     is_negative: false,
@@ -1212,9 +1196,11 @@ mod tests {
                 full: "[@supports_not_(display:grid)]:grid",
                 order: Default::default(),
                 plugin: &layout::display::PluginDefinition,
-                variants: vec![Variant::Arbitrary(Cow::from(
-                    "@supports not (display:grid)"
-                ))],
+                variants: vec![Variant {
+                    order: Default::default(),
+                    prefixed: false,
+                    template: Cow::from("@supports not (display:grid)")
+                }],
                 modifier: Modifier::Builtin {
                     is_negative: false,
                     value: "grid",
@@ -1242,16 +1228,20 @@ mod tests {
                 order: Default::default(),
                 plugin: &typography::text_align::PluginDefinition,
                 variants: vec![
-                    Variant::Builtin {
+                    Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
+                        template: Cow::from("@media (width >= 80rem)")
                     },
-                    Variant::Arbitrary(Cow::from("&>*")),
-                    Variant::Builtin {
+                    Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::PseudoClass("focus")
+                        template: Cow::from("&>*")
+                    },
+                    Variant {
+                        order: Default::default(),
+                        prefixed: false,
+                        template: Cow::Borrowed("&:focus")
                     }
                 ],
                 modifier: Modifier::Builtin {
@@ -1281,16 +1271,20 @@ mod tests {
                 order: Default::default(),
                 plugin: &spacing::margin::PluginDefinition,
                 variants: vec![
-                    Variant::Builtin {
+                    Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
+                        template: Cow::from("@media (width >= 80rem)")
                     },
-                    Variant::Arbitrary(Cow::from("&>*")),
-                    Variant::Builtin {
+                    Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::PseudoClass("focus")
+                        template: Cow::from("&>*")
+                    },
+                    Variant {
+                        order: Default::default(),
+                        prefixed: false,
+                        template: Cow::Borrowed("&:focus")
                     }
                 ],
                 modifier: Modifier::Builtin {
@@ -1404,15 +1398,15 @@ mod tests {
                 order: Default::default(),
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![
-                    Variant::Builtin {
+                    Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
+                        template: Cow::from("@media (width >= 80rem)")
                     },
-                    Variant::Builtin {
+                    Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::WrapClass(Cow::from("& *::marker, &::marker"))
+                        template: Cow::from("& *::marker, &::marker")
                     },
                 ],
                 modifier: Modifier::Arbitrary {
@@ -1443,15 +1437,15 @@ mod tests {
                 order: Default::default(),
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![
-                    Variant::Builtin {
+                    Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
+                        template: Cow::from("@media (width >= 80rem)")
                     },
-                    Variant::Builtin {
+                    Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::WrapClass(Cow::from("& *::marker, &::marker"))
+                        template: Cow::from("& *::marker, &::marker")
                     },
                 ],
                 modifier: Modifier::Arbitrary {
@@ -1481,7 +1475,11 @@ mod tests {
                 full: "[&>*]:bg-[#fff]",
                 order: Default::default(),
                 plugin: &background::background_color::PluginDefinition,
-                variants: vec![Variant::Arbitrary(Cow::from("&>*"))],
+                variants: vec![Variant {
+                    order: Default::default(),
+                    prefixed: false,
+                    template: Cow::from("&>*")
+                },],
                 modifier: Modifier::Arbitrary {
                     prefix: "",
                     hint: "",
@@ -1509,7 +1507,11 @@ mod tests {
                 full: r"[\[type='input'\]_&>:*]:bg-red-300",
                 order: Default::default(),
                 plugin: &background::background_color::PluginDefinition,
-                variants: vec![Variant::Arbitrary(Cow::from("[type='input'] &>:*"))],
+                variants: vec![Variant {
+                    order: Default::default(),
+                    prefixed: false,
+                    template: Cow::from("[type='input'] &>:*")
+                },],
                 modifier: Modifier::Builtin {
                     is_negative: false,
                     value: "red-300",
@@ -1537,16 +1539,20 @@ mod tests {
                 order: Default::default(),
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![
-                    Variant::Builtin {
+                    Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
+                        template: Cow::from("@media (width >= 80rem)")
                     },
-                    Variant::Arbitrary(Cow::from("&>*")),
-                    Variant::Builtin {
+                    Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::PseudoClass("hover")
+                        template: Cow::from("&>*")
+                    },
+                    Variant {
+                        order: Default::default(),
+                        prefixed: false,
+                        template: Cow::Borrowed("&:hover")
                     }
                 ],
                 modifier: Modifier::Arbitrary {
@@ -1577,16 +1583,20 @@ mod tests {
                 order: Default::default(),
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![
-                    Variant::Builtin {
+                    Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
+                        template: Cow::from("@media (width >= 80rem)")
                     },
-                    Variant::Arbitrary(Cow::from("&>*")),
-                    Variant::Builtin {
+                    Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::PseudoClass("hover")
+                        template: Cow::from("&>*")
+                    },
+                    Variant {
+                        order: Default::default(),
+                        prefixed: false,
+                        template: Cow::Borrowed("&:hover")
                     }
                 ],
                 modifier: Modifier::Arbitrary {
@@ -1644,10 +1654,10 @@ mod tests {
                 full: "hover:[mask-type:luminance]",
                 order: BUILTIN_PLUGINS.len(),
                 plugin: &CssPropertyPlugin,
-                variants: vec![Variant::Builtin {
+                variants: vec![Variant {
                     order: Default::default(),
                     prefixed: false,
-                    variant: VariantType::PseudoClass("hover")
+                    template: Cow::Borrowed("&:hover")
                 }],
                 modifier: Modifier::Arbitrary {
                     prefix: "",
@@ -1676,15 +1686,15 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("focus")
+                            template: Cow::Borrowed("&:focus")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("hover")
+                            template: Cow::Borrowed("&:hover")
                         }
                     ],
                     modifier: Modifier::Builtin {
@@ -1697,10 +1707,10 @@ mod tests {
                     full: "hover:(focus:bg-gray-500,text-[color:black,])",
                     order: Default::default(),
                     plugin: &typography::text_color::PluginDefinition,
-                    variants: vec![Variant::Builtin {
+                    variants: vec![Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::PseudoClass("hover")
+                        template: Cow::Borrowed("&:hover")
                     }],
                     modifier: Modifier::Arbitrary {
                         prefix: "",
@@ -1728,10 +1738,10 @@ mod tests {
                 full: "hover:(bg-gray-500)",
                 order: Default::default(),
                 plugin: &background::background_color::PluginDefinition,
-                variants: vec![Variant::Builtin {
+                variants: vec![Variant {
                     order: Default::default(),
                     prefixed: false,
-                    variant: VariantType::PseudoClass("hover")
+                    template: Cow::Borrowed("&:hover")
                 }],
                 modifier: Modifier::Builtin {
                     is_negative: false,
@@ -1771,10 +1781,10 @@ mod tests {
                 full: "min-[475px]:visible",
                 order: Default::default(),
                 plugin: &layout::visibility::PluginDefinition,
-                variants: vec![Variant::Builtin {
+                variants: vec![Variant {
                     order: Default::default(),
                     prefixed: false,
-                    variant: VariantType::AtRule(Cow::from("@media (width >= 475px)"))
+                    template: Cow::from("@media (width >= 475px)")
                 }],
                 modifier: Modifier::Builtin {
                     is_negative: false,
@@ -1802,11 +1812,15 @@ mod tests {
                     order: Default::default(),
                     plugin: &spacing::margin::PluginDefinition,
                     variants: vec![
-                        Variant::Arbitrary(Cow::from("&>*")),
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("focus")
+                            template: Cow::from("&>*")
+                        },
+                        Variant {
+                            order: Default::default(),
+                            prefixed: false,
+                            template: Cow::Borrowed("&:focus")
                         },
                     ],
                     modifier: Modifier::Builtin {
@@ -1820,22 +1834,20 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
+                            template: Cow::from("@media (width >= 80rem)")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::from(
-                                "@media (prefers-color-scheme: dark)"
-                            ))
+                            template: Cow::from("@media (prefers-color-scheme: dark)")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("focus")
+                            template: Cow::Borrowed("&:focus")
                         },
                     ],
                     modifier: Modifier::Builtin {
@@ -1849,27 +1861,25 @@ mod tests {
                     order: Default::default(),
                     plugin: &typography::text_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::WrapClass(Cow::from("[dir=\"rtl\"] &"))
+                            template: Cow::from("[dir=\"rtl\"] &")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
+                            template: Cow::from("@media (width >= 80rem)")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::from(
-                                "@media (prefers-color-scheme: dark)"
-                            ))
+                            template: Cow::from("@media (prefers-color-scheme: dark)")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("focus")
+                            template: Cow::Borrowed("&:focus")
                         },
                     ],
                     modifier: Modifier::Arbitrary {
@@ -1900,11 +1910,15 @@ mod tests {
                     order: Default::default(),
                     plugin: &spacing::margin::PluginDefinition,
                     variants: vec![
-                        Variant::Arbitrary(Cow::from("&>*")),
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("focus")
+                            template: Cow::from("&>*")
+                        },
+                        Variant {
+                            order: Default::default(),
+                            prefixed: false,
+                            template: Cow::Borrowed("&:focus")
                         },
                     ],
                     modifier: Modifier::Builtin {
@@ -1918,23 +1932,25 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Arbitrary(Cow::from(r"[type='text'].light &,.foo")),
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
+                            template: Cow::from(r"[type='text'].light &,.foo")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::from(
-                                "@media (prefers-color-scheme: dark)"
-                            ))
+                            template: Cow::from("@media (width >= 80rem)")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("focus")
+                            template: Cow::from("@media (prefers-color-scheme: dark)")
+                        },
+                        Variant {
+                            order: Default::default(),
+                            prefixed: false,
+                            template: Cow::Borrowed("&:focus")
                         },
                     ],
                     modifier: Modifier::Builtin {
@@ -1948,22 +1964,20 @@ mod tests {
                     order: Default::default(),
                     plugin: &typography::text_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
+                            template: Cow::from("@media (width >= 80rem)")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::from(
-                                "@media (prefers-color-scheme: dark)"
-                            ))
+                            template: Cow::from("@media (prefers-color-scheme: dark)")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("focus")
+                            template: Cow::Borrowed("&:focus")
                         },
                     ],
                     modifier: Modifier::Arbitrary {
@@ -1994,15 +2008,15 @@ mod tests {
                     order: Default::default(),
                     plugin: &border::outline_style::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("focus")
+                            template: Cow::Borrowed("&:focus")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
+                            template: Cow::from("@media (width >= 80rem)")
                         }
                     ],
                     modifier: Modifier::Builtin {
@@ -2016,15 +2030,15 @@ mod tests {
                     order: Default::default(),
                     plugin: &border::outline_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("focus")
+                            template: Cow::Borrowed("&:focus")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
+                            template: Cow::from("@media (width >= 80rem)")
                         }
                     ],
                     modifier: Modifier::Builtin {
@@ -2038,17 +2052,15 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::from(
-                                "@media (prefers-color-scheme: dark)"
-                            ))
+                            template: Cow::from("@media (prefers-color-scheme: dark)")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
+                            template: Cow::from("@media (width >= 80rem)")
                         },
                     ],
                     modifier: Modifier::Builtin {
@@ -2062,17 +2074,15 @@ mod tests {
                     order: Default::default(),
                     plugin: &typography::text_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::from(
-                                "@media (prefers-color-scheme: dark)"
-                            ))
+                            template: Cow::from("@media (prefers-color-scheme: dark)")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
+                            template: Cow::from("@media (width >= 80rem)")
                         },
                     ],
                     modifier: Modifier::Builtin {
@@ -2102,10 +2112,10 @@ mod tests {
                     full: "(hover,focus):bg-red-400",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![Variant::Builtin {
+                    variants: vec![Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::PseudoClass("hover")
+                        template: Cow::Borrowed("&:hover")
                     }],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -2117,10 +2127,10 @@ mod tests {
                     full: "(hover,focus):bg-red-400",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![Variant::Builtin {
+                    variants: vec![Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::PseudoClass("focus")
+                        template: Cow::Borrowed("&:focus")
                     },],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -2144,9 +2154,11 @@ mod tests {
                     full: "([@supports_(display:flex)],focus-visible):flex",
                     order: Default::default(),
                     plugin: &flexbox::flex::PluginDefinition,
-                    variants: vec![Variant::Arbitrary(Cow::Borrowed(
-                        "@supports (display:flex)"
-                    ))],
+                    variants: vec![Variant {
+                        order: Default::default(),
+                        prefixed: false,
+                        template: Cow::from("@supports (display:flex)")
+                    }],
                     modifier: Modifier::Builtin {
                         is_negative: false,
                         value: "flex",
@@ -2157,10 +2169,10 @@ mod tests {
                     full: "([@supports_(display:flex)],focus-visible):flex",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![Variant::Builtin {
+                    variants: vec![Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::PseudoClass("focus-visible")
+                        template: Cow::Borrowed("&:focus-visible")
                     },],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -2184,9 +2196,11 @@ mod tests {
                     full: "([@supports_(display:flex)],focus-visible):!-m-4",
                     order: Default::default(),
                     plugin: &spacing::margin::PluginDefinition,
-                    variants: vec![Variant::Arbitrary(Cow::Borrowed(
-                        "@supports (display:flex)"
-                    ))],
+                    variants: vec![Variant {
+                        order: Default::default(),
+                        prefixed: false,
+                        template: Cow::from("@supports (display:flex)")
+                    }],
                     modifier: Modifier::Builtin {
                         is_negative: true,
                         value: "4",
@@ -2197,10 +2211,10 @@ mod tests {
                     full: "([@supports_(display:flex)],focus-visible):!-m-4",
                     order: Default::default(),
                     plugin: &spacing::margin::PluginDefinition,
-                    variants: vec![Variant::Builtin {
+                    variants: vec![Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::PseudoClass("focus-visible")
+                        template: Cow::Borrowed("&:focus-visible")
                     },],
                     modifier: Modifier::Builtin {
                         is_negative: true,
@@ -2225,15 +2239,15 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::Borrowed("@media (width >= 80rem)"))
+                            template: Cow::Borrowed("@media (width >= 80rem)")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("hover")
+                            template: Cow::Borrowed("&:hover")
                         }
                     ],
                     modifier: Modifier::Builtin {
@@ -2247,15 +2261,15 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::Borrowed("@media (width >= 80rem)"))
+                            template: Cow::Borrowed("@media (width >= 80rem)")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("focus")
+                            template: Cow::Borrowed("&:focus")
                         },
                     ],
                     modifier: Modifier::Builtin {
@@ -2282,10 +2296,10 @@ mod tests {
                     full: "(hover:bg-red-400,focus:bg-green-400)",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![Variant::Builtin {
+                    variants: vec![Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::PseudoClass("hover")
+                        template: Cow::Borrowed("&:hover")
                     }],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -2297,10 +2311,10 @@ mod tests {
                     full: "(hover:bg-red-400,focus:bg-green-400)",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![Variant::Builtin {
+                    variants: vec![Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::PseudoClass("focus")
+                        template: Cow::Borrowed("&:focus")
                     },],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -2325,27 +2339,25 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::Borrowed(
-                                "@media (prefers-color-scheme: dark)"
-                            ))
+                            template: Cow::from("@media (prefers-color-scheme: dark)")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::Borrowed("@media (width >= 80rem)"))
+                            template: Cow::Borrowed("@media (width >= 80rem)")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("hover")
+                            template: Cow::Borrowed("&:hover")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("target")
+                            template: Cow::Borrowed("&:target")
                         },
                     ],
                     modifier: Modifier::Builtin {
@@ -2359,27 +2371,25 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::Borrowed(
-                                "@media (prefers-color-scheme: dark)"
-                            ))
+                            template: Cow::from("@media (prefers-color-scheme: dark)")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::Borrowed("@media (width >= 80rem)"))
+                            template: Cow::Borrowed("@media (width >= 80rem)")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("focus")
+                            template: Cow::Borrowed("&:focus")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("target")
+                            template: Cow::Borrowed("&:target")
                         },
                     ],
                     modifier: Modifier::Builtin {
@@ -2393,20 +2403,20 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::Borrowed("@media (width >= 80rem)"))
+                            template: Cow::Borrowed("@media (width >= 80rem)")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("hover")
+                            template: Cow::Borrowed("&:hover")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("target")
+                            template: Cow::Borrowed("&:target")
                         }
                     ],
                     modifier: Modifier::Builtin {
@@ -2420,20 +2430,20 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::AtRule(Cow::Borrowed("@media (width >= 80rem)"))
+                            template: Cow::Borrowed("@media (width >= 80rem)")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("focus")
+                            template: Cow::Borrowed("&:focus")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("target")
+                            template: Cow::Borrowed("&:target")
                         }
                     ],
                     modifier: Modifier::Builtin {
@@ -2459,15 +2469,15 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("hover")
+                            template: Cow::Borrowed("&:hover")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("focus-within")
+                            template: Cow::Borrowed("&:focus-within")
                         },
                     ],
                     modifier: Modifier::Builtin {
@@ -2481,15 +2491,15 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("focus")
+                            template: Cow::Borrowed("&:focus")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("focus-within")
+                            template: Cow::Borrowed("&:focus-within")
                         }
                     ],
                     modifier: Modifier::Builtin {
@@ -2503,15 +2513,15 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("hover")
+                            template: Cow::Borrowed("&:hover")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("target")
+                            template: Cow::Borrowed("&:target")
                         },
                     ],
                     modifier: Modifier::Builtin {
@@ -2525,15 +2535,15 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("focus")
+                            template: Cow::Borrowed("&:focus")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("target")
+                            template: Cow::Borrowed("&:target")
                         }
                     ],
                     modifier: Modifier::Builtin {
@@ -2558,10 +2568,10 @@ mod tests {
                     full: "(hover,focus):(bg-red-400,(target,focus-within):bg-green-400)",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![Variant::Builtin {
+                    variants: vec![Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::PseudoClass("hover")
+                        template: Cow::Borrowed("&:hover")
                     },],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -2573,10 +2583,10 @@ mod tests {
                     full: "(hover,focus):(bg-red-400,(target,focus-within):bg-green-400)",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![Variant::Builtin {
+                    variants: vec![Variant {
                         order: Default::default(),
                         prefixed: false,
-                        variant: VariantType::PseudoClass("focus")
+                        template: Cow::Borrowed("&:focus")
                     },],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -2589,15 +2599,15 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("target")
+                            template: Cow::Borrowed("&:target")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("hover")
+                            template: Cow::Borrowed("&:hover")
                         },
                     ],
                     modifier: Modifier::Builtin {
@@ -2611,15 +2621,15 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("target")
+                            template: Cow::Borrowed("&:target")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("focus")
+                            template: Cow::Borrowed("&:focus")
                         },
                     ],
                     modifier: Modifier::Builtin {
@@ -2633,15 +2643,15 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("focus-within")
+                            template: Cow::Borrowed("&:focus-within")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("hover")
+                            template: Cow::Borrowed("&:hover")
                         }
                     ],
                     modifier: Modifier::Builtin {
@@ -2655,15 +2665,15 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("focus-within")
+                            template: Cow::Borrowed("&:focus-within")
                         },
-                        Variant::Builtin {
+                        Variant {
                             order: Default::default(),
                             prefixed: false,
-                            variant: VariantType::PseudoClass("focus")
+                            template: Cow::Borrowed("&:focus")
                         }
                     ],
                     modifier: Modifier::Builtin {

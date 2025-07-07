@@ -2,11 +2,11 @@
 use crate::{
     config::{Config, MaxShortcutDepth},
     preflight::Preflight,
-    selector::{parse, Modifier, Selector, Variant, VariantType},
+    selector::{parse, Modifier, Selector, Variant},
     utils::buffer::Buffer,
 };
 
-use std::{borrow::Cow, collections::BTreeSet, fmt::Write};
+use std::{borrow::Cow, collections::BTreeSet};
 
 /// The context used in the [`Plugin::can_handle`] method.
 ///
@@ -58,16 +58,11 @@ pub fn generate_at_rules<T: FnOnce(&mut ContextHandle)>(
     } = context;
 
     if !selector.variants.is_empty() {
-        selector.variants.iter().for_each(|variant| match variant {
-            Variant::Builtin { variant: VariantType::AtRule(variant), .. } => {
-                buffer.line(format_args!("{variant} {{"));
+        selector.variants.iter().for_each(|variant| {
+            if variant.template.starts_with('@') {
+                buffer.line(format_args!("{} {{", variant.template));
                 buffer.indent();
             }
-            Variant::Arbitrary(variant) if variant.starts_with('@') => {
-                buffer.line(format_args!("{variant} {{"));
-                buffer.indent();
-            }
-            _ => (),
         });
     }
 
@@ -128,47 +123,10 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle)>(
         // Variants are applied from right to left
         // (https://tailwindcss.com/docs/upgrade-guide#variant-stacking-order),
         // so no need to reverse the variants
-        selector.variants.iter().for_each(|variant| match variant {
-            Variant::Builtin { variant, .. } => match variant {
-                VariantType::PseudoElement(element) => {
-                    write!(base_class, "::{element}").expect("writing to a String can't fail");
-                }
-                VariantType::PseudoClass(class) => {
-                    write!(base_class, ":{class}").expect("writing to a String can't fail");
-                }
-                VariantType::WrapClass(template) => {
-                    base_class = template.replace('&', &base_class);
-                }
-                VariantType::AtRule(_) => (),
-                VariantType::Group { name, class } => {
-                    let suffix = if let Some(name) = name {
-                        Cow::Owned(format!("\\/{name}"))
-                    } else {
-                        Cow::Borrowed("")
-                    };
-                    base_class = format!(".group{suffix}:{class} {base_class}");
-                }
-                VariantType::Peer { name, class } => {
-                    let suffix = if let Some(name) = name {
-                        Cow::Owned(format!("\\/{name}"))
-                    } else {
-                        Cow::Borrowed("")
-                    };
-                    base_class = format!(".peer{suffix}:{class} ~ {base_class}");
-                }
-                VariantType::PeerNot { name, class } => {
-                    let suffix = if let Some(name) = name {
-                        Cow::Owned(format!("\\/{name}"))
-                    } else {
-                        Cow::Borrowed("")
-                    };
-                    base_class = format!(".peer{suffix}:not(:{class}) ~ {base_class}");
-                }
-            },
-            Variant::Arbitrary(template) if !template.starts_with('@') => {
-                base_class = template.replace('&', &base_class);
+        selector.variants.iter().for_each(|variant| {
+            if !variant.template.starts_with('@') {
+                base_class = variant.template.replace('&', &base_class);
             }
-            Variant::Arbitrary(_) => (),
         });
     }
     buffer.line(format_args!("{base_class}{custom_after_class} {{"));
@@ -186,14 +144,11 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle)>(
 
     // If the rule is selecting the `::before` or `::after` pseudo elements, we need to generate a
     // default `content` property
-    if selector.variants.iter().any(|variant| {
-        if let Variant::Builtin { variant, .. } = variant {
-            *variant == VariantType::PseudoElement("before")
-                || *variant == VariantType::PseudoElement("after")
-        } else {
-            false
-        }
-    }) {
+    if selector
+        .variants
+        .iter()
+        .any(|variant| ["&::before", "&::after"].contains(&&*variant.template))
+    {
         buffer.line("content: var(--en-content);");
     }
 
@@ -1182,7 +1137,10 @@ mod tests {
 
     #[test]
     fn named_group_and_peer() {
-        let generated = generate(["group-checked/item:block peer-checked/item:block peer-not-checked/item:block"], &base_config());
+        let generated = generate(
+            ["group-checked/item:block peer-checked/item:block peer-not-checked/item:block"],
+            &base_config(),
+        );
 
         assert_eq!(
             generated,
@@ -1204,7 +1162,10 @@ mod tests {
 
     #[test]
     fn prefixed_variants() {
-        let generated = generate(["supports-[display:flex]:flex nth-of-type-[span]:text-red-500 data-[active]:block"], &base_config());
+        let generated = generate(
+            ["supports-[display:flex]:flex nth-of-type-[span]:text-red-500 data-[active]:block"],
+            &base_config(),
+        );
 
         assert_eq!(
             generated,
