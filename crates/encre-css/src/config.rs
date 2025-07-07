@@ -599,6 +599,9 @@ pub const BUILTIN_CONTAINERS: &[(&str, &str)] = &[
 
 /// The list of all default variants (sorted following their importance in the CSS file).
 ///
+/// - `not-[{}]`: applies [`:not()`](https://developer.mozilla.org/en-US/docs/Web/CSS/:not) with the value specified between the square brackets
+/// - `group-[{}]`: applies a selector to the group then selects all its child nodes
+/// - `peer-[{}]`: applies a selector to a peer element then selects all its peer nodes
 /// - `first-letter`: applies the [`first-letter`](https://developer.mozilla.org/en-US/docs/Web/CSS/::first-letter) pseudo element
 /// - `first-line`: applies the [`first-line`](https://developer.mozilla.org/en-US/docs/Web/CSS/::first-line) pseudo element
 /// - `marker`: applies the [`marker`](https://developer.mozilla.org/en-US/docs/Web/CSS/::marker) pseudo element to the element **and all of its nested children**
@@ -606,10 +609,11 @@ pub const BUILTIN_CONTAINERS: &[(&str, &str)] = &[
 /// - `file`: applies the [`file-selector-button`](https://developer.mozilla.org/en-US/docs/Web/CSS/::file-selector-button) pseudo element
 /// - `placeholder`: applies the [`placeholder`](https://developer.mozilla.org/en-US/docs/Web/CSS/::placeholder) pseudo element
 /// - `backdrop`: applies the [`backdrop`](https://developer.mozilla.org/en-US/docs/Web/CSS/::backdrop) pseudo element
+/// - `details-content`: applies the [`details-content`](https://developer.mozilla.org/en-US/docs/Web/CSS/::details-content) pseudo element
 /// - `before`: applies the [`before`](https://developer.mozilla.org/en-US/docs/Web/CSS/::before) pseudo element
 /// - `after`: applies the [`before`](https://developer.mozilla.org/en-US/docs/Web/CSS/::before) pseudo element
-/// - `all`: selects all nested children instead of the element itself
-/// - `children`, `*`: selects all direct children (only one level deep) instead of the element itself
+/// - `all` or `**`: selects all nested children instead of the element itself
+/// - `children` or `*`: selects all direct children (only one level deep) instead of the element itself
 /// - `siblings`: selects all siblings of the element using the [general sibling combinator `~`](https://developer.mozilla.org/en-US/docs/Web/CSS/General_sibling_combinator)
 /// - `sibling`: select the sibling next to the element using the [adjacent sibling combinator `+`](https://developer.mozilla.org/en-US/docs/Web/CSS/Adjacent_sibling_combinator)
 /// - `first`: applies the [`first-child`](https://developer.mozilla.org/en-US/docs/Web/CSS/:first-child) pseudo class
@@ -651,15 +655,9 @@ pub const BUILTIN_CONTAINERS: &[(&str, &str)] = &[
 /// - `active`: applies the [`active`](https://developer.mozilla.org/en-US/docs/Web/CSS/:active) pseudo class
 /// - `enabled`: applies the [`enabled`](https://developer.mozilla.org/en-US/docs/Web/CSS/:enabled) pseudo class
 /// - `disabled`: applies the [`disabled`](https://developer.mozilla.org/en-US/docs/Web/CSS/:disabled) pseudo class
-/// - `ltr`: selects all elements contained in an element having the [`dir="ltr"` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/dir), useful when styling based on writing direction
-/// - `rtl`: selects all elements contained in an element having the [`dir="rtl"` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/dir), useful when styling based on writing direction
-/// - `motion-safe`: applies the [`@media (prefers-reduced-motion: no-preference)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion) at-rule
-/// - `motion-reduce`: applies the [`@media (prefers-reduced-motion: reduce)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion) at-rule
-/// - `print`: applies the [`@media print`](https://developer.mozilla.org/en-US/docs/Web/Guide/Printing#using_media_queries_to_improve_layout) at-rule
-/// - `portrait`: applies the [`@media (orientation: portrait)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/orientation) at-rule
-/// - `landscape`: applies the [`@media (orientation: landscape)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/orientation) at-rule
-/// - `contrast-more`: applies the [`@media (prefers-contrast: more)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-contrast) at-rule
-/// - `contrast-less`: applies the [`@media (prefers-contrast: less)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-contrast) at-rule
+/// - `inert`: selects all the elements (and their child nodes) having the [`inert` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/inert)
+/// - `in-[{}]`: selects the element based on the state of the parent elements
+/// - `has-[{}]`: selects elements using [`:has()`](https://developer.mozilla.org/en-US/docs/Web/CSS/:has)
 /// - `aria-busy`: selects all elements having the [`aria-busy="true"` attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-busy)
 /// - `aria-checked`: selects all elements having the [`aria-checked="true"` attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-checked)
 /// - `aria-disabled`: selects all elements having the [`aria-disabled="true"` attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-disabled)
@@ -669,9 +667,39 @@ pub const BUILTIN_CONTAINERS: &[(&str, &str)] = &[
 /// - `aria-readonly`: selects all elements having the [`aria-readonly="true"` attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-readonly)
 /// - `aria-required`: selects all elements having the [`aria-required="true"` attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-required)
 /// - `aria-selected`: selects all elements having the [`aria-selected="true"` attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-selected)
+/// - `aria-[{}]`: selects all elements having a custom aria attribute
+/// - `data-[{}]`: selects all elements having the [`data-{}` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/data-*)
+/// - `nth-[{}]`: selects all elements having a specific position in a list of children using the [`:nth-child({})` pseudo class](https://developer.mozilla.org/en-US/docs/Web/CSS/:nth-child)
+/// - `nth-last-[{}]`: selects all elements having a specific position in a list of children using the [`:nth-last-child({})` pseudo class](https://developer.mozilla.org/en-US/docs/Web/CSS/:nth-last-child)
+/// - `nth-of-type-[{}]`: selects all elements having a specific type using the [`:nth-of-type-({})` pseudo class](https://developer.mozilla.org/en-US/docs/Web/CSS/:nth-of-type)
+/// - `nth-last-of-type-[{}]`: selects all elements having a specific type using the [`:nth-last-of-type-({})` pseudo class](https://developer.mozilla.org/en-US/docs/Web/CSS/:nth-of-type)
+/// - `supports-[{}]`: applies the [`@supports`](https://developer.mozilla.org/en-US/docs/Web/CSS/@supports) at-rule
+/// - `motion-safe`: applies the [`@media (prefers-reduced-motion: no-preference)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion) at-rule
+/// - `motion-reduce`: applies the [`@media (prefers-reduced-motion: reduce)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion) at-rule
+/// - `contrast-more`: applies the [`@media (prefers-contrast: more)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-contrast) at-rule
+/// - `contrast-less`: applies the [`@media (prefers-contrast: less)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-contrast) at-rule
+/// - `max`: applies the [`@media (width < {})`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/width) at-rule
+/// - `min`: applies the [`@media (width >= {})`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/width) at-rule
+/// - `@max`: applies the [`@container (width < {})`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/width) at-rule
+/// - `@min`: applies the [`@container (width >= {})`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/width) at-rule
+/// - `portrait`: applies the [`@media (orientation: portrait)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/orientation) at-rule
+/// - `landscape`: applies the [`@media (orientation: landscape)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/orientation) at-rule
+/// - `ltr`: selects all elements contained in an element having the [`dir="ltr"` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/dir), useful when styling based on writing direction
+/// - `rtl`: selects all elements contained in an element having the [`dir="rtl"` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/dir), useful when styling based on writing direction
+/// - `starting`: applies the [`@starting-style`](https://developer.mozilla.org/en-US/docs/Web/CSS/@starting-style) at-rule
+/// - `print`: applies the [`@media print`](https://developer.mozilla.org/en-US/docs/Web/Guide/Printing#using_media_queries_to_improve_layout) at-rule
+/// - `forced-colors`: applies the [`@media (forced-colors: active)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/forced-colors) at-rule
+/// - `inverted-colors`: applies the [`@media (inverted-colors: inverted)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/inverted-colors) at-rule
+/// - `pointer-none`: applies the [`@media (pointer: none)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/pointer) at-rule
+/// - `pointer-coarse`: applies the [`@media (pointer: coarse)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/pointer) at-rule
+/// - `pointer-fine`: applies the [`@media (pointer: fine)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/pointer) at-rule
+/// - `any-pointer-none`: applies the [`@media (any-pointer: none)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/any-pointer) at-rule
+/// - `any-pointer-coarse`: applies the [`@media (any-pointer: coarse)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/any-pointer) at-rule
+/// - `any-pointer-fine`: applies the [`@media (any-pointer: fine)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/any-pointer) at-rule
+/// - `noscript`: applies the [`@media (scripting: none)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/scripting) at-rule
 ///
 /// Besides the default variants, some others are auto-generated from the configuration like
-/// breakpoints (see [`BUILTIN_SCREENS`]) and the dark mode (`dark:` variant).
+/// breakpoints (see [`BUILTIN_SCREENS`]), container sizes (see [`BUILTIN_CONTAINERS`]) and the dark mode (`dark:` variant).
 ///
 /// Based on [Tailwind's default variants](https://tailwindcss.com/docs/hover-focus-and-other-states).
 #[rustfmt::skip]
@@ -681,7 +709,7 @@ pub const BUILTIN_VARIANTS: phf::OrderedMap<&'static str, Variant> = const {
     phf_ordered_map! {
         "not" => Variant::new_const(&mut counter, "&:not({})").with_prefixed(),
         "group" => Variant::new_const(&mut counter, "&:is(:where(.group){} *)").with_prefixed(),
-        "peer" => Variant::new_const(&mut counter, "&:is(:where(.peer){} *)").with_prefixed(),
+        "peer" => Variant::new_const(&mut counter, "&:is(:where(.peer){} ~ *)").with_prefixed(),
 
         "first-letter" => Variant::new_const(&mut counter, "&::first-letter"),
         "first-line" => Variant::new_const(&mut counter, "&::first-line"),

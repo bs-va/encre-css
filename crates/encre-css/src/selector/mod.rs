@@ -40,7 +40,7 @@
 //!
 //! <p class="with-hints" style="counter-reset: hints; margin-top: 2rem;"><b><span>hover:xl</span><span>:</span><span>bg</span><span>-</span><span>red-500</span></b></p>
 //!
-//! 1. The **[variants](crate::selector::VariantType)** (used to add pseudo-selectors, pseudo-elements, pseudo classes, media queries), in this case
+//! 1. The **[variants](crate::selector::Variant)** (used to add pseudo-selectors, pseudo-elements, pseudo classes, media queries), in this case
 //!    the class will be applied only on a screen larger than 1280px (see [`BUILTIN_SCREENS`]) and
 //!    if hovered;
 //! 2. The **namespace** (basically the name of the plugin), in this case `bg` for changing the background;
@@ -152,9 +152,7 @@ pub enum Modifier<'a> {
 #[derive(Debug, Clone, Eq)]
 pub struct Variant<'a> {
     pub(crate) order: usize,
-
     pub(crate) prefixed: bool,
-
     pub(crate) template: Cow<'a, str>,
 }
 
@@ -258,7 +256,7 @@ impl PartialEq for Variant<'_> {
 
 /// A parsed selector, aka a utility class, containing the variants, the namespace and the modifier.
 ///
-/// See [`crate::selector`] for more informations.
+/// See [`crate::selector`] for more information.
 #[derive(Clone, Debug)]
 pub(crate) struct Selector<'a> {
     pub(crate) order: usize,
