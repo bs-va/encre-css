@@ -46,7 +46,7 @@ use crate::{
     error::{Error, Result},
     preflight::Preflight,
     scanner::Scanner,
-    selector::VariantType,
+    selector::{Variant, VariantType},
 };
 
 #[allow(clippy::wildcard_imports)]
@@ -675,96 +675,114 @@ pub const BUILTIN_CONTAINERS: &[(&str, &str)] = &[
 ///
 /// Based on [Tailwind's default variants](https://tailwindcss.com/docs/hover-focus-and-other-states).
 #[rustfmt::skip]
-pub const BUILTIN_VARIANTS: phf::Map<&'static str, (usize, VariantType)> = phf_map! {
-    // --- Pseudo element ---
-    "first-letter" => (0, VariantType::PseudoElement("first-letter")),
-    "first-line" => (1, VariantType::PseudoElement("first-line")),
-    "marker" => (2, VariantType::WrapClass(Cow::Borrowed("& *::marker, &::marker"))),
-    "selection" => (3, VariantType::WrapClass(Cow::Borrowed("& *::selection, &::selection"))),
-    "file" => (4, VariantType::WrapClass(Cow::Borrowed("&::file-selector-button, &::-webkit-file-upload-button"))),
-    "placeholder" => (5, VariantType::PseudoElement("placeholder")),
-    "backdrop" => (6, VariantType::PseudoElement("backdrop")),
-    "before" => (7, VariantType::PseudoElement("before")),
-    "after" => (8, VariantType::PseudoElement("after")),
-    "all" => (9, VariantType::WrapClass(Cow::Borrowed("& *"))),
-    "**" => (9, VariantType::WrapClass(Cow::Borrowed("& *"))),
-    "children" => (10, VariantType::WrapClass(Cow::Borrowed("& > *"))),
-    "*" => (10, VariantType::WrapClass(Cow::Borrowed("& > *"))),
-    "siblings" => (11, VariantType::WrapClass(Cow::Borrowed("& ~ *"))),
-    "sibling" => (12, VariantType::WrapClass(Cow::Borrowed("& + *"))),
+pub const BUILTIN_VARIANTS: phf::Map<&'static str, Variant> = phf_map! {
+    "not" => Variant::Builtin { order: 0, prefixed: true, variant: VariantType::WrapClass(Cow::Borrowed("&:not({})")) },
+    "group" => Variant::Builtin { order: 1, prefixed: true, variant: VariantType::WrapClass(Cow::Borrowed("&:is(:where(.group){} *)")) },
+    "peer" => Variant::Builtin { order: 2, prefixed: true, variant: VariantType::WrapClass(Cow::Borrowed("&:is(:where(.peer){} *)")) },
 
-    // --- Pseudo class ---
-    "first" => (13, VariantType::PseudoClass("first-child")),
-    "not-first" => (14, VariantType::PseudoClass("not(:first-child)")),
-    "last" => (16, VariantType::PseudoClass("last-child")),
-    "not-last" => (17, VariantType::PseudoClass("not(:last-child)")),
-    "only" => (18, VariantType::PseudoClass("only-child")),
-    "not-only" => (18, VariantType::PseudoClass("not(:only-child)")),
-    "odd" => (19, VariantType::PseudoClass("nth-child(odd)")),
-    "even" => (20, VariantType::PseudoClass("nth-child(even)")),
-    "first-of-type" => (21, VariantType::PseudoClass("first-of-type")),
-    "last-of-type" => (22, VariantType::PseudoClass("last-of-type")),
-    "only-of-type" => (23, VariantType::PseudoClass("only-of-type")),
-    "not-first-of-type" => (24, VariantType::PseudoClass("not(:first-of-type)")),
-    "not-last-of-type" => (25, VariantType::PseudoClass("not(:last-of-type)")),
-    "not-only-of-type" => (26, VariantType::PseudoClass("not(:only-of-type)")),
-    "visited" => (27, VariantType::PseudoClass("visited")),
-    "target" => (28, VariantType::PseudoClass("target")),
-    "open" => (29, VariantType::WrapClass(Cow::Borrowed("&[open]"))),
-    "default" => (30, VariantType::PseudoClass("default")),
-    "checked" => (31, VariantType::PseudoClass("checked")),
-    "not-checked" => (32, VariantType::PseudoClass("not(:checked)")),
-    "indeterminate" => (33, VariantType::PseudoClass("indeterminate")),
-    "placeholder-shown" => (34, VariantType::PseudoClass("placeholder-shown")),
-    "autofill" => (35, VariantType::PseudoClass("autofill")),
-    "optional" => (36, VariantType::PseudoClass("optional")),
-    "required" => (37, VariantType::PseudoClass("required")),
-    "valid" => (38, VariantType::PseudoClass("valid")),
-    "invalid" => (39, VariantType::PseudoClass("invalid")),
-    "in-range" => (40, VariantType::PseudoClass("in-range")),
-    "out-of-range" => (41, VariantType::PseudoClass("out-of-range")),
-    "read-only" => (42, VariantType::PseudoClass("read-only")),
-    "read-write" => (43, VariantType::PseudoClass("read-write")),
-    "empty" => (44, VariantType::PseudoClass("empty")),
-    "focus-within" => (45, VariantType::PseudoClass("focus-within")),
-    "hover" => (46, VariantType::PseudoClass("hover")),
-    "focus" => (47, VariantType::PseudoClass("focus")),
-    "focus-visible" => (48, VariantType::PseudoClass("focus-visible")),
-    "active" => (49, VariantType::PseudoClass("active")),
-    "enabled" => (50, VariantType::PseudoClass("enabled")),
-    "disabled" => (51, VariantType::PseudoClass("disabled")),
-    "ltr" => (52, VariantType::WrapClass(Cow::Borrowed("[dir=\"ltr\"] &"))),
-    "rtl" => (53, VariantType::WrapClass(Cow::Borrowed("[dir=\"rtl\"] &"))),
+    "first-letter" => Variant::Builtin { order: 3, prefixed: false, variant: VariantType::PseudoElement("first-letter") },
+    "first-line" => Variant::Builtin { order: 4, prefixed: false, variant: VariantType::PseudoElement("first-line") },
+    "marker" => Variant::Builtin { order: 5, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("& *::marker, &::marker")) },
+    "selection" => Variant::Builtin { order: 6, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("& *::selection, &::selection")) },
+    "file" => Variant::Builtin { order: 7, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("&::file-selector-button, &::-webkit-file-upload-button")) },
+    "placeholder" => Variant::Builtin { order: 8, prefixed: false, variant: VariantType::PseudoElement("placeholder") },
+    "backdrop" => Variant::Builtin { order: 9, prefixed: false, variant: VariantType::PseudoElement("backdrop") },
+    "details-content" => Variant::Builtin { order: 9, prefixed: false, variant: VariantType::PseudoElement("details-content") },
+    "before" => Variant::Builtin { order: 10, prefixed: false, variant: VariantType::PseudoElement("before") },
+    "after" => Variant::Builtin { order: 11, prefixed: false, variant: VariantType::PseudoElement("after") },
+    "all" => Variant::Builtin { order: 12, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("& *")) },
+    "**" => Variant::Builtin { order: 13, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("& *")) },
+    "children" => Variant::Builtin { order: 14, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("& > *")) },
+    "*" => Variant::Builtin { order: 15, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("& > *")) },
+    "siblings" => Variant::Builtin { order: 16, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("& ~ *")) },
+    "sibling" => Variant::Builtin { order: 17, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("& + *")) },
 
-    // --- At rules ---
-    "motion-safe" => (54, VariantType::AtRule(Cow::Borrowed("@media (prefers-reduced-motion: no-preference)"))),
-    "motion-reduce" => (55, VariantType::AtRule(Cow::Borrowed("@media (prefers-reduced-motion: reduce)"))),
-    "contrast-more" => (56, VariantType::AtRule(Cow::Borrowed("@media (prefers-contrast: more)"))),
-    "contrast-less" => (57, VariantType::AtRule(Cow::Borrowed("@media (prefers-contrast: less)"))),
-    "portrait" => (58, VariantType::AtRule(Cow::Borrowed("@media (orientation: portrait)"))),
-    "landscape" => (59, VariantType::AtRule(Cow::Borrowed("@media (orientation: landscape)"))),
-    "starting" => (60, VariantType::AtRule(Cow::Borrowed("@starting-style"))),
-    "print" => (61, VariantType::AtRule(Cow::Borrowed("@media print"))),
-    "forced-colors" => (62, VariantType::AtRule(Cow::Borrowed("@media (forced-colors: active)"))),
-    "inverted-colors" => (63, VariantType::AtRule(Cow::Borrowed("@media (inverted-colors: inverted)"))),
-    "pointer-none" => (64, VariantType::AtRule(Cow::Borrowed("@media (pointer: none)"))),
-    "pointer-coarse" => (65, VariantType::AtRule(Cow::Borrowed("@media (pointer: coarse)"))),
-    "pointer-fine" => (66, VariantType::AtRule(Cow::Borrowed("@media (pointer: fine)"))),
-    "any-pointer-none" => (67, VariantType::AtRule(Cow::Borrowed("@media (any-pointer: none)"))),
-    "any-pointer-coarse" => (68, VariantType::AtRule(Cow::Borrowed("@media (any-pointer: coarse)"))),
-    "any-pointer-fine" => (69, VariantType::AtRule(Cow::Borrowed("@media (any-pointer: fine)"))),
-    "noscript" => (70, VariantType::AtRule(Cow::Borrowed("@media (scripting: none)"))),
+    "first" => Variant::Builtin { order: 18, prefixed: false, variant: VariantType::PseudoClass("first-child") },
+    "not-first" => Variant::Builtin { order: 19, prefixed: false, variant: VariantType::PseudoClass("not(:first-child)") },
+    "last" => Variant::Builtin { order: 20, prefixed: false, variant: VariantType::PseudoClass("last-child") },
+    "not-last" => Variant::Builtin { order: 21, prefixed: false, variant: VariantType::PseudoClass("not(:last-child)") },
+    "only" => Variant::Builtin { order: 22, prefixed: false, variant: VariantType::PseudoClass("only-child") },
+    "not-only" => Variant::Builtin { order: 23, prefixed: false, variant: VariantType::PseudoClass("not(:only-child)") },
+    "odd" => Variant::Builtin { order: 24, prefixed: false, variant: VariantType::PseudoClass("nth-child(odd)") },
+    "even" => Variant::Builtin { order: 25, prefixed: false, variant: VariantType::PseudoClass("nth-child(even)") },
+    "first-of-type" => Variant::Builtin { order: 26, prefixed: false, variant: VariantType::PseudoClass("first-of-type") },
+    "last-of-type" => Variant::Builtin { order: 27, prefixed: false, variant: VariantType::PseudoClass("last-of-type") },
+    "only-of-type" => Variant::Builtin { order: 28, prefixed: false, variant: VariantType::PseudoClass("only-of-type") },
+    "not-first-of-type" => Variant::Builtin { order: 29, prefixed: false, variant: VariantType::PseudoClass("not(:first-of-type)") },
+    "not-last-of-type" => Variant::Builtin { order: 30, prefixed: false, variant: VariantType::PseudoClass("not(:last-of-type)") },
+    "not-only-of-type" => Variant::Builtin { order: 31, prefixed: false, variant: VariantType::PseudoClass("not(:only-of-type)") },
+    "visited" => Variant::Builtin { order: 32, prefixed: false, variant: VariantType::PseudoClass("visited") },
+    "target" => Variant::Builtin { order: 33, prefixed: false, variant: VariantType::PseudoClass("target") },
+    "open" => Variant::Builtin { order: 34, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("&[open]")) },
+    "default" => Variant::Builtin { order: 35, prefixed: false, variant: VariantType::PseudoClass("default") },
+    "checked" => Variant::Builtin { order: 36, prefixed: false, variant: VariantType::PseudoClass("checked") },
+    "not-checked" => Variant::Builtin { order: 37, prefixed: false, variant: VariantType::PseudoClass("not(:checked)") },
+    "indeterminate" => Variant::Builtin { order: 38, prefixed: false, variant: VariantType::PseudoClass("indeterminate") },
+    "placeholder-shown" => Variant::Builtin { order: 39, prefixed: false, variant: VariantType::PseudoClass("placeholder-shown") },
+    "autofill" => Variant::Builtin { order: 40, prefixed: false, variant: VariantType::PseudoClass("autofill") },
+    "optional" => Variant::Builtin { order: 41, prefixed: false, variant: VariantType::PseudoClass("optional") },
+    "required" => Variant::Builtin { order: 42, prefixed: false, variant: VariantType::PseudoClass("required") },
+    "valid" => Variant::Builtin { order: 43, prefixed: false, variant: VariantType::PseudoClass("valid") },
+    "invalid" => Variant::Builtin { order: 44, prefixed: false, variant: VariantType::PseudoClass("invalid") },
+    "in-range" => Variant::Builtin { order: 45, prefixed: false, variant: VariantType::PseudoClass("in-range") },
+    "out-of-range" => Variant::Builtin { order: 46, prefixed: false, variant: VariantType::PseudoClass("out-of-range") },
+    "read-only" => Variant::Builtin { order: 47, prefixed: false, variant: VariantType::PseudoClass("read-only") },
+    "read-write" => Variant::Builtin { order: 48, prefixed: false, variant: VariantType::PseudoClass("read-write") },
+    "empty" => Variant::Builtin { order: 49, prefixed: false, variant: VariantType::PseudoClass("empty") },
+    "focus-within" => Variant::Builtin { order: 50, prefixed: false, variant: VariantType::PseudoClass("focus-within") },
+    "hover" => Variant::Builtin { order: 51, prefixed: false, variant: VariantType::PseudoClass("hover") },
+    "focus" => Variant::Builtin { order: 52, prefixed: false, variant: VariantType::PseudoClass("focus") },
+    "focus-visible" => Variant::Builtin { order: 53, prefixed: false, variant: VariantType::PseudoClass("focus-visible") },
+    "active" => Variant::Builtin { order: 54, prefixed: false, variant: VariantType::PseudoClass("active") },
+    "enabled" => Variant::Builtin { order: 55, prefixed: false, variant: VariantType::PseudoClass("enabled") },
+    "disabled" => Variant::Builtin { order: 56, prefixed: false, variant: VariantType::PseudoClass("disabled") },
+    "inert" => Variant::Builtin { order: 57, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("&:is([inert], [inert] *)")) },
+    "in" => Variant::Builtin { order: 58, prefixed: true, variant: VariantType::WrapClass(Cow::Borrowed(":where({}) &")) },
+    "has" => Variant::Builtin { order: 59, prefixed: true, variant: VariantType::WrapClass(Cow::Borrowed("&:has({})")) },
 
-    // --- ARIA states ---
-    "aria-busy" => (71, VariantType::WrapClass(Cow::Borrowed("&[aria-busy=\"true\"]"))),
-    "aria-checked" => (72, VariantType::WrapClass(Cow::Borrowed("&[aria-checked=\"true\"]"))),
-    "aria-disabled" => (73, VariantType::WrapClass(Cow::Borrowed("&[aria-disabled=\"true\"]"))),
-    "aria-expanded" => (74, VariantType::WrapClass(Cow::Borrowed("&[aria-expanded=\"true\"]"))),
-    "aria-hidden" => (75, VariantType::WrapClass(Cow::Borrowed("&[aria-hidden=\"true\"]"))),
-    "aria-pressed" => (76, VariantType::WrapClass(Cow::Borrowed("&[aria-pressed=\"true\"]"))),
-    "aria-readonly" => (77, VariantType::WrapClass(Cow::Borrowed("&[aria-readonly=\"true\"]"))),
-    "aria-required" => (78, VariantType::WrapClass(Cow::Borrowed("&[aria-required=\"true\"]"))),
-    "aria-selected" => (79, VariantType::WrapClass(Cow::Borrowed("&[aria-selected=\"true\"]"))),
+    "aria-busy" => Variant::Builtin { order: 60, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("&[aria-busy=\"true\"]")) },
+    "aria-checked" => Variant::Builtin { order: 61, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("&[aria-checked=\"true\"]")) },
+    "aria-disabled" => Variant::Builtin { order: 62, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("&[aria-disabled=\"true\"]")) },
+    "aria-expanded" => Variant::Builtin { order: 63, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("&[aria-expanded=\"true\"]")) },
+    "aria-hidden" => Variant::Builtin { order: 64, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("&[aria-hidden=\"true\"]")) },
+    "aria-pressed" => Variant::Builtin { order: 65, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("&[aria-pressed=\"true\"]")) },
+    "aria-readonly" => Variant::Builtin { order: 66, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("&[aria-readonly=\"true\"]")) },
+    "aria-required" => Variant::Builtin { order: 67, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("&[aria-required=\"true\"]")) },
+    "aria-selected" => Variant::Builtin { order: 68, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("&[aria-selected=\"true\"]")) },
+    "aria" => Variant::Builtin { order: 69, prefixed: true, variant: VariantType::WrapClass(Cow::Borrowed("&[aria-{}]")) },
+
+    "data" => Variant::Builtin { order: 70, prefixed: true, variant: VariantType::WrapClass(Cow::Borrowed("&[data-{}]")) },
+    "nth" => Variant::Builtin { order: 71, prefixed: true, variant: VariantType::WrapClass(Cow::Borrowed("&:nth-child({})")) },
+    "nth-last" => Variant::Builtin { order: 72, prefixed: true, variant: VariantType::WrapClass(Cow::Borrowed("&:nth-last-child({})")) },
+    "nth-of-type" => Variant::Builtin { order: 73, prefixed: true, variant: VariantType::WrapClass(Cow::Borrowed("&:nth-of-type({})")) },
+    "nth-last-of-type" => Variant::Builtin { order: 74, prefixed: true, variant: VariantType::WrapClass(Cow::Borrowed("&:nth-last-of-type({})")) },
+    "supports" => Variant::Builtin { order: 75, prefixed: true, variant: VariantType::AtRule(Cow::Borrowed("@supports ({})")) },
+
+    "motion-safe" => Variant::Builtin { order: 76, prefixed: false, variant: VariantType::AtRule(Cow::Borrowed("@media (prefers-reduced-motion: no-preference)")) },
+    "motion-reduce" => Variant::Builtin { order: 77, prefixed: false, variant: VariantType::AtRule(Cow::Borrowed("@media (prefers-reduced-motion: reduce)")) },
+    "contrast-more" => Variant::Builtin { order: 78, prefixed: false, variant: VariantType::AtRule(Cow::Borrowed("@media (prefers-contrast: more)")) },
+    "contrast-less" => Variant::Builtin { order: 79, prefixed: false, variant: VariantType::AtRule(Cow::Borrowed("@media (prefers-contrast: less)")) },
+
+    "max" => Variant::Builtin { order: 80, prefixed: true, variant: VariantType::AtRule(Cow::Borrowed("@media (width < {})")) },
+    "min" => Variant::Builtin { order: 81, prefixed: true, variant: VariantType::AtRule(Cow::Borrowed("@media (width >= {})")) },
+    "@max" => Variant::Builtin { order: 82, prefixed: true, variant: VariantType::AtRule(Cow::Borrowed("@container (width < {})")) },
+    "@min" => Variant::Builtin { order: 83, prefixed: true, variant: VariantType::AtRule(Cow::Borrowed("@container (width >= {})")) },
+
+    "portrait" => Variant::Builtin { order: 84, prefixed: false, variant: VariantType::AtRule(Cow::Borrowed("@media (orientation: portrait)")) },
+    "landscape" => Variant::Builtin { order: 85, prefixed: false, variant: VariantType::AtRule(Cow::Borrowed("@media (orientation: landscape)")) },
+    "ltr" => Variant::Builtin { order: 86, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("[dir=\"ltr\"] &")) },
+    "rtl" => Variant::Builtin { order: 87, prefixed: false, variant: VariantType::WrapClass(Cow::Borrowed("[dir=\"rtl\"] &")) },
+    "starting" => Variant::Builtin { order: 88, prefixed: false, variant: VariantType::AtRule(Cow::Borrowed("@starting-style")) },
+    "print" => Variant::Builtin { order: 89, prefixed: false, variant: VariantType::AtRule(Cow::Borrowed("@media print")) },
+    "forced-colors" => Variant::Builtin { order: 90, prefixed: false, variant: VariantType::AtRule(Cow::Borrowed("@media (forced-colors: active)")) },
+    "inverted-colors" => Variant::Builtin { order: 91, prefixed: false, variant: VariantType::AtRule(Cow::Borrowed("@media (inverted-colors: inverted)")) },
+    "pointer-none" => Variant::Builtin { order: 92, prefixed: false, variant: VariantType::AtRule(Cow::Borrowed("@media (pointer: none)")) },
+    "pointer-coarse" => Variant::Builtin { order: 93, prefixed: false, variant: VariantType::AtRule(Cow::Borrowed("@media (pointer: coarse)")) },
+    "pointer-fine" => Variant::Builtin { order: 94, prefixed: false, variant: VariantType::AtRule(Cow::Borrowed("@media (pointer: fine)")) },
+    "any-pointer-none" => Variant::Builtin { order: 95, prefixed: false, variant: VariantType::AtRule(Cow::Borrowed("@media (any-pointer: none)")) },
+    "any-pointer-coarse" => Variant::Builtin { order: 96, prefixed: false, variant: VariantType::AtRule(Cow::Borrowed("@media (any-pointer: coarse)")) },
+    "any-pointer-fine" => Variant::Builtin { order: 97, prefixed: false, variant: VariantType::AtRule(Cow::Borrowed("@media (any-pointer: fine)")) },
+    "noscript" => Variant::Builtin { order: 98, prefixed: false, variant: VariantType::AtRule(Cow::Borrowed("@media (scripting: none)")) },
 };
 
 /// The list of all default plugins.
@@ -1479,85 +1497,152 @@ pub struct Config {
 
     /// A list of custom variants.
     ///
+    /// Check [`BUILTIN_VARIANTS`] to choose the order of the custom variants you define.
+    ///
     /// This field is skipped when deserializing from a [TOML](https://toml.io) file.
     #[serde(skip)]
-    pub(crate) custom_variants: Vec<(Cow<'static, str>, VariantType)>,
+    pub(crate) custom_variants: Vec<(Cow<'static, str>, Variant<'static>)>,
     // TODO: Prefix (en-)
 }
 
 impl Config {
     /// Get variants derived from other configuration fields like breakpoints and the dark mode.
-    pub(crate) fn get_derived_variants(&self) -> Vec<(Cow<'static, str>, VariantType)> {
+    pub(crate) fn get_derived_variants(&self) -> Vec<(Cow<'static, str>, Variant<'static>)> {
         self.theme
             .screens
             .iter()
             .map(|screen| {
                 (
                     screen.0.clone(),
-                    VariantType::AtRule(Cow::Owned(format!("@media (width >= {})", screen.1))),
+                    Variant::Builtin {
+                        order: BUILTIN_VARIANTS.len(),
+                        prefixed: false,
+                        variant: VariantType::AtRule(Cow::Owned(format!(
+                            "@media (width >= {})",
+                            screen.1
+                        ))),
+                    },
                 )
             })
             .chain(BUILTIN_SCREENS.iter().map(|screen| {
                 (
                     Cow::from(screen.0),
-                    VariantType::AtRule(Cow::Owned(format!("@media (width >= {})", screen.1))),
+                    Variant::Builtin {
+                        order: BUILTIN_VARIANTS.len() + self.theme.screens.0.len(),
+                        prefixed: false,
+                        variant: VariantType::AtRule(Cow::Owned(format!(
+                            "@media (width >= {})",
+                            screen.1
+                        ))),
+                    },
                 )
             }))
             .chain(self.theme.screens.iter().map(|screen| {
-
                 (
                     Cow::from(format!("max-{}", screen.0)),
-                    VariantType::AtRule(Cow::Owned(format!("@media (width < {})", screen.1))),
+                    Variant::Builtin {
+                        order: BUILTIN_VARIANTS.len() + self.theme.screens.0.len() + BUILTIN_SCREENS.len(),
+                        prefixed: false,
+                        variant: VariantType::AtRule(Cow::Owned(format!(
+                            "@media (width < {})",
+                            screen.1
+                        ))),
+                    },
                 )
             }))
             .chain(BUILTIN_SCREENS.iter().map(|screen| {
                 (
                     Cow::from(format!("max-{}", screen.0)),
-                    VariantType::AtRule(Cow::Owned(format!("@media (width < {})", screen.1))),
+                    Variant::Builtin {
+                        order: BUILTIN_VARIANTS.len() + 2 * self.theme.screens.0.len() + BUILTIN_SCREENS.len(),
+                        prefixed: false,
+                        variant: VariantType::AtRule(Cow::Owned(format!(
+                            "@media (width < {})",
+                            screen.1
+                        ))),
+                    },
                 )
             }))
-
             .chain(self.theme.containers.iter().map(|container| {
-
                 (
                     Cow::from(format!("@{}", container.0)),
-                    VariantType::AtRule(Cow::Owned(format!("@container (width >= {})", container.1))),
+                    Variant::Builtin {
+                        order: BUILTIN_VARIANTS.len() + 2 * self.theme.screens.0.len() + 2 * BUILTIN_SCREENS.len(),
+                        prefixed: false,
+                        variant: VariantType::AtRule(Cow::Owned(format!(
+                            "@container (width >= {})",
+                            container.1
+                        ))),
+                    },
                 )
             }))
             .chain(BUILTIN_CONTAINERS.iter().map(|container| {
                 (
                     Cow::from(format!("@{}", container.0)),
-                    VariantType::AtRule(Cow::Owned(format!("@container (width >= {})", container.1))),
+                    Variant::Builtin {
+                        order: BUILTIN_VARIANTS.len() + 2 * self.theme.screens.0.len() + 2 * BUILTIN_SCREENS.len() + self.theme.containers.0.len(),
+                        prefixed: false,
+                        variant: VariantType::AtRule(Cow::Owned(format!(
+                            "@container (width >= {})",
+                            container.1
+                        ))),
+                    },
                 )
             }))
             .chain(self.theme.containers.iter().map(|container| {
-
                 (
                     Cow::from(format!("@max-{}", container.0)),
-                    VariantType::AtRule(Cow::Owned(format!("@container (width < {})", container.1))),
+                    Variant::Builtin {
+                        order: BUILTIN_VARIANTS.len() + 2 * self.theme.screens.0.len() + 2 * BUILTIN_SCREENS.len() + self.theme.containers.0.len() + BUILTIN_CONTAINERS.len(),
+                        prefixed: false,
+                        variant: VariantType::AtRule(Cow::Owned(format!(
+                            "@container (width < {})",
+                            container.1
+                        ))),
+                    },
                 )
             }))
             .chain(BUILTIN_CONTAINERS.iter().map(|container| {
                 (
                     Cow::from(format!("@max-{}", container.0)),
-                    VariantType::AtRule(Cow::Owned(format!("@container (width < {})", container.1))),
+                    Variant::Builtin {
+                        order: BUILTIN_VARIANTS.len() + 2 * self.theme.screens.0.len() + 2 * BUILTIN_SCREENS.len() + 2 * self.theme.containers.0.len() + BUILTIN_CONTAINERS.len(),
+                        prefixed: false,
+                        variant: VariantType::AtRule(Cow::Owned(format!(
+                            "@container (width < {})",
+                            container.1
+                        ))),
+                    },
                 )
             }))
-
             .chain(self.theme.aria.iter().map(|aria| {
                 (
                     Cow::from(format!("aria-{}", aria.0)),
-                    VariantType::WrapClass(Cow::Owned(format!("&[aria-{}]", aria.1))),
+                    Variant::Builtin {
+                        order: BUILTIN_VARIANTS.len() + 2 * self.theme.screens.0.len() + 2 * BUILTIN_SCREENS.len() + 2 * self.theme.containers.0.len() + 2 * BUILTIN_CONTAINERS.len(),
+                        prefixed: false,
+                        variant: VariantType::WrapClass(Cow::Owned(format!("&[aria-{}]", aria.1))),
+                    },
                 )
             }))
             .chain(iter::once(match &self.theme.dark_mode {
                 DarkMode::Media => (
                     Cow::from("dark"),
-                    VariantType::AtRule(Cow::from("@media (prefers-color-scheme: dark)")),
+                    Variant::Builtin {
+                        order: BUILTIN_VARIANTS.len() + 2 * self.theme.screens.0.len() + 2 * BUILTIN_SCREENS.len() + 2 * self.theme.containers.0.len() + 2 * BUILTIN_CONTAINERS.len() + self.theme.aria.0.len(),
+                        prefixed: false,
+                        variant: VariantType::AtRule(Cow::from(
+                            "@media (prefers-color-scheme: dark)",
+                        )),
+                    },
                 ),
                 DarkMode::Class(name) => (
                     Cow::from("dark"),
-                    VariantType::WrapClass(name.clone() + " &"),
+                    Variant::Builtin {
+                        order: BUILTIN_VARIANTS.len() + 2 * self.theme.screens.0.len() + 2 * BUILTIN_SCREENS.len() + 2 * self.theme.containers.0.len() + 2 * BUILTIN_CONTAINERS.len() + self.theme.aria.0.len(),
+                        prefixed: false,
+                        variant: VariantType::WrapClass(name.clone() + " &"),
+                    },
                 ),
             }))
             .collect()
@@ -1624,11 +1709,16 @@ impl Config {
     /// # Example
     ///
     /// ```
-    /// use encre_css::{Config, selector::VariantType};
+    /// use encre_css::{Config, selector::{VariantType, Variant}};
     /// use std::borrow::Cow;
     ///
     /// let mut config = Config::default();
-    /// config.register_variant("headings", VariantType::WrapClass(Cow::Borrowed("& :where(h1, h2, h3, h4, h5, h6)")));
+    /// config.register_variant("headings", Variant::Builtin {
+    ///     // Insert the generated classes having this variant after all the builtin variants
+    ///     order: encre_css::config::BUILTIN_VARIANTS.len(),
+    ///     prefixed: false,
+    ///     variant: VariantType::WrapClass(Cow::Borrowed("& :where(h1, h2, h3, h4, h5, h6)")),
+    /// });
     ///
     /// let generated = encre_css::generate(
     ///     ["headings:text-gray-700"],
@@ -1639,13 +1729,43 @@ impl Config {
     ///   color: oklch(37.3% .034 259.733);
     /// }"));
     /// ```
+    ///
+    /// You can also make a prefixed variant, that is a variant which as a prefix and an arbitrary
+    /// value delimited by square brackets. When defining this kind of variant, you need to set the
+    /// [`Variant::Builtin::prefixed`] field to `true` and to insert the placeholder `{}` in the variant
+    /// string, it will be replaced with the given arbitrary value.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use encre_css::{Config, selector::{VariantType, Variant}};
+    /// use std::borrow::Cow;
+    ///
+    /// let mut config = Config::default();
+    /// config.register_variant("media", Variant::Builtin {
+    ///     // Insert the generated classes having this variant after all the builtin variants
+    ///     order: encre_css::config::BUILTIN_VARIANTS.len(),
+    ///     prefixed: true,
+    ///     variant: VariantType::AtRule(Cow::Borrowed("@media {}")),
+    /// });
+    ///
+    /// let generated = encre_css::generate(
+    ///     ["media-[print]:flex"],
+    ///     &config,
+    /// );
+    ///
+    /// assert!(generated.ends_with(r"@media print {
+    ///   .media-\[print\]\:flex {
+    ///     display: flex;
+    ///   }
+    /// }"));
+    /// ```
     pub fn register_variant<T: Into<Cow<'static, str>>>(
         &mut self,
         variant_name: T,
-        variant_type: VariantType,
+        variant: Variant<'static>,
     ) {
-        self.custom_variants
-            .push((variant_name.into(), variant_type));
+        self.custom_variants.push((variant_name.into(), variant));
     }
 
     /// Deserialize the content of a [TOML](https://toml.io) file to get the configuration.
@@ -1977,16 +2097,16 @@ mod tests {
   background-color: #ffef0e;
 }
 
+@media (width >= 2000px) {
+  .lg\:text-rosa-500 {
+    color: #e5186a;
+  }
+}
+
 @media (width >= 1600px) {
   .\33xl\:underline {
     -webkit-text-decoration-line: underline;
     text-decoration-line: underline;
-  }
-}
-
-@media (width >= 2000px) {
-  .lg\:text-rosa-500 {
-    color: #e5186a;
   }
 }"
             )

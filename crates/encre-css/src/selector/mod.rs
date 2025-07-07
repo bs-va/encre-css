@@ -229,9 +229,29 @@ pub enum VariantType {
     },
 }
 
+/// A selector variant.
 #[derive(Debug, Clone, Eq)]
-pub(crate) enum Variant<'a> {
-    Builtin(usize, VariantType),
+pub enum Variant<'a> {
+    /// A known variant with a static variant type.
+    Builtin {
+        /// The order of the variant among other variants.
+        ///
+        /// It's used to decide where the generated class having this variant will be placed in
+        /// the generated CSS.
+        order: usize,
+
+        /// Whether the variant is a prefix followed by an arbitrary value, e.g
+        /// `supports-[display:flex]` or a common variant like `hover`.
+        prefixed: bool,
+
+        /// The variant type.
+        variant: VariantType
+    },
+
+    /// A dynamic variant having an arbitrary contents.
+    ///
+    /// The inner string follows a specific syntax where `&` specifies
+    /// a placeholder where the rest of the selector is injected.
     Arbitrary(Cow<'a, str>),
 }
 
@@ -239,7 +259,7 @@ impl PartialEq for Variant<'_> {
     fn eq(&self, other: &Self) -> bool {
         // Does not test order because it can change
         match (self, other) {
-            (Self::Builtin(_, v1), Self::Builtin(_, v2)) => v1 == v2,
+            (Self::Builtin { variant: v1, .. }, Self::Builtin { variant: v2, .. }) => v1 == v2,
             (Self::Arbitrary(s1), Self::Arbitrary(s2)) => s1 == s2,
             _ => false,
         }
@@ -259,15 +279,6 @@ pub(crate) struct Selector<'a> {
     pub(crate) plugin: &'static (dyn Plugin + Sync + Send),
 }
 
-#[cfg(not(test))]
-impl PartialEq for Selector<'_> {
-    fn eq(&self, other: &Self) -> bool {
-        self.full == other.full
-    }
-}
-
-// Use a stricter implementation when testing
-#[cfg(test)]
 impl PartialEq for Selector<'_> {
     fn eq(&self, other: &Self) -> bool {
         // Does not test order because it can change
@@ -288,6 +299,10 @@ impl PartialOrd for Selector<'_> {
 
 impl Ord for Selector<'_> {
     fn cmp(&self, other: &Self) -> Ordering {
+        if self == other {
+            return Ordering::Equal;
+        }
+
         if self.variants.is_empty() && !other.variants.is_empty() {
             Ordering::Less
         } else if !self.variants.is_empty() && other.variants.is_empty() {
@@ -303,11 +318,11 @@ impl Ord for Selector<'_> {
                 }
 
                 let res = match self.variants.get(variant_i).as_ref().unwrap() {
-                    Variant::Builtin(order, _) => order,
+                    Variant::Builtin { order, .. } => order,
                     Variant::Arbitrary(_) => &1_000_000,
                 }
                 .cmp(&match other.variants.get(variant_i).unwrap() {
-                    Variant::Builtin(order, _) => *order,
+                    Variant::Builtin { order, .. } => *order,
                     Variant::Arbitrary(_) => 1_000_001,
                 });
 

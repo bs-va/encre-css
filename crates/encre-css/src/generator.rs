@@ -59,7 +59,7 @@ pub fn generate_at_rules<T: FnOnce(&mut ContextHandle)>(
 
     if !selector.variants.is_empty() {
         selector.variants.iter().for_each(|variant| match variant {
-            Variant::Builtin(_, VariantType::AtRule(variant)) => {
+            Variant::Builtin { variant: VariantType::AtRule(variant), .. } => {
                 buffer.line(format_args!("{variant} {{"));
                 buffer.indent();
             }
@@ -129,7 +129,7 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle)>(
         // (https://tailwindcss.com/docs/upgrade-guide#variant-stacking-order),
         // so no need to reverse the variants
         selector.variants.iter().for_each(|variant| match variant {
-            Variant::Builtin(_, variant) => match variant {
+            Variant::Builtin { variant, .. } => match variant {
                 VariantType::PseudoElement(element) => {
                     write!(base_class, "::{element}").expect("writing to a String can't fail");
                 }
@@ -187,7 +187,7 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle)>(
     // If the rule is selecting the `::before` or `::after` pseudo elements, we need to generate a
     // default `content` property
     if selector.variants.iter().any(|variant| {
-        if let Variant::Builtin(_, variant) = variant {
+        if let Variant::Builtin { variant, .. } = variant {
             *variant == VariantType::PseudoElement("before")
                 || *variant == VariantType::PseudoElement("after")
         } else {
@@ -256,7 +256,7 @@ fn resolve_selector<'a>(
     full_class: Option<&'a str>,
     selectors: &mut BTreeSet<Selector<'a>>,
     config: &'a Config,
-    config_derived_variants: &[(Cow<'static, str>, VariantType)],
+    config_derived_variants: &[(Cow<'static, str>, Variant<'static>)],
     depth: MaxShortcutDepth,
 ) {
     if depth.get() == 0 {
@@ -1197,6 +1197,30 @@ mod tests {
 
 .peer\/item:checked ~ .peer-checked\/item\:block {
   display: block;
+}"
+            )
+        );
+    }
+
+    #[test]
+    fn prefixed_variants() {
+        let generated = generate(["supports-[display:flex]:flex nth-of-type-[span]:text-red-500 data-[active]:block"], &base_config());
+
+        assert_eq!(
+            generated,
+            String::from(
+                r".data-\[active\]\:block[data-active] {
+  display: block;
+}
+
+.nth-of-type-\[span\]\:text-red-500:nth-of-type(span) {
+  color: oklch(63.7% .237 25.331);
+}
+
+@supports (display:flex) {
+  .supports-\[display\:flex\]\:flex {
+    display: flex;
+  }
 }"
             )
         );

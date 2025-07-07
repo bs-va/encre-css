@@ -7,7 +7,7 @@ use encre_css::{
         generate_at_rules, generate_class, generate_wrapper, ContextCanHandle, ContextHandle,
     },
     plugins::Plugin,
-    selector::{Modifier, VariantType},
+    selector::{Modifier, Variant, VariantType},
     Config,
 };
 use std::borrow::Cow;
@@ -1210,14 +1210,18 @@ pub fn register(config: &mut Config) {
     ] {
         config.register_variant(
             format!("prose-{name}"),
-            VariantType::WrapClass(Cow::from(format!(
-                r#"& :is({}:not(:where([class~="not-prose"] *)))"#,
-                if let Some(selector) = selector {
-                    Cow::from(selector)
-                } else {
-                    Cow::from(format!(":where({name})"))
-                }
-            ))),
+            Variant::Builtin {
+                order: encre_css::config::BUILTIN_VARIANTS.len(),
+                prefixed: false,
+                variant: VariantType::WrapClass(Cow::from(format!(
+                    r#"& :is({}:not(:where([class~="not-prose"] *)))"#,
+                    if let Some(selector) = selector {
+                        Cow::from(selector)
+                    } else {
+                        Cow::from(format!(":where({name})"))
+                    }
+                ))),
+            },
         );
     }
 
