@@ -102,7 +102,7 @@ system (if you have one):
   </div>
   <div class="flex justify-between">
     <a href="#" class="p-3 text-rose-600">Dismiss</a>
-    <a href="#" class="p-3 bg-blue-600 text-white rounded-br-xl rounded-tl-xl shadow shadow-blue-600">Try it here!</a>
+    <a href="#" class="p-3 bg-blue-600 text-white rounded-br-xl rounded-tl-xl shadow-sm shadow-blue-600">Try it here!</a>
   </div>
 </div>
 ```
