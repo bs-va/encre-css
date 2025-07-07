@@ -128,36 +128,48 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle)>(
         // Variants are applied from right to left
         // (https://tailwindcss.com/docs/upgrade-guide#variant-stacking-order),
         // so no need to reverse the variants
-        selector
-            .variants
-            .iter()
-            .for_each(|variant| match variant {
-                Variant::Builtin(_, variant) => match variant {
-                    VariantType::PseudoElement(element) => {
-                        write!(base_class, "::{element}").expect("writing to a String can't fail");
-                    }
-                    VariantType::PseudoClass(class) => {
-                        write!(base_class, ":{class}").expect("writing to a String can't fail");
-                    }
-                    VariantType::WrapClass(template) => {
-                        base_class = template.replace('&', &base_class);
-                    }
-                    VariantType::AtRule(_) => (),
-                    VariantType::Group(class) => {
-                        base_class = format!(".group:{class} {base_class}");
-                    }
-                    VariantType::Peer(class) => {
-                        base_class = format!(".peer:{class} ~ {base_class}");
-                    }
-                    VariantType::PeerNot(class) => {
-                        base_class = format!(".peer:not(:{class}) ~ {base_class}");
-                    }
-                },
-                Variant::Arbitrary(template) if !template.starts_with('@') => {
+        selector.variants.iter().for_each(|variant| match variant {
+            Variant::Builtin(_, variant) => match variant {
+                VariantType::PseudoElement(element) => {
+                    write!(base_class, "::{element}").expect("writing to a String can't fail");
+                }
+                VariantType::PseudoClass(class) => {
+                    write!(base_class, ":{class}").expect("writing to a String can't fail");
+                }
+                VariantType::WrapClass(template) => {
                     base_class = template.replace('&', &base_class);
                 }
-                Variant::Arbitrary(_) => (),
-            });
+                VariantType::AtRule(_) => (),
+                VariantType::Group { name, class } => {
+                    let suffix = if let Some(name) = name {
+                        Cow::Owned(format!("\\/{name}"))
+                    } else {
+                        Cow::Borrowed("")
+                    };
+                    base_class = format!(".group{suffix}:{class} {base_class}");
+                }
+                VariantType::Peer { name, class } => {
+                    let suffix = if let Some(name) = name {
+                        Cow::Owned(format!("\\/{name}"))
+                    } else {
+                        Cow::Borrowed("")
+                    };
+                    base_class = format!(".peer{suffix}:{class} ~ {base_class}");
+                }
+                VariantType::PeerNot { name, class } => {
+                    let suffix = if let Some(name) = name {
+                        Cow::Owned(format!("\\/{name}"))
+                    } else {
+                        Cow::Borrowed("")
+                    };
+                    base_class = format!(".peer{suffix}:not(:{class}) ~ {base_class}");
+                }
+            },
+            Variant::Arbitrary(template) if !template.starts_with('@') => {
+                base_class = template.replace('&', &base_class);
+            }
+            Variant::Arbitrary(_) => (),
+        });
     }
     buffer.line(format_args!("{base_class}{custom_after_class} {{"));
 
@@ -1163,6 +1175,28 @@ mod tests {
             String::from(
                 r".dark .dark\:mt-px {
   margin-top: 1px;
+}"
+            )
+        );
+    }
+
+    #[test]
+    fn named_group_and_peer() {
+        let generated = generate(["group-checked/item:block peer-checked/item:block peer-not-checked/item:block"], &base_config());
+
+        assert_eq!(
+            generated,
+            String::from(
+                r".group\/item:checked .group-checked\/item\:block {
+  display: block;
+}
+
+.peer\/item:not(:checked) ~ .peer-not-checked\/item\:block {
+  display: block;
+}
+
+.peer\/item:checked ~ .peer-checked\/item\:block {
+  display: block;
 }"
             )
         );

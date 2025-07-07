@@ -192,17 +192,41 @@ pub enum VariantType {
     /// A variant applied to a group element like `group-hover`.
     ///
     /// This variant should not be built manually.
-    Group(&'static str),
+    Group {
+        /// The name of the group if it's specified.
+        ///
+        /// It's parsed as the part after the slash, e.g `item` in `group-hover/item:block`
+        name: Option<String>,
+
+        /// The pseudo class to apply to the group elements.
+        class: &'static str,
+    },
 
     /// A variant applied to a peer element like `peer-focus`.
     ///
     /// This variant should not be built manually.
-    Peer(&'static str),
+    Peer {
+        /// The name of the peer if it's specified.
+        ///
+        /// It's parsed as the part after the slash, e.g `item` in `peer-hover/item:block`
+        name: Option<String>,
+
+        /// The pseudo class to apply to the peer elements.
+        class: &'static str,
+    },
 
     /// A negated variant applied to a peer element like `peer-not-hover`.
     ///
     /// This variant should not be built manually.
-    PeerNot(&'static str),
+    PeerNot {
+        /// The name of the peer if it's specified.
+        ///
+        /// It's parsed as the part after the slash, e.g `item` in `peer-not-hover/item:block`
+        name: Option<String>,
+
+        /// The pseudo class to apply to the peer elements.
+        class: &'static str
+    },
 }
 
 #[derive(Debug, Clone, Eq)]

@@ -687,6 +687,7 @@ pub const BUILTIN_VARIANTS: phf::Map<&'static str, (usize, VariantType)> = phf_m
     "before" => (7, VariantType::PseudoElement("before")),
     "after" => (8, VariantType::PseudoElement("after")),
     "all" => (9, VariantType::WrapClass(Cow::Borrowed("& *"))),
+    "**" => (9, VariantType::WrapClass(Cow::Borrowed("& *"))),
     "children" => (10, VariantType::WrapClass(Cow::Borrowed("& > *"))),
     "*" => (10, VariantType::WrapClass(Cow::Borrowed("& > *"))),
     "siblings" => (11, VariantType::WrapClass(Cow::Borrowed("& ~ *"))),

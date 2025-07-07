@@ -172,8 +172,10 @@ fn push_variant<'a>(
         variant_list.push(Variant::Arbitrary(underscores_to_spaces(unescape(
             Cow::from(variant),
         ))));
+        return Ok(());
     } else if let Some((order, variant)) = BUILTIN_VARIANTS.get(variant) {
         variant_list.push(Variant::Builtin(*order, variant.clone()));
+        return Ok(());
     } else if let Some((order, variant)) = config
         .custom_variants
         .iter()
@@ -185,35 +187,66 @@ fn push_variant<'a>(
             BUILTIN_VARIANTS.len() + order,
             variant.1.clone(),
         ));
+        return Ok(());
     } else {
-        // Maybe a parent or peer variant
+        // Maybe a group or peer variant
         if let Some(group_variant) = variant.strip_prefix("group-") {
+            let (group_variant, name) = if let Some((variant, name)) = group_variant.split_once("/")
+            {
+                (variant, Some(name.to_string()))
+            } else {
+                (group_variant, None)
+            };
+
             if let Some((order, VariantType::PseudoClass(class))) =
                 BUILTIN_VARIANTS.get(group_variant)
             {
-                variant_list.push(Variant::Builtin(order + 1000, VariantType::Group(class)));
+                variant_list.push(Variant::Builtin(
+                    order + 1000,
+                    VariantType::Group { name, class },
+                ));
+                return Ok(());
             }
         } else if let Some(peer_not_variant) = variant.strip_prefix("peer-not-") {
+            let (peer_not_variant, name) =
+                if let Some((variant, name)) = peer_not_variant.split_once("/") {
+                    (variant, Some(name.to_string()))
+                } else {
+                    (peer_not_variant, None)
+                };
+
             if let Some((order, VariantType::PseudoClass(class))) =
                 BUILTIN_VARIANTS.get(peer_not_variant)
             {
-                variant_list.push(Variant::Builtin(order + 2000, VariantType::PeerNot(class)));
+                variant_list.push(Variant::Builtin(
+                    order + 2000,
+                    VariantType::PeerNot { name, class },
+                ));
+                return Ok(());
             }
         } else if let Some(peer_variant) = variant.strip_prefix("peer-") {
+            let (peer_variant, name) = if let Some((variant, name)) = peer_variant.split_once("/") {
+                (variant, Some(name.to_string()))
+            } else {
+                (peer_variant, None)
+            };
+
             if let Some((order, VariantType::PseudoClass(class))) =
                 BUILTIN_VARIANTS.get(peer_variant)
             {
-                variant_list.push(Variant::Builtin(order + 3000, VariantType::Peer(class)));
+                variant_list.push(Variant::Builtin(
+                    order + 3000,
+                    VariantType::Peer { name, class },
+                ));
+                return Ok(());
             }
-        } else {
-            return Err(ParseError::new(
-                span.clone(),
-                ParseErrorKind::UnknownVariant(variant, val),
-            ));
         }
     }
 
-    Ok(())
+    Err(ParseError::new(
+        span.clone(),
+        ParseErrorKind::UnknownVariant(variant, val),
+    ))
 }
 
 #[allow(clippy::too_many_lines)]
@@ -785,7 +818,10 @@ mod tests {
                 full: "hover:text-center",
                 order: Default::default(),
                 plugin: &typography::text_align::PluginDefinition,
-                variants: vec![Variant::Builtin(Default::default(), VariantType::PseudoClass("hover"))],
+                variants: vec![Variant::Builtin(
+                    Default::default(),
+                    VariantType::PseudoClass("hover")
+                )],
                 modifier: Modifier::Builtin {
                     is_negative: false,
                     value: "center",
@@ -890,6 +926,170 @@ mod tests {
                 modifier: Modifier::Builtin {
                     is_negative: false,
                     value: "center",
+                },
+                is_important: false,
+            }
+        );
+    }
+
+    #[test]
+    fn group_and_peer() {
+        let config = Config::default();
+        assert_eq!(
+            parse(
+                "group-checked:block",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
+            &Selector {
+                full: "group-checked:block",
+                order: Default::default(),
+                plugin: &layout::display::PluginDefinition,
+                variants: vec![Variant::Builtin(Default::default(), VariantType::Group {
+                    name: None,
+                    class: "checked",
+                })],
+                modifier: Modifier::Builtin {
+                    is_negative: false,
+                    value: "block",
+                },
+                is_important: false,
+            }
+        );
+
+        assert_eq!(
+            parse(
+                "peer-checked:block",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
+            &Selector {
+                full: "peer-checked:block",
+                order: Default::default(),
+                plugin: &layout::display::PluginDefinition,
+                variants: vec![Variant::Builtin(Default::default(), VariantType::Peer {
+                    name: None,
+                    class: "checked",
+                })],
+                modifier: Modifier::Builtin {
+                    is_negative: false,
+                    value: "block",
+                },
+                is_important: false,
+            }
+        );
+
+        assert_eq!(
+            parse(
+                "peer-not-checked:block",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
+            &Selector {
+                full: "peer-not-checked:block",
+                order: Default::default(),
+                plugin: &layout::display::PluginDefinition,
+                variants: vec![Variant::Builtin(Default::default(), VariantType::PeerNot {
+                    name: None,
+                    class: "checked",
+                })],
+                modifier: Modifier::Builtin {
+                    is_negative: false,
+                    value: "block",
+                },
+                is_important: false,
+            }
+        );
+    }
+
+    #[test]
+    fn arbitrary_named_group_and_peer() {
+        let config = Config::default();
+        assert_eq!(
+            parse(
+                "group-checked/item:block",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
+            &Selector {
+                full: "group-checked/item:block",
+                order: Default::default(),
+                plugin: &layout::display::PluginDefinition,
+                variants: vec![Variant::Builtin(Default::default(), VariantType::Group {
+                    name: Some(String::from("item")),
+                    class: "checked",
+                })],
+                modifier: Modifier::Builtin {
+                    is_negative: false,
+                    value: "block",
+                },
+                is_important: false,
+            }
+        );
+
+        assert_eq!(
+            parse(
+                "peer-checked/item:block",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
+            &Selector {
+                full: "peer-checked/item:block",
+                order: Default::default(),
+                plugin: &layout::display::PluginDefinition,
+                variants: vec![Variant::Builtin(Default::default(), VariantType::Peer {
+                    name: Some(String::from("item")),
+                    class: "checked",
+                })],
+                modifier: Modifier::Builtin {
+                    is_negative: false,
+                    value: "block",
+                },
+                is_important: false,
+            }
+        );
+
+        assert_eq!(
+            parse(
+                "peer-not-checked/item:block",
+                None,
+                None,
+                &config,
+                &config.get_derived_variants()
+            )[0]
+            .as_ref()
+            .unwrap(),
+            &Selector {
+                full: "peer-not-checked/item:block",
+                order: Default::default(),
+                plugin: &layout::display::PluginDefinition,
+                variants: vec![Variant::Builtin(Default::default(), VariantType::PeerNot {
+                    name: Some(String::from("item")),
+                    class: "checked",
+                })],
+                modifier: Modifier::Builtin {
+                    is_negative: false,
+                    value: "block",
                 },
                 is_important: false,
             }
@@ -1321,7 +1521,10 @@ mod tests {
                 full: "hover:[mask-type:luminance]",
                 order: BUILTIN_PLUGINS.len(),
                 plugin: &CssPropertyPlugin,
-                variants: vec![Variant::Builtin(Default::default(), VariantType::PseudoClass("hover"))],
+                variants: vec![Variant::Builtin(
+                    Default::default(),
+                    VariantType::PseudoClass("hover")
+                )],
                 modifier: Modifier::Arbitrary {
                     prefix: "",
                     hint: "",
@@ -1362,7 +1565,10 @@ mod tests {
                     full: "hover:(focus:bg-gray-500,text-[color:black,])",
                     order: Default::default(),
                     plugin: &typography::text_color::PluginDefinition,
-                    variants: vec![Variant::Builtin(Default::default(), VariantType::PseudoClass("hover"))],
+                    variants: vec![Variant::Builtin(
+                        Default::default(),
+                        VariantType::PseudoClass("hover")
+                    )],
                     modifier: Modifier::Arbitrary {
                         prefix: "",
                         hint: "color",
@@ -1389,7 +1595,10 @@ mod tests {
                 full: "hover:(bg-gray-500)",
                 order: Default::default(),
                 plugin: &background::background_color::PluginDefinition,
-                variants: vec![Variant::Builtin(Default::default(), VariantType::PseudoClass("hover"))],
+                variants: vec![Variant::Builtin(
+                    Default::default(),
+                    VariantType::PseudoClass("hover")
+                )],
                 modifier: Modifier::Builtin {
                     is_negative: false,
                     value: "gray-500",
@@ -1451,7 +1660,10 @@ mod tests {
                     order: Default::default(),
                     plugin: &typography::text_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin(Default::default(), VariantType::WrapClass(Cow::from("[dir=\"rtl\"] &"))),
+                        Variant::Builtin(
+                            Default::default(),
+                            VariantType::WrapClass(Cow::from("[dir=\"rtl\"] &"))
+                        ),
                         Variant::Builtin(
                             73,
                             VariantType::AtRule(Cow::from("@media (width >= 80rem)"))
@@ -1654,7 +1866,10 @@ mod tests {
                     full: "(hover,focus):bg-red-400",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![Variant::Builtin(Default::default(), VariantType::PseudoClass("hover"))],
+                    variants: vec![Variant::Builtin(
+                        Default::default(),
+                        VariantType::PseudoClass("hover")
+                    )],
                     modifier: Modifier::Builtin {
                         is_negative: false,
                         value: "red-400",
@@ -1665,7 +1880,10 @@ mod tests {
                     full: "(hover,focus):bg-red-400",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),],
+                    variants: vec![Variant::Builtin(
+                        Default::default(),
+                        VariantType::PseudoClass("focus")
+                    ),],
                     modifier: Modifier::Builtin {
                         is_negative: false,
                         value: "red-400",
@@ -1814,7 +2032,10 @@ mod tests {
                     full: "(hover:bg-red-400,focus:bg-green-400)",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![Variant::Builtin(Default::default(), VariantType::PseudoClass("hover"))],
+                    variants: vec![Variant::Builtin(
+                        Default::default(),
+                        VariantType::PseudoClass("hover")
+                    )],
                     modifier: Modifier::Builtin {
                         is_negative: false,
                         value: "red-400",
@@ -1825,7 +2046,10 @@ mod tests {
                     full: "(hover:bg-red-400,focus:bg-green-400)",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),],
+                    variants: vec![Variant::Builtin(
+                        Default::default(),
+                        VariantType::PseudoClass("focus")
+                    ),],
                     modifier: Modifier::Builtin {
                         is_negative: false,
                         value: "green-400",
@@ -1946,7 +2170,10 @@ mod tests {
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(Default::default(), VariantType::PseudoClass("hover")),
-                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus-within")),
+                        Variant::Builtin(
+                            Default::default(),
+                            VariantType::PseudoClass("focus-within")
+                        ),
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -1960,7 +2187,10 @@ mod tests {
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
                         Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),
-                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus-within"))
+                        Variant::Builtin(
+                            Default::default(),
+                            VariantType::PseudoClass("focus-within")
+                        )
                     ],
                     modifier: Modifier::Builtin {
                         is_negative: false,
@@ -2012,7 +2242,10 @@ mod tests {
                     full: "(hover,focus):(bg-red-400,(target,focus-within):bg-green-400)",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![Variant::Builtin(Default::default(), VariantType::PseudoClass("hover")),],
+                    variants: vec![Variant::Builtin(
+                        Default::default(),
+                        VariantType::PseudoClass("hover")
+                    ),],
                     modifier: Modifier::Builtin {
                         is_negative: false,
                         value: "red-400",
@@ -2023,7 +2256,10 @@ mod tests {
                     full: "(hover,focus):(bg-red-400,(target,focus-within):bg-green-400)",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
-                    variants: vec![Variant::Builtin(Default::default(), VariantType::PseudoClass("focus")),],
+                    variants: vec![Variant::Builtin(
+                        Default::default(),
+                        VariantType::PseudoClass("focus")
+                    ),],
                     modifier: Modifier::Builtin {
                         is_negative: false,
                         value: "red-400",
@@ -2063,7 +2299,10 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus-within")),
+                        Variant::Builtin(
+                            Default::default(),
+                            VariantType::PseudoClass("focus-within")
+                        ),
                         Variant::Builtin(Default::default(), VariantType::PseudoClass("hover"))
                     ],
                     modifier: Modifier::Builtin {
@@ -2077,7 +2316,10 @@ mod tests {
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
-                        Variant::Builtin(Default::default(), VariantType::PseudoClass("focus-within")),
+                        Variant::Builtin(
+                            Default::default(),
+                            VariantType::PseudoClass("focus-within")
+                        ),
                         Variant::Builtin(Default::default(), VariantType::PseudoClass("focus"))
                     ],
                     modifier: Modifier::Builtin {
