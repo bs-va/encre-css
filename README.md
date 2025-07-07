@@ -152,8 +152,7 @@ assert!(css.expect("failed to generate the CSS").ends_with(r#"
 }
 
 .bg-red-200 {
-  --en-bg-opacity: 1;
-  background-color: rgb(254 202 202 / var(--en-bg-opacity));
+  background-color: oklch(88.5% .062 18.334);
 }"#));
 ```
 
