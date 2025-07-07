@@ -1551,6 +1551,7 @@ pub struct Config {
 
 impl Config {
     /// Get variants derived from other configuration fields like breakpoints and the dark mode.
+    #[allow(clippy::too_many_lines)]
     pub(crate) fn get_derived_variants(&self) -> Vec<(Cow<'static, str>, Variant<'static>)> {
         self.theme
             .screens
@@ -1700,7 +1701,6 @@ impl Config {
     /// Returns the order of the last variant which can be used when defining a new variant which
     /// must be generated after all the other variants.
     pub fn last_variant_order(&self) -> usize {
-        println!("{BUILTIN_VARIANTS:?}");
         BUILTIN_VARIANTS.len()
             + 2 * self.theme.screens.len()
             + 2 * BUILTIN_SCREENS.len()
@@ -1793,8 +1793,8 @@ impl Config {
     /// ```
     ///
     /// You can also make a prefixed variant, that is a variant which as a prefix and an arbitrary
-    /// value delimited by square brackets. When defining this kind of variant, you need to set the
-    /// [`Variant::prefixed`] field to `true` and to insert the placeholder `{}` in the variant
+    /// value delimited by square brackets. When defining this kind of variant, you need to call
+    /// [`Variant::with_prefixed`] and to insert the placeholder `{}` in the variant
     /// template, it will be replaced with the given arbitrary value.
     ///
     /// # Example

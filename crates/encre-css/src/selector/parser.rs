@@ -159,6 +159,7 @@ pub(crate) fn parse<'a>(
     parse_recursive(val, span, full_class, config, config_derived_variants)
 }
 
+#[allow(clippy::too_many_lines)]
 fn push_variant<'a>(
     is_arbitrary: bool,
     full_variant: &'a str,
@@ -214,7 +215,7 @@ fn push_variant<'a>(
                     ));
                 };
 
-                variant.template = Cow::Owned(variant.template.replace("{}", &*value));
+                variant.template = Cow::Owned(variant.template.replace("{}", &value));
                 variant_list.push(variant.clone());
                 return Ok(());
             }
@@ -222,7 +223,7 @@ fn push_variant<'a>(
     } else {
         // Maybe a group or peer variant
         if let Some(group_variant) = full_variant.strip_prefix("group-") {
-            let (group_variant, name) = if let Some((variant, name)) = group_variant.split_once("/")
+            let (group_variant, name) = if let Some((variant, name)) = group_variant.split_once('/')
             {
                 (variant, Some(name.to_string()))
             } else {
@@ -249,7 +250,7 @@ fn push_variant<'a>(
             }
         } else if let Some(peer_not_variant) = full_variant.strip_prefix("peer-not-") {
             let (peer_not_variant, name) =
-                if let Some((variant, name)) = peer_not_variant.split_once("/") {
+                if let Some((variant, name)) = peer_not_variant.split_once('/') {
                     (variant, Some(name.to_string()))
                 } else {
                     (peer_not_variant, None)
@@ -276,7 +277,7 @@ fn push_variant<'a>(
                 }
             }
         } else if let Some(peer_variant) = full_variant.strip_prefix("peer-") {
-            let (peer_variant, name) = if let Some((variant, name)) = peer_variant.split_once("/") {
+            let (peer_variant, name) = if let Some((variant, name)) = peer_variant.split_once('/') {
                 (variant, Some(name.to_string()))
             } else {
                 (peer_variant, None)

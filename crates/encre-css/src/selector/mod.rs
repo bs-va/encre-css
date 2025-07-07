@@ -241,6 +241,7 @@ impl<'a> Variant<'a> {
     ///   }
     /// }"));
     /// ```
+    #[must_use]
     pub const fn with_prefixed(mut self) -> Self {
         self.prefixed = true;
         self
