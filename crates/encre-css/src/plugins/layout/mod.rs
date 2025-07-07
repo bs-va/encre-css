@@ -330,10 +330,7 @@ mod tests {
         assert_eq!(
             generate(["inset-2"], &base_config()),
             ".inset-2 {
-  top: 0.5rem;
-  right: 0.5rem;
-  bottom: 0.5rem;
-  left: 0.5rem;
+  inset: 0.5rem;
 }"
         );
         assert_eq!(
@@ -357,17 +354,13 @@ mod tests {
         assert_eq!(
             generate(["inset-[20px]"], &base_config()),
             r".inset-\[20px\] {
-  top: 20px;
-  right: 20px;
-  bottom: 20px;
-  left: 20px;
+  inset: 20px;
 }"
         );
         assert_eq!(
             generate(["inset-y-[10em]"], &base_config()),
             r".inset-y-\[10em\] {
-  top: 10em;
-  bottom: 10em;
+  inset-block: 10em;
 }"
         );
     }

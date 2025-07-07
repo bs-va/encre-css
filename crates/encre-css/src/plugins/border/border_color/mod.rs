@@ -54,7 +54,7 @@ impl Plugin for PluginXDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        color_handle(&["border-left-color", "border-right-color"], context);
+        color_handle(&["border-inline-color"], context);
     }
 }
 
@@ -67,7 +67,7 @@ impl Plugin for PluginYDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        color_handle(&["border-top-color", "border-bottom-color"], context);
+        color_handle(&["border-block-color"], context);
     }
 }
 

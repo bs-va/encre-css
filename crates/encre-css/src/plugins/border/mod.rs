@@ -38,8 +38,7 @@ mod tests {
         assert_eq!(
             generate(["border-x-[#ff0]"], &base_config()),
             r".border-x-\[\#ff0\] {
-  border-left-color: #ff0;
-  border-right-color: #ff0;
+  border-inline-color: #ff0;
 }"
         );
         assert_eq!(
@@ -84,8 +83,7 @@ mod tests {
         assert_eq!(
             generate(["border-x"], &base_config()),
             ".border-x {
-  border-left-width: 1px;
-  border-right-width: 1px;
+  border-inline-width: 1px;
 }"
         );
         assert_eq!(
@@ -110,8 +108,7 @@ mod tests {
         assert_eq!(
             generate(["border-x-24"], &base_config()),
             ".border-x-24 {
-  border-left-width: 24px;
-  border-right-width: 24px;
+  border-inline-width: 24px;
 }"
         );
         assert_eq!(
@@ -135,8 +132,7 @@ mod tests {
         assert_eq!(
             generate(["border-y-[thick]"], &base_config()),
             r".border-y-\[thick\] {
-  border-top-width: thick;
-  border-bottom-width: thick;
+  border-block-width: thick;
 }"
         );
     }
@@ -254,16 +250,16 @@ mod tests {
             generate(["divide-x"], &base_config()),
             ".divide-x > :not([hidden]) ~ :not([hidden]) {
   --en-divide-x-reverse: 0;
-  border-right-width: calc(1px * var(--en-divide-x-reverse));
-  border-left-width: calc(1px * calc(1 - var(--en-divide-x-reverse)));
+  border-inline-start-width: calc(1px * var(--en-divide-x-reverse));
+  border-inline-end-width: calc(1px * calc(1 - var(--en-divide-x-reverse)));
 }"
         );
         assert_eq!(
             generate(["divide-y-2"], &base_config()),
             ".divide-y-2 > :not([hidden]) ~ :not([hidden]) {
   --en-divide-y-reverse: 0;
-  border-top-width: calc(2px * calc(1 - var(--en-divide-y-reverse)));
-  border-bottom-width: calc(2px * var(--en-divide-y-reverse));
+  border-block-start-width: calc(2px * calc(1 - var(--en-divide-y-reverse)));
+  border-block-end-width: calc(2px * var(--en-divide-y-reverse));
 }"
         );
         assert_eq!(
@@ -276,8 +272,8 @@ mod tests {
             generate(["divide-y-[0.1rem]"], &base_config()),
             r".divide-y-\[0\.1rem\] > :not([hidden]) ~ :not([hidden]) {
   --en-divide-y-reverse: 0;
-  border-top-width: calc(0.1rem * calc(1 - var(--en-divide-y-reverse)));
-  border-bottom-width: calc(0.1rem * var(--en-divide-y-reverse));
+  border-block-start-width: calc(0.1rem * calc(1 - var(--en-divide-y-reverse)));
+  border-block-end-width: calc(0.1rem * var(--en-divide-y-reverse));
 }"
         );
         assert_eq!(

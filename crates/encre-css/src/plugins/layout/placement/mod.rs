@@ -1,5 +1,5 @@
 #![doc = include_str!("README.md")]
-#![doc(alias = "layout")]
+#![doc(alias("layout", "inset"))]
 use crate::prelude::build_plugin::*;
 
 use std::borrow::Cow;
@@ -52,7 +52,7 @@ impl Plugin for PluginInsetDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        placement_handle(&["top", "right", "bottom", "left"], context);
+        placement_handle(&["inset"], context);
     }
 }
 
@@ -65,7 +65,7 @@ impl Plugin for PluginInsetXDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        placement_handle(&["left", "right"], context);
+        placement_handle(&["inset-inline"], context);
     }
 }
 
@@ -78,7 +78,7 @@ impl Plugin for PluginInsetYDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        placement_handle(&["top", "bottom"], context);
+        placement_handle(&["inset-block"], context);
     }
 }
 

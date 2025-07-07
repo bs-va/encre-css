@@ -138,7 +138,7 @@ impl Plugin for PluginXDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        width_handle(&["border-left-width", "border-right-width"], context);
+        width_handle(&["border-inline-width"], context);
     }
 }
 
@@ -151,6 +151,6 @@ impl Plugin for PluginYDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        width_handle(&["border-top-width", "border-bottom-width"], context);
+        width_handle(&["border-block-width"], context);
     }
 }

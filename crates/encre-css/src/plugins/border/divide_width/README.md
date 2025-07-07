@@ -8,9 +8,9 @@ Utilities for controlling the border width between children.
     </tr>
   </thead>
   <tbody>
-    <tr><td>divide-x-<i>&lt;integer&gt;</i></td><td>border-right-width: <i>&lt;integer&gt;</i>px;<br>border-left-width: <i>&lt;integer&gt;</i>px;</td></tr>
+    <tr><td>divide-x-<i>&lt;integer&gt;</i></td>border-inline-width: <i>&lt;integer&gt;</i>px;</td></tr>
     <tr><td>divide-x-reverse</td><td>--en-divide-x-reverse: 1;</td></tr>
-    <tr><td>divide-y-<i>&lt;integer&gt;</i></td><td>border-bottom-width: <i>&lt;integer&gt;</i>px;<br>border-top-width: <i>&lt;integer&gt;</i>px;</td></tr>
+    <tr><td>divide-y-<i>&lt;integer&gt;</i></td><td>border-block-width: <i>&lt;integer&gt;</i>px;</td></tr>
     <tr><td>divide-y-reverse</td><td>--en-divide-y-reverse: 1;</td></tr>
   </tbody>
 </table>

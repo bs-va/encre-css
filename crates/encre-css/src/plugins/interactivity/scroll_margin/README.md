@@ -12,14 +12,14 @@ Utilities for controlling the scroll offset around items in a snap container.
     <tr><td>scroll-m-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>margin: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
     <tr><td>scroll-m-px</td><td>margin: 1px;</td></tr>
     <tr><td>scroll-m-auto</td><td>margin: auto;</td></tr>
-    <tr><td>scroll-mx-<i>&lt;float&gt;</i></td><td>scroll-margin-left: <i>&lt;float / 4&gt;</i>rem;<br>scroll-margin-right: <i>&lt;float / 4&gt;</i>rem;</td></tr>
-    <tr><td>scroll-mx-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>scroll-margin-left: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;<br>scroll-margin-right: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
-    <tr><td>scroll-mx-px</td><td>scroll-margin-left: 1px;<br>scroll-margin-right: 1px;</td></tr>
-    <tr><td>scroll-mx-auto</td><td>scroll-margin-left: auto;<br>scroll-margin-right: auto;</td></tr>
-    <tr><td>scroll-my-<i>&lt;float&gt;</i></td><td>scroll-margin-top: <i>&lt;float / 4&gt;</i>rem;<br>scroll-margin-bottom: <i>&lt;float / 4&gt;</i>rem;</td></tr>
-    <tr><td>scroll-my-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>scroll-margin-top: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;<br>scroll-margin-bottom: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
-    <tr><td>scroll-my-px</td><td>scroll-margin-top: 1px;<br>scroll-margin-bottom: 1px;</td></tr>
-    <tr><td>scroll-my-auto</td><td>scroll-margin-top: auto;<br>scroll-margin-bottom: auto;</td></tr>
+    <tr><td>scroll-mx-<i>&lt;float&gt;</i></td><td>scroll-margin-inline: <i>&lt;float / 4&gt;</i>rem;</td></tr>
+    <tr><td>scroll-mx-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>scroll-margin-inline: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
+    <tr><td>scroll-mx-px</td><td>scroll-margin-inline: 1px;</td></tr>
+    <tr><td>scroll-mx-auto</td><td>scroll-margin-inline: auto;</td></tr>
+    <tr><td>scroll-my-<i>&lt;float&gt;</i></td><td>scroll-margin-block: <i>&lt;float / 4&gt;</i>rem;</td></tr>
+    <tr><td>scroll-my-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>scroll-margin-block: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
+    <tr><td>scroll-my-px</td><td>scroll-margin-block: 1px;</td></tr>
+    <tr><td>scroll-my-auto</td><td>scroll-margin-block: auto;</td></tr>
     <tr><td>scroll-ms-<i>&lt;float&gt;</i></td><td>scroll-margin-inline-start: <i>&lt;float / 4&gt;</i>rem;</td></tr>
     <tr><td>scroll-ms-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>scroll-margin-inline-start: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
     <tr><td>scroll-ms-px</td><td>scroll-margin-inline-start: 1px;</td></tr>

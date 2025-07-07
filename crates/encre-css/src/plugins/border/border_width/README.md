@@ -10,10 +10,10 @@ Utilities for controlling the width of an element's borders.
   <tbody>
     <tr><td>border-<i>&lt;integer&gt;</i></td><td>border-width: <i>&lt;integer&gt;</i>px;</td></tr>
     <tr><td>border</td><td>border-width: 1px;</td></tr>
-    <tr><td>border-x-<i>&lt;integer&gt;</i></td><td>border-left-width: <i>&lt;integer&gt;</i>px;<br>border-right-width: <i>&lt;integer&gt;</i>px;</td></tr>
-    <tr><td>border-x</td><td>border-left-width: 1px;<br>border-right-width: 1px;</td></tr>
-    <tr><td>border-y-<i>&lt;integer&gt;</i></td><td>border-top-width: <i>&lt;integer&gt;</i>px;<br>border-bottom-width: <i>&lt;integer&gt;</i>px;</td></tr>
-    <tr><td>border-y</td><td>border-top-width: 1px;<br>border-bottom-width: 1px;</td></tr>
+    <tr><td>border-x-<i>&lt;integer&gt;</i></td><td>border-inline-width: <i>&lt;integer&gt;</i>px;</td></tr>
+    <tr><td>border-x</td><td>border-inline-width: 1px;</td></tr>
+    <tr><td>border-y-<i>&lt;integer&gt;</i></td><td>border-block-width: <i>&lt;integer&gt;</i>px;</td></tr>
+    <tr><td>border-y</td><td>border-block-width: 1px;</td></tr>
     <tr><td>border-s-<i>&lt;integer&gt;</i></td><td>border-inline-start-width: <i>&lt;integer&gt;</i>px;</td></tr>
     <tr><td>border-s</td><td>border-inline-start-width: 1px;</td></tr>
     <tr><td>border-e-<i>&lt;integer&gt;</i></td><td>border-inline-end-width: <i>&lt;integer&gt;</i>px;</td></tr>

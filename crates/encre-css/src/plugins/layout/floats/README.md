@@ -8,6 +8,8 @@ Utilities for controlling the wrapping of content around an element.
     </tr>
   </thead>
   <tbody>
+    <tr><td>float-start</td><td>float: inline-start;</td></tr>
+    <tr><td>float-end</td><td>float: inline-end;</td></tr>
     <tr><td>float-right</td><td>float: right;</td></tr>
     <tr><td>float-left</td><td>float: left;</td></tr>
     <tr><td>float-none</td><td>float: none;</td></tr>

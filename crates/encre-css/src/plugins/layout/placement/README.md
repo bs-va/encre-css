@@ -8,31 +8,31 @@ Utilities for controlling the placement of positioned elements.
     </tr>
   </thead>
   <tbody>
-    <tr><td>inset-<i>&lt;float&gt;</i></td><td>top: <i>&lt;float / 4&gt;</i>rem;<br>right: <i>&lt;float / 4&gt;</i>rem;<br>bottom: <i>&lt;float / 4&gt;</i>rem;<br>left: <i>&lt;float / 4&gt;</i>rem;</td></tr>
-    <tr><td>inset-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>top: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;<br>right: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;<br>bottom: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;<br>left: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
-    <tr><td>inset-px</td><td>top: 1px;<br>right: 1px;<br>bottom: 1px;<br>left: 1px;</td></tr>
-    <tr><td>inset-auto</td><td>top: auto;<br>right: auto;<br>bottom: auto;<br>left: auto;</td></tr>
-    <tr><td>inset-full</td><td>top: 100%;<br>right: 100%;<br>bottom: 100%;<br>left: 100%;</td></tr>
-    <tr><td>inset-x-<i>&lt;float&gt;</i></td><td>left: <i>&lt;float / 4&gt;</i>rem;<br>right: <i>&lt;float / 4&gt;</i>rem;</td></tr>
-    <tr><td>inset-x-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>left: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;<br>right: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
-    <tr><td>inset-x-px</td><td>left: 1px;<br>right: 1px;</td></tr>
-    <tr><td>inset-x-auto</td><td>left: auto;<br>right: auto;</td></tr>
-    <tr><td>inset-x-full</td><td>left: 100%;<br>right: 100%;</td></tr>
-    <tr><td>inset-y-<i>&lt;float&gt;</i></td><td>top: <i>&lt;float / 4&gt;</i>rem;<br>bottom: <i>&lt;float / 4&gt;</i>rem;</td></tr>
-    <tr><td>inset-y-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>top: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;<br>bottom: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
-    <tr><td>inset-y-px</td><td>top: 1px;<br>bottom: 1px;</td></tr>
-    <tr><td>inset-y-auto</td><td>top: auto;<br>bottom: auto;</td></tr>
-    <tr><td>inset-y-full</td><td>top: 100%;<br>bottom: 100%;</td></tr>
+    <tr><td>inset-<i>&lt;float&gt;</i></td><td>inset: <i>&lt;float / 4&gt;</i>rem;</td></tr>
+    <tr><td>inset-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>inset: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
+    <tr><td>inset-px</td><td>inset: 1px;</td></tr>
+    <tr><td>inset-auto</td><td>inset: auto;</td></tr>
+    <tr><td>inset-full</td><td>inset: 100%;</td></tr>
+    <tr><td>inset-x-<i>&lt;float&gt;</i></td><td>inset-inline: <i>&lt;float / 4&gt;</i>rem;</td></tr>
+    <tr><td>inset-x-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>inset-inline: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
+    <tr><td>inset-x-px</td><td>inset-inline: 1px;</td></tr>
+    <tr><td>inset-x-auto</td><td>inset-inline: auto;</td></tr>
+    <tr><td>inset-x-full</td><td>inset-inline: 100%;</td></tr>
+    <tr><td>inset-y-<i>&lt;float&gt;</i></td><td>inset-block: <i>&lt;float / 4&gt;</i>rem;</td></tr>
+    <tr><td>inset-y-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>inset-block: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
+    <tr><td>inset-y-px</td><td>inset-block: 1px;</td></tr>
+    <tr><td>inset-y-auto</td><td>inset-block: auto;</td></tr>
+    <tr><td>inset-y-full</td><td>inset-block: 100%;</td></tr>
     <tr><td>start-<i>&lt;float&gt;</i></td><td>inset-inline-start: <i>&lt;float / 4&gt;</i>rem;</td></tr>
     <tr><td>start-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>inset-inline-start: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
     <tr><td>start-px</td><td>inset-inline-start: 1px;</td></tr>
     <tr><td>start-auto</td><td>inset-inline-start: auto;</td></tr>
     <tr><td>start-full</td><td>inset-inline-start: 100%;</td></tr>
-    <tr><td>end-<i>&lt;float&gt;</i></td><td>inset-inline-inset-inline-end: <i>&lt;float / 4&gt;</i>rem;</td></tr>
-    <tr><td>end-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>inset-inline-inset-inline-end: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
-    <tr><td>end-px</td><td>inset-inline-inset-inline-end: 1px;</td></tr>
-    <tr><td>end-auto</td><td>inset-inline-inset-inline-end: auto;</td></tr>
-    <tr><td>end-full</td><td>inset-inline-inset-inline-end: 100%;</td></tr>
+    <tr><td>end-<i>&lt;float&gt;</i></td><td>inset-inline-end: <i>&lt;float / 4&gt;</i>rem;</td></tr>
+    <tr><td>end-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>inset-inline-end: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
+    <tr><td>end-px</td><td>inset-inline-end: 1px;</td></tr>
+    <tr><td>end-auto</td><td>inset-inline-end: auto;</td></tr>
+    <tr><td>end-full</td><td>inset-inline-end: 100%;</td></tr>
     <tr><td>top-<i>&lt;float&gt;</i></td><td>top: <i>&lt;float / 4&gt;</i>rem;</td></tr>
     <tr><td>top-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>top: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
     <tr><td>top-px</td><td>top: 1px;</td></tr>

@@ -26,15 +26,13 @@ mod tests {
         assert_eq!(
             generate(["mx-[2px]"], &base_config()),
             r".mx-\[2px\] {
-  margin-left: 2px;
-  margin-right: 2px;
+  margin-inline: 2px;
 }"
         );
         assert_eq!(
             generate(["my-[20%]"], &base_config()),
             r".my-\[20\%\] {
-  margin-top: 20%;
-  margin-bottom: 20%;
+  margin-block: 20%;
 }"
         );
     }
@@ -56,15 +54,13 @@ mod tests {
         assert_eq!(
             generate(["px-[2px]"], &base_config()),
             r".px-\[2px\] {
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-inline: 2px;
 }"
         );
         assert_eq!(
             generate(["py-[20%]"], &base_config()),
             r".py-\[20\%\] {
-  padding-top: 20%;
-  padding-bottom: 20%;
+  padding-block: 20%;
 }"
         );
     }
@@ -75,16 +71,16 @@ mod tests {
             generate(["space-x-42"], &base_config()),
             ".space-x-42 > :not(:last-child) {
   --en-space-x-reverse: 0;
-  margin-right: calc(10.5rem * var(--en-space-x-reverse));
-  margin-left: calc(10.5rem * calc(1 - var(--en-space-x-reverse)));
+  margin-inline-start: calc(10.5rem * var(--en-space-x-reverse));
+  margin-inline-end: calc(10.5rem * calc(1 - var(--en-space-x-reverse)));
 }"
         );
         assert_eq!(
             generate(["space-x-[42px]"], &base_config()),
             r".space-x-\[42px\] > :not(:last-child) {
   --en-space-x-reverse: 0;
-  margin-right: calc(42px * var(--en-space-x-reverse));
-  margin-left: calc(42px * calc(1 - var(--en-space-x-reverse)));
+  margin-inline-start: calc(42px * var(--en-space-x-reverse));
+  margin-inline-end: calc(42px * calc(1 - var(--en-space-x-reverse)));
 }"
         );
         assert_eq!(
@@ -103,8 +99,8 @@ mod tests {
             generate(["space-y-[12%]"], &base_config()),
             r".space-y-\[12\%\] > :not(:last-child) {
   --en-space-y-reverse: 0;
-  margin-top: calc(12% * calc(1 - var(--en-space-y-reverse)));
-  margin-bottom: calc(12% * var(--en-space-y-reverse));
+  margin-block-start: calc(12% * calc(1 - var(--en-space-y-reverse)));
+  margin-block-end: calc(12% * var(--en-space-y-reverse));
 }"
         );
     }

@@ -10,7 +10,7 @@ impl Plugin for PluginDefinition {
         matches!(
             context.modifier,
             Modifier::Builtin {
-                value: "left" | "right" | "none",
+                value: "start" | "end" | "left" | "right" | "none",
                 ..
             }
         )
@@ -18,7 +18,13 @@ impl Plugin for PluginDefinition {
 
     fn handle(&self, context: &mut ContextHandle) {
         if let Modifier::Builtin { value, .. } = context.modifier {
-            context.buffer.line(format_args!("float: {value};"));
+            if *value == "start" {
+                context.buffer.line(format_args!("float: inline-start;"));
+            } else if *value == "end" {
+                context.buffer.line(format_args!("float: inline-end;"));
+            } else {
+                context.buffer.line(format_args!("float: {value};"));
+            }
         }
     }
 }

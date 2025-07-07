@@ -34,18 +34,18 @@ impl Plugin for PluginXDefinition {
                         let length = spacing::get(value, *is_negative).unwrap();
                         context.buffer.lines([
                             format_args!("--en-space-x-reverse: 0;"),
-                            format_args!("margin-right: calc({length} * var(--en-space-x-reverse));"),
-                            format_args!("margin-left: calc({length} * calc(1 - var(--en-space-x-reverse)));"),
+                            format_args!("margin-inline-start: calc({length} * var(--en-space-x-reverse));"),
+                            format_args!("margin-inline-end: calc({length} * calc(1 - var(--en-space-x-reverse)));"),
                         ]);
                     }
                     Modifier::Arbitrary { value, .. } => {
                         context.buffer.lines([
                             format_args!("--en-space-x-reverse: 0;"),
                             format_args!(
-                                "margin-right: calc({value} * var(--en-space-x-reverse));"
+                                "margin-inline-start: calc({value} * var(--en-space-x-reverse));"
                             ),
                             format_args!(
-                                "margin-left: calc({value} * calc(1 - var(--en-space-x-reverse)));"
+                                "margin-inline-end: calc({value} * calc(1 - var(--en-space-x-reverse)));"
                             ),
                         ]);
                     }
@@ -89,10 +89,10 @@ impl Plugin for PluginYDefinition {
                         context.buffer.lines([
                             format_args!("--en-space-y-reverse: 0;"),
                             format_args!(
-                                "margin-top: calc({length} * calc(1 - var(--en-space-y-reverse)));"
+                                "margin-block-start: calc({length} * calc(1 - var(--en-space-y-reverse)));"
                             ),
                             format_args!(
-                                "margin-bottom: calc({length} * var(--en-space-y-reverse));"
+                                "margin-block-end: calc({length} * var(--en-space-y-reverse));"
                             ),
                         ]);
                     }
@@ -100,10 +100,10 @@ impl Plugin for PluginYDefinition {
                         context.buffer.lines([
                             format_args!("--en-space-y-reverse: 0;"),
                             format_args!(
-                                "margin-top: calc({value} * calc(1 - var(--en-space-y-reverse)));"
+                                "margin-block-start: calc({value} * calc(1 - var(--en-space-y-reverse)));"
                             ),
                             format_args!(
-                                "margin-bottom: calc({value} * var(--en-space-y-reverse));"
+                                "margin-block-end: calc({value} * var(--en-space-y-reverse));"
                             ),
                         ]);
                     }

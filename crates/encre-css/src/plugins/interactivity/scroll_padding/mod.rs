@@ -50,7 +50,7 @@ impl Plugin for PluginXDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        scroll_padding_handle(&["scroll-padding-left", "scroll-padding-right"], context);
+        scroll_padding_handle(&["scroll-padding-inline"], context);
     }
 }
 
@@ -63,7 +63,7 @@ impl Plugin for PluginYDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        scroll_padding_handle(&["scroll-padding-top", "scroll-padding-bottom"], context);
+        scroll_padding_handle(&["scroll-padding-block"], context);
     }
 }
 

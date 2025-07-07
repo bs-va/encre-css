@@ -50,7 +50,7 @@ impl Plugin for PluginXDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        scroll_margin_handle(&["scroll-margin-left", "scroll-margin-right"], context);
+        scroll_margin_handle(&["scroll-margin-inline"], context);
     }
 }
 
@@ -63,7 +63,7 @@ impl Plugin for PluginYDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        scroll_margin_handle(&["scroll-margin-top", "scroll-margin-bottom"], context);
+        scroll_margin_handle(&["scroll-margin-block"], context);
     }
 }
 

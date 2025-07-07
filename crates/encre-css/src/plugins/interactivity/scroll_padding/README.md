@@ -12,14 +12,14 @@ Utilities for controlling an element's scroll offset within a snap container.
     <tr><td>scroll-p-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>scroll-padding: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
     <tr><td>scroll-p-px</td><td>scroll-padding: 1px;</td></tr>
     <tr><td>scroll-p-auto</td><td>scroll-padding: auto;</td></tr>
-    <tr><td>scroll-px-<i>&lt;float&gt;</i></td><td>scroll-padding-left: <i>&lt;float / 4&gt;</i>rem;<br>scroll-padding-right: <i>&lt;float / 4&gt;</i>rem;</td></tr>
-    <tr><td>scroll-px-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>scroll-padding-left: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;<br>scroll-padding-right: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
-    <tr><td>scroll-px-px</td><td>scroll-padding-left: 1px;<br>scroll-padding-right: 1px;</td></tr>
-    <tr><td>scroll-px-auto</td><td>scroll-padding-left: auto;<br>scroll-padding-right: auto;</td></tr>
-    <tr><td>scroll-py-<i>&lt;float&gt;</i></td><td>scroll-padding-top: <i>&lt;float / 4&gt;</i>rem;<br>scroll-padding-bottom: <i>&lt;float / 4&gt;</i>rem;</td></tr>
-    <tr><td>scroll-py-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>scroll-padding-top: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;<br>scroll-padding-bottom: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
-    <tr><td>scroll-py-px</td><td>scroll-padding-top: 1px;<br>scroll-padding-bottom: 1px;</td></tr>
-    <tr><td>scroll-py-auto</td><td>scroll-padding-top: auto;<br>scroll-padding-bottom: auto;</td></tr>
+    <tr><td>scroll-px-<i>&lt;float&gt;</i></td><td>scroll-padding-inline: <i>&lt;float / 4&gt;</i>rem;</td></tr>
+    <tr><td>scroll-px-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>scroll-padding-inline: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
+    <tr><td>scroll-px-px</td><td>scroll-padding-inline: 1px;</td></tr>
+    <tr><td>scroll-px-auto</td><td>scroll-padding-inline: auto;</td></tr>
+    <tr><td>scroll-py-<i>&lt;float&gt;</i></td><td>scroll-padding-block: <i>&lt;float / 4&gt;</i>rem;</td></tr>
+    <tr><td>scroll-py-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>scroll-padding-block: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
+    <tr><td>scroll-py-px</td><td>scroll-padding-block: 1px;</td></tr>
+    <tr><td>scroll-py-auto</td><td>scroll-padding-block: auto;</td></tr>
     <tr><td>scroll-ps-<i>&lt;float&gt;</i></td><td>scroll-padding-inline-start: <i>&lt;float / 4&gt;</i>rem;</td></tr>
     <tr><td>scroll-ps-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>scroll-padding-inline-start: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
     <tr><td>scroll-ps-px</td><td>scroll-padding-inline-start: 1px;</td></tr>

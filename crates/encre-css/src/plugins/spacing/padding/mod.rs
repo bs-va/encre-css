@@ -60,7 +60,7 @@ impl Plugin for PluginXDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        padding_handle(&["padding-left", "padding-right"], context);
+        padding_handle(&["padding-inline"], context);
     }
 }
 
@@ -73,7 +73,7 @@ impl Plugin for PluginYDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        padding_handle(&["padding-top", "padding-bottom"], context);
+        padding_handle(&["padding-block"], context);
     }
 }
 

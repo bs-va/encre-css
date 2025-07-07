@@ -12,14 +12,14 @@ Utilities for controlling an element's padding.
     <tr><td>p-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>padding: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
     <tr><td>p-px</td><td>padding: 1px;</td></tr>
     <tr><td>p-auto</td><td>padding: auto;</td></tr>
-    <tr><td>px-<i>&lt;float&gt;</i></td><td>padding-left: <i>&lt;float / 4&gt;</i>rem;<br>padding-right: <i>&lt;float / 4&gt;</i>rem;</td></tr>
-    <tr><td>px-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>padding-left: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;<br>padding-right: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
-    <tr><td>px-px</td><td>padding-left: 1px;<br>padding-right: 1px;</td></tr>
-    <tr><td>px-auto</td><td>padding-left: auto;<br>padding-right: auto;</td></tr>
-    <tr><td>py-<i>&lt;float&gt;</i></td><td>padding-top: <i>&lt;float / 4&gt;</i>rem;<br>padding-bottom: <i>&lt;float / 4&gt;</i>rem;</td></tr>
-    <tr><td>py-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>padding-top: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;<br>padding-bottom: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
-    <tr><td>py-px</td><td>padding-top: 1px;<br>padding-bottom: 1px;</td></tr>
-    <tr><td>py-auto</td><td>padding-top: auto;<br>padding-bottom: auto;</td></tr>
+    <tr><td>px-<i>&lt;float&gt;</i></td><td>padding-inline: <i>&lt;float / 4&gt;</i>rem;</td></tr>
+    <tr><td>px-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>padding-inline: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
+    <tr><td>px-px</td><td>padding-inline: 1px;</td></tr>
+    <tr><td>px-auto</td><td>padding-inline: auto;</td></tr>
+    <tr><td>py-<i>&lt;float&gt;</i></td><td>padding-block: <i>&lt;float / 4&gt;</i>rem;</td></tr>
+    <tr><td>py-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>padding-block: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
+    <tr><td>py-px</td><td>padding-block: 1px;</td></tr>
+    <tr><td>py-auto</td><td>padding-block: auto;</td></tr>
     <tr><td>ps-<i>&lt;float&gt;</i></td><td>padding-inline-start: <i>&lt;float / 4&gt;</i>rem;</td></tr>
     <tr><td>ps-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>padding-inline-start: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
     <tr><td>ps-px</td><td>padding-inline-start: 1px;</td></tr>

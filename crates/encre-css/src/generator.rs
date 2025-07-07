@@ -351,14 +351,14 @@ mod tests {
             String::from(
                 r".space-x-2 > :not(:last-child) {
   --en-space-x-reverse: 0;
-  margin-right: calc(0.5rem * var(--en-space-x-reverse));
-  margin-left: calc(0.5rem * calc(1 - var(--en-space-x-reverse)));
+  margin-inline-start: calc(0.5rem * var(--en-space-x-reverse));
+  margin-inline-end: calc(0.5rem * calc(1 - var(--en-space-x-reverse)));
 }
 
 .divide-x-\[11px\] > :not([hidden]) ~ :not([hidden]) {
   --en-divide-x-reverse: 0;
-  border-right-width: calc(11px * var(--en-divide-x-reverse));
-  border-left-width: calc(11px * calc(1 - var(--en-divide-x-reverse)));
+  border-inline-start-width: calc(11px * var(--en-divide-x-reverse));
+  border-inline-end-width: calc(11px * calc(1 - var(--en-divide-x-reverse)));
 }
 
 .divide-dashed > :not([hidden]) ~ :not([hidden]) {
@@ -371,22 +371,22 @@ mod tests {
 
 .hover\:space-x-1:hover > :not(:last-child) {
   --en-space-x-reverse: 0;
-  margin-right: calc(0.25rem * var(--en-space-x-reverse));
-  margin-left: calc(0.25rem * calc(1 - var(--en-space-x-reverse)));
+  margin-inline-start: calc(0.25rem * var(--en-space-x-reverse));
+  margin-inline-end: calc(0.25rem * calc(1 - var(--en-space-x-reverse)));
 }
 
 @media (width >= 80rem) {
   .xl\:\[\&_\>_\*\]\:divide-y-2 > * > :not([hidden]) ~ :not([hidden]) {
     --en-divide-y-reverse: 0;
-    border-top-width: calc(2px * calc(1 - var(--en-divide-y-reverse)));
-    border-bottom-width: calc(2px * var(--en-divide-y-reverse));
+    border-block-start-width: calc(2px * calc(1 - var(--en-divide-y-reverse)));
+    border-block-end-width: calc(2px * var(--en-divide-y-reverse));
   }
 }
 
 .\[\&\:has\(\.class\)_\>_\*\]\:space-y-3:has(.class) > * > :not(:last-child) {
   --en-space-y-reverse: 0;
-  margin-top: calc(0.75rem * calc(1 - var(--en-space-y-reverse)));
-  margin-bottom: calc(0.75rem * var(--en-space-y-reverse));
+  margin-block-start: calc(0.75rem * calc(1 - var(--en-space-y-reverse)));
+  margin-block-end: calc(0.75rem * var(--en-space-y-reverse));
 }"
             )
         );
@@ -460,8 +460,8 @@ mod tests {
 
 .-space-x-2 > :not(:last-child) {
   --en-space-x-reverse: 0;
-  margin-right: calc(-0.5rem * var(--en-space-x-reverse));
-  margin-left: calc(-0.5rem * calc(1 - var(--en-space-x-reverse)));
+  margin-inline-start: calc(-0.5rem * var(--en-space-x-reverse));
+  margin-inline-end: calc(-0.5rem * calc(1 - var(--en-space-x-reverse)));
 }
 
 .-indent-2 {
@@ -908,8 +908,7 @@ mod tests {
 }
 
 .border-x {
-  border-left-width: 1px;
-  border-right-width: 1px;
+  border-inline-width: 1px;
 }
 
 .border-t-2 {
@@ -993,8 +992,7 @@ mod tests {
             String::from(
                 r"@media (width >= 48rem) {
   .md\:mx-auto {
-    margin-left: auto;
-    margin-right: auto;
+    margin-inline: auto;
   }
 }
 

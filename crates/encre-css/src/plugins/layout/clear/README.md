@@ -8,6 +8,8 @@ Utilities for controlling the wrapping of content around an element.
     </tr>
   </thead>
   <tbody>
+    <tr><td>clear-start</td><td>clear: inline-start;</td></tr>
+    <tr><td>clear-end</td><td>clear: inline-end;</td></tr>
     <tr><td>clear-left</td><td>clear: left;</td></tr>
     <tr><td>clear-right</td><td>clear: right;</td></tr>
     <tr><td>clear-both</td><td>clear: both;</td></tr>

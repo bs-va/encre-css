@@ -60,7 +60,7 @@ impl Plugin for PluginXDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        margin_handle(&["margin-left", "margin-right"], context);
+        margin_handle(&["margin-inline"], context);
     }
 }
 
@@ -73,7 +73,7 @@ impl Plugin for PluginYDefinition {
     }
 
     fn handle(&self, context: &mut ContextHandle) {
-        margin_handle(&["margin-top", "margin-bottom"], context);
+        margin_handle(&["margin-block"], context);
     }
 }
 

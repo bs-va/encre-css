@@ -982,10 +982,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 }
 
 .inset-0 {
-  top: 0px;
-  right: 0px;
-  bottom: 0px;
-  left: 0px;
+  inset: 0px;
 }
 
 .top-48 {
@@ -997,8 +994,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 }
 
 .mx-auto {
-  margin-left: auto;
-  margin-right: auto;
+  margin-inline: auto;
 }
 
 .mt-8 {
@@ -1088,18 +1084,15 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 }
 
 .px-6 {
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  padding-inline: 1.5rem;
 }
 
 .py-12 {
-  padding-top: 3rem;
-  padding-bottom: 3rem;
+  padding-block: 3rem;
 }
 
 .py-8 {
-  padding-top: 2rem;
-  padding-bottom: 2rem;
+  padding-block: 2rem;
 }
 
 .underline {
@@ -1133,8 +1126,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 
 @media (width >= 48rem) {
   .md\:mx-auto {
-    margin-left: auto;
-    margin-right: auto;
+    margin-inline: auto;
   }
 }
 
@@ -1153,8 +1145,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 
 @media (width >= 64rem) {
   .lg\:py-12 {
-    padding-top: 3rem;
-    padding-bottom: 3rem;
+    padding-block: 3rem;
   }
 }
 

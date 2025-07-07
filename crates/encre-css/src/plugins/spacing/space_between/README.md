@@ -8,14 +8,14 @@ Utilities for controlling the space between child elements.
     </tr>
   </thead>
   <tbody>
-    <tr><td>space-x-<i>&lt;float&gt;</i></td><td>margin-left: <i>&lt;float / 4&gt;</i>rem;<br>margin-right: <i>&lt;float / 4&gt;</i>rem;</td></tr>
-    <tr><td>space-x-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>margin-left: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;<br>margin-right: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
-    <tr><td>space-x-px</td><td>margin-left: 1px;<br>margin-right: 1px;</td></tr>
-    <tr><td>space-x-auto</td><td>margin-left: auto;<br>margin-right: auto;</td></tr>
-    <tr><td>space-y-<i>&lt;float&gt;</i></td><td>margin-top: <i>&lt;float / 4&gt;</i>rem;<br>margin-bottom: <i>&lt;float / 4&gt;</i>rem;</td></tr>
-    <tr><td>space-y-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>margin-top: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;<br>margin-bottom: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
-    <tr><td>space-y-px</td><td>margin-top: 1px;<br>margin-bottom: 1px;</td></tr>
-    <tr><td>space-y-auto</td><td>margin-top: auto;<br>margin-bottom: auto;</td></tr>
+    <tr><td>space-x-<i>&lt;float&gt;</i></td><td>margin-inline: <i>&lt;float / 4&gt;</i>rem;</td></tr>
+    <tr><td>space-x-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>margin-inline: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
+    <tr><td>space-x-px</td><td>margin-inline: 1px;</td></tr>
+    <tr><td>space-x-auto</td><td>margin-inline: auto;</td></tr>
+    <tr><td>space-y-<i>&lt;float&gt;</i></td><td>margin-block: <i>&lt;float / 4&gt;</i>rem;</td></tr>
+    <tr><td>space-y-<i>&lt;integer&gt;/&lt;integer&gt;</i></td><td>margin-block: (<i>&lt;integer&gt;/&lt;integer&gt;</i>)%;</td></tr>
+    <tr><td>space-y-px</td><td>margin-block: 1px;</td></tr>
+    <tr><td>space-y-auto</td><td>margin-block: auto;</td></tr>
   </tbody>
 </table>
 

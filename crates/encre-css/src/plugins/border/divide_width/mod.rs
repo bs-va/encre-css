@@ -39,10 +39,10 @@ impl Plugin for PluginXDefinition {
                         context.buffer.lines([
                             format_args!("--en-divide-x-reverse: 0;"),
                             format_args!(
-                                "border-right-width: calc({value}px * var(--en-divide-x-reverse));",
+                                "border-inline-start-width: calc({value}px * var(--en-divide-x-reverse));",
                             ),
                             format_args!(
-                                "border-left-width: calc({value}px * calc(1 - var(--en-divide-x-reverse)));",
+                                "border-inline-end-width: calc({value}px * calc(1 - var(--en-divide-x-reverse)));",
                             ),
                         ]);
                     }
@@ -50,10 +50,10 @@ impl Plugin for PluginXDefinition {
                         context.buffer.lines([
                             format_args!("--en-divide-x-reverse: 0;"),
                             format_args!(
-                                "border-right-width: calc({value} * var(--en-divide-x-reverse));"
+                                "border-inline-start-width: calc({value} * var(--en-divide-x-reverse));"
                             ),
                             format_args!(
-                                "border-left-width: calc({value} * calc(1 - var(--en-divide-x-reverse)));"
+                                "border-inline-end-width: calc({value} * calc(1 - var(--en-divide-x-reverse)));"
                             ),
                         ]);
                     }
@@ -90,10 +90,10 @@ impl Plugin for PluginYDefinition {
                         context.buffer.lines([
                             format_args!("--en-divide-y-reverse: 0;"),
                             format_args!(
-                                "border-top-width: calc({value}px * calc(1 - var(--en-divide-y-reverse)));",
+                                "border-block-start-width: calc({value}px * calc(1 - var(--en-divide-y-reverse)));",
                             ),
                             format_args!(
-                                "border-bottom-width: calc({value}px * var(--en-divide-y-reverse));",
+                                "border-block-end-width: calc({value}px * var(--en-divide-y-reverse));",
                             ),
                         ]);
                     }
@@ -101,10 +101,10 @@ impl Plugin for PluginYDefinition {
                         context.buffer.lines([
                             format_args!("--en-divide-y-reverse: 0;"),
                             format_args!(
-                                "border-top-width: calc({value} * calc(1 - var(--en-divide-y-reverse)));"
+                                "border-block-start-width: calc({value} * calc(1 - var(--en-divide-y-reverse)));"
                             ),
                             format_args!(
-                                "border-bottom-width: calc({value} * var(--en-divide-y-reverse));"
+                                "border-block-end-width: calc({value} * var(--en-divide-y-reverse));"
                             ),
                         ]);
                     }
