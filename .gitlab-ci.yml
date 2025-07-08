@@ -19,8 +19,8 @@ check:test:
     - rustup component add llvm-tools-preview
     - cargo test
     - curl -L https://github.com/mozilla/grcov/releases/latest/download/grcov-x86_64-unknown-linux-musl.tar.bz2 | tar jxf -
-    - ./grcov . --binary-path ./target/debug/ -s . -t html --branch --excl-br-start "mod tests \{|// grcov-ignore-start" --excl-start "mod tests \{|// grcov-ignore-start" --excl-stop "// grcov-ignore-stop" --excl-br-stop "// grcov-ignore-stop" --excl-br-line "#\[derive\(|unreachable!()|todo!()" --excl-line "#\[derive\(|unreachable!()|todo!()" --ignore-not-existing --ignore "*cargo*" -o ./coverage/
-    - ./grcov . --binary-path ./target/debug/ -s . -t lcov --branch --excl-br-start "mod tests \{|// grcov-ignore-start" --excl-start "mod tests \{|// grcov-ignore-start" --excl-stop "// grcov-ignore-stop" --excl-br-stop "// grcov-ignore-stop" --excl-br-line "#\[derive\(|unreachable!()|todo!()" --excl-line "#\[derive\(|unreachable!()|todo!()" --ignore-not-existing --ignore "*cargo*" -o coverage.lcov
+    - ./grcov . --binary-path ./target/debug/ -s . -t html --branch --excl-br-start "mod tests \{|// grcov-ignore-start" --excl-start "mod tests \{|// grcov-ignore-start" --excl-stop "// grcov-ignore-stop" --excl-br-stop "// grcov-ignore-stop" --excl-br-line "#\[derive\(|unreachable!()|todo!()" --excl-line "#\[derive\(|unreachable!()|todo!()" --ignore-not-existing --ignore "*cargo*" --ignore "crates/encre-css-cli/*" -o ./coverage/
+    - ./grcov . --binary-path ./target/debug/ -s . -t lcov --branch --excl-br-start "mod tests \{|// grcov-ignore-start" --excl-start "mod tests \{|// grcov-ignore-start" --excl-stop "// grcov-ignore-stop" --excl-br-stop "// grcov-ignore-stop" --excl-br-line "#\[derive\(|unreachable!()|todo!()" --excl-line "#\[derive\(|unreachable!()|todo!()" --ignore-not-existing --ignore "*cargo*" --ignore "crates/encre-css-cli/*" -o coverage.lcov
     - apt-get update && apt-get install -y lcov
     - lcov --summary coverage.lcov
   coverage: '/\s*lines\.*:\s*([\d\.]+%)/'

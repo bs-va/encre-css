@@ -124,6 +124,38 @@ mod tests {
     }
 
     #[test]
+    fn margin() {
+        assert_eq!(
+            generate(["scroll-m-2"], &base_config()),
+            ".scroll-m-2 {
+  scroll-margin: 0.5rem;
+}"
+        );
+        assert_eq!(
+            generate(["scroll-mx-[2px]"], &base_config()),
+            r".scroll-mx-\[2px\] {
+  scroll-margin-inline: 2px;
+}"
+        );
+    }
+
+    #[test]
+    fn padding() {
+        assert_eq!(
+            generate(["scroll-p-2"], &base_config()),
+            ".scroll-p-2 {
+  scroll-padding: 0.5rem;
+}"
+        );
+        assert_eq!(
+            generate(["scroll-px-[2px]"], &base_config()),
+            r".scroll-px-\[2px\] {
+  scroll-padding-inline: 2px;
+}"
+        );
+    }
+
+    #[test]
     fn scroll_snap_align() {
         assert_eq!(
             generate(["snap-center"], &base_config()),

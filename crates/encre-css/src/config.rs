@@ -703,7 +703,7 @@ pub const BUILTIN_CONTAINERS: &[(&str, &str)] = &[
 ///
 /// Based on [Tailwind's default variants](https://tailwindcss.com/docs/hover-focus-and-other-states).
 #[rustfmt::skip]
-pub const BUILTIN_VARIANTS: phf::OrderedMap<&'static str, Variant> = const {
+pub const BUILTIN_VARIANTS: phf::OrderedMap<&'static str, Variant> = {
     let mut counter = 0;
 
     phf_ordered_map! {

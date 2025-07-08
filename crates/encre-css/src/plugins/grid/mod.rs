@@ -16,6 +16,7 @@ mod tests {
 
     #[test]
     fn gap() {
+        // gap
         assert_eq!(
             generate(["gap-4"], &base_config()),
             ".gap-4 {
@@ -32,6 +33,46 @@ mod tests {
             generate(["gap-[40px]"], &base_config()),
             r".gap-\[40px\] {
   gap: 40px;
+}"
+        );
+
+        // gap-x
+        assert_eq!(
+            generate(["gap-x-4"], &base_config()),
+            ".gap-x-4 {
+  column-gap: 1rem;
+}"
+        );
+        assert_eq!(
+            generate(["-gap-x-4"], &base_config()),
+            ".-gap-x-4 {
+  column-gap: -1rem;
+}"
+        );
+        assert_eq!(
+            generate(["gap-x-[40px]"], &base_config()),
+            r".gap-x-\[40px\] {
+  column-gap: 40px;
+}"
+        );
+
+        // gap-y
+        assert_eq!(
+            generate(["gap-y-4"], &base_config()),
+            ".gap-y-4 {
+  row-gap: 1rem;
+}"
+        );
+        assert_eq!(
+            generate(["-gap-y-4"], &base_config()),
+            ".-gap-y-4 {
+  row-gap: -1rem;
+}"
+        );
+        assert_eq!(
+            generate(["gap-y-[40px]"], &base_config()),
+            r".gap-y-\[40px\] {
+  row-gap: 40px;
 }"
         );
     }

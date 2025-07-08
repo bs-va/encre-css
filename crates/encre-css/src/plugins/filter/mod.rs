@@ -338,6 +338,18 @@ mod tests {
     }
 
     #[test]
+    fn backdrop_saturate() {
+        assert_eq!(
+            generate(["backdrop-saturate-20"], &base_config()),
+            ".backdrop-saturate-20 {
+  --en-backdrop-saturate: saturate(0.2);
+  -webkit-backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
+  backdrop-filter: var(--en-backdrop-blur) var(--en-backdrop-brightness) var(--en-backdrop-contrast) var(--en-backdrop-grayscale) var(--en-backdrop-hue-rotate) var(--en-backdrop-invert) var(--en-backdrop-opacity) var(--en-backdrop-saturate) var(--en-backdrop-sepia);
+}"
+        );
+    }
+
+    #[test]
     fn backdrop_sepia() {
         assert_eq!(
             generate(["backdrop-sepia-20"], &base_config()),

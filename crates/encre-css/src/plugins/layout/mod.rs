@@ -131,6 +131,20 @@ mod tests {
   clear: both;
 }"
         );
+
+        assert_eq!(
+            generate(["clear-start"], &base_config()),
+            ".clear-start {
+  clear: inline-start;
+}"
+        );
+
+        assert_eq!(
+            generate(["clear-end"], &base_config()),
+            ".clear-end {
+  clear: inline-end;
+}"
+        );
     }
 
     #[test]
@@ -211,6 +225,20 @@ mod tests {
             generate(["float-right"], &base_config()),
             ".float-right {
   float: right;
+}"
+        );
+
+        assert_eq!(
+            generate(["float-start"], &base_config()),
+            ".float-start {
+  float: inline-start;
+}"
+        );
+
+        assert_eq!(
+            generate(["float-end"], &base_config()),
+            ".float-end {
+  float: inline-end;
 }"
         );
     }
@@ -404,13 +432,17 @@ mod tests {
     #[test]
     fn at_container() {
         assert_eq!(
-            generate(["@container @md:bg-red-300"], &base_config()),
-            ".\\@container {
+            generate(["@container @container-[size_scroll-state] @md:bg-red-300"], &base_config()),
+            r".\@container {
   container-type: inline-size;
 }
 
+.\@container-\[size_scroll-state\] {
+  container-type: size scroll-state;
+}
+
 @container (width >= 28rem) {
-  .\\@md\\:bg-red-300 {
+  .\@md\:bg-red-300 {
     background-color: oklch(80.8% .114 19.571);
   }
 }"

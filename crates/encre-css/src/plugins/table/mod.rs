@@ -77,4 +77,21 @@ mod tests {
 }"
         );
     }
+
+    #[test]
+    fn caption_side() {
+        assert_eq!(
+            generate(["caption-top"], &base_config()),
+            ".caption-top {
+  caption-side: top;
+}"
+        );
+
+        assert_eq!(
+            generate(["caption-bottom"], &base_config()),
+            ".caption-bottom {
+  caption-side: bottom;
+}"
+        );
+    }
 }
