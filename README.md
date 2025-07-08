@@ -46,9 +46,11 @@
   </a>
 </div>
 
-> Since v0.16.0, this library only supports Tailwind v4.0.
-> If you are using Tailwind v3.0, check the upgrade guide at
+> Since v0.16.0, this library only supports TailwindCSS v4.0.
+> If you are using TailwindCSS v3.0, check the upgrade guide at
 > https://tailwindcss.com/docs/upgrade-guide or pin `encre-css` to v0.15.0.
+>
+> This is **not** a project made by the TailwindCSS team.
 
 ## Table of contents
 
