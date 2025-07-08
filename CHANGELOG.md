@@ -2,6 +2,48 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.16.0] - 2025-07-08
+
+### Bug Fixes
+
+- Update `space-between` plugin to support TailwindCSS v4.0
+- [**breaking**] Update the preflight to support TailwindCSS v4.0 (Preflight::Full::{border,ring,placeholder}_color are removed)
+- [**breaking**] Apply variants from right to left to support Tailwind v4.0
+
+### Documentation
+
+- Update readme
+- Update some documentation comments
+- Update the README example
+- Update README example
+- Clarify the README
+
+### Features
+
+- Use oklch colors and update to TailwindCSS v4.0's color palette
+- Enable oklab color interpolation in gradients to support TailwindCSS v4.0
+- Add support for all variants of TailwindCSS v4.0
+- Add support for the `@container` rule
+- Add support for named groups and peers in variants to support TailwindCSS v4.0
+- [**breaking**] Add support for prefixed variants like `supports-[display:flex]` to support Tailwind v4.0
+- Use CSS logical properties where it's relevant
+
+### Miscellaneous Tasks
+
+- [**breaking**] Remove *-opacity classes to support TailwindCSS v4.0
+- Fix Clippy warnings
+- Update crates
+- Fix Clippy warnings
+- Improve fuzz testing
+
+### Refactor
+
+- [**breaking**] Simplify the creation and use of `Variant`s
+
+### Testing
+
+- Improve test coverage
+
 ## [0.15.0] - 2025-07-04
 
 ### Documentation
@@ -12,6 +54,10 @@ All notable changes to this project will be documented in this file.
 
 - Add a Cargo feature to disable the filesystem cache
 - Support embedding icons in the binary
+
+### Miscellaneous Tasks
+
+- Publish encre-css v0.15.0, encre-css-cli v0.15.0, encre-css-typography v0.1.5 and encre-css-icons v0.2.0
 
 ## [0.14.1] - 2024-09-01
 
