@@ -1,6 +1,6 @@
 [package]
 name = "encre-css-icons"
-version = "0.3.0"
+version = "0.3.1"
 description = "Quickly add pure CSS icons to your website"
 authors = ["nifou <nifou@mailfence.com>"]
 license = "MIT"
