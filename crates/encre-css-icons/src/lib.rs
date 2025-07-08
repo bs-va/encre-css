@@ -579,34 +579,38 @@ impl Plugin for Icons {
                 }
 
                 #[cfg(not(target_arch = "wasm32"))]
-                if let Some(((width, height), icon_data_uri)) = get_icon(
-                    context.config,
-                    MEM_CACHE.lock().unwrap().get(collection).unwrap(),
-                    icon,
-                ) {
-                    if icon_data_uri.contains("currentColor") {
-                        // From https://codepen.io/noahblon/post/coloring-svgs-in-css-background-images
+                if let Some(coll) = MEM_CACHE.lock().unwrap().get(collection) {
+                    if let Some(((width, height), icon_data_uri)) =
+                        get_icon(context.config, coll, icon)
+                    {
+                        if icon_data_uri.contains("currentColor") {
+                            // From https://codepen.io/noahblon/post/coloring-svgs-in-css-background-images
+                            context.buffer.lines([
+                                format_args!(r#"--en-icon: url("{icon_data_uri}");"#),
+                                format_args!("mask: var(--en-icon) no-repeat;"),
+                                format_args!("mask-size: 100% 100%;"),
+                                format_args!("-webkit-mask: var(--en-icon) no-repeat;"),
+                                format_args!("-webkit-mask-size: 100% 100%;"),
+                                format_args!("background-color: currentColor;"),
+                            ]);
+                        } else {
+                            context.buffer.lines([
+                                format_args!(
+                                    r#"background: url("{icon_data_uri}") no-repeat center;"#
+                                ),
+                                format_args!("background-color: transparent;"),
+                                format_args!("background-size: 100% 100%;"),
+                            ]);
+                        }
+
                         context.buffer.lines([
-                            format_args!(r#"--en-icon: url("{icon_data_uri}");"#),
-                            format_args!("mask: var(--en-icon) no-repeat;"),
-                            format_args!("mask-size: 100% 100%;"),
-                            format_args!("-webkit-mask: var(--en-icon) no-repeat;"),
-                            format_args!("-webkit-mask-size: 100% 100%;"),
-                            format_args!("background-color: currentColor;"),
-                        ]);
-                    } else {
-                        context.buffer.lines([
-                            format_args!(r#"background: url("{icon_data_uri}") no-repeat center;"#),
-                            format_args!("background-color: transparent;"),
-                            format_args!("background-size: 100% 100%;"),
+                            format_args!("display: inline-block;"),
+                            format_args!("width: {width};"),
+                            format_args!("height: {height};"),
                         ]);
                     }
-
-                    context.buffer.lines([
-                        format_args!("display: inline-block;"),
-                        format_args!("width: {width};"),
-                        format_args!("height: {height};"),
-                    ]);
+                } else {
+                    println!("encre_css_icons: Warning: the collection `{collection}` is not loaded but referenced. It can happen if you embed icons in the binary and forgot to add the JSON file containing the icons in the directory you specified");
                 }
             }
             Modifier::Arbitrary { .. } => unreachable!(),
