@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.16.1] - 2025-07-11
+
+### Bug Fixes
+
+- Improve the message when a collection is not loaded but referenced when embedding icons
+- Backdrop filters not working due to missing global CSS variable
+- Wrong spacing around containers having `divide-width` or `space-between` utilities on Y-axis
+
+### Documentation
+
+- Fix typo
+- Fix HTML in docs
+
 ## [0.16.0] - 2025-07-08
 
 ### Bug Fixes

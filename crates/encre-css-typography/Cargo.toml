@@ -1,6 +1,6 @@
 [package]
 name = "encre-css-typography"
-version = "0.2.0"
+version = "0.2.1"
 description = "Define beautiful typographic defaults for HTML you don't control"
 authors = ["nifou <nifou@mailfence.com>"]
 license = "MIT"
