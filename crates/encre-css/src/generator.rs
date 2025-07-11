@@ -378,15 +378,15 @@ mod tests {
 @media (width >= 80rem) {
   .xl\:\[\&_\>_\*\]\:divide-y-2 > * > :not([hidden]) ~ :not([hidden]) {
     --en-divide-y-reverse: 0;
-    border-block-start-width: calc(2px * calc(1 - var(--en-divide-y-reverse)));
-    border-block-end-width: calc(2px * var(--en-divide-y-reverse));
+    border-block-start-width: calc(2px * var(--en-divide-y-reverse));
+    border-block-end-width: calc(2px * calc(1 - var(--en-divide-y-reverse)));
   }
 }
 
 .\[\&\:has\(\.class\)_\>_\*\]\:space-y-3:has(.class) > * > :not(:last-child) {
   --en-space-y-reverse: 0;
-  margin-block-start: calc(0.75rem * calc(1 - var(--en-space-y-reverse)));
-  margin-block-end: calc(0.75rem * var(--en-space-y-reverse));
+  margin-block-start: calc(0.75rem * var(--en-space-y-reverse));
+  margin-block-end: calc(0.75rem * calc(1 - var(--en-space-y-reverse)));
 }"
             )
         );

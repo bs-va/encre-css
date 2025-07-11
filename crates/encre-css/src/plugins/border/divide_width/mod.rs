@@ -90,10 +90,10 @@ impl Plugin for PluginYDefinition {
                         context.buffer.lines([
                             format_args!("--en-divide-y-reverse: 0;"),
                             format_args!(
-                                "border-block-start-width: calc({value}px * calc(1 - var(--en-divide-y-reverse)));",
+                                "border-block-start-width: calc({value}px * var(--en-divide-y-reverse));",
                             ),
                             format_args!(
-                                "border-block-end-width: calc({value}px * var(--en-divide-y-reverse));",
+                                "border-block-end-width: calc({value}px * calc(1 - var(--en-divide-y-reverse)));",
                             ),
                         ]);
                     }
@@ -101,10 +101,10 @@ impl Plugin for PluginYDefinition {
                         context.buffer.lines([
                             format_args!("--en-divide-y-reverse: 0;"),
                             format_args!(
-                                "border-block-start-width: calc({value} * calc(1 - var(--en-divide-y-reverse)));"
+                                "border-block-start-width: calc({value} * var(--en-divide-y-reverse));"
                             ),
                             format_args!(
-                                "border-block-end-width: calc({value} * var(--en-divide-y-reverse));"
+                                "border-block-end-width: calc({value} * calc(1 - var(--en-divide-y-reverse)));"
                             ),
                         ]);
                     }

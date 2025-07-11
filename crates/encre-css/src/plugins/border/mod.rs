@@ -258,8 +258,8 @@ mod tests {
             generate(["divide-y-2"], &base_config()),
             ".divide-y-2 > :not([hidden]) ~ :not([hidden]) {
   --en-divide-y-reverse: 0;
-  border-block-start-width: calc(2px * calc(1 - var(--en-divide-y-reverse)));
-  border-block-end-width: calc(2px * var(--en-divide-y-reverse));
+  border-block-start-width: calc(2px * var(--en-divide-y-reverse));
+  border-block-end-width: calc(2px * calc(1 - var(--en-divide-y-reverse)));
 }"
         );
         assert_eq!(
@@ -272,8 +272,8 @@ mod tests {
             generate(["divide-y-[0.1rem]"], &base_config()),
             r".divide-y-\[0\.1rem\] > :not([hidden]) ~ :not([hidden]) {
   --en-divide-y-reverse: 0;
-  border-block-start-width: calc(0.1rem * calc(1 - var(--en-divide-y-reverse)));
-  border-block-end-width: calc(0.1rem * var(--en-divide-y-reverse));
+  border-block-start-width: calc(0.1rem * var(--en-divide-y-reverse));
+  border-block-end-width: calc(0.1rem * calc(1 - var(--en-divide-y-reverse)));
 }"
         );
         assert_eq!(

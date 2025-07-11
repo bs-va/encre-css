@@ -99,8 +99,8 @@ mod tests {
             generate(["space-y-[12%]"], &base_config()),
             r".space-y-\[12\%\] > :not(:last-child) {
   --en-space-y-reverse: 0;
-  margin-block-start: calc(12% * calc(1 - var(--en-space-y-reverse)));
-  margin-block-end: calc(12% * var(--en-space-y-reverse));
+  margin-block-start: calc(12% * var(--en-space-y-reverse));
+  margin-block-end: calc(12% * calc(1 - var(--en-space-y-reverse)));
 }"
         );
     }
