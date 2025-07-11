@@ -1792,7 +1792,7 @@ impl Config {
     /// }"));
     /// ```
     ///
-    /// You can also make a prefixed variant, that is a variant which as a prefix and an arbitrary
+    /// You can also make a prefixed variant, that is a variant which has a prefix and an arbitrary
     /// value delimited by square brackets. When defining this kind of variant, you need to call
     /// [`Variant::with_prefixed`] and to insert the placeholder `{}` in the variant
     /// template, it will be replaced with the given arbitrary value.
