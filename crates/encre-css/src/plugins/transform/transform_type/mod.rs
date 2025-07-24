@@ -21,7 +21,7 @@ impl Plugin for PluginDefinition {
         match context.modifier {
             Modifier::Builtin { value, .. } => match *value {
                 "" | "cpu" => context.buffer.line(CSS_TRANSFORM),
-                "gpu" => context.buffer.line("transform: translate3d(var(--en-translate-x), var(--en-translate-y), 0) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));"),
+                "gpu" => context.buffer.line("transform: translate3d(var(--en-translate-x), var(--en-translate-y), var(--en-translate-z)) rotateX(var(--en-rotate-x)) rotateY(var(--en-rotate-y)) rotateZ(var(--en-rotate-z)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scale3d(var(--en-scale-x), var(--en-scale-y), var(--en-scale-z));"),
                 "none" => context.buffer.line("transform: none;"),
                 _ => unreachable!(),
             },

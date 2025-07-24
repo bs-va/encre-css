@@ -182,11 +182,15 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   --en-border-spacing-y: 0;
   --en-translate-x: 0;
   --en-translate-y: 0;
-  --en-rotate: 0;
+  --en-translate-z: 0;
+  --en-rotate-x: 0;
+  --en-rotate-y: 0;
+  --en-rotate-z: 0;
   --en-skew-x: 0;
   --en-skew-y: 0;
   --en-scale-x: 1;
   --en-scale-y: 1;
+  --en-scale-z: 1;
   --en-pan-x: ;
   --en-pan-y: ;
   --en-pinch-zoom: ;
@@ -229,11 +233,15 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   --en-border-spacing-y: 0;
   --en-translate-x: 0;
   --en-translate-y: 0;
-  --en-rotate: 0;
+  --en-translate-z: 0;
+  --en-rotate-x: 0;
+  --en-rotate-y: 0;
+  --en-rotate-z: 0;
   --en-skew-x: 0;
   --en-skew-y: 0;
   --en-scale-x: 1;
   --en-scale-y: 1;
+  --en-scale-z: 1;
   --en-pan-x: ;
   --en-pan-y: ;
   --en-pinch-zoom: ;
@@ -276,11 +284,15 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
   --en-border-spacing-y: 0;
   --en-translate-x: 0;
   --en-translate-y: 0;
-  --en-rotate: 0;
+  --en-translate-z: 0;
+  --en-rotate-x: 0;
+  --en-rotate-y: 0;
+  --en-rotate-z: 0;
   --en-skew-x: 0;
   --en-skew-y: 0;
   --en-scale-x: 1;
   --en-scale-y: 1;
+  --en-scale-z: 1;
   --en-pan-x: ;
   --en-pan-y: ;
   --en-pinch-zoom: ;
@@ -1042,12 +1054,12 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 
 .-translate-x-2\/3 {
   --en-translate-x: -66.666667%;
-  transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
+  transform: translate3d(var(--en-translate-x), var(--en-translate-y), var(--en-translate-z)) rotateX(var(--en-rotate-x)) rotateY(var(--en-rotate-y)) rotateZ(var(--en-rotate-z)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scale3d(var(--en-scale-x), var(--en-scale-y), var(--en-scale-z));
 }
 
 .-translate-y-1\/2 {
   --en-translate-y: -50%;
-  transform: translate(var(--en-translate-x), var(--en-translate-y)) rotate(var(--en-rotate)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scaleX(var(--en-scale-x)) scaleY(var(--en-scale-y));
+  transform: translate3d(var(--en-translate-x), var(--en-translate-y), var(--en-translate-z)) rotateX(var(--en-rotate-x)) rotateY(var(--en-rotate-y)) rotateZ(var(--en-rotate-z)) skewX(var(--en-skew-x)) skewY(var(--en-skew-y)) scale3d(var(--en-scale-x), var(--en-scale-y), var(--en-scale-z));
 }
 
 .flex-col {

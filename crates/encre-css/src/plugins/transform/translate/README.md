@@ -10,6 +10,7 @@ Utilities for translating elements with transform.
   <tbody>
     <tr><td>translate-x-<i>&lt;integer&gt;</i></td><td>transform: translateX(<i>&lt;integer&gt;</i>px);</td></tr>
     <tr><td>translate-y-<i>&lt;integer&gt;</i></td><td>transform: translateY(<i>&lt;integer&gt;</i>px);</td></tr>
+    <tr><td>translate-z-<i>&lt;integer&gt;</i></td><td>transform: translateZ(<i>&lt;integer&gt;</i>px);</td></tr>
   </tbody>
 </table>
 

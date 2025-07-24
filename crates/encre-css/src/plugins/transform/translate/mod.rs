@@ -64,3 +64,16 @@ impl Plugin for PluginYDefinition {
         translate_handle("--en-translate-y", context);
     }
 }
+
+#[derive(Debug)]
+pub(crate) struct PluginZDefinition;
+
+impl Plugin for PluginZDefinition {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        translate_can_handle(&context)
+    }
+
+    fn handle(&self, context: &mut ContextHandle) {
+        translate_handle("--en-translate-z", context);
+    }
+}

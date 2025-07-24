@@ -9,6 +9,9 @@ Utilities for rotating elements with transform.
   </thead>
   <tbody>
     <tr><td>rotate-<i>&lt;integer&gt;</i></td><td>transform: rotate(<i>&lt;integer&gt;</i>deg);</td></tr>
+    <tr><td>rotate-x-<i>&lt;integer&gt;</i></td><td>transform: rotateX(<i>&lt;integer&gt;</i>deg);</td></tr>
+    <tr><td>rotate-y-<i>&lt;integer&gt;</i></td><td>transform: rotateY(<i>&lt;integer&gt;</i>deg);</td></tr>
+    <tr><td>rotate-z-<i>&lt;integer&gt;</i></td><td>transform: rotateZ(<i>&lt;integer&gt;</i>deg);</td></tr>
   </tbody>
 </table>
 
