@@ -872,6 +872,8 @@ pub const BUILTIN_PLUGINS: &[(Cow<'static, str>, &'static (dyn Plugin + Send + S
     (Cow::Borrowed("border-spacing-x"), &table::border_spacing::PluginXDefinition),
     (Cow::Borrowed("border-spacing-y"), &table::border_spacing::PluginYDefinition),
     (Cow::Borrowed("origin"), &transform::transform_origin::PluginDefinition),
+    (Cow::Borrowed("perspective-origin"), &transform::perspective_origin::PluginDefinition),
+    (Cow::Borrowed("perspective"), &transform::perspective::PluginDefinition),
     (Cow::Borrowed("translate-x"), &transform::translate::PluginXDefinition),
     (Cow::Borrowed("translate-y"), &transform::translate::PluginYDefinition),
     (Cow::Borrowed("rotate"), &transform::rotate::PluginDefinition),

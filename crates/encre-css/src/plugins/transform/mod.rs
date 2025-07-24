@@ -1,4 +1,6 @@
 //! Transform utilities
+pub mod perspective;
+pub mod perspective_origin;
 pub mod rotate;
 pub mod scale;
 pub mod skew;
@@ -13,6 +15,26 @@ mod tests {
     use crate::{generate, utils::testing::base_config};
 
     use pretty_assertions::assert_eq;
+
+    #[test]
+    fn perspective() {
+        assert_eq!(generate(["perspective-distant"], &base_config()), ".perspective-distant {
+  perspective: 1200px;
+}");
+        assert_eq!(generate(["perspective-[0.1rem]"], &base_config()), r".perspective-\[0\.1rem\] {
+  perspective: 0.1rem;
+}");
+    }
+
+    #[test]
+    fn perspective_origin() {
+        assert_eq!(generate(["perspective-origin-top-left"], &base_config()), ".perspective-origin-top-left {
+  perspective-origin: top left;
+}");
+        assert_eq!(generate(["perspective-origin-[0.1rem_center]"], &base_config()), r".perspective-origin-\[0\.1rem_center\] {
+  perspective-origin: 0.1rem center;
+}");
+    }
 
     #[test]
     fn rotate() {
