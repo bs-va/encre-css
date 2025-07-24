@@ -29,7 +29,7 @@ impl Plugin for PluginDefinition {
             Modifier::Builtin { value, .. } => {
                 context
                     .buffer
-                    .line(format_args!("transform-origin: {value};"));
+                    .line(format_args!("transform-origin: {};", value.replace('-', " ")));
             }
             Modifier::Arbitrary { value, .. } => {
                 context

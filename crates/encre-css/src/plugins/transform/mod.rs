@@ -145,6 +145,12 @@ mod tests {
 }"
         );
         assert_eq!(
+            generate(["origin-top-left"], &base_config()),
+            ".origin-top-left {
+  transform-origin: top left;
+}"
+        );
+        assert_eq!(
             generate(["origin-[bottom_right_60px]"], &base_config()),
             r".origin-\[bottom_right_60px\] {
   transform-origin: bottom right 60px;
