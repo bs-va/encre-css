@@ -1029,6 +1029,8 @@ pub const BUILTIN_PLUGINS: &[(Cow<'static, str>, &'static (dyn Plugin + Send + S
     (Cow::Borrowed("opacity"), &effect::opacity::PluginDefinition),
     (Cow::Borrowed("bg-blend"), &effect::background_blend_mode::PluginDefinition),
     (Cow::Borrowed("mix-blend"), &effect::mix_blend_mode::PluginDefinition),
+    (Cow::Borrowed("text-shadow"), &effect::text_shadow::PluginDefinition),
+    (Cow::Borrowed("text-shadow"), &effect::text_shadow_color::PluginDefinition),
     (Cow::Borrowed("shadow"), &effect::box_shadow::PluginDefinition),
     (Cow::Borrowed("shadow"), &effect::box_shadow_color::PluginDefinition),
     (Cow::Borrowed("outline"), &border::outline_style::PluginDefinition),

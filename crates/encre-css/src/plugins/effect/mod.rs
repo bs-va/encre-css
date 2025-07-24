@@ -2,6 +2,8 @@
 pub mod background_blend_mode;
 pub mod box_shadow;
 pub mod box_shadow_color;
+pub mod text_shadow;
+pub mod text_shadow_color;
 pub mod mix_blend_mode;
 pub mod opacity;
 
@@ -71,14 +73,56 @@ mod tests {
             generate(["shadow-red-400"], &base_config()),
             ".shadow-red-400 {
   --en-shadow-color: oklch(70.4% .191 22.216);
-  --en-shadow: var(--en-shadow-colored);
 }"
         );
         assert_eq!(
             generate(["shadow-[rgb(12,12,12)]"], &base_config()),
             r".shadow-\[rgb\(12\,12\,12\)\] {
   --en-shadow-color: rgb(12,12,12);
-  --en-shadow: var(--en-shadow-colored);
+}"
+        );
+    }
+
+    #[test]
+    fn text_shadow() {
+        assert_eq!(
+            generate(["text-shadow-2xs"], &base_config()),
+            ".text-shadow-2xs {
+  text-shadow: 0px 1px 0px var(--en-text-shadow-color, rgb(0 0 0 / 0.15));
+}"
+        );
+        assert_eq!(
+            generate(["text-shadow-sm"], &base_config()),
+            ".text-shadow-sm {
+  text-shadow: 0px 1px 0px var(--en-text-shadow-color, rgb(0 0 0 / 0.075)), 0px 1px 1px var(--en-text-shadow-color, rgb(0 0 0 / 0.075)), 0px 2px 2px var(--en-text-shadow-color, rgb(0 0 0 / 0.075));
+}"
+        );
+        assert_eq!(
+            generate(["text-shadow-none"], &base_config()),
+            ".text-shadow-none {
+  text-shadow: none;
+}"
+        );
+        assert_eq!(
+            generate(["text-shadow-[12px_3rem_12rem_#f00]"], &base_config()),
+            r".text-shadow-\[12px_3rem_12rem_\#f00\] {
+  text-shadow: 12px 3rem 12rem var(--en-text-shadow-color, #f00);
+}"
+        );
+    }
+
+    #[test]
+    fn text_shadow_color() {
+        assert_eq!(
+            generate(["text-shadow-red-400"], &base_config()),
+            ".text-shadow-red-400 {
+  --en-text-shadow-color: oklch(70.4% .191 22.216);
+}"
+        );
+        assert_eq!(
+            generate(["text-shadow-[rgb(12,12,12)]"], &base_config()),
+            r".text-shadow-\[rgb\(12\,12\,12\)\] {
+  --en-text-shadow-color: rgb(12,12,12);
 }"
         );
     }
