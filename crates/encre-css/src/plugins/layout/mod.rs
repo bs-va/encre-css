@@ -284,9 +284,9 @@ mod tests {
 }"
         );
         assert_eq!(
-            generate(["object-left-top"], &base_config()),
-            ".object-left-top {
-  object-position: left top;
+            generate(["object-top-left"], &base_config()),
+            ".object-top-left {
+  object-position: top left;
 }"
         );
         assert_eq!(
