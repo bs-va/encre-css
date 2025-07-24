@@ -22,62 +22,53 @@ impl Plugin for PluginDefinition {
             Modifier::Builtin { value, .. } => match *value {
                 "2xs" => {
                     context.buffer.lines([
-                        "--en-shadow: 0 1px rgb(0 0 0 / 0.05);",
-                        "--en-shadow-colored: 0 1px var(--en-shadow-color);",
+                        "--en-shadow: 0 1px var(--en-shadow-color, rgb(0 0 0 / 0.05));",
                     ]);
                 }
                 "xs" => {
                     context.buffer.lines([
-                        "--en-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);",
-                        "--en-shadow-colored: 0 1px 2px 0 var(--en-shadow-color);",
+                        "--en-shadow: 0 1px 2px 0 var(--en-shadow-color, rgb(0 0 0 / 0.05));",
                     ]);
                 }
                 "sm" => {
                     context.buffer.lines([
-                        "--en-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);",
-                        "--en-shadow-colored: 0 1px 3px 0 var(--en-shadow-color), 0 1px 2px -1px var(--en-shadow-color);",
+                        "--en-shadow: 0 1px 3px 0 var(--en-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--en-shadow-color, rgb(0 0 0 / 0.1));",
                     ]);
                 }
                 "md" => {
                     context.buffer.lines([
-                        "--en-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);",
-                        "--en-shadow-colored: 0 4px 6px -1px var(--en-shadow-color), 0 2px 4px -2px var(--en-shadow-color);",
+                        "--en-shadow: 0 4px 6px -1px var(--en-shadow-color, rgb(0 0 0 / 0.1)), 0 2px 4px -2px var(--en-shadow-color, rgb(0 0 0 / 0.1));",
                     ]);
                 }
                 "lg" => {
                     context.buffer.lines([
-                        "--en-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);",
-                        "--en-shadow-colored: 0 10px 15px -3px var(--en-shadow-color), 0 4px 6px -4px var(--en-shadow-color);",
+                        "--en-shadow: 0 10px 15px -3px var(--en-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--en-shadow-color, rgb(0 0 0 / 0.1));",
                     ]);
                 }
                 "xl" => {
                     context.buffer.lines([
-                        "--en-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);",
-                        "--en-shadow-colored: 0 20px 25px -5px var(--en-shadow-color), 0 8px 10px -6px var(--en-shadow-color);",
+                        "--en-shadow: 0 20px 25px -5px var(--en-shadow-color, rgb(0 0 0 / 0.1)), 0 8px 10px -6px var(--en-shadow-color, rgb(0 0 0 / 0.1));",
                     ]);
                 }
                 "2xl" => {
                     context.buffer.lines([
-                        "--en-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);",
-                        "--en-shadow-colored: 0 25px 50px -12px var(--en-shadow-color);",
+                        "--en-shadow: 0 25px 50px -12px var(--en-shadow-color, rgb(0 0 0 / 0.25));",
                     ]);
                 }
                 "inner" => {
                     context.buffer.lines([
-                        "--en-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);",
-                        "--en-shadow-colored: inset 0 2px 4px 0 var(--en-shadow-color);",
+                        "--en-shadow: inset 0 2px 4px 0 var(--en-shadow-color, rgb(0 0 0 / 0.05));",
                     ]);
                 }
                 "none" => return context.buffer.line("box-shadow: none;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
-                context.buffer.line(format_args!("--en-shadow: {value};"));
                 let mut shadow = shadow::ShadowList::parse(value).unwrap();
-                shadow.replace_all_colors("var(--en-shadow-color)");
+                shadow.replace_all_colors("var(--en-shadow-color, {})");
                 context
                     .buffer
-                    .line(format_args!("--en-shadow-colored: {shadow};"));
+                    .line(format_args!("--en-shadow: {shadow};"));
             }
         }
 

@@ -1,7 +1,7 @@
 //! Shadow parsing utility functions.
 use super::value_matchers::{is_matching_color, is_matching_length, is_matching_var};
 
-use std::fmt;
+use std::{borrow::Cow, fmt};
 
 const SHADOW_KEYWORDS: [&str; 5] = ["none", "inherit", "initial", "revert", "unset"];
 
@@ -14,14 +14,14 @@ enum Shadow<'a> {
         is_inset: bool,
         offset_x: &'a str,
         offset_y: &'a str,
-        color: &'a str,
+        color: Cow<'a, str>,
     },
     Shorthand2 {
         is_inset: bool,
         offset_x: &'a str,
         offset_y: &'a str,
         blur_radius: &'a str,
-        color: &'a str,
+        color: Cow<'a, str>,
     },
     Full {
         is_inset: bool,
@@ -29,7 +29,7 @@ enum Shadow<'a> {
         offset_y: &'a str,
         blur_radius: &'a str,
         spread_radius: &'a str,
-        color: &'a str,
+        color: Cow<'a, str>,
     },
 }
 
@@ -77,7 +77,7 @@ impl Shadow<'_> {
                         is_inset,
                         offset_x: shadow[0],
                         offset_y: shadow[1],
-                        color: shadow[2],
+                        color: Cow::Borrowed(shadow[2]),
                     })
                 } else {
                     None
@@ -94,7 +94,7 @@ impl Shadow<'_> {
                         offset_x: shadow[0],
                         offset_y: shadow[1],
                         blur_radius: shadow[2],
-                        color: shadow[3],
+                        color: Cow::Borrowed(shadow[3]),
                     })
                 } else {
                     None
@@ -113,7 +113,7 @@ impl Shadow<'_> {
                         offset_y: shadow[1],
                         blur_radius: shadow[2],
                         spread_radius: shadow[3],
-                        color: shadow[4],
+                        color: Cow::Borrowed(shadow[4]),
                     })
                 } else {
                     None
@@ -268,11 +268,13 @@ impl<'a> ShadowList<'a> {
     }
 
     /// Replace the color of all shadows with the color given as the first argument.
+    ///
+    /// If the given color contains `{}`, it will be replaced by the old color.
     pub fn replace_all_colors(&mut self, new_color: &'a str) {
         self.0.iter_mut().for_each(|shadow| match shadow {
             Shadow::Shorthand1 { ref mut color, .. }
             | Shadow::Shorthand2 { ref mut color, .. }
-            | Shadow::Full { ref mut color, .. } => *color = new_color,
+            | Shadow::Full { ref mut color, .. } => *color = Cow::Owned(new_color.replace("{}", color)),
             _ => (),
         });
     }
@@ -305,20 +307,20 @@ mod tests {
                     offset_y: "35px",
                     blur_radius: "60px",
                     spread_radius: "-15px",
-                    color: "rgba(0,0,0,0.3)",
+                    color: Cow::Borrowed("rgba(0,0,0,0.3)"),
                 },
                 Shadow::Shorthand1 {
                     is_inset: false,
                     offset_x: "0",
                     offset_y: "72px",
-                    color: "rgba(0,2,42,0.2)",
+                    color: Cow::Borrowed("rgba(0,2,42,0.2)"),
                 },
                 Shadow::Shorthand2 {
                     is_inset: true,
                     offset_x: "23px",
                     offset_y: "42em",
                     blur_radius: "42px",
-                    color: "rgba(255,0,0,1)",
+                    color: Cow::Borrowed("rgba(255,0,0,1)"),
                 }
             ])
         );
@@ -332,7 +334,7 @@ mod tests {
                     offset_x: "1px",
                     offset_y: "2px",
                     blur_radius: "3rem",
-                    color: "rgb(0, 0, 0)",
+                    color: Cow::Borrowed("rgb(0, 0, 0)"),
                 },
             ])
         );
@@ -350,7 +352,7 @@ mod tests {
                 offset_y: "5px",
                 blur_radius: "90px",
                 spread_radius: "40px",
-                color: "rgba(0,0,0,0.2)"
+                color: Cow::Borrowed("rgba(0,0,0,0.2)")
             }])
         );
     }
@@ -360,6 +362,14 @@ mod tests {
         let shadow = "20px 35px 60px -15px rgba(0,0,0,0.3),0 72px rgba(0,2,42,0.2),inset 23px 42em rgba(255,0,0,1)";
         let result = ShadowList::parse(shadow).unwrap();
         assert_eq!(&result.to_string(), shadow);
+    }
+
+    #[test]
+    fn replace_all_colors() {
+        let shadow = "20px 35px 60px -15px rgba(0,0,0,0.3),0 72px rgba(0,2,42,0.2),inset 23px 42em rgba(255,0,0,1)";
+        let mut result = ShadowList::parse(shadow).unwrap();
+        result.replace_all_colors("var(--en-shadow, {})");
+        assert_eq!(&result.to_string(), "20px 35px 60px -15px var(--en-shadow, rgba(0,0,0,0.3)),0 72px var(--en-shadow, rgba(0,2,42,0.2)),inset 23px 42em var(--en-shadow, rgba(255,0,0,1))");
     }
 
     #[test]

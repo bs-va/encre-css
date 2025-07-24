@@ -1104,14 +1104,12 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 }
 
 .shadow-xl {
-  --en-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  --en-shadow-colored: 0 20px 25px -5px var(--en-shadow-color), 0 8px 10px -6px var(--en-shadow-color);
+  --en-shadow: 0 20px 25px -5px var(--en-shadow-color, rgb(0 0 0 / 0.1)), 0 8px 10px -6px var(--en-shadow-color, rgb(0 0 0 / 0.1));
   box-shadow: var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow);
 }
 
 .shadow-slate-700\/10 {
   --en-shadow-color: color-mix(in oklab, oklch(37.2% .044 257.287) 10%, transparent);
-  --en-shadow: var(--en-shadow-colored);
 }
 
 .ring-1 {

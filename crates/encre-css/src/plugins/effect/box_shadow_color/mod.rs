@@ -29,9 +29,5 @@ impl Plugin for PluginDefinition {
                     .line(format_args!("--en-shadow-color: {value};"));
             }
         }
-
-        context
-            .buffer
-            .line("--en-shadow: var(--en-shadow-colored);");
     }
 }
