@@ -2,7 +2,6 @@
 name = "encre-css-cli"
 version = "0.16.1"
 description = "A TailwindCSS-compatible utility-first CSS generation library written in Rust"
-authors = ["nifou <nifou@mailfence.com>"]
 license = "MIT"
 edition = "2021"
 repository = "https://gitlab.com/encre-org/encre-css.git"

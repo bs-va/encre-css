@@ -2,7 +2,6 @@
 name = "encre-css-typography"
 version = "0.2.1"
 description = "Define beautiful typographic defaults for HTML you don't control"
-authors = ["nifou <nifou@mailfence.com>"]
 license = "MIT"
 edition = "2021"
 repository = "https://gitlab.com/encre-org/encre-css.git"
