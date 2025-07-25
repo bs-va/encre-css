@@ -108,6 +108,32 @@ mod tests {
 }"
         );
         assert_eq!(
+            generate(["bg-linear-to-b"], &base_config()),
+            ".bg-linear-to-b {
+  background-image: linear-gradient(to bottom in oklab, var(--en-gradient-stops));
+}"
+        );
+        assert_eq!(
+            generate(["bg-linear-123"], &base_config()),
+            ".bg-linear-123 {
+  background-image: linear-gradient(123deg in oklab, var(--en-gradient-stops));
+}"
+        );
+        assert_eq!(
+            generate(["bg-linear-to-b/decreasing"], &base_config()),
+            r".bg-linear-to-b\/decreasing {
+  background-image: linear-gradient(to bottom in oklch decreasing hue, var(--en-gradient-stops));
+}"
+        );
+        assert_eq!(generate(["bg-linear-to-b/d"], &base_config()), "",);
+        assert_eq!(generate(["bg-linear-to-b/"], &base_config()), "",);
+        assert_eq!(
+            generate(["bg-linear-[to_bottom_#000,#fff]"], &base_config()),
+            r".bg-linear-\[to_bottom_\#000\,\#fff\] {
+  background-image: linear-gradient(to bottom #000,#fff);
+}"
+        );
+        assert_eq!(
             generate(["bg-[url('/hello.png')]"], &base_config()),
             r".bg-\[url\(\'\/hello\.png\'\)\] {
   background-image: url('/hello.png');
@@ -117,6 +143,42 @@ mod tests {
             generate(["bg-[url('/hello_with_underscores.png')]"], &base_config()),
             r".bg-\[url\(\'\/hello_with_underscores\.png\'\)\] {
   background-image: url('/hello_with_underscores.png');
+}"
+        );
+        assert_eq!(
+            generate(["bg-radial"], &base_config()),
+            ".bg-radial {
+  background-image: radial-gradient(in oklab, var(--en-gradient-stops));
+}"
+        );
+        assert_eq!(
+            generate(["bg-radial-[at_50%_75%]"], &base_config()),
+            r".bg-radial-\[at_50\%_75\%\] {
+  background-image: radial-gradient(at 50% 75%);
+}"
+        );
+        assert_eq!(
+            generate(["bg-conic"], &base_config()),
+            ".bg-conic {
+  background-image: conic-gradient(in oklab, var(--en-gradient-stops));
+}"
+        );
+        assert_eq!(
+            generate(["bg-conic/decreasing"], &base_config()),
+            r".bg-conic\/decreasing {
+  background-image: conic-gradient(in oklch decreasing hue, var(--en-gradient-stops));
+}"
+        );
+        assert_eq!(
+            generate(["bg-conic-180"], &base_config()),
+            ".bg-conic-180 {
+  background-image: conic-gradient(from 180deg in oklab, var(--en-gradient-stops));
+}"
+        );
+        assert_eq!(
+            generate(["-bg-conic-180"], &base_config()),
+            ".-bg-conic-180 {
+  background-image: conic-gradient(from -180deg in oklab, var(--en-gradient-stops));
 }"
         );
     }
