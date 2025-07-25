@@ -5,685 +5,751 @@ Utilities for controlling the color stops in background gradients.
     <tr>
       <th style="text-align: center;">Class</th>
       <th style="text-align: center;">Properties</th>
-      <th style="text-align: center; width: 10rem;">Color</th>
     </tr>
   </thead>
   <tbody>
-    <tr><td>from-inherit</td><td>--en-gradient-from: inherit;<br>--en-gradient-to: rgb(255 255 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: inherit;"></td></tr>
-    <tr><td>from-current</td><td>--en-gradient-from: currentColor;<br>--en-gradient-to: rgb(255 255 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: currentColor;"></td></tr>
-    <tr><td>from-transparent</td><td>--en-gradient-from: transparent;<br>--en-gradient-to: rgb(0 0 0 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: transparent;"></td></tr>
-    <tr><td>from-black</td><td>--en-gradient-from: rgb(0 0 0);<br>--en-gradient-to: rgb(0 0 0 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(0 0 0);"></td></tr>
-    <tr><td>from-white</td><td>--en-gradient-from: rgb(255 255 255);<br>--en-gradient-to: rgb(255 255 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(255 255 255);"></td></tr>
-    <tr><td>from-slate-50</td><td>--en-gradient-from: rgb(248 250 252);<br>--en-gradient-to: rgb(248 250 252 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(248 250 252);"></td></tr>
-    <tr><td>from-slate-100</td><td>--en-gradient-from: rgb(241 245 249);<br>--en-gradient-to: rgb(241 245 249 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(241 245 249);"></td></tr>
-    <tr><td>from-slate-200</td><td>--en-gradient-from: rgb(226 232 240);<br>--en-gradient-to: rgb(226 232 240 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(226 232 240);"></td></tr>
-    <tr><td>from-slate-300</td><td>--en-gradient-from: rgb(203 213 225);<br>--en-gradient-to: rgb(203 213 225 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(203 213 225);"></td></tr>
-    <tr><td>from-slate-400</td><td>--en-gradient-from: rgb(148 163 184);<br>--en-gradient-to: rgb(148 163 184 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(148 163 184);"></td></tr>
-    <tr><td>from-slate-500</td><td>--en-gradient-from: rgb(100 116 139);<br>--en-gradient-to: rgb(100 116 139 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(100 116 139);"></td></tr>
-    <tr><td>from-slate-600</td><td>--en-gradient-from: rgb(71 85 105);<br>--en-gradient-to: rgb(71 85 105 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(71 85 105);"></td></tr>
-    <tr><td>from-slate-700</td><td>--en-gradient-from: rgb(51 65 85);<br>--en-gradient-to: rgb(51 65 85 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(51 65 85);"></td></tr>
-    <tr><td>from-slate-800</td><td>--en-gradient-from: rgb(30 41 59);<br>--en-gradient-to: rgb(30 41 59 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(30 41 59);"></td></tr>
-    <tr><td>from-slate-900</td><td>--en-gradient-from: rgb(15 23 42);<br>--en-gradient-to: rgb(15 23 42 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(15 23 42);"></td></tr>
-    <tr><td>from-gray-50</td><td>--en-gradient-from: rgb(249 250 251);<br>--en-gradient-to: rgb(249 250 251 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(249 250 251);"></td></tr>
-    <tr><td>from-gray-100</td><td>--en-gradient-from: rgb(243 244 246);<br>--en-gradient-to: rgb(243 244 246 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(243 244 246);"></td></tr>
-    <tr><td>from-gray-200</td><td>--en-gradient-from: rgb(229 231 235);<br>--en-gradient-to: rgb(229 231 235 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(229 231 235);"></td></tr>
-    <tr><td>from-gray-300</td><td>--en-gradient-from: rgb(209 213 219);<br>--en-gradient-to: rgb(209 213 219 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(209 213 219);"></td></tr>
-    <tr><td>from-gray-400</td><td>--en-gradient-from: rgb(156 163 175);<br>--en-gradient-to: rgb(156 163 175 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(156 163 175);"></td></tr>
-    <tr><td>from-gray-500</td><td>--en-gradient-from: rgb(107 114 128);<br>--en-gradient-to: rgb(107 114 128 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(107 114 128);"></td></tr>
-    <tr><td>from-gray-600</td><td>--en-gradient-from: rgb(75 85 99);<br>--en-gradient-to: rgb(75 85 99 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(75 85 99);"></td></tr>
-    <tr><td>from-gray-700</td><td>--en-gradient-from: rgb(55 65 81);<br>--en-gradient-to: rgb(55 65 81 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(55 65 81);"></td></tr>
-    <tr><td>from-gray-800</td><td>--en-gradient-from: rgb(31 41 55);<br>--en-gradient-to: rgb(31 41 55 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(31 41 55);"></td></tr>
-    <tr><td>from-gray-900</td><td>--en-gradient-from: rgb(17 24 39);<br>--en-gradient-to: rgb(17 24 39 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(17 24 39);"></td></tr>
-    <tr><td>from-zinc-50</td><td>--en-gradient-from: rgb(250 250 250);<br>--en-gradient-to: rgb(250 250 250 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(250 250 250);"></td></tr>
-    <tr><td>from-zinc-100</td><td>--en-gradient-from: rgb(244 244 245);<br>--en-gradient-to: rgb(244 244 245 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(244 244 245);"></td></tr>
-    <tr><td>from-zinc-200</td><td>--en-gradient-from: rgb(228 228 231);<br>--en-gradient-to: rgb(228 228 231 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(228 228 231);"></td></tr>
-    <tr><td>from-zinc-300</td><td>--en-gradient-from: rgb(212 212 216);<br>--en-gradient-to: rgb(212 212 216 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(212 212 216);"></td></tr>
-    <tr><td>from-zinc-400</td><td>--en-gradient-from: rgb(161 161 170);<br>--en-gradient-to: rgb(161 161 170 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(161 161 170);"></td></tr>
-    <tr><td>from-zinc-500</td><td>--en-gradient-from: rgb(113 113 122);<br>--en-gradient-to: rgb(113 113 122 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(113 113 122);"></td></tr>
-    <tr><td>from-zinc-600</td><td>--en-gradient-from: rgb(82 82 91);<br>--en-gradient-to: rgb(82 82 91 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(82 82 91);"></td></tr>
-    <tr><td>from-zinc-700</td><td>--en-gradient-from: rgb(63 63 70);<br>--en-gradient-to: rgb(63 63 70 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(63 63 70);"></td></tr>
-    <tr><td>from-zinc-800</td><td>--en-gradient-from: rgb(39 39 42);<br>--en-gradient-to: rgb(39 39 42 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(39 39 42);"></td></tr>
-    <tr><td>from-zinc-900</td><td>--en-gradient-from: rgb(24 24 27);<br>--en-gradient-to: rgb(24 24 27 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(24 24 27);"></td></tr>
-    <tr><td>from-neutral-50</td><td>--en-gradient-from: rgb(250 250 250);<br>--en-gradient-to: rgb(250 250 250 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(250 250 250);"></td></tr>
-    <tr><td>from-neutral-100</td><td>--en-gradient-from: rgb(245 245 245);<br>--en-gradient-to: rgb(245 245 245 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(245 245 245);"></td></tr>
-    <tr><td>from-neutral-200</td><td>--en-gradient-from: rgb(229 229 229);<br>--en-gradient-to: rgb(229 229 229 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(229 229 229);"></td></tr>
-    <tr><td>from-neutral-300</td><td>--en-gradient-from: rgb(212 212 212);<br>--en-gradient-to: rgb(212 212 212 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(212 212 212);"></td></tr>
-    <tr><td>from-neutral-400</td><td>--en-gradient-from: rgb(163 163 163);<br>--en-gradient-to: rgb(163 163 163 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(163 163 163);"></td></tr>
-    <tr><td>from-neutral-500</td><td>--en-gradient-from: rgb(115 115 115);<br>--en-gradient-to: rgb(115 115 115 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(115 115 115);"></td></tr>
-    <tr><td>from-neutral-600</td><td>--en-gradient-from: rgb(82 82 82);<br>--en-gradient-to: rgb(82 82 82 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(82 82 82);"></td></tr>
-    <tr><td>from-neutral-700</td><td>--en-gradient-from: rgb(64 64 64);<br>--en-gradient-to: rgb(64 64 64 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(64 64 64);"></td></tr>
-    <tr><td>from-neutral-800</td><td>--en-gradient-from: rgb(38 38 38);<br>--en-gradient-to: rgb(38 38 38 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(38 38 38);"></td></tr>
-    <tr><td>from-neutral-900</td><td>--en-gradient-from: rgb(23 23 23);<br>--en-gradient-to: rgb(23 23 23 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(23 23 23);"></td></tr>
-    <tr><td>from-stone-50</td><td>--en-gradient-from: rgb(250 250 249);<br>--en-gradient-to: rgb(250 250 249 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(250 250 249);"></td></tr>
-    <tr><td>from-stone-100</td><td>--en-gradient-from: rgb(245 245 244);<br>--en-gradient-to: rgb(245 245 244 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(245 245 244);"></td></tr>
-    <tr><td>from-stone-200</td><td>--en-gradient-from: rgb(231 229 228);<br>--en-gradient-to: rgb(231 229 228 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(231 229 228);"></td></tr>
-    <tr><td>from-stone-300</td><td>--en-gradient-from: rgb(214 211 209);<br>--en-gradient-to: rgb(214 211 209 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(214 211 209);"></td></tr>
-    <tr><td>from-stone-400</td><td>--en-gradient-from: rgb(168 162 158);<br>--en-gradient-to: rgb(168 162 158 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(168 162 158);"></td></tr>
-    <tr><td>from-stone-500</td><td>--en-gradient-from: rgb(120 113 108);<br>--en-gradient-to: rgb(120 113 108 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(120 113 108);"></td></tr>
-    <tr><td>from-stone-600</td><td>--en-gradient-from: rgb(87 83 78);<br>--en-gradient-to: rgb(87 83 78 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(87 83 78);"></td></tr>
-    <tr><td>from-stone-700</td><td>--en-gradient-from: rgb(68 64 60);<br>--en-gradient-to: rgb(68 64 60 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(68 64 60);"></td></tr>
-    <tr><td>from-stone-800</td><td>--en-gradient-from: rgb(41 37 36);<br>--en-gradient-to: rgb(41 37 36 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(41 37 36);"></td></tr>
-    <tr><td>from-stone-900</td><td>--en-gradient-from: rgb(28 25 23);<br>--en-gradient-to: rgb(28 25 23 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(28 25 23);"></td></tr>
-    <tr><td>from-red-50</td><td>--en-gradient-from: rgb(254 242 242);<br>--en-gradient-to: rgb(254 242 242 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(254 242 242);"></td></tr>
-    <tr><td>from-red-100</td><td>--en-gradient-from: rgb(254 226 226);<br>--en-gradient-to: rgb(254 226 226 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(254 226 226);"></td></tr>
-    <tr><td>from-red-200</td><td>--en-gradient-from: rgb(254 202 202);<br>--en-gradient-to: rgb(254 202 202 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(254 202 202);"></td></tr>
-    <tr><td>from-red-300</td><td>--en-gradient-from: rgb(252 165 165);<br>--en-gradient-to: rgb(252 165 165 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(252 165 165);"></td></tr>
-    <tr><td>from-red-400</td><td>--en-gradient-from: rgb(248 113 113);<br>--en-gradient-to: rgb(248 113 113 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(248 113 113);"></td></tr>
-    <tr><td>from-red-500</td><td>--en-gradient-from: rgb(239 68 68);<br>--en-gradient-to: rgb(239 68 68 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(239 68 68);"></td></tr>
-    <tr><td>from-red-600</td><td>--en-gradient-from: rgb(220 38 38);<br>--en-gradient-to: rgb(220 38 38 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(220 38 38);"></td></tr>
-    <tr><td>from-red-700</td><td>--en-gradient-from: rgb(185 28 28);<br>--en-gradient-to: rgb(185 28 28 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(185 28 28);"></td></tr>
-    <tr><td>from-red-800</td><td>--en-gradient-from: rgb(153 27 27);<br>--en-gradient-to: rgb(153 27 27 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(153 27 27);"></td></tr>
-    <tr><td>from-red-900</td><td>--en-gradient-from: rgb(127 29 29);<br>--en-gradient-to: rgb(127 29 29 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(127 29 29);"></td></tr>
-    <tr><td>from-orange-50</td><td>--en-gradient-from: rgb(255 247 237);<br>--en-gradient-to: rgb(255 247 237 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(255 247 237);"></td></tr>
-    <tr><td>from-orange-100</td><td>--en-gradient-from: rgb(255 237 213);<br>--en-gradient-to: rgb(255 237 213 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(255 237 213);"></td></tr>
-    <tr><td>from-orange-200</td><td>--en-gradient-from: rgb(254 215 170);<br>--en-gradient-to: rgb(254 215 170 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(254 215 170);"></td></tr>
-    <tr><td>from-orange-300</td><td>--en-gradient-from: rgb(253 186 116);<br>--en-gradient-to: rgb(253 186 116 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(253 186 116);"></td></tr>
-    <tr><td>from-orange-400</td><td>--en-gradient-from: rgb(251 146 60);<br>--en-gradient-to: rgb(251 146 60 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(251 146 60);"></td></tr>
-    <tr><td>from-orange-500</td><td>--en-gradient-from: rgb(249 115 22);<br>--en-gradient-to: rgb(249 115 22 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(249 115 22);"></td></tr>
-    <tr><td>from-orange-600</td><td>--en-gradient-from: rgb(234 88 12);<br>--en-gradient-to: rgb(234 88 12 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(234 88 12);"></td></tr>
-    <tr><td>from-orange-700</td><td>--en-gradient-from: rgb(194 65 12);<br>--en-gradient-to: rgb(194 65 12 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(194 65 12);"></td></tr>
-    <tr><td>from-orange-800</td><td>--en-gradient-from: rgb(154 52 18);<br>--en-gradient-to: rgb(154 52 18 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(154 52 18);"></td></tr>
-    <tr><td>from-orange-900</td><td>--en-gradient-from: rgb(124 45 18);<br>--en-gradient-to: rgb(124 45 18 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(124 45 18);"></td></tr>
-    <tr><td>from-amber-50</td><td>--en-gradient-from: rgb(255 251 235);<br>--en-gradient-to: rgb(255 251 235 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(255 251 235);"></td></tr>
-    <tr><td>from-amber-100</td><td>--en-gradient-from: rgb(254 243 199);<br>--en-gradient-to: rgb(254 243 199 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(254 243 199);"></td></tr>
-    <tr><td>from-amber-200</td><td>--en-gradient-from: rgb(253 230 138);<br>--en-gradient-to: rgb(253 230 138 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(253 230 138);"></td></tr>
-    <tr><td>from-amber-300</td><td>--en-gradient-from: rgb(252 211 77);<br>--en-gradient-to: rgb(252 211 77 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(252 211 77);"></td></tr>
-    <tr><td>from-amber-400</td><td>--en-gradient-from: rgb(251 191 36);<br>--en-gradient-to: rgb(251 191 36 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(251 191 36);"></td></tr>
-    <tr><td>from-amber-500</td><td>--en-gradient-from: rgb(245 158 11);<br>--en-gradient-to: rgb(245 158 11 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(245 158 11);"></td></tr>
-    <tr><td>from-amber-600</td><td>--en-gradient-from: rgb(217 119 6);<br>--en-gradient-to: rgb(217 119 6 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(217 119 6);"></td></tr>
-    <tr><td>from-amber-700</td><td>--en-gradient-from: rgb(180 83 9);<br>--en-gradient-to: rgb(180 83 9 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(180 83 9);"></td></tr>
-    <tr><td>from-amber-800</td><td>--en-gradient-from: rgb(146 64 14);<br>--en-gradient-to: rgb(146 64 14 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(146 64 14);"></td></tr>
-    <tr><td>from-amber-900</td><td>--en-gradient-from: rgb(120 53 15);<br>--en-gradient-to: rgb(120 53 15 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(120 53 15);"></td></tr>
-    <tr><td>from-yellow-50</td><td>--en-gradient-from: rgb(254 252 232);<br>--en-gradient-to: rgb(254 252 232 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(254 252 232);"></td></tr>
-    <tr><td>from-yellow-100</td><td>--en-gradient-from: rgb(254 249 195);<br>--en-gradient-to: rgb(254 249 195 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(254 249 195);"></td></tr>
-    <tr><td>from-yellow-200</td><td>--en-gradient-from: rgb(254 240 138);<br>--en-gradient-to: rgb(254 240 138 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(254 240 138);"></td></tr>
-    <tr><td>from-yellow-300</td><td>--en-gradient-from: rgb(253 224 71);<br>--en-gradient-to: rgb(253 224 71 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(253 224 71);"></td></tr>
-    <tr><td>from-yellow-400</td><td>--en-gradient-from: rgb(250 204 21);<br>--en-gradient-to: rgb(250 204 21 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(250 204 21);"></td></tr>
-    <tr><td>from-yellow-500</td><td>--en-gradient-from: rgb(234 179 8);<br>--en-gradient-to: rgb(234 179 8 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(234 179 8);"></td></tr>
-    <tr><td>from-yellow-600</td><td>--en-gradient-from: rgb(202 138 4);<br>--en-gradient-to: rgb(202 138 4 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(202 138 4);"></td></tr>
-    <tr><td>from-yellow-700</td><td>--en-gradient-from: rgb(161 98 7);<br>--en-gradient-to: rgb(161 98 7 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(161 98 7);"></td></tr>
-    <tr><td>from-yellow-800</td><td>--en-gradient-from: rgb(133 77 14);<br>--en-gradient-to: rgb(133 77 14 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(133 77 14);"></td></tr>
-    <tr><td>from-yellow-900</td><td>--en-gradient-from: rgb(113 63 18);<br>--en-gradient-to: rgb(113 63 18 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(113 63 18);"></td></tr>
-    <tr><td>from-lime-50</td><td>--en-gradient-from: rgb(247 254 231);<br>--en-gradient-to: rgb(247 254 231 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(247 254 231);"></td></tr>
-    <tr><td>from-lime-100</td><td>--en-gradient-from: rgb(236 252 203);<br>--en-gradient-to: rgb(236 252 203 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(236 252 203);"></td></tr>
-    <tr><td>from-lime-200</td><td>--en-gradient-from: rgb(217 249 157);<br>--en-gradient-to: rgb(217 249 157 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(217 249 157);"></td></tr>
-    <tr><td>from-lime-300</td><td>--en-gradient-from: rgb(190 242 100);<br>--en-gradient-to: rgb(190 242 100 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(190 242 100);"></td></tr>
-    <tr><td>from-lime-400</td><td>--en-gradient-from: rgb(163 230 53);<br>--en-gradient-to: rgb(163 230 53 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(163 230 53);"></td></tr>
-    <tr><td>from-lime-500</td><td>--en-gradient-from: rgb(132 204 22);<br>--en-gradient-to: rgb(132 204 22 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(132 204 22);"></td></tr>
-    <tr><td>from-lime-600</td><td>--en-gradient-from: rgb(101 163 13);<br>--en-gradient-to: rgb(101 163 13 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(101 163 13);"></td></tr>
-    <tr><td>from-lime-700</td><td>--en-gradient-from: rgb(77 124 15);<br>--en-gradient-to: rgb(77 124 15 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(77 124 15);"></td></tr>
-    <tr><td>from-lime-800</td><td>--en-gradient-from: rgb(63 98 18);<br>--en-gradient-to: rgb(63 98 18 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(63 98 18);"></td></tr>
-    <tr><td>from-lime-900</td><td>--en-gradient-from: rgb(54 83 20);<br>--en-gradient-to: rgb(54 83 20 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(54 83 20);"></td></tr>
-    <tr><td>from-green-50</td><td>--en-gradient-from: rgb(240 253 244);<br>--en-gradient-to: rgb(240 253 244 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(240 253 244);"></td></tr>
-    <tr><td>from-green-100</td><td>--en-gradient-from: rgb(220 252 231);<br>--en-gradient-to: rgb(220 252 231 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(220 252 231);"></td></tr>
-    <tr><td>from-green-200</td><td>--en-gradient-from: rgb(187 247 208);<br>--en-gradient-to: rgb(187 247 208 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(187 247 208);"></td></tr>
-    <tr><td>from-green-300</td><td>--en-gradient-from: rgb(134 239 172);<br>--en-gradient-to: rgb(134 239 172 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(134 239 172);"></td></tr>
-    <tr><td>from-green-400</td><td>--en-gradient-from: rgb(74 222 128);<br>--en-gradient-to: rgb(74 222 128 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(74 222 128);"></td></tr>
-    <tr><td>from-green-500</td><td>--en-gradient-from: rgb(34 197 94);<br>--en-gradient-to: rgb(34 197 94 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(34 197 94);"></td></tr>
-    <tr><td>from-green-600</td><td>--en-gradient-from: rgb(22 163 74);<br>--en-gradient-to: rgb(22 163 74 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(22 163 74);"></td></tr>
-    <tr><td>from-green-700</td><td>--en-gradient-from: rgb(21 128 61);<br>--en-gradient-to: rgb(21 128 61 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(21 128 61);"></td></tr>
-    <tr><td>from-green-800</td><td>--en-gradient-from: rgb(22 101 52);<br>--en-gradient-to: rgb(22 101 52 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(22 101 52);"></td></tr>
-    <tr><td>from-green-900</td><td>--en-gradient-from: rgb(20 83 45);<br>--en-gradient-to: rgb(20 83 45 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(20 83 45);"></td></tr>
-    <tr><td>from-emerald-50</td><td>--en-gradient-from: rgb(236 253 245);<br>--en-gradient-to: rgb(236 253 245 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(236 253 245);"></td></tr>
-    <tr><td>from-emerald-100</td><td>--en-gradient-from: rgb(209 250 229);<br>--en-gradient-to: rgb(209 250 229 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(209 250 229);"></td></tr>
-    <tr><td>from-emerald-200</td><td>--en-gradient-from: rgb(167 243 208);<br>--en-gradient-to: rgb(167 243 208 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(167 243 208);"></td></tr>
-    <tr><td>from-emerald-300</td><td>--en-gradient-from: rgb(110 231 183);<br>--en-gradient-to: rgb(110 231 183 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(110 231 183);"></td></tr>
-    <tr><td>from-emerald-400</td><td>--en-gradient-from: rgb(52 211 153);<br>--en-gradient-to: rgb(52 211 153 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(52 211 153);"></td></tr>
-    <tr><td>from-emerald-500</td><td>--en-gradient-from: rgb(16 185 129);<br>--en-gradient-to: rgb(16 185 129 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(16 185 129);"></td></tr>
-    <tr><td>from-emerald-600</td><td>--en-gradient-from: rgb(5 150 105);<br>--en-gradient-to: rgb(5 150 105 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(5 150 105);"></td></tr>
-    <tr><td>from-emerald-700</td><td>--en-gradient-from: rgb(4 120 87);<br>--en-gradient-to: rgb(4 120 87 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(4 120 87);"></td></tr>
-    <tr><td>from-emerald-800</td><td>--en-gradient-from: rgb(6 95 70);<br>--en-gradient-to: rgb(6 95 70 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(6 95 70);"></td></tr>
-    <tr><td>from-emerald-900</td><td>--en-gradient-from: rgb(6 78 59);<br>--en-gradient-to: rgb(6 78 59 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(6 78 59);"></td></tr>
-    <tr><td>from-teal-50</td><td>--en-gradient-from: rgb(240 253 250);<br>--en-gradient-to: rgb(240 253 250 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(240 253 250);"></td></tr>
-    <tr><td>from-teal-100</td><td>--en-gradient-from: rgb(204 251 241);<br>--en-gradient-to: rgb(204 251 241 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(204 251 241);"></td></tr>
-    <tr><td>from-teal-200</td><td>--en-gradient-from: rgb(153 246 228);<br>--en-gradient-to: rgb(153 246 228 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(153 246 228);"></td></tr>
-    <tr><td>from-teal-300</td><td>--en-gradient-from: rgb(94 234 212);<br>--en-gradient-to: rgb(94 234 212 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(94 234 212);"></td></tr>
-    <tr><td>from-teal-400</td><td>--en-gradient-from: rgb(45 212 191);<br>--en-gradient-to: rgb(45 212 191 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(45 212 191);"></td></tr>
-    <tr><td>from-teal-500</td><td>--en-gradient-from: rgb(20 184 166);<br>--en-gradient-to: rgb(20 184 166 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(20 184 166);"></td></tr>
-    <tr><td>from-teal-600</td><td>--en-gradient-from: rgb(13 148 136);<br>--en-gradient-to: rgb(13 148 136 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(13 148 136);"></td></tr>
-    <tr><td>from-teal-700</td><td>--en-gradient-from: rgb(15 118 110);<br>--en-gradient-to: rgb(15 118 110 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(15 118 110);"></td></tr>
-    <tr><td>from-teal-800</td><td>--en-gradient-from: rgb(17 94 89);<br>--en-gradient-to: rgb(17 94 89 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(17 94 89);"></td></tr>
-    <tr><td>from-teal-900</td><td>--en-gradient-from: rgb(19 78 74);<br>--en-gradient-to: rgb(19 78 74 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(19 78 74);"></td></tr>
-    <tr><td>from-cyan-50</td><td>--en-gradient-from: rgb(236 254 255);<br>--en-gradient-to: rgb(236 254 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(236 254 255);"></td></tr>
-    <tr><td>from-cyan-100</td><td>--en-gradient-from: rgb(207 250 254);<br>--en-gradient-to: rgb(207 250 254 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(207 250 254);"></td></tr>
-    <tr><td>from-cyan-200</td><td>--en-gradient-from: rgb(165 243 252);<br>--en-gradient-to: rgb(165 243 252 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(165 243 252);"></td></tr>
-    <tr><td>from-cyan-300</td><td>--en-gradient-from: rgb(103 232 249);<br>--en-gradient-to: rgb(103 232 249 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(103 232 249);"></td></tr>
-    <tr><td>from-cyan-400</td><td>--en-gradient-from: rgb(34 211 238);<br>--en-gradient-to: rgb(34 211 238 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(34 211 238);"></td></tr>
-    <tr><td>from-cyan-500</td><td>--en-gradient-from: rgb(6 182 212);<br>--en-gradient-to: rgb(6 182 212 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(6 182 212);"></td></tr>
-    <tr><td>from-cyan-600</td><td>--en-gradient-from: rgb(8 145 178);<br>--en-gradient-to: rgb(8 145 178 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(8 145 178);"></td></tr>
-    <tr><td>from-cyan-700</td><td>--en-gradient-from: rgb(14 116 144);<br>--en-gradient-to: rgb(14 116 144 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(14 116 144);"></td></tr>
-    <tr><td>from-cyan-800</td><td>--en-gradient-from: rgb(21 94 117);<br>--en-gradient-to: rgb(21 94 117 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(21 94 117);"></td></tr>
-    <tr><td>from-cyan-900</td><td>--en-gradient-from: rgb(22 78 99);<br>--en-gradient-to: rgb(22 78 99 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(22 78 99);"></td></tr>
-    <tr><td>from-sky-50</td><td>--en-gradient-from: rgb(240 249 255);<br>--en-gradient-to: rgb(240 249 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(240 249 255);"></td></tr>
-    <tr><td>from-sky-100</td><td>--en-gradient-from: rgb(224 242 254);<br>--en-gradient-to: rgb(224 242 254 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(224 242 254);"></td></tr>
-    <tr><td>from-sky-200</td><td>--en-gradient-from: rgb(186 230 253);<br>--en-gradient-to: rgb(186 230 253 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(186 230 253);"></td></tr>
-    <tr><td>from-sky-300</td><td>--en-gradient-from: rgb(125 211 252);<br>--en-gradient-to: rgb(125 211 252 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(125 211 252);"></td></tr>
-    <tr><td>from-sky-400</td><td>--en-gradient-from: rgb(56 189 248);<br>--en-gradient-to: rgb(56 189 248 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(56 189 248);"></td></tr>
-    <tr><td>from-sky-500</td><td>--en-gradient-from: rgb(14 165 233);<br>--en-gradient-to: rgb(14 165 233 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(14 165 233);"></td></tr>
-    <tr><td>from-sky-600</td><td>--en-gradient-from: rgb(2 132 199);<br>--en-gradient-to: rgb(2 132 199 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(2 132 199);"></td></tr>
-    <tr><td>from-sky-700</td><td>--en-gradient-from: rgb(3 105 161);<br>--en-gradient-to: rgb(3 105 161 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(3 105 161);"></td></tr>
-    <tr><td>from-sky-800</td><td>--en-gradient-from: rgb(7 89 133);<br>--en-gradient-to: rgb(7 89 133 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(7 89 133);"></td></tr>
-    <tr><td>from-sky-900</td><td>--en-gradient-from: rgb(12 74 110);<br>--en-gradient-to: rgb(12 74 110 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(12 74 110);"></td></tr>
-    <tr><td>from-blue-50</td><td>--en-gradient-from: rgb(239 246 255);<br>--en-gradient-to: rgb(239 246 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(239 246 255);"></td></tr>
-    <tr><td>from-blue-100</td><td>--en-gradient-from: rgb(219 234 254);<br>--en-gradient-to: rgb(219 234 254 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(219 234 254);"></td></tr>
-    <tr><td>from-blue-200</td><td>--en-gradient-from: rgb(191 219 254);<br>--en-gradient-to: rgb(191 219 254 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(191 219 254);"></td></tr>
-    <tr><td>from-blue-300</td><td>--en-gradient-from: rgb(147 197 253);<br>--en-gradient-to: rgb(147 197 253 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(147 197 253);"></td></tr>
-    <tr><td>from-blue-400</td><td>--en-gradient-from: rgb(96 165 250);<br>--en-gradient-to: rgb(96 165 250 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(96 165 250);"></td></tr>
-    <tr><td>from-blue-500</td><td>--en-gradient-from: rgb(59 130 246);<br>--en-gradient-to: rgb(59 130 246 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(59 130 246);"></td></tr>
-    <tr><td>from-blue-600</td><td>--en-gradient-from: rgb(37 99 235);<br>--en-gradient-to: rgb(37 99 235 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(37 99 235);"></td></tr>
-    <tr><td>from-blue-700</td><td>--en-gradient-from: rgb(29 78 216);<br>--en-gradient-to: rgb(29 78 216 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(29 78 216);"></td></tr>
-    <tr><td>from-blue-800</td><td>--en-gradient-from: rgb(30 64 175);<br>--en-gradient-to: rgb(30 64 175 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(30 64 175);"></td></tr>
-    <tr><td>from-blue-900</td><td>--en-gradient-from: rgb(30 58 138);<br>--en-gradient-to: rgb(30 58 138 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(30 58 138);"></td></tr>
-    <tr><td>from-indigo-50</td><td>--en-gradient-from: rgb(238 242 255);<br>--en-gradient-to: rgb(238 242 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(238 242 255);"></td></tr>
-    <tr><td>from-indigo-100</td><td>--en-gradient-from: rgb(224 231 255);<br>--en-gradient-to: rgb(224 231 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(224 231 255);"></td></tr>
-    <tr><td>from-indigo-200</td><td>--en-gradient-from: rgb(199 210 254);<br>--en-gradient-to: rgb(199 210 254 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(199 210 254);"></td></tr>
-    <tr><td>from-indigo-300</td><td>--en-gradient-from: rgb(165 180 252);<br>--en-gradient-to: rgb(165 180 252 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(165 180 252);"></td></tr>
-    <tr><td>from-indigo-400</td><td>--en-gradient-from: rgb(129 140 248);<br>--en-gradient-to: rgb(129 140 248 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(129 140 248);"></td></tr>
-    <tr><td>from-indigo-500</td><td>--en-gradient-from: rgb(99 102 241);<br>--en-gradient-to: rgb(99 102 241 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(99 102 241);"></td></tr>
-    <tr><td>from-indigo-600</td><td>--en-gradient-from: rgb(79 70 229);<br>--en-gradient-to: rgb(79 70 229 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(79 70 229);"></td></tr>
-    <tr><td>from-indigo-700</td><td>--en-gradient-from: rgb(67 56 202);<br>--en-gradient-to: rgb(67 56 202 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(67 56 202);"></td></tr>
-    <tr><td>from-indigo-800</td><td>--en-gradient-from: rgb(55 48 163);<br>--en-gradient-to: rgb(55 48 163 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(55 48 163);"></td></tr>
-    <tr><td>from-indigo-900</td><td>--en-gradient-from: rgb(49 46 129);<br>--en-gradient-to: rgb(49 46 129 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(49 46 129);"></td></tr>
-    <tr><td>from-violet-50</td><td>--en-gradient-from: rgb(245 243 255);<br>--en-gradient-to: rgb(245 243 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(245 243 255);"></td></tr>
-    <tr><td>from-violet-100</td><td>--en-gradient-from: rgb(237 233 254);<br>--en-gradient-to: rgb(237 233 254 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(237 233 254);"></td></tr>
-    <tr><td>from-violet-200</td><td>--en-gradient-from: rgb(221 214 254);<br>--en-gradient-to: rgb(221 214 254 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(221 214 254);"></td></tr>
-    <tr><td>from-violet-300</td><td>--en-gradient-from: rgb(196 181 253);<br>--en-gradient-to: rgb(196 181 253 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(196 181 253);"></td></tr>
-    <tr><td>from-violet-400</td><td>--en-gradient-from: rgb(167 139 250);<br>--en-gradient-to: rgb(167 139 250 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(167 139 250);"></td></tr>
-    <tr><td>from-violet-500</td><td>--en-gradient-from: rgb(139 92 246);<br>--en-gradient-to: rgb(139 92 246 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(139 92 246);"></td></tr>
-    <tr><td>from-violet-600</td><td>--en-gradient-from: rgb(124 58 237);<br>--en-gradient-to: rgb(124 58 237 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(124 58 237);"></td></tr>
-    <tr><td>from-violet-700</td><td>--en-gradient-from: rgb(109 40 217);<br>--en-gradient-to: rgb(109 40 217 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(109 40 217);"></td></tr>
-    <tr><td>from-violet-800</td><td>--en-gradient-from: rgb(91 33 182);<br>--en-gradient-to: rgb(91 33 182 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(91 33 182);"></td></tr>
-    <tr><td>from-violet-900</td><td>--en-gradient-from: rgb(76 29 149);<br>--en-gradient-to: rgb(76 29 149 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(76 29 149);"></td></tr>
-    <tr><td>from-purple-50</td><td>--en-gradient-from: rgb(250 245 255);<br>--en-gradient-to: rgb(250 245 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(250 245 255);"></td></tr>
-    <tr><td>from-purple-100</td><td>--en-gradient-from: rgb(243 232 255);<br>--en-gradient-to: rgb(243 232 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(243 232 255);"></td></tr>
-    <tr><td>from-purple-200</td><td>--en-gradient-from: rgb(233 213 255);<br>--en-gradient-to: rgb(233 213 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(233 213 255);"></td></tr>
-    <tr><td>from-purple-300</td><td>--en-gradient-from: rgb(216 180 254);<br>--en-gradient-to: rgb(216 180 254 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(216 180 254);"></td></tr>
-    <tr><td>from-purple-400</td><td>--en-gradient-from: rgb(192 132 252);<br>--en-gradient-to: rgb(192 132 252 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(192 132 252);"></td></tr>
-    <tr><td>from-purple-500</td><td>--en-gradient-from: rgb(168 85 247);<br>--en-gradient-to: rgb(168 85 247 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(168 85 247);"></td></tr>
-    <tr><td>from-purple-600</td><td>--en-gradient-from: rgb(147 51 234);<br>--en-gradient-to: rgb(147 51 234 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(147 51 234);"></td></tr>
-    <tr><td>from-purple-700</td><td>--en-gradient-from: rgb(126 34 206);<br>--en-gradient-to: rgb(126 34 206 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(126 34 206);"></td></tr>
-    <tr><td>from-purple-800</td><td>--en-gradient-from: rgb(107 33 168);<br>--en-gradient-to: rgb(107 33 168 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(107 33 168);"></td></tr>
-    <tr><td>from-purple-900</td><td>--en-gradient-from: rgb(88 28 135);<br>--en-gradient-to: rgb(88 28 135 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(88 28 135);"></td></tr>
-    <tr><td>from-fuchsia-50</td><td>--en-gradient-from: rgb(253 244 255);<br>--en-gradient-to: rgb(253 244 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(253 244 255);"></td></tr>
-    <tr><td>from-fuchsia-100</td><td>--en-gradient-from: rgb(250 232 255);<br>--en-gradient-to: rgb(250 232 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(250 232 255);"></td></tr>
-    <tr><td>from-fuchsia-200</td><td>--en-gradient-from: rgb(245 208 254);<br>--en-gradient-to: rgb(245 208 254 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(245 208 254);"></td></tr>
-    <tr><td>from-fuchsia-300</td><td>--en-gradient-from: rgb(240 171 252);<br>--en-gradient-to: rgb(240 171 252 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(240 171 252);"></td></tr>
-    <tr><td>from-fuchsia-400</td><td>--en-gradient-from: rgb(232 121 249);<br>--en-gradient-to: rgb(232 121 249 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(232 121 249);"></td></tr>
-    <tr><td>from-fuchsia-500</td><td>--en-gradient-from: rgb(217 70 239);<br>--en-gradient-to: rgb(217 70 239 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(217 70 239);"></td></tr>
-    <tr><td>from-fuchsia-600</td><td>--en-gradient-from: rgb(192 38 211);<br>--en-gradient-to: rgb(192 38 211 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(192 38 211);"></td></tr>
-    <tr><td>from-fuchsia-700</td><td>--en-gradient-from: rgb(162 28 175);<br>--en-gradient-to: rgb(162 28 175 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(162 28 175);"></td></tr>
-    <tr><td>from-fuchsia-800</td><td>--en-gradient-from: rgb(134 25 143);<br>--en-gradient-to: rgb(134 25 143 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(134 25 143);"></td></tr>
-    <tr><td>from-fuchsia-900</td><td>--en-gradient-from: rgb(112 26 117);<br>--en-gradient-to: rgb(112 26 117 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(112 26 117);"></td></tr>
-    <tr><td>from-pink-50</td><td>--en-gradient-from: rgb(253 242 248);<br>--en-gradient-to: rgb(253 242 248 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(253 242 248);"></td></tr>
-    <tr><td>from-pink-100</td><td>--en-gradient-from: rgb(252 231 243);<br>--en-gradient-to: rgb(252 231 243 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(252 231 243);"></td></tr>
-    <tr><td>from-pink-200</td><td>--en-gradient-from: rgb(251 207 232);<br>--en-gradient-to: rgb(251 207 232 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(251 207 232);"></td></tr>
-    <tr><td>from-pink-300</td><td>--en-gradient-from: rgb(249 168 212);<br>--en-gradient-to: rgb(249 168 212 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(249 168 212);"></td></tr>
-    <tr><td>from-pink-400</td><td>--en-gradient-from: rgb(244 114 182);<br>--en-gradient-to: rgb(244 114 182 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(244 114 182);"></td></tr>
-    <tr><td>from-pink-500</td><td>--en-gradient-from: rgb(236 72 153);<br>--en-gradient-to: rgb(236 72 153 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(236 72 153);"></td></tr>
-    <tr><td>from-pink-600</td><td>--en-gradient-from: rgb(219 39 119);<br>--en-gradient-to: rgb(219 39 119 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(219 39 119);"></td></tr>
-    <tr><td>from-pink-700</td><td>--en-gradient-from: rgb(190 24 93);<br>--en-gradient-to: rgb(190 24 93 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(190 24 93);"></td></tr>
-    <tr><td>from-pink-800</td><td>--en-gradient-from: rgb(157 23 77);<br>--en-gradient-to: rgb(157 23 77 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(157 23 77);"></td></tr>
-    <tr><td>from-pink-900</td><td>--en-gradient-from: rgb(131 24 67);<br>--en-gradient-to: rgb(131 24 67 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(131 24 67);"></td></tr>
-    <tr><td>from-rose-50</td><td>--en-gradient-from: rgb(255 241 242);<br>--en-gradient-to: rgb(255 241 242 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(255 241 242);"></td></tr>
-    <tr><td>from-rose-100</td><td>--en-gradient-from: rgb(255 228 230);<br>--en-gradient-to: rgb(255 228 230 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(255 228 230);"></td></tr>
-    <tr><td>from-rose-200</td><td>--en-gradient-from: rgb(254 205 211);<br>--en-gradient-to: rgb(254 205 211 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(254 205 211);"></td></tr>
-    <tr><td>from-rose-300</td><td>--en-gradient-from: rgb(253 164 175);<br>--en-gradient-to: rgb(253 164 175 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(253 164 175);"></td></tr>
-    <tr><td>from-rose-400</td><td>--en-gradient-from: rgb(251 113 133);<br>--en-gradient-to: rgb(251 113 133 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(251 113 133);"></td></tr>
-    <tr><td>from-rose-500</td><td>--en-gradient-from: rgb(244 63 94);<br>--en-gradient-to: rgb(244 63 94 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(244 63 94);"></td></tr>
-    <tr><td>from-rose-600</td><td>--en-gradient-from: rgb(225 29 72);<br>--en-gradient-to: rgb(225 29 72 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(225 29 72);"></td></tr>
-    <tr><td>from-rose-700</td><td>--en-gradient-from: rgb(190 18 60);<br>--en-gradient-to: rgb(190 18 60 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(190 18 60);"></td></tr>
-    <tr><td>from-rose-800</td><td>--en-gradient-from: rgb(159 18 57);<br>--en-gradient-to: rgb(159 18 57 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(159 18 57);"></td></tr>
-    <tr><td>from-rose-900</td><td>--en-gradient-from: rgb(136 19 55);<br>--en-gradient-to: rgb(136 19 55 / 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td><td style="background-color: rgb(136 19 55);"></td></tr>
-    <tr><td>via-inherit</td><td>--en-gradient-to: rgb(255 255 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), inherit, var(--en-gradient-to);</td><td style="background-color: inherit;"></td></tr>
-    <tr><td>via-current</td><td>--en-gradient-to: rgb(255 255 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), currentColor, var(--en-gradient-to);</td><td style="background-color: currentColor;"></td></tr>
-    <tr><td>via-transparent</td><td>--en-gradient-to: rgb(0 0 0 / 0);<br>--en-gradient-stops: var(--en-gradient-from), transparent, var(--en-gradient-to);</td><td style="background-color: transparent;"></td></tr>
-    <tr><td>via-black</td><td>--en-gradient-to: rgb(0 0 0 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(0 0 0), var(--en-gradient-to);</td><td style="background-color: rgb(0 0 0);"></td></tr>
-    <tr><td>via-white</td><td>--en-gradient-to: rgb(255 255 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(255 255 255), var(--en-gradient-to);</td><td style="background-color: rgb(255 255 255);"></td></tr>
-    <tr><td>via-slate-50</td><td>--en-gradient-to: rgb(248 250 252 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(248 250 252), var(--en-gradient-to);</td><td style="background-color: rgb(248 250 252);"></td></tr>
-    <tr><td>via-slate-100</td><td>--en-gradient-to: rgb(241 245 249 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(241 245 249), var(--en-gradient-to);</td><td style="background-color: rgb(241 245 249);"></td></tr>
-    <tr><td>via-slate-200</td><td>--en-gradient-to: rgb(226 232 240 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(226 232 240), var(--en-gradient-to);</td><td style="background-color: rgb(226 232 240);"></td></tr>
-    <tr><td>via-slate-300</td><td>--en-gradient-to: rgb(203 213 225 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(203 213 225), var(--en-gradient-to);</td><td style="background-color: rgb(203 213 225);"></td></tr>
-    <tr><td>via-slate-400</td><td>--en-gradient-to: rgb(148 163 184 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(148 163 184), var(--en-gradient-to);</td><td style="background-color: rgb(148 163 184);"></td></tr>
-    <tr><td>via-slate-500</td><td>--en-gradient-to: rgb(100 116 139 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(100 116 139), var(--en-gradient-to);</td><td style="background-color: rgb(100 116 139);"></td></tr>
-    <tr><td>via-slate-600</td><td>--en-gradient-to: rgb(71 85 105 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(71 85 105), var(--en-gradient-to);</td><td style="background-color: rgb(71 85 105);"></td></tr>
-    <tr><td>via-slate-700</td><td>--en-gradient-to: rgb(51 65 85 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(51 65 85), var(--en-gradient-to);</td><td style="background-color: rgb(51 65 85);"></td></tr>
-    <tr><td>via-slate-800</td><td>--en-gradient-to: rgb(30 41 59 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(30 41 59), var(--en-gradient-to);</td><td style="background-color: rgb(30 41 59);"></td></tr>
-    <tr><td>via-slate-900</td><td>--en-gradient-to: rgb(15 23 42 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(15 23 42), var(--en-gradient-to);</td><td style="background-color: rgb(15 23 42);"></td></tr>
-    <tr><td>via-gray-50</td><td>--en-gradient-to: rgb(249 250 251 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(249 250 251), var(--en-gradient-to);</td><td style="background-color: rgb(249 250 251);"></td></tr>
-    <tr><td>via-gray-100</td><td>--en-gradient-to: rgb(243 244 246 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(243 244 246), var(--en-gradient-to);</td><td style="background-color: rgb(243 244 246);"></td></tr>
-    <tr><td>via-gray-200</td><td>--en-gradient-to: rgb(229 231 235 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(229 231 235), var(--en-gradient-to);</td><td style="background-color: rgb(229 231 235);"></td></tr>
-    <tr><td>via-gray-300</td><td>--en-gradient-to: rgb(209 213 219 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(209 213 219), var(--en-gradient-to);</td><td style="background-color: rgb(209 213 219);"></td></tr>
-    <tr><td>via-gray-400</td><td>--en-gradient-to: rgb(156 163 175 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(156 163 175), var(--en-gradient-to);</td><td style="background-color: rgb(156 163 175);"></td></tr>
-    <tr><td>via-gray-500</td><td>--en-gradient-to: rgb(107 114 128 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(107 114 128), var(--en-gradient-to);</td><td style="background-color: rgb(107 114 128);"></td></tr>
-    <tr><td>via-gray-600</td><td>--en-gradient-to: rgb(75 85 99 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(75 85 99), var(--en-gradient-to);</td><td style="background-color: rgb(75 85 99);"></td></tr>
-    <tr><td>via-gray-700</td><td>--en-gradient-to: rgb(55 65 81 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(55 65 81), var(--en-gradient-to);</td><td style="background-color: rgb(55 65 81);"></td></tr>
-    <tr><td>via-gray-800</td><td>--en-gradient-to: rgb(31 41 55 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(31 41 55), var(--en-gradient-to);</td><td style="background-color: rgb(31 41 55);"></td></tr>
-    <tr><td>via-gray-900</td><td>--en-gradient-to: rgb(17 24 39 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(17 24 39), var(--en-gradient-to);</td><td style="background-color: rgb(17 24 39);"></td></tr>
-    <tr><td>via-zinc-50</td><td>--en-gradient-to: rgb(250 250 250 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(250 250 250), var(--en-gradient-to);</td><td style="background-color: rgb(250 250 250);"></td></tr>
-    <tr><td>via-zinc-100</td><td>--en-gradient-to: rgb(244 244 245 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(244 244 245), var(--en-gradient-to);</td><td style="background-color: rgb(244 244 245);"></td></tr>
-    <tr><td>via-zinc-200</td><td>--en-gradient-to: rgb(228 228 231 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(228 228 231), var(--en-gradient-to);</td><td style="background-color: rgb(228 228 231);"></td></tr>
-    <tr><td>via-zinc-300</td><td>--en-gradient-to: rgb(212 212 216 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(212 212 216), var(--en-gradient-to);</td><td style="background-color: rgb(212 212 216);"></td></tr>
-    <tr><td>via-zinc-400</td><td>--en-gradient-to: rgb(161 161 170 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(161 161 170), var(--en-gradient-to);</td><td style="background-color: rgb(161 161 170);"></td></tr>
-    <tr><td>via-zinc-500</td><td>--en-gradient-to: rgb(113 113 122 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(113 113 122), var(--en-gradient-to);</td><td style="background-color: rgb(113 113 122);"></td></tr>
-    <tr><td>via-zinc-600</td><td>--en-gradient-to: rgb(82 82 91 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(82 82 91), var(--en-gradient-to);</td><td style="background-color: rgb(82 82 91);"></td></tr>
-    <tr><td>via-zinc-700</td><td>--en-gradient-to: rgb(63 63 70 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(63 63 70), var(--en-gradient-to);</td><td style="background-color: rgb(63 63 70);"></td></tr>
-    <tr><td>via-zinc-800</td><td>--en-gradient-to: rgb(39 39 42 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(39 39 42), var(--en-gradient-to);</td><td style="background-color: rgb(39 39 42);"></td></tr>
-    <tr><td>via-zinc-900</td><td>--en-gradient-to: rgb(24 24 27 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(24 24 27), var(--en-gradient-to);</td><td style="background-color: rgb(24 24 27);"></td></tr>
-    <tr><td>via-neutral-50</td><td>--en-gradient-to: rgb(250 250 250 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(250 250 250), var(--en-gradient-to);</td><td style="background-color: rgb(250 250 250);"></td></tr>
-    <tr><td>via-neutral-100</td><td>--en-gradient-to: rgb(245 245 245 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(245 245 245), var(--en-gradient-to);</td><td style="background-color: rgb(245 245 245);"></td></tr>
-    <tr><td>via-neutral-200</td><td>--en-gradient-to: rgb(229 229 229 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(229 229 229), var(--en-gradient-to);</td><td style="background-color: rgb(229 229 229);"></td></tr>
-    <tr><td>via-neutral-300</td><td>--en-gradient-to: rgb(212 212 212 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(212 212 212), var(--en-gradient-to);</td><td style="background-color: rgb(212 212 212);"></td></tr>
-    <tr><td>via-neutral-400</td><td>--en-gradient-to: rgb(163 163 163 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(163 163 163), var(--en-gradient-to);</td><td style="background-color: rgb(163 163 163);"></td></tr>
-    <tr><td>via-neutral-500</td><td>--en-gradient-to: rgb(115 115 115 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(115 115 115), var(--en-gradient-to);</td><td style="background-color: rgb(115 115 115);"></td></tr>
-    <tr><td>via-neutral-600</td><td>--en-gradient-to: rgb(82 82 82 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(82 82 82), var(--en-gradient-to);</td><td style="background-color: rgb(82 82 82);"></td></tr>
-    <tr><td>via-neutral-700</td><td>--en-gradient-to: rgb(64 64 64 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(64 64 64), var(--en-gradient-to);</td><td style="background-color: rgb(64 64 64);"></td></tr>
-    <tr><td>via-neutral-800</td><td>--en-gradient-to: rgb(38 38 38 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(38 38 38), var(--en-gradient-to);</td><td style="background-color: rgb(38 38 38);"></td></tr>
-    <tr><td>via-neutral-900</td><td>--en-gradient-to: rgb(23 23 23 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(23 23 23), var(--en-gradient-to);</td><td style="background-color: rgb(23 23 23);"></td></tr>
-    <tr><td>via-stone-50</td><td>--en-gradient-to: rgb(250 250 249 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(250 250 249), var(--en-gradient-to);</td><td style="background-color: rgb(250 250 249);"></td></tr>
-    <tr><td>via-stone-100</td><td>--en-gradient-to: rgb(245 245 244 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(245 245 244), var(--en-gradient-to);</td><td style="background-color: rgb(245 245 244);"></td></tr>
-    <tr><td>via-stone-200</td><td>--en-gradient-to: rgb(231 229 228 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(231 229 228), var(--en-gradient-to);</td><td style="background-color: rgb(231 229 228);"></td></tr>
-    <tr><td>via-stone-300</td><td>--en-gradient-to: rgb(214 211 209 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(214 211 209), var(--en-gradient-to);</td><td style="background-color: rgb(214 211 209);"></td></tr>
-    <tr><td>via-stone-400</td><td>--en-gradient-to: rgb(168 162 158 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(168 162 158), var(--en-gradient-to);</td><td style="background-color: rgb(168 162 158);"></td></tr>
-    <tr><td>via-stone-500</td><td>--en-gradient-to: rgb(120 113 108 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(120 113 108), var(--en-gradient-to);</td><td style="background-color: rgb(120 113 108);"></td></tr>
-    <tr><td>via-stone-600</td><td>--en-gradient-to: rgb(87 83 78 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(87 83 78), var(--en-gradient-to);</td><td style="background-color: rgb(87 83 78);"></td></tr>
-    <tr><td>via-stone-700</td><td>--en-gradient-to: rgb(68 64 60 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(68 64 60), var(--en-gradient-to);</td><td style="background-color: rgb(68 64 60);"></td></tr>
-    <tr><td>via-stone-800</td><td>--en-gradient-to: rgb(41 37 36 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(41 37 36), var(--en-gradient-to);</td><td style="background-color: rgb(41 37 36);"></td></tr>
-    <tr><td>via-stone-900</td><td>--en-gradient-to: rgb(28 25 23 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(28 25 23), var(--en-gradient-to);</td><td style="background-color: rgb(28 25 23);"></td></tr>
-    <tr><td>via-red-50</td><td>--en-gradient-to: rgb(254 242 242 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(254 242 242), var(--en-gradient-to);</td><td style="background-color: rgb(254 242 242);"></td></tr>
-    <tr><td>via-red-100</td><td>--en-gradient-to: rgb(254 226 226 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(254 226 226), var(--en-gradient-to);</td><td style="background-color: rgb(254 226 226);"></td></tr>
-    <tr><td>via-red-200</td><td>--en-gradient-to: rgb(254 202 202 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(254 202 202), var(--en-gradient-to);</td><td style="background-color: rgb(254 202 202);"></td></tr>
-    <tr><td>via-red-300</td><td>--en-gradient-to: rgb(252 165 165 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(252 165 165), var(--en-gradient-to);</td><td style="background-color: rgb(252 165 165);"></td></tr>
-    <tr><td>via-red-400</td><td>--en-gradient-to: rgb(248 113 113 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(248 113 113), var(--en-gradient-to);</td><td style="background-color: rgb(248 113 113);"></td></tr>
-    <tr><td>via-red-500</td><td>--en-gradient-to: rgb(239 68 68 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(239 68 68), var(--en-gradient-to);</td><td style="background-color: rgb(239 68 68);"></td></tr>
-    <tr><td>via-red-600</td><td>--en-gradient-to: rgb(220 38 38 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(220 38 38), var(--en-gradient-to);</td><td style="background-color: rgb(220 38 38);"></td></tr>
-    <tr><td>via-red-700</td><td>--en-gradient-to: rgb(185 28 28 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(185 28 28), var(--en-gradient-to);</td><td style="background-color: rgb(185 28 28);"></td></tr>
-    <tr><td>via-red-800</td><td>--en-gradient-to: rgb(153 27 27 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(153 27 27), var(--en-gradient-to);</td><td style="background-color: rgb(153 27 27);"></td></tr>
-    <tr><td>via-red-900</td><td>--en-gradient-to: rgb(127 29 29 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(127 29 29), var(--en-gradient-to);</td><td style="background-color: rgb(127 29 29);"></td></tr>
-    <tr><td>via-orange-50</td><td>--en-gradient-to: rgb(255 247 237 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(255 247 237), var(--en-gradient-to);</td><td style="background-color: rgb(255 247 237);"></td></tr>
-    <tr><td>via-orange-100</td><td>--en-gradient-to: rgb(255 237 213 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(255 237 213), var(--en-gradient-to);</td><td style="background-color: rgb(255 237 213);"></td></tr>
-    <tr><td>via-orange-200</td><td>--en-gradient-to: rgb(254 215 170 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(254 215 170), var(--en-gradient-to);</td><td style="background-color: rgb(254 215 170);"></td></tr>
-    <tr><td>via-orange-300</td><td>--en-gradient-to: rgb(253 186 116 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(253 186 116), var(--en-gradient-to);</td><td style="background-color: rgb(253 186 116);"></td></tr>
-    <tr><td>via-orange-400</td><td>--en-gradient-to: rgb(251 146 60 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(251 146 60), var(--en-gradient-to);</td><td style="background-color: rgb(251 146 60);"></td></tr>
-    <tr><td>via-orange-500</td><td>--en-gradient-to: rgb(249 115 22 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(249 115 22), var(--en-gradient-to);</td><td style="background-color: rgb(249 115 22);"></td></tr>
-    <tr><td>via-orange-600</td><td>--en-gradient-to: rgb(234 88 12 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(234 88 12), var(--en-gradient-to);</td><td style="background-color: rgb(234 88 12);"></td></tr>
-    <tr><td>via-orange-700</td><td>--en-gradient-to: rgb(194 65 12 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(194 65 12), var(--en-gradient-to);</td><td style="background-color: rgb(194 65 12);"></td></tr>
-    <tr><td>via-orange-800</td><td>--en-gradient-to: rgb(154 52 18 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(154 52 18), var(--en-gradient-to);</td><td style="background-color: rgb(154 52 18);"></td></tr>
-    <tr><td>via-orange-900</td><td>--en-gradient-to: rgb(124 45 18 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(124 45 18), var(--en-gradient-to);</td><td style="background-color: rgb(124 45 18);"></td></tr>
-    <tr><td>via-amber-50</td><td>--en-gradient-to: rgb(255 251 235 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(255 251 235), var(--en-gradient-to);</td><td style="background-color: rgb(255 251 235);"></td></tr>
-    <tr><td>via-amber-100</td><td>--en-gradient-to: rgb(254 243 199 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(254 243 199), var(--en-gradient-to);</td><td style="background-color: rgb(254 243 199);"></td></tr>
-    <tr><td>via-amber-200</td><td>--en-gradient-to: rgb(253 230 138 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(253 230 138), var(--en-gradient-to);</td><td style="background-color: rgb(253 230 138);"></td></tr>
-    <tr><td>via-amber-300</td><td>--en-gradient-to: rgb(252 211 77 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(252 211 77), var(--en-gradient-to);</td><td style="background-color: rgb(252 211 77);"></td></tr>
-    <tr><td>via-amber-400</td><td>--en-gradient-to: rgb(251 191 36 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(251 191 36), var(--en-gradient-to);</td><td style="background-color: rgb(251 191 36);"></td></tr>
-    <tr><td>via-amber-500</td><td>--en-gradient-to: rgb(245 158 11 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(245 158 11), var(--en-gradient-to);</td><td style="background-color: rgb(245 158 11);"></td></tr>
-    <tr><td>via-amber-600</td><td>--en-gradient-to: rgb(217 119 6 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(217 119 6), var(--en-gradient-to);</td><td style="background-color: rgb(217 119 6);"></td></tr>
-    <tr><td>via-amber-700</td><td>--en-gradient-to: rgb(180 83 9 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(180 83 9), var(--en-gradient-to);</td><td style="background-color: rgb(180 83 9);"></td></tr>
-    <tr><td>via-amber-800</td><td>--en-gradient-to: rgb(146 64 14 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(146 64 14), var(--en-gradient-to);</td><td style="background-color: rgb(146 64 14);"></td></tr>
-    <tr><td>via-amber-900</td><td>--en-gradient-to: rgb(120 53 15 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(120 53 15), var(--en-gradient-to);</td><td style="background-color: rgb(120 53 15);"></td></tr>
-    <tr><td>via-yellow-50</td><td>--en-gradient-to: rgb(254 252 232 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(254 252 232), var(--en-gradient-to);</td><td style="background-color: rgb(254 252 232);"></td></tr>
-    <tr><td>via-yellow-100</td><td>--en-gradient-to: rgb(254 249 195 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(254 249 195), var(--en-gradient-to);</td><td style="background-color: rgb(254 249 195);"></td></tr>
-    <tr><td>via-yellow-200</td><td>--en-gradient-to: rgb(254 240 138 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(254 240 138), var(--en-gradient-to);</td><td style="background-color: rgb(254 240 138);"></td></tr>
-    <tr><td>via-yellow-300</td><td>--en-gradient-to: rgb(253 224 71 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(253 224 71), var(--en-gradient-to);</td><td style="background-color: rgb(253 224 71);"></td></tr>
-    <tr><td>via-yellow-400</td><td>--en-gradient-to: rgb(250 204 21 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(250 204 21), var(--en-gradient-to);</td><td style="background-color: rgb(250 204 21);"></td></tr>
-    <tr><td>via-yellow-500</td><td>--en-gradient-to: rgb(234 179 8 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(234 179 8), var(--en-gradient-to);</td><td style="background-color: rgb(234 179 8);"></td></tr>
-    <tr><td>via-yellow-600</td><td>--en-gradient-to: rgb(202 138 4 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(202 138 4), var(--en-gradient-to);</td><td style="background-color: rgb(202 138 4);"></td></tr>
-    <tr><td>via-yellow-700</td><td>--en-gradient-to: rgb(161 98 7 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(161 98 7), var(--en-gradient-to);</td><td style="background-color: rgb(161 98 7);"></td></tr>
-    <tr><td>via-yellow-800</td><td>--en-gradient-to: rgb(133 77 14 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(133 77 14), var(--en-gradient-to);</td><td style="background-color: rgb(133 77 14);"></td></tr>
-    <tr><td>via-yellow-900</td><td>--en-gradient-to: rgb(113 63 18 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(113 63 18), var(--en-gradient-to);</td><td style="background-color: rgb(113 63 18);"></td></tr>
-    <tr><td>via-lime-50</td><td>--en-gradient-to: rgb(247 254 231 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(247 254 231), var(--en-gradient-to);</td><td style="background-color: rgb(247 254 231);"></td></tr>
-    <tr><td>via-lime-100</td><td>--en-gradient-to: rgb(236 252 203 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(236 252 203), var(--en-gradient-to);</td><td style="background-color: rgb(236 252 203);"></td></tr>
-    <tr><td>via-lime-200</td><td>--en-gradient-to: rgb(217 249 157 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(217 249 157), var(--en-gradient-to);</td><td style="background-color: rgb(217 249 157);"></td></tr>
-    <tr><td>via-lime-300</td><td>--en-gradient-to: rgb(190 242 100 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(190 242 100), var(--en-gradient-to);</td><td style="background-color: rgb(190 242 100);"></td></tr>
-    <tr><td>via-lime-400</td><td>--en-gradient-to: rgb(163 230 53 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(163 230 53), var(--en-gradient-to);</td><td style="background-color: rgb(163 230 53);"></td></tr>
-    <tr><td>via-lime-500</td><td>--en-gradient-to: rgb(132 204 22 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(132 204 22), var(--en-gradient-to);</td><td style="background-color: rgb(132 204 22);"></td></tr>
-    <tr><td>via-lime-600</td><td>--en-gradient-to: rgb(101 163 13 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(101 163 13), var(--en-gradient-to);</td><td style="background-color: rgb(101 163 13);"></td></tr>
-    <tr><td>via-lime-700</td><td>--en-gradient-to: rgb(77 124 15 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(77 124 15), var(--en-gradient-to);</td><td style="background-color: rgb(77 124 15);"></td></tr>
-    <tr><td>via-lime-800</td><td>--en-gradient-to: rgb(63 98 18 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(63 98 18), var(--en-gradient-to);</td><td style="background-color: rgb(63 98 18);"></td></tr>
-    <tr><td>via-lime-900</td><td>--en-gradient-to: rgb(54 83 20 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(54 83 20), var(--en-gradient-to);</td><td style="background-color: rgb(54 83 20);"></td></tr>
-    <tr><td>via-green-50</td><td>--en-gradient-to: rgb(240 253 244 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(240 253 244), var(--en-gradient-to);</td><td style="background-color: rgb(240 253 244);"></td></tr>
-    <tr><td>via-green-100</td><td>--en-gradient-to: rgb(220 252 231 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(220 252 231), var(--en-gradient-to);</td><td style="background-color: rgb(220 252 231);"></td></tr>
-    <tr><td>via-green-200</td><td>--en-gradient-to: rgb(187 247 208 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(187 247 208), var(--en-gradient-to);</td><td style="background-color: rgb(187 247 208);"></td></tr>
-    <tr><td>via-green-300</td><td>--en-gradient-to: rgb(134 239 172 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(134 239 172), var(--en-gradient-to);</td><td style="background-color: rgb(134 239 172);"></td></tr>
-    <tr><td>via-green-400</td><td>--en-gradient-to: rgb(74 222 128 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(74 222 128), var(--en-gradient-to);</td><td style="background-color: rgb(74 222 128);"></td></tr>
-    <tr><td>via-green-500</td><td>--en-gradient-to: rgb(34 197 94 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(34 197 94), var(--en-gradient-to);</td><td style="background-color: rgb(34 197 94);"></td></tr>
-    <tr><td>via-green-600</td><td>--en-gradient-to: rgb(22 163 74 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(22 163 74), var(--en-gradient-to);</td><td style="background-color: rgb(22 163 74);"></td></tr>
-    <tr><td>via-green-700</td><td>--en-gradient-to: rgb(21 128 61 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(21 128 61), var(--en-gradient-to);</td><td style="background-color: rgb(21 128 61);"></td></tr>
-    <tr><td>via-green-800</td><td>--en-gradient-to: rgb(22 101 52 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(22 101 52), var(--en-gradient-to);</td><td style="background-color: rgb(22 101 52);"></td></tr>
-    <tr><td>via-green-900</td><td>--en-gradient-to: rgb(20 83 45 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(20 83 45), var(--en-gradient-to);</td><td style="background-color: rgb(20 83 45);"></td></tr>
-    <tr><td>via-emerald-50</td><td>--en-gradient-to: rgb(236 253 245 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(236 253 245), var(--en-gradient-to);</td><td style="background-color: rgb(236 253 245);"></td></tr>
-    <tr><td>via-emerald-100</td><td>--en-gradient-to: rgb(209 250 229 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(209 250 229), var(--en-gradient-to);</td><td style="background-color: rgb(209 250 229);"></td></tr>
-    <tr><td>via-emerald-200</td><td>--en-gradient-to: rgb(167 243 208 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(167 243 208), var(--en-gradient-to);</td><td style="background-color: rgb(167 243 208);"></td></tr>
-    <tr><td>via-emerald-300</td><td>--en-gradient-to: rgb(110 231 183 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(110 231 183), var(--en-gradient-to);</td><td style="background-color: rgb(110 231 183);"></td></tr>
-    <tr><td>via-emerald-400</td><td>--en-gradient-to: rgb(52 211 153 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(52 211 153), var(--en-gradient-to);</td><td style="background-color: rgb(52 211 153);"></td></tr>
-    <tr><td>via-emerald-500</td><td>--en-gradient-to: rgb(16 185 129 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(16 185 129), var(--en-gradient-to);</td><td style="background-color: rgb(16 185 129);"></td></tr>
-    <tr><td>via-emerald-600</td><td>--en-gradient-to: rgb(5 150 105 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(5 150 105), var(--en-gradient-to);</td><td style="background-color: rgb(5 150 105);"></td></tr>
-    <tr><td>via-emerald-700</td><td>--en-gradient-to: rgb(4 120 87 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(4 120 87), var(--en-gradient-to);</td><td style="background-color: rgb(4 120 87);"></td></tr>
-    <tr><td>via-emerald-800</td><td>--en-gradient-to: rgb(6 95 70 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(6 95 70), var(--en-gradient-to);</td><td style="background-color: rgb(6 95 70);"></td></tr>
-    <tr><td>via-emerald-900</td><td>--en-gradient-to: rgb(6 78 59 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(6 78 59), var(--en-gradient-to);</td><td style="background-color: rgb(6 78 59);"></td></tr>
-    <tr><td>via-teal-50</td><td>--en-gradient-to: rgb(240 253 250 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(240 253 250), var(--en-gradient-to);</td><td style="background-color: rgb(240 253 250);"></td></tr>
-    <tr><td>via-teal-100</td><td>--en-gradient-to: rgb(204 251 241 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(204 251 241), var(--en-gradient-to);</td><td style="background-color: rgb(204 251 241);"></td></tr>
-    <tr><td>via-teal-200</td><td>--en-gradient-to: rgb(153 246 228 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(153 246 228), var(--en-gradient-to);</td><td style="background-color: rgb(153 246 228);"></td></tr>
-    <tr><td>via-teal-300</td><td>--en-gradient-to: rgb(94 234 212 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(94 234 212), var(--en-gradient-to);</td><td style="background-color: rgb(94 234 212);"></td></tr>
-    <tr><td>via-teal-400</td><td>--en-gradient-to: rgb(45 212 191 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(45 212 191), var(--en-gradient-to);</td><td style="background-color: rgb(45 212 191);"></td></tr>
-    <tr><td>via-teal-500</td><td>--en-gradient-to: rgb(20 184 166 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(20 184 166), var(--en-gradient-to);</td><td style="background-color: rgb(20 184 166);"></td></tr>
-    <tr><td>via-teal-600</td><td>--en-gradient-to: rgb(13 148 136 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(13 148 136), var(--en-gradient-to);</td><td style="background-color: rgb(13 148 136);"></td></tr>
-    <tr><td>via-teal-700</td><td>--en-gradient-to: rgb(15 118 110 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(15 118 110), var(--en-gradient-to);</td><td style="background-color: rgb(15 118 110);"></td></tr>
-    <tr><td>via-teal-800</td><td>--en-gradient-to: rgb(17 94 89 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(17 94 89), var(--en-gradient-to);</td><td style="background-color: rgb(17 94 89);"></td></tr>
-    <tr><td>via-teal-900</td><td>--en-gradient-to: rgb(19 78 74 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(19 78 74), var(--en-gradient-to);</td><td style="background-color: rgb(19 78 74);"></td></tr>
-    <tr><td>via-cyan-50</td><td>--en-gradient-to: rgb(236 254 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(236 254 255), var(--en-gradient-to);</td><td style="background-color: rgb(236 254 255);"></td></tr>
-    <tr><td>via-cyan-100</td><td>--en-gradient-to: rgb(207 250 254 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(207 250 254), var(--en-gradient-to);</td><td style="background-color: rgb(207 250 254);"></td></tr>
-    <tr><td>via-cyan-200</td><td>--en-gradient-to: rgb(165 243 252 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(165 243 252), var(--en-gradient-to);</td><td style="background-color: rgb(165 243 252);"></td></tr>
-    <tr><td>via-cyan-300</td><td>--en-gradient-to: rgb(103 232 249 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(103 232 249), var(--en-gradient-to);</td><td style="background-color: rgb(103 232 249);"></td></tr>
-    <tr><td>via-cyan-400</td><td>--en-gradient-to: rgb(34 211 238 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(34 211 238), var(--en-gradient-to);</td><td style="background-color: rgb(34 211 238);"></td></tr>
-    <tr><td>via-cyan-500</td><td>--en-gradient-to: rgb(6 182 212 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(6 182 212), var(--en-gradient-to);</td><td style="background-color: rgb(6 182 212);"></td></tr>
-    <tr><td>via-cyan-600</td><td>--en-gradient-to: rgb(8 145 178 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(8 145 178), var(--en-gradient-to);</td><td style="background-color: rgb(8 145 178);"></td></tr>
-    <tr><td>via-cyan-700</td><td>--en-gradient-to: rgb(14 116 144 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(14 116 144), var(--en-gradient-to);</td><td style="background-color: rgb(14 116 144);"></td></tr>
-    <tr><td>via-cyan-800</td><td>--en-gradient-to: rgb(21 94 117 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(21 94 117), var(--en-gradient-to);</td><td style="background-color: rgb(21 94 117);"></td></tr>
-    <tr><td>via-cyan-900</td><td>--en-gradient-to: rgb(22 78 99 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(22 78 99), var(--en-gradient-to);</td><td style="background-color: rgb(22 78 99);"></td></tr>
-    <tr><td>via-sky-50</td><td>--en-gradient-to: rgb(240 249 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(240 249 255), var(--en-gradient-to);</td><td style="background-color: rgb(240 249 255);"></td></tr>
-    <tr><td>via-sky-100</td><td>--en-gradient-to: rgb(224 242 254 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(224 242 254), var(--en-gradient-to);</td><td style="background-color: rgb(224 242 254);"></td></tr>
-    <tr><td>via-sky-200</td><td>--en-gradient-to: rgb(186 230 253 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(186 230 253), var(--en-gradient-to);</td><td style="background-color: rgb(186 230 253);"></td></tr>
-    <tr><td>via-sky-300</td><td>--en-gradient-to: rgb(125 211 252 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(125 211 252), var(--en-gradient-to);</td><td style="background-color: rgb(125 211 252);"></td></tr>
-    <tr><td>via-sky-400</td><td>--en-gradient-to: rgb(56 189 248 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(56 189 248), var(--en-gradient-to);</td><td style="background-color: rgb(56 189 248);"></td></tr>
-    <tr><td>via-sky-500</td><td>--en-gradient-to: rgb(14 165 233 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(14 165 233), var(--en-gradient-to);</td><td style="background-color: rgb(14 165 233);"></td></tr>
-    <tr><td>via-sky-600</td><td>--en-gradient-to: rgb(2 132 199 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(2 132 199), var(--en-gradient-to);</td><td style="background-color: rgb(2 132 199);"></td></tr>
-    <tr><td>via-sky-700</td><td>--en-gradient-to: rgb(3 105 161 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(3 105 161), var(--en-gradient-to);</td><td style="background-color: rgb(3 105 161);"></td></tr>
-    <tr><td>via-sky-800</td><td>--en-gradient-to: rgb(7 89 133 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(7 89 133), var(--en-gradient-to);</td><td style="background-color: rgb(7 89 133);"></td></tr>
-    <tr><td>via-sky-900</td><td>--en-gradient-to: rgb(12 74 110 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(12 74 110), var(--en-gradient-to);</td><td style="background-color: rgb(12 74 110);"></td></tr>
-    <tr><td>via-blue-50</td><td>--en-gradient-to: rgb(239 246 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(239 246 255), var(--en-gradient-to);</td><td style="background-color: rgb(239 246 255);"></td></tr>
-    <tr><td>via-blue-100</td><td>--en-gradient-to: rgb(219 234 254 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(219 234 254), var(--en-gradient-to);</td><td style="background-color: rgb(219 234 254);"></td></tr>
-    <tr><td>via-blue-200</td><td>--en-gradient-to: rgb(191 219 254 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(191 219 254), var(--en-gradient-to);</td><td style="background-color: rgb(191 219 254);"></td></tr>
-    <tr><td>via-blue-300</td><td>--en-gradient-to: rgb(147 197 253 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(147 197 253), var(--en-gradient-to);</td><td style="background-color: rgb(147 197 253);"></td></tr>
-    <tr><td>via-blue-400</td><td>--en-gradient-to: rgb(96 165 250 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(96 165 250), var(--en-gradient-to);</td><td style="background-color: rgb(96 165 250);"></td></tr>
-    <tr><td>via-blue-500</td><td>--en-gradient-to: rgb(59 130 246 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(59 130 246), var(--en-gradient-to);</td><td style="background-color: rgb(59 130 246);"></td></tr>
-    <tr><td>via-blue-600</td><td>--en-gradient-to: rgb(37 99 235 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(37 99 235), var(--en-gradient-to);</td><td style="background-color: rgb(37 99 235);"></td></tr>
-    <tr><td>via-blue-700</td><td>--en-gradient-to: rgb(29 78 216 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(29 78 216), var(--en-gradient-to);</td><td style="background-color: rgb(29 78 216);"></td></tr>
-    <tr><td>via-blue-800</td><td>--en-gradient-to: rgb(30 64 175 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(30 64 175), var(--en-gradient-to);</td><td style="background-color: rgb(30 64 175);"></td></tr>
-    <tr><td>via-blue-900</td><td>--en-gradient-to: rgb(30 58 138 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(30 58 138), var(--en-gradient-to);</td><td style="background-color: rgb(30 58 138);"></td></tr>
-    <tr><td>via-indigo-50</td><td>--en-gradient-to: rgb(238 242 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(238 242 255), var(--en-gradient-to);</td><td style="background-color: rgb(238 242 255);"></td></tr>
-    <tr><td>via-indigo-100</td><td>--en-gradient-to: rgb(224 231 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(224 231 255), var(--en-gradient-to);</td><td style="background-color: rgb(224 231 255);"></td></tr>
-    <tr><td>via-indigo-200</td><td>--en-gradient-to: rgb(199 210 254 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(199 210 254), var(--en-gradient-to);</td><td style="background-color: rgb(199 210 254);"></td></tr>
-    <tr><td>via-indigo-300</td><td>--en-gradient-to: rgb(165 180 252 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(165 180 252), var(--en-gradient-to);</td><td style="background-color: rgb(165 180 252);"></td></tr>
-    <tr><td>via-indigo-400</td><td>--en-gradient-to: rgb(129 140 248 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(129 140 248), var(--en-gradient-to);</td><td style="background-color: rgb(129 140 248);"></td></tr>
-    <tr><td>via-indigo-500</td><td>--en-gradient-to: rgb(99 102 241 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(99 102 241), var(--en-gradient-to);</td><td style="background-color: rgb(99 102 241);"></td></tr>
-    <tr><td>via-indigo-600</td><td>--en-gradient-to: rgb(79 70 229 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(79 70 229), var(--en-gradient-to);</td><td style="background-color: rgb(79 70 229);"></td></tr>
-    <tr><td>via-indigo-700</td><td>--en-gradient-to: rgb(67 56 202 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(67 56 202), var(--en-gradient-to);</td><td style="background-color: rgb(67 56 202);"></td></tr>
-    <tr><td>via-indigo-800</td><td>--en-gradient-to: rgb(55 48 163 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(55 48 163), var(--en-gradient-to);</td><td style="background-color: rgb(55 48 163);"></td></tr>
-    <tr><td>via-indigo-900</td><td>--en-gradient-to: rgb(49 46 129 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(49 46 129), var(--en-gradient-to);</td><td style="background-color: rgb(49 46 129);"></td></tr>
-    <tr><td>via-violet-50</td><td>--en-gradient-to: rgb(245 243 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(245 243 255), var(--en-gradient-to);</td><td style="background-color: rgb(245 243 255);"></td></tr>
-    <tr><td>via-violet-100</td><td>--en-gradient-to: rgb(237 233 254 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(237 233 254), var(--en-gradient-to);</td><td style="background-color: rgb(237 233 254);"></td></tr>
-    <tr><td>via-violet-200</td><td>--en-gradient-to: rgb(221 214 254 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(221 214 254), var(--en-gradient-to);</td><td style="background-color: rgb(221 214 254);"></td></tr>
-    <tr><td>via-violet-300</td><td>--en-gradient-to: rgb(196 181 253 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(196 181 253), var(--en-gradient-to);</td><td style="background-color: rgb(196 181 253);"></td></tr>
-    <tr><td>via-violet-400</td><td>--en-gradient-to: rgb(167 139 250 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(167 139 250), var(--en-gradient-to);</td><td style="background-color: rgb(167 139 250);"></td></tr>
-    <tr><td>via-violet-500</td><td>--en-gradient-to: rgb(139 92 246 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(139 92 246), var(--en-gradient-to);</td><td style="background-color: rgb(139 92 246);"></td></tr>
-    <tr><td>via-violet-600</td><td>--en-gradient-to: rgb(124 58 237 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(124 58 237), var(--en-gradient-to);</td><td style="background-color: rgb(124 58 237);"></td></tr>
-    <tr><td>via-violet-700</td><td>--en-gradient-to: rgb(109 40 217 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(109 40 217), var(--en-gradient-to);</td><td style="background-color: rgb(109 40 217);"></td></tr>
-    <tr><td>via-violet-800</td><td>--en-gradient-to: rgb(91 33 182 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(91 33 182), var(--en-gradient-to);</td><td style="background-color: rgb(91 33 182);"></td></tr>
-    <tr><td>via-violet-900</td><td>--en-gradient-to: rgb(76 29 149 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(76 29 149), var(--en-gradient-to);</td><td style="background-color: rgb(76 29 149);"></td></tr>
-    <tr><td>via-purple-50</td><td>--en-gradient-to: rgb(250 245 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(250 245 255), var(--en-gradient-to);</td><td style="background-color: rgb(250 245 255);"></td></tr>
-    <tr><td>via-purple-100</td><td>--en-gradient-to: rgb(243 232 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(243 232 255), var(--en-gradient-to);</td><td style="background-color: rgb(243 232 255);"></td></tr>
-    <tr><td>via-purple-200</td><td>--en-gradient-to: rgb(233 213 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(233 213 255), var(--en-gradient-to);</td><td style="background-color: rgb(233 213 255);"></td></tr>
-    <tr><td>via-purple-300</td><td>--en-gradient-to: rgb(216 180 254 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(216 180 254), var(--en-gradient-to);</td><td style="background-color: rgb(216 180 254);"></td></tr>
-    <tr><td>via-purple-400</td><td>--en-gradient-to: rgb(192 132 252 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(192 132 252), var(--en-gradient-to);</td><td style="background-color: rgb(192 132 252);"></td></tr>
-    <tr><td>via-purple-500</td><td>--en-gradient-to: rgb(168 85 247 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(168 85 247), var(--en-gradient-to);</td><td style="background-color: rgb(168 85 247);"></td></tr>
-    <tr><td>via-purple-600</td><td>--en-gradient-to: rgb(147 51 234 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(147 51 234), var(--en-gradient-to);</td><td style="background-color: rgb(147 51 234);"></td></tr>
-    <tr><td>via-purple-700</td><td>--en-gradient-to: rgb(126 34 206 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(126 34 206), var(--en-gradient-to);</td><td style="background-color: rgb(126 34 206);"></td></tr>
-    <tr><td>via-purple-800</td><td>--en-gradient-to: rgb(107 33 168 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(107 33 168), var(--en-gradient-to);</td><td style="background-color: rgb(107 33 168);"></td></tr>
-    <tr><td>via-purple-900</td><td>--en-gradient-to: rgb(88 28 135 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(88 28 135), var(--en-gradient-to);</td><td style="background-color: rgb(88 28 135);"></td></tr>
-    <tr><td>via-fuchsia-50</td><td>--en-gradient-to: rgb(253 244 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(253 244 255), var(--en-gradient-to);</td><td style="background-color: rgb(253 244 255);"></td></tr>
-    <tr><td>via-fuchsia-100</td><td>--en-gradient-to: rgb(250 232 255 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(250 232 255), var(--en-gradient-to);</td><td style="background-color: rgb(250 232 255);"></td></tr>
-    <tr><td>via-fuchsia-200</td><td>--en-gradient-to: rgb(245 208 254 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(245 208 254), var(--en-gradient-to);</td><td style="background-color: rgb(245 208 254);"></td></tr>
-    <tr><td>via-fuchsia-300</td><td>--en-gradient-to: rgb(240 171 252 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(240 171 252), var(--en-gradient-to);</td><td style="background-color: rgb(240 171 252);"></td></tr>
-    <tr><td>via-fuchsia-400</td><td>--en-gradient-to: rgb(232 121 249 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(232 121 249), var(--en-gradient-to);</td><td style="background-color: rgb(232 121 249);"></td></tr>
-    <tr><td>via-fuchsia-500</td><td>--en-gradient-to: rgb(217 70 239 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(217 70 239), var(--en-gradient-to);</td><td style="background-color: rgb(217 70 239);"></td></tr>
-    <tr><td>via-fuchsia-600</td><td>--en-gradient-to: rgb(192 38 211 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(192 38 211), var(--en-gradient-to);</td><td style="background-color: rgb(192 38 211);"></td></tr>
-    <tr><td>via-fuchsia-700</td><td>--en-gradient-to: rgb(162 28 175 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(162 28 175), var(--en-gradient-to);</td><td style="background-color: rgb(162 28 175);"></td></tr>
-    <tr><td>via-fuchsia-800</td><td>--en-gradient-to: rgb(134 25 143 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(134 25 143), var(--en-gradient-to);</td><td style="background-color: rgb(134 25 143);"></td></tr>
-    <tr><td>via-fuchsia-900</td><td>--en-gradient-to: rgb(112 26 117 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(112 26 117), var(--en-gradient-to);</td><td style="background-color: rgb(112 26 117);"></td></tr>
-    <tr><td>via-pink-50</td><td>--en-gradient-to: rgb(253 242 248 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(253 242 248), var(--en-gradient-to);</td><td style="background-color: rgb(253 242 248);"></td></tr>
-    <tr><td>via-pink-100</td><td>--en-gradient-to: rgb(252 231 243 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(252 231 243), var(--en-gradient-to);</td><td style="background-color: rgb(252 231 243);"></td></tr>
-    <tr><td>via-pink-200</td><td>--en-gradient-to: rgb(251 207 232 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(251 207 232), var(--en-gradient-to);</td><td style="background-color: rgb(251 207 232);"></td></tr>
-    <tr><td>via-pink-300</td><td>--en-gradient-to: rgb(249 168 212 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(249 168 212), var(--en-gradient-to);</td><td style="background-color: rgb(249 168 212);"></td></tr>
-    <tr><td>via-pink-400</td><td>--en-gradient-to: rgb(244 114 182 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(244 114 182), var(--en-gradient-to);</td><td style="background-color: rgb(244 114 182);"></td></tr>
-    <tr><td>via-pink-500</td><td>--en-gradient-to: rgb(236 72 153 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(236 72 153), var(--en-gradient-to);</td><td style="background-color: rgb(236 72 153);"></td></tr>
-    <tr><td>via-pink-600</td><td>--en-gradient-to: rgb(219 39 119 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(219 39 119), var(--en-gradient-to);</td><td style="background-color: rgb(219 39 119);"></td></tr>
-    <tr><td>via-pink-700</td><td>--en-gradient-to: rgb(190 24 93 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(190 24 93), var(--en-gradient-to);</td><td style="background-color: rgb(190 24 93);"></td></tr>
-    <tr><td>via-pink-800</td><td>--en-gradient-to: rgb(157 23 77 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(157 23 77), var(--en-gradient-to);</td><td style="background-color: rgb(157 23 77);"></td></tr>
-    <tr><td>via-pink-900</td><td>--en-gradient-to: rgb(131 24 67 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(131 24 67), var(--en-gradient-to);</td><td style="background-color: rgb(131 24 67);"></td></tr>
-    <tr><td>via-rose-50</td><td>--en-gradient-to: rgb(255 241 242 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(255 241 242), var(--en-gradient-to);</td><td style="background-color: rgb(255 241 242);"></td></tr>
-    <tr><td>via-rose-100</td><td>--en-gradient-to: rgb(255 228 230 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(255 228 230), var(--en-gradient-to);</td><td style="background-color: rgb(255 228 230);"></td></tr>
-    <tr><td>via-rose-200</td><td>--en-gradient-to: rgb(254 205 211 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(254 205 211), var(--en-gradient-to);</td><td style="background-color: rgb(254 205 211);"></td></tr>
-    <tr><td>via-rose-300</td><td>--en-gradient-to: rgb(253 164 175 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(253 164 175), var(--en-gradient-to);</td><td style="background-color: rgb(253 164 175);"></td></tr>
-    <tr><td>via-rose-400</td><td>--en-gradient-to: rgb(251 113 133 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(251 113 133), var(--en-gradient-to);</td><td style="background-color: rgb(251 113 133);"></td></tr>
-    <tr><td>via-rose-500</td><td>--en-gradient-to: rgb(244 63 94 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(244 63 94), var(--en-gradient-to);</td><td style="background-color: rgb(244 63 94);"></td></tr>
-    <tr><td>via-rose-600</td><td>--en-gradient-to: rgb(225 29 72 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(225 29 72), var(--en-gradient-to);</td><td style="background-color: rgb(225 29 72);"></td></tr>
-    <tr><td>via-rose-700</td><td>--en-gradient-to: rgb(190 18 60 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(190 18 60), var(--en-gradient-to);</td><td style="background-color: rgb(190 18 60);"></td></tr>
-    <tr><td>via-rose-800</td><td>--en-gradient-to: rgb(159 18 57 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(159 18 57), var(--en-gradient-to);</td><td style="background-color: rgb(159 18 57);"></td></tr>
-    <tr><td>via-rose-900</td><td>--en-gradient-to: rgb(136 19 55 / 0);<br>--en-gradient-stops: var(--en-gradient-from), rgb(136 19 55), var(--en-gradient-to);</td><td style="background-color: rgb(136 19 55);"></td></tr>
-    <tr><td>to-inherit</td><td>--en-gradient-to: inherit;</td><td style="background-color: inherit;"></td></tr>
-    <tr><td>to-current</td><td>--en-gradient-to: currentColor;</td><td style="background-color: currentColor;"></td></tr>
-    <tr><td>to-transparent</td><td>--en-gradient-to: transparent;</td><td style="background-color: transparent;"></td></tr>
-    <tr><td>to-black</td><td>--en-gradient-to: rgb(0 0 0);</td><td style="background-color: rgb(0 0 0);"></td></tr>
-    <tr><td>to-white</td><td>--en-gradient-to: rgb(255 255 255);</td><td style="background-color: rgb(255 255 255);"></td></tr>
-    <tr><td>to-slate-50</td><td>--en-gradient-to: rgb(248 250 252);</td><td style="background-color: rgb(248 250 252);"></td></tr>
-    <tr><td>to-slate-100</td><td>--en-gradient-to: rgb(241 245 249);</td><td style="background-color: rgb(241 245 249);"></td></tr>
-    <tr><td>to-slate-200</td><td>--en-gradient-to: rgb(226 232 240);</td><td style="background-color: rgb(226 232 240);"></td></tr>
-    <tr><td>to-slate-300</td><td>--en-gradient-to: rgb(203 213 225);</td><td style="background-color: rgb(203 213 225);"></td></tr>
-    <tr><td>to-slate-400</td><td>--en-gradient-to: rgb(148 163 184);</td><td style="background-color: rgb(148 163 184);"></td></tr>
-    <tr><td>to-slate-500</td><td>--en-gradient-to: rgb(100 116 139);</td><td style="background-color: rgb(100 116 139);"></td></tr>
-    <tr><td>to-slate-600</td><td>--en-gradient-to: rgb(71 85 105);</td><td style="background-color: rgb(71 85 105);"></td></tr>
-    <tr><td>to-slate-700</td><td>--en-gradient-to: rgb(51 65 85);</td><td style="background-color: rgb(51 65 85);"></td></tr>
-    <tr><td>to-slate-800</td><td>--en-gradient-to: rgb(30 41 59);</td><td style="background-color: rgb(30 41 59);"></td></tr>
-    <tr><td>to-slate-900</td><td>--en-gradient-to: rgb(15 23 42);</td><td style="background-color: rgb(15 23 42);"></td></tr>
-    <tr><td>to-gray-50</td><td>--en-gradient-to: rgb(249 250 251);</td><td style="background-color: rgb(249 250 251);"></td></tr>
-    <tr><td>to-gray-100</td><td>--en-gradient-to: rgb(243 244 246);</td><td style="background-color: rgb(243 244 246);"></td></tr>
-    <tr><td>to-gray-200</td><td>--en-gradient-to: rgb(229 231 235);</td><td style="background-color: rgb(229 231 235);"></td></tr>
-    <tr><td>to-gray-300</td><td>--en-gradient-to: rgb(209 213 219);</td><td style="background-color: rgb(209 213 219);"></td></tr>
-    <tr><td>to-gray-400</td><td>--en-gradient-to: rgb(156 163 175);</td><td style="background-color: rgb(156 163 175);"></td></tr>
-    <tr><td>to-gray-500</td><td>--en-gradient-to: rgb(107 114 128);</td><td style="background-color: rgb(107 114 128);"></td></tr>
-    <tr><td>to-gray-600</td><td>--en-gradient-to: rgb(75 85 99);</td><td style="background-color: rgb(75 85 99);"></td></tr>
-    <tr><td>to-gray-700</td><td>--en-gradient-to: rgb(55 65 81);</td><td style="background-color: rgb(55 65 81);"></td></tr>
-    <tr><td>to-gray-800</td><td>--en-gradient-to: rgb(31 41 55);</td><td style="background-color: rgb(31 41 55);"></td></tr>
-    <tr><td>to-gray-900</td><td>--en-gradient-to: rgb(17 24 39);</td><td style="background-color: rgb(17 24 39);"></td></tr>
-    <tr><td>to-zinc-50</td><td>--en-gradient-to: rgb(250 250 250);</td><td style="background-color: rgb(250 250 250);"></td></tr>
-    <tr><td>to-zinc-100</td><td>--en-gradient-to: rgb(244 244 245);</td><td style="background-color: rgb(244 244 245);"></td></tr>
-    <tr><td>to-zinc-200</td><td>--en-gradient-to: rgb(228 228 231);</td><td style="background-color: rgb(228 228 231);"></td></tr>
-    <tr><td>to-zinc-300</td><td>--en-gradient-to: rgb(212 212 216);</td><td style="background-color: rgb(212 212 216);"></td></tr>
-    <tr><td>to-zinc-400</td><td>--en-gradient-to: rgb(161 161 170);</td><td style="background-color: rgb(161 161 170);"></td></tr>
-    <tr><td>to-zinc-500</td><td>--en-gradient-to: rgb(113 113 122);</td><td style="background-color: rgb(113 113 122);"></td></tr>
-    <tr><td>to-zinc-600</td><td>--en-gradient-to: rgb(82 82 91);</td><td style="background-color: rgb(82 82 91);"></td></tr>
-    <tr><td>to-zinc-700</td><td>--en-gradient-to: rgb(63 63 70);</td><td style="background-color: rgb(63 63 70);"></td></tr>
-    <tr><td>to-zinc-800</td><td>--en-gradient-to: rgb(39 39 42);</td><td style="background-color: rgb(39 39 42);"></td></tr>
-    <tr><td>to-zinc-900</td><td>--en-gradient-to: rgb(24 24 27);</td><td style="background-color: rgb(24 24 27);"></td></tr>
-    <tr><td>to-neutral-50</td><td>--en-gradient-to: rgb(250 250 250);</td><td style="background-color: rgb(250 250 250);"></td></tr>
-    <tr><td>to-neutral-100</td><td>--en-gradient-to: rgb(245 245 245);</td><td style="background-color: rgb(245 245 245);"></td></tr>
-    <tr><td>to-neutral-200</td><td>--en-gradient-to: rgb(229 229 229);</td><td style="background-color: rgb(229 229 229);"></td></tr>
-    <tr><td>to-neutral-300</td><td>--en-gradient-to: rgb(212 212 212);</td><td style="background-color: rgb(212 212 212);"></td></tr>
-    <tr><td>to-neutral-400</td><td>--en-gradient-to: rgb(163 163 163);</td><td style="background-color: rgb(163 163 163);"></td></tr>
-    <tr><td>to-neutral-500</td><td>--en-gradient-to: rgb(115 115 115);</td><td style="background-color: rgb(115 115 115);"></td></tr>
-    <tr><td>to-neutral-600</td><td>--en-gradient-to: rgb(82 82 82);</td><td style="background-color: rgb(82 82 82);"></td></tr>
-    <tr><td>to-neutral-700</td><td>--en-gradient-to: rgb(64 64 64);</td><td style="background-color: rgb(64 64 64);"></td></tr>
-    <tr><td>to-neutral-800</td><td>--en-gradient-to: rgb(38 38 38);</td><td style="background-color: rgb(38 38 38);"></td></tr>
-    <tr><td>to-neutral-900</td><td>--en-gradient-to: rgb(23 23 23);</td><td style="background-color: rgb(23 23 23);"></td></tr>
-    <tr><td>to-stone-50</td><td>--en-gradient-to: rgb(250 250 249);</td><td style="background-color: rgb(250 250 249);"></td></tr>
-    <tr><td>to-stone-100</td><td>--en-gradient-to: rgb(245 245 244);</td><td style="background-color: rgb(245 245 244);"></td></tr>
-    <tr><td>to-stone-200</td><td>--en-gradient-to: rgb(231 229 228);</td><td style="background-color: rgb(231 229 228);"></td></tr>
-    <tr><td>to-stone-300</td><td>--en-gradient-to: rgb(214 211 209);</td><td style="background-color: rgb(214 211 209);"></td></tr>
-    <tr><td>to-stone-400</td><td>--en-gradient-to: rgb(168 162 158);</td><td style="background-color: rgb(168 162 158);"></td></tr>
-    <tr><td>to-stone-500</td><td>--en-gradient-to: rgb(120 113 108);</td><td style="background-color: rgb(120 113 108);"></td></tr>
-    <tr><td>to-stone-600</td><td>--en-gradient-to: rgb(87 83 78);</td><td style="background-color: rgb(87 83 78);"></td></tr>
-    <tr><td>to-stone-700</td><td>--en-gradient-to: rgb(68 64 60);</td><td style="background-color: rgb(68 64 60);"></td></tr>
-    <tr><td>to-stone-800</td><td>--en-gradient-to: rgb(41 37 36);</td><td style="background-color: rgb(41 37 36);"></td></tr>
-    <tr><td>to-stone-900</td><td>--en-gradient-to: rgb(28 25 23);</td><td style="background-color: rgb(28 25 23);"></td></tr>
-    <tr><td>to-red-50</td><td>--en-gradient-to: rgb(254 242 242);</td><td style="background-color: rgb(254 242 242);"></td></tr>
-    <tr><td>to-red-100</td><td>--en-gradient-to: rgb(254 226 226);</td><td style="background-color: rgb(254 226 226);"></td></tr>
-    <tr><td>to-red-200</td><td>--en-gradient-to: rgb(254 202 202);</td><td style="background-color: rgb(254 202 202);"></td></tr>
-    <tr><td>to-red-300</td><td>--en-gradient-to: rgb(252 165 165);</td><td style="background-color: rgb(252 165 165);"></td></tr>
-    <tr><td>to-red-400</td><td>--en-gradient-to: rgb(248 113 113);</td><td style="background-color: rgb(248 113 113);"></td></tr>
-    <tr><td>to-red-500</td><td>--en-gradient-to: rgb(239 68 68);</td><td style="background-color: rgb(239 68 68);"></td></tr>
-    <tr><td>to-red-600</td><td>--en-gradient-to: rgb(220 38 38);</td><td style="background-color: rgb(220 38 38);"></td></tr>
-    <tr><td>to-red-700</td><td>--en-gradient-to: rgb(185 28 28);</td><td style="background-color: rgb(185 28 28);"></td></tr>
-    <tr><td>to-red-800</td><td>--en-gradient-to: rgb(153 27 27);</td><td style="background-color: rgb(153 27 27);"></td></tr>
-    <tr><td>to-red-900</td><td>--en-gradient-to: rgb(127 29 29);</td><td style="background-color: rgb(127 29 29);"></td></tr>
-    <tr><td>to-orange-50</td><td>--en-gradient-to: rgb(255 247 237);</td><td style="background-color: rgb(255 247 237);"></td></tr>
-    <tr><td>to-orange-100</td><td>--en-gradient-to: rgb(255 237 213);</td><td style="background-color: rgb(255 237 213);"></td></tr>
-    <tr><td>to-orange-200</td><td>--en-gradient-to: rgb(254 215 170);</td><td style="background-color: rgb(254 215 170);"></td></tr>
-    <tr><td>to-orange-300</td><td>--en-gradient-to: rgb(253 186 116);</td><td style="background-color: rgb(253 186 116);"></td></tr>
-    <tr><td>to-orange-400</td><td>--en-gradient-to: rgb(251 146 60);</td><td style="background-color: rgb(251 146 60);"></td></tr>
-    <tr><td>to-orange-500</td><td>--en-gradient-to: rgb(249 115 22);</td><td style="background-color: rgb(249 115 22);"></td></tr>
-    <tr><td>to-orange-600</td><td>--en-gradient-to: rgb(234 88 12);</td><td style="background-color: rgb(234 88 12);"></td></tr>
-    <tr><td>to-orange-700</td><td>--en-gradient-to: rgb(194 65 12);</td><td style="background-color: rgb(194 65 12);"></td></tr>
-    <tr><td>to-orange-800</td><td>--en-gradient-to: rgb(154 52 18);</td><td style="background-color: rgb(154 52 18);"></td></tr>
-    <tr><td>to-orange-900</td><td>--en-gradient-to: rgb(124 45 18);</td><td style="background-color: rgb(124 45 18);"></td></tr>
-    <tr><td>to-amber-50</td><td>--en-gradient-to: rgb(255 251 235);</td><td style="background-color: rgb(255 251 235);"></td></tr>
-    <tr><td>to-amber-100</td><td>--en-gradient-to: rgb(254 243 199);</td><td style="background-color: rgb(254 243 199);"></td></tr>
-    <tr><td>to-amber-200</td><td>--en-gradient-to: rgb(253 230 138);</td><td style="background-color: rgb(253 230 138);"></td></tr>
-    <tr><td>to-amber-300</td><td>--en-gradient-to: rgb(252 211 77);</td><td style="background-color: rgb(252 211 77);"></td></tr>
-    <tr><td>to-amber-400</td><td>--en-gradient-to: rgb(251 191 36);</td><td style="background-color: rgb(251 191 36);"></td></tr>
-    <tr><td>to-amber-500</td><td>--en-gradient-to: rgb(245 158 11);</td><td style="background-color: rgb(245 158 11);"></td></tr>
-    <tr><td>to-amber-600</td><td>--en-gradient-to: rgb(217 119 6);</td><td style="background-color: rgb(217 119 6);"></td></tr>
-    <tr><td>to-amber-700</td><td>--en-gradient-to: rgb(180 83 9);</td><td style="background-color: rgb(180 83 9);"></td></tr>
-    <tr><td>to-amber-800</td><td>--en-gradient-to: rgb(146 64 14);</td><td style="background-color: rgb(146 64 14);"></td></tr>
-    <tr><td>to-amber-900</td><td>--en-gradient-to: rgb(120 53 15);</td><td style="background-color: rgb(120 53 15);"></td></tr>
-    <tr><td>to-yellow-50</td><td>--en-gradient-to: rgb(254 252 232);</td><td style="background-color: rgb(254 252 232);"></td></tr>
-    <tr><td>to-yellow-100</td><td>--en-gradient-to: rgb(254 249 195);</td><td style="background-color: rgb(254 249 195);"></td></tr>
-    <tr><td>to-yellow-200</td><td>--en-gradient-to: rgb(254 240 138);</td><td style="background-color: rgb(254 240 138);"></td></tr>
-    <tr><td>to-yellow-300</td><td>--en-gradient-to: rgb(253 224 71);</td><td style="background-color: rgb(253 224 71);"></td></tr>
-    <tr><td>to-yellow-400</td><td>--en-gradient-to: rgb(250 204 21);</td><td style="background-color: rgb(250 204 21);"></td></tr>
-    <tr><td>to-yellow-500</td><td>--en-gradient-to: rgb(234 179 8);</td><td style="background-color: rgb(234 179 8);"></td></tr>
-    <tr><td>to-yellow-600</td><td>--en-gradient-to: rgb(202 138 4);</td><td style="background-color: rgb(202 138 4);"></td></tr>
-    <tr><td>to-yellow-700</td><td>--en-gradient-to: rgb(161 98 7);</td><td style="background-color: rgb(161 98 7);"></td></tr>
-    <tr><td>to-yellow-800</td><td>--en-gradient-to: rgb(133 77 14);</td><td style="background-color: rgb(133 77 14);"></td></tr>
-    <tr><td>to-yellow-900</td><td>--en-gradient-to: rgb(113 63 18);</td><td style="background-color: rgb(113 63 18);"></td></tr>
-    <tr><td>to-lime-50</td><td>--en-gradient-to: rgb(247 254 231);</td><td style="background-color: rgb(247 254 231);"></td></tr>
-    <tr><td>to-lime-100</td><td>--en-gradient-to: rgb(236 252 203);</td><td style="background-color: rgb(236 252 203);"></td></tr>
-    <tr><td>to-lime-200</td><td>--en-gradient-to: rgb(217 249 157);</td><td style="background-color: rgb(217 249 157);"></td></tr>
-    <tr><td>to-lime-300</td><td>--en-gradient-to: rgb(190 242 100);</td><td style="background-color: rgb(190 242 100);"></td></tr>
-    <tr><td>to-lime-400</td><td>--en-gradient-to: rgb(163 230 53);</td><td style="background-color: rgb(163 230 53);"></td></tr>
-    <tr><td>to-lime-500</td><td>--en-gradient-to: rgb(132 204 22);</td><td style="background-color: rgb(132 204 22);"></td></tr>
-    <tr><td>to-lime-600</td><td>--en-gradient-to: rgb(101 163 13);</td><td style="background-color: rgb(101 163 13);"></td></tr>
-    <tr><td>to-lime-700</td><td>--en-gradient-to: rgb(77 124 15);</td><td style="background-color: rgb(77 124 15);"></td></tr>
-    <tr><td>to-lime-800</td><td>--en-gradient-to: rgb(63 98 18);</td><td style="background-color: rgb(63 98 18);"></td></tr>
-    <tr><td>to-lime-900</td><td>--en-gradient-to: rgb(54 83 20);</td><td style="background-color: rgb(54 83 20);"></td></tr>
-    <tr><td>to-green-50</td><td>--en-gradient-to: rgb(240 253 244);</td><td style="background-color: rgb(240 253 244);"></td></tr>
-    <tr><td>to-green-100</td><td>--en-gradient-to: rgb(220 252 231);</td><td style="background-color: rgb(220 252 231);"></td></tr>
-    <tr><td>to-green-200</td><td>--en-gradient-to: rgb(187 247 208);</td><td style="background-color: rgb(187 247 208);"></td></tr>
-    <tr><td>to-green-300</td><td>--en-gradient-to: rgb(134 239 172);</td><td style="background-color: rgb(134 239 172);"></td></tr>
-    <tr><td>to-green-400</td><td>--en-gradient-to: rgb(74 222 128);</td><td style="background-color: rgb(74 222 128);"></td></tr>
-    <tr><td>to-green-500</td><td>--en-gradient-to: rgb(34 197 94);</td><td style="background-color: rgb(34 197 94);"></td></tr>
-    <tr><td>to-green-600</td><td>--en-gradient-to: rgb(22 163 74);</td><td style="background-color: rgb(22 163 74);"></td></tr>
-    <tr><td>to-green-700</td><td>--en-gradient-to: rgb(21 128 61);</td><td style="background-color: rgb(21 128 61);"></td></tr>
-    <tr><td>to-green-800</td><td>--en-gradient-to: rgb(22 101 52);</td><td style="background-color: rgb(22 101 52);"></td></tr>
-    <tr><td>to-green-900</td><td>--en-gradient-to: rgb(20 83 45);</td><td style="background-color: rgb(20 83 45);"></td></tr>
-    <tr><td>to-emerald-50</td><td>--en-gradient-to: rgb(236 253 245);</td><td style="background-color: rgb(236 253 245);"></td></tr>
-    <tr><td>to-emerald-100</td><td>--en-gradient-to: rgb(209 250 229);</td><td style="background-color: rgb(209 250 229);"></td></tr>
-    <tr><td>to-emerald-200</td><td>--en-gradient-to: rgb(167 243 208);</td><td style="background-color: rgb(167 243 208);"></td></tr>
-    <tr><td>to-emerald-300</td><td>--en-gradient-to: rgb(110 231 183);</td><td style="background-color: rgb(110 231 183);"></td></tr>
-    <tr><td>to-emerald-400</td><td>--en-gradient-to: rgb(52 211 153);</td><td style="background-color: rgb(52 211 153);"></td></tr>
-    <tr><td>to-emerald-500</td><td>--en-gradient-to: rgb(16 185 129);</td><td style="background-color: rgb(16 185 129);"></td></tr>
-    <tr><td>to-emerald-600</td><td>--en-gradient-to: rgb(5 150 105);</td><td style="background-color: rgb(5 150 105);"></td></tr>
-    <tr><td>to-emerald-700</td><td>--en-gradient-to: rgb(4 120 87);</td><td style="background-color: rgb(4 120 87);"></td></tr>
-    <tr><td>to-emerald-800</td><td>--en-gradient-to: rgb(6 95 70);</td><td style="background-color: rgb(6 95 70);"></td></tr>
-    <tr><td>to-emerald-900</td><td>--en-gradient-to: rgb(6 78 59);</td><td style="background-color: rgb(6 78 59);"></td></tr>
-    <tr><td>to-teal-50</td><td>--en-gradient-to: rgb(240 253 250);</td><td style="background-color: rgb(240 253 250);"></td></tr>
-    <tr><td>to-teal-100</td><td>--en-gradient-to: rgb(204 251 241);</td><td style="background-color: rgb(204 251 241);"></td></tr>
-    <tr><td>to-teal-200</td><td>--en-gradient-to: rgb(153 246 228);</td><td style="background-color: rgb(153 246 228);"></td></tr>
-    <tr><td>to-teal-300</td><td>--en-gradient-to: rgb(94 234 212);</td><td style="background-color: rgb(94 234 212);"></td></tr>
-    <tr><td>to-teal-400</td><td>--en-gradient-to: rgb(45 212 191);</td><td style="background-color: rgb(45 212 191);"></td></tr>
-    <tr><td>to-teal-500</td><td>--en-gradient-to: rgb(20 184 166);</td><td style="background-color: rgb(20 184 166);"></td></tr>
-    <tr><td>to-teal-600</td><td>--en-gradient-to: rgb(13 148 136);</td><td style="background-color: rgb(13 148 136);"></td></tr>
-    <tr><td>to-teal-700</td><td>--en-gradient-to: rgb(15 118 110);</td><td style="background-color: rgb(15 118 110);"></td></tr>
-    <tr><td>to-teal-800</td><td>--en-gradient-to: rgb(17 94 89);</td><td style="background-color: rgb(17 94 89);"></td></tr>
-    <tr><td>to-teal-900</td><td>--en-gradient-to: rgb(19 78 74);</td><td style="background-color: rgb(19 78 74);"></td></tr>
-    <tr><td>to-cyan-50</td><td>--en-gradient-to: rgb(236 254 255);</td><td style="background-color: rgb(236 254 255);"></td></tr>
-    <tr><td>to-cyan-100</td><td>--en-gradient-to: rgb(207 250 254);</td><td style="background-color: rgb(207 250 254);"></td></tr>
-    <tr><td>to-cyan-200</td><td>--en-gradient-to: rgb(165 243 252);</td><td style="background-color: rgb(165 243 252);"></td></tr>
-    <tr><td>to-cyan-300</td><td>--en-gradient-to: rgb(103 232 249);</td><td style="background-color: rgb(103 232 249);"></td></tr>
-    <tr><td>to-cyan-400</td><td>--en-gradient-to: rgb(34 211 238);</td><td style="background-color: rgb(34 211 238);"></td></tr>
-    <tr><td>to-cyan-500</td><td>--en-gradient-to: rgb(6 182 212);</td><td style="background-color: rgb(6 182 212);"></td></tr>
-    <tr><td>to-cyan-600</td><td>--en-gradient-to: rgb(8 145 178);</td><td style="background-color: rgb(8 145 178);"></td></tr>
-    <tr><td>to-cyan-700</td><td>--en-gradient-to: rgb(14 116 144);</td><td style="background-color: rgb(14 116 144);"></td></tr>
-    <tr><td>to-cyan-800</td><td>--en-gradient-to: rgb(21 94 117);</td><td style="background-color: rgb(21 94 117);"></td></tr>
-    <tr><td>to-cyan-900</td><td>--en-gradient-to: rgb(22 78 99);</td><td style="background-color: rgb(22 78 99);"></td></tr>
-    <tr><td>to-sky-50</td><td>--en-gradient-to: rgb(240 249 255);</td><td style="background-color: rgb(240 249 255);"></td></tr>
-    <tr><td>to-sky-100</td><td>--en-gradient-to: rgb(224 242 254);</td><td style="background-color: rgb(224 242 254);"></td></tr>
-    <tr><td>to-sky-200</td><td>--en-gradient-to: rgb(186 230 253);</td><td style="background-color: rgb(186 230 253);"></td></tr>
-    <tr><td>to-sky-300</td><td>--en-gradient-to: rgb(125 211 252);</td><td style="background-color: rgb(125 211 252);"></td></tr>
-    <tr><td>to-sky-400</td><td>--en-gradient-to: rgb(56 189 248);</td><td style="background-color: rgb(56 189 248);"></td></tr>
-    <tr><td>to-sky-500</td><td>--en-gradient-to: rgb(14 165 233);</td><td style="background-color: rgb(14 165 233);"></td></tr>
-    <tr><td>to-sky-600</td><td>--en-gradient-to: rgb(2 132 199);</td><td style="background-color: rgb(2 132 199);"></td></tr>
-    <tr><td>to-sky-700</td><td>--en-gradient-to: rgb(3 105 161);</td><td style="background-color: rgb(3 105 161);"></td></tr>
-    <tr><td>to-sky-800</td><td>--en-gradient-to: rgb(7 89 133);</td><td style="background-color: rgb(7 89 133);"></td></tr>
-    <tr><td>to-sky-900</td><td>--en-gradient-to: rgb(12 74 110);</td><td style="background-color: rgb(12 74 110);"></td></tr>
-    <tr><td>to-blue-50</td><td>--en-gradient-to: rgb(239 246 255);</td><td style="background-color: rgb(239 246 255);"></td></tr>
-    <tr><td>to-blue-100</td><td>--en-gradient-to: rgb(219 234 254);</td><td style="background-color: rgb(219 234 254);"></td></tr>
-    <tr><td>to-blue-200</td><td>--en-gradient-to: rgb(191 219 254);</td><td style="background-color: rgb(191 219 254);"></td></tr>
-    <tr><td>to-blue-300</td><td>--en-gradient-to: rgb(147 197 253);</td><td style="background-color: rgb(147 197 253);"></td></tr>
-    <tr><td>to-blue-400</td><td>--en-gradient-to: rgb(96 165 250);</td><td style="background-color: rgb(96 165 250);"></td></tr>
-    <tr><td>to-blue-500</td><td>--en-gradient-to: rgb(59 130 246);</td><td style="background-color: rgb(59 130 246);"></td></tr>
-    <tr><td>to-blue-600</td><td>--en-gradient-to: rgb(37 99 235);</td><td style="background-color: rgb(37 99 235);"></td></tr>
-    <tr><td>to-blue-700</td><td>--en-gradient-to: rgb(29 78 216);</td><td style="background-color: rgb(29 78 216);"></td></tr>
-    <tr><td>to-blue-800</td><td>--en-gradient-to: rgb(30 64 175);</td><td style="background-color: rgb(30 64 175);"></td></tr>
-    <tr><td>to-blue-900</td><td>--en-gradient-to: rgb(30 58 138);</td><td style="background-color: rgb(30 58 138);"></td></tr>
-    <tr><td>to-indigo-50</td><td>--en-gradient-to: rgb(238 242 255);</td><td style="background-color: rgb(238 242 255);"></td></tr>
-    <tr><td>to-indigo-100</td><td>--en-gradient-to: rgb(224 231 255);</td><td style="background-color: rgb(224 231 255);"></td></tr>
-    <tr><td>to-indigo-200</td><td>--en-gradient-to: rgb(199 210 254);</td><td style="background-color: rgb(199 210 254);"></td></tr>
-    <tr><td>to-indigo-300</td><td>--en-gradient-to: rgb(165 180 252);</td><td style="background-color: rgb(165 180 252);"></td></tr>
-    <tr><td>to-indigo-400</td><td>--en-gradient-to: rgb(129 140 248);</td><td style="background-color: rgb(129 140 248);"></td></tr>
-    <tr><td>to-indigo-500</td><td>--en-gradient-to: rgb(99 102 241);</td><td style="background-color: rgb(99 102 241);"></td></tr>
-    <tr><td>to-indigo-600</td><td>--en-gradient-to: rgb(79 70 229);</td><td style="background-color: rgb(79 70 229);"></td></tr>
-    <tr><td>to-indigo-700</td><td>--en-gradient-to: rgb(67 56 202);</td><td style="background-color: rgb(67 56 202);"></td></tr>
-    <tr><td>to-indigo-800</td><td>--en-gradient-to: rgb(55 48 163);</td><td style="background-color: rgb(55 48 163);"></td></tr>
-    <tr><td>to-indigo-900</td><td>--en-gradient-to: rgb(49 46 129);</td><td style="background-color: rgb(49 46 129);"></td></tr>
-    <tr><td>to-violet-50</td><td>--en-gradient-to: rgb(245 243 255);</td><td style="background-color: rgb(245 243 255);"></td></tr>
-    <tr><td>to-violet-100</td><td>--en-gradient-to: rgb(237 233 254);</td><td style="background-color: rgb(237 233 254);"></td></tr>
-    <tr><td>to-violet-200</td><td>--en-gradient-to: rgb(221 214 254);</td><td style="background-color: rgb(221 214 254);"></td></tr>
-    <tr><td>to-violet-300</td><td>--en-gradient-to: rgb(196 181 253);</td><td style="background-color: rgb(196 181 253);"></td></tr>
-    <tr><td>to-violet-400</td><td>--en-gradient-to: rgb(167 139 250);</td><td style="background-color: rgb(167 139 250);"></td></tr>
-    <tr><td>to-violet-500</td><td>--en-gradient-to: rgb(139 92 246);</td><td style="background-color: rgb(139 92 246);"></td></tr>
-    <tr><td>to-violet-600</td><td>--en-gradient-to: rgb(124 58 237);</td><td style="background-color: rgb(124 58 237);"></td></tr>
-    <tr><td>to-violet-700</td><td>--en-gradient-to: rgb(109 40 217);</td><td style="background-color: rgb(109 40 217);"></td></tr>
-    <tr><td>to-violet-800</td><td>--en-gradient-to: rgb(91 33 182);</td><td style="background-color: rgb(91 33 182);"></td></tr>
-    <tr><td>to-violet-900</td><td>--en-gradient-to: rgb(76 29 149);</td><td style="background-color: rgb(76 29 149);"></td></tr>
-    <tr><td>to-purple-50</td><td>--en-gradient-to: rgb(250 245 255);</td><td style="background-color: rgb(250 245 255);"></td></tr>
-    <tr><td>to-purple-100</td><td>--en-gradient-to: rgb(243 232 255);</td><td style="background-color: rgb(243 232 255);"></td></tr>
-    <tr><td>to-purple-200</td><td>--en-gradient-to: rgb(233 213 255);</td><td style="background-color: rgb(233 213 255);"></td></tr>
-    <tr><td>to-purple-300</td><td>--en-gradient-to: rgb(216 180 254);</td><td style="background-color: rgb(216 180 254);"></td></tr>
-    <tr><td>to-purple-400</td><td>--en-gradient-to: rgb(192 132 252);</td><td style="background-color: rgb(192 132 252);"></td></tr>
-    <tr><td>to-purple-500</td><td>--en-gradient-to: rgb(168 85 247);</td><td style="background-color: rgb(168 85 247);"></td></tr>
-    <tr><td>to-purple-600</td><td>--en-gradient-to: rgb(147 51 234);</td><td style="background-color: rgb(147 51 234);"></td></tr>
-    <tr><td>to-purple-700</td><td>--en-gradient-to: rgb(126 34 206);</td><td style="background-color: rgb(126 34 206);"></td></tr>
-    <tr><td>to-purple-800</td><td>--en-gradient-to: rgb(107 33 168);</td><td style="background-color: rgb(107 33 168);"></td></tr>
-    <tr><td>to-purple-900</td><td>--en-gradient-to: rgb(88 28 135);</td><td style="background-color: rgb(88 28 135);"></td></tr>
-    <tr><td>to-fuchsia-50</td><td>--en-gradient-to: rgb(253 244 255);</td><td style="background-color: rgb(253 244 255);"></td></tr>
-    <tr><td>to-fuchsia-100</td><td>--en-gradient-to: rgb(250 232 255);</td><td style="background-color: rgb(250 232 255);"></td></tr>
-    <tr><td>to-fuchsia-200</td><td>--en-gradient-to: rgb(245 208 254);</td><td style="background-color: rgb(245 208 254);"></td></tr>
-    <tr><td>to-fuchsia-300</td><td>--en-gradient-to: rgb(240 171 252);</td><td style="background-color: rgb(240 171 252);"></td></tr>
-    <tr><td>to-fuchsia-400</td><td>--en-gradient-to: rgb(232 121 249);</td><td style="background-color: rgb(232 121 249);"></td></tr>
-    <tr><td>to-fuchsia-500</td><td>--en-gradient-to: rgb(217 70 239);</td><td style="background-color: rgb(217 70 239);"></td></tr>
-    <tr><td>to-fuchsia-600</td><td>--en-gradient-to: rgb(192 38 211);</td><td style="background-color: rgb(192 38 211);"></td></tr>
-    <tr><td>to-fuchsia-700</td><td>--en-gradient-to: rgb(162 28 175);</td><td style="background-color: rgb(162 28 175);"></td></tr>
-    <tr><td>to-fuchsia-800</td><td>--en-gradient-to: rgb(134 25 143);</td><td style="background-color: rgb(134 25 143);"></td></tr>
-    <tr><td>to-fuchsia-900</td><td>--en-gradient-to: rgb(112 26 117);</td><td style="background-color: rgb(112 26 117);"></td></tr>
-    <tr><td>to-pink-50</td><td>--en-gradient-to: rgb(253 242 248);</td><td style="background-color: rgb(253 242 248);"></td></tr>
-    <tr><td>to-pink-100</td><td>--en-gradient-to: rgb(252 231 243);</td><td style="background-color: rgb(252 231 243);"></td></tr>
-    <tr><td>to-pink-200</td><td>--en-gradient-to: rgb(251 207 232);</td><td style="background-color: rgb(251 207 232);"></td></tr>
-    <tr><td>to-pink-300</td><td>--en-gradient-to: rgb(249 168 212);</td><td style="background-color: rgb(249 168 212);"></td></tr>
-    <tr><td>to-pink-400</td><td>--en-gradient-to: rgb(244 114 182);</td><td style="background-color: rgb(244 114 182);"></td></tr>
-    <tr><td>to-pink-500</td><td>--en-gradient-to: rgb(236 72 153);</td><td style="background-color: rgb(236 72 153);"></td></tr>
-    <tr><td>to-pink-600</td><td>--en-gradient-to: rgb(219 39 119);</td><td style="background-color: rgb(219 39 119);"></td></tr>
-    <tr><td>to-pink-700</td><td>--en-gradient-to: rgb(190 24 93);</td><td style="background-color: rgb(190 24 93);"></td></tr>
-    <tr><td>to-pink-800</td><td>--en-gradient-to: rgb(157 23 77);</td><td style="background-color: rgb(157 23 77);"></td></tr>
-    <tr><td>to-pink-900</td><td>--en-gradient-to: rgb(131 24 67);</td><td style="background-color: rgb(131 24 67);"></td></tr>
-    <tr><td>to-rose-50</td><td>--en-gradient-to: rgb(255 241 242);</td><td style="background-color: rgb(255 241 242);"></td></tr>
-    <tr><td>to-rose-100</td><td>--en-gradient-to: rgb(255 228 230);</td><td style="background-color: rgb(255 228 230);"></td></tr>
-    <tr><td>to-rose-200</td><td>--en-gradient-to: rgb(254 205 211);</td><td style="background-color: rgb(254 205 211);"></td></tr>
-    <tr><td>to-rose-300</td><td>--en-gradient-to: rgb(253 164 175);</td><td style="background-color: rgb(253 164 175);"></td></tr>
-    <tr><td>to-rose-400</td><td>--en-gradient-to: rgb(251 113 133);</td><td style="background-color: rgb(251 113 133);"></td></tr>
-    <tr><td>to-rose-500</td><td>--en-gradient-to: rgb(244 63 94);</td><td style="background-color: rgb(244 63 94);"></td></tr>
-    <tr><td>to-rose-600</td><td>--en-gradient-to: rgb(225 29 72);</td><td style="background-color: rgb(225 29 72);"></td></tr>
-    <tr><td>to-rose-700</td><td>--en-gradient-to: rgb(190 18 60);</td><td style="background-color: rgb(190 18 60);"></td></tr>
-    <tr><td>to-rose-800</td><td>--en-gradient-to: rgb(159 18 57);</td><td style="background-color: rgb(159 18 57);"></td></tr>
-    <tr><td>to-rose-900</td><td>--en-gradient-to: rgb(136 19 55);</td><td style="background-color: rgb(136 19 55);"></td></tr>
+    <tr><td>from-inherit</td><td>--en-gradient-from: inherit;<br>--en-gradient-to: transparent;<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-current</td><td>--en-gradient-from: currentColor;<br>--en-gradient-to: transparent;<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-transparent</td><td>--en-gradient-from: transparent;<br>--en-gradient-to: transparent;<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-red-50</td><td>--en-gradient-from: oklch(97.1% .013 17.38);<br>--en-gradient-to: oklch(97.1% .013 17.38);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-red-100</td><td>--en-gradient-from: oklch(93.6% .032 17.717);<br>--en-gradient-to: oklch(93.6% .032 17.717);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-red-200</td><td>--en-gradient-from: oklch(88.5% .062 18.334);<br>--en-gradient-to: oklch(88.5% .062 18.334);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-red-300</td><td>--en-gradient-from: oklch(80.8% .114 19.571);<br>--en-gradient-to: oklch(80.8% .114 19.571);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-red-400</td><td>--en-gradient-from: oklch(70.4% .191 22.216);<br>--en-gradient-to: oklch(70.4% .191 22.216);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-red-500</td><td>--en-gradient-from: oklch(63.7% .237 25.331);<br>--en-gradient-to: oklch(63.7% .237 25.331);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-red-600</td><td>--en-gradient-from: oklch(57.7% .245 27.325);<br>--en-gradient-to: oklch(57.7% .245 27.325);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-red-700</td><td>--en-gradient-from: oklch(50.5% .213 27.518);<br>--en-gradient-to: oklch(50.5% .213 27.518);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-red-800</td><td>--en-gradient-from: oklch(44.4% .177 26.899);<br>--en-gradient-to: oklch(44.4% .177 26.899);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-red-900</td><td>--en-gradient-from: oklch(39.6% .141 25.723);<br>--en-gradient-to: oklch(39.6% .141 25.723);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-red-950</td><td>--en-gradient-from: oklch(25.8% .092 26.042);<br>--en-gradient-to: oklch(25.8% .092 26.042);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-orange-50</td><td>--en-gradient-from: oklch(98% .016 73.684);<br>--en-gradient-to: oklch(98% .016 73.684);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-orange-100</td><td>--en-gradient-from: oklch(95.4% .038 75.164);<br>--en-gradient-to: oklch(95.4% .038 75.164);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-orange-200</td><td>--en-gradient-from: oklch(90.1% .076 70.697);<br>--en-gradient-to: oklch(90.1% .076 70.697);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-orange-300</td><td>--en-gradient-from: oklch(83.7% .128 66.29);<br>--en-gradient-to: oklch(83.7% .128 66.29);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-orange-400</td><td>--en-gradient-from: oklch(75% .183 55.934);<br>--en-gradient-to: oklch(75% .183 55.934);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-orange-500</td><td>--en-gradient-from: oklch(70.5% .213 47.604);<br>--en-gradient-to: oklch(70.5% .213 47.604);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-orange-600</td><td>--en-gradient-from: oklch(64.6% .222 41.116);<br>--en-gradient-to: oklch(64.6% .222 41.116);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-orange-700</td><td>--en-gradient-from: oklch(55.3% .195 38.402);<br>--en-gradient-to: oklch(55.3% .195 38.402);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-orange-800</td><td>--en-gradient-from: oklch(47% .157 37.304);<br>--en-gradient-to: oklch(47% .157 37.304);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-orange-900</td><td>--en-gradient-from: oklch(40.8% .123 38.172);<br>--en-gradient-to: oklch(40.8% .123 38.172);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-orange-950</td><td>--en-gradient-from: oklch(26.6% .079 36.259);<br>--en-gradient-to: oklch(26.6% .079 36.259);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-amber-50</td><td>--en-gradient-from: oklch(98.7% .022 95.277);<br>--en-gradient-to: oklch(98.7% .022 95.277);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-amber-100</td><td>--en-gradient-from: oklch(96.2% .059 95.617);<br>--en-gradient-to: oklch(96.2% .059 95.617);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-amber-200</td><td>--en-gradient-from: oklch(92.4% .12 95.746);<br>--en-gradient-to: oklch(92.4% .12 95.746);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-amber-300</td><td>--en-gradient-from: oklch(87.9% .169 91.605);<br>--en-gradient-to: oklch(87.9% .169 91.605);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-amber-400</td><td>--en-gradient-from: oklch(82.8% .189 84.429);<br>--en-gradient-to: oklch(82.8% .189 84.429);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-amber-500</td><td>--en-gradient-from: oklch(76.9% .188 70.08);<br>--en-gradient-to: oklch(76.9% .188 70.08);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-amber-600</td><td>--en-gradient-from: oklch(66.6% .179 58.318);<br>--en-gradient-to: oklch(66.6% .179 58.318);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-amber-700</td><td>--en-gradient-from: oklch(55.5% .163 48.998);<br>--en-gradient-to: oklch(55.5% .163 48.998);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-amber-800</td><td>--en-gradient-from: oklch(47.3% .137 46.201);<br>--en-gradient-to: oklch(47.3% .137 46.201);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-amber-900</td><td>--en-gradient-from: oklch(41.4% .112 45.904);<br>--en-gradient-to: oklch(41.4% .112 45.904);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-amber-950</td><td>--en-gradient-from: oklch(27.9% .077 45.635);<br>--en-gradient-to: oklch(27.9% .077 45.635);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-yellow-50</td><td>--en-gradient-from: oklch(98.7% .026 102.212);<br>--en-gradient-to: oklch(98.7% .026 102.212);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-yellow-100</td><td>--en-gradient-from: oklch(97.3% .071 103.193);<br>--en-gradient-to: oklch(97.3% .071 103.193);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-yellow-200</td><td>--en-gradient-from: oklch(94.5% .129 101.54);<br>--en-gradient-to: oklch(94.5% .129 101.54);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-yellow-300</td><td>--en-gradient-from: oklch(90.5% .182 98.111);<br>--en-gradient-to: oklch(90.5% .182 98.111);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-yellow-400</td><td>--en-gradient-from: oklch(85.2% .199 91.936);<br>--en-gradient-to: oklch(85.2% .199 91.936);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-yellow-500</td><td>--en-gradient-from: oklch(79.5% .184 86.047);<br>--en-gradient-to: oklch(79.5% .184 86.047);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-yellow-600</td><td>--en-gradient-from: oklch(68.1% .162 75.834);<br>--en-gradient-to: oklch(68.1% .162 75.834);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-yellow-700</td><td>--en-gradient-from: oklch(55.4% .135 66.442);<br>--en-gradient-to: oklch(55.4% .135 66.442);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-yellow-800</td><td>--en-gradient-from: oklch(47.6% .114 61.907);<br>--en-gradient-to: oklch(47.6% .114 61.907);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-yellow-900</td><td>--en-gradient-from: oklch(42.1% .095 57.708);<br>--en-gradient-to: oklch(42.1% .095 57.708);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-yellow-950</td><td>--en-gradient-from: oklch(28.6% .066 53.813);<br>--en-gradient-to: oklch(28.6% .066 53.813);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-lime-50</td><td>--en-gradient-from: oklch(98.6% .031 120.757);<br>--en-gradient-to: oklch(98.6% .031 120.757);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-lime-100</td><td>--en-gradient-from: oklch(96.7% .067 122.328);<br>--en-gradient-to: oklch(96.7% .067 122.328);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-lime-200</td><td>--en-gradient-from: oklch(93.8% .127 124.321);<br>--en-gradient-to: oklch(93.8% .127 124.321);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-lime-300</td><td>--en-gradient-from: oklch(89.7% .196 126.665);<br>--en-gradient-to: oklch(89.7% .196 126.665);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-lime-400</td><td>--en-gradient-from: oklch(84.1% .238 128.85);<br>--en-gradient-to: oklch(84.1% .238 128.85);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-lime-500</td><td>--en-gradient-from: oklch(76.8% .233 130.85);<br>--en-gradient-to: oklch(76.8% .233 130.85);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-lime-600</td><td>--en-gradient-from: oklch(64.8% .2 131.684);<br>--en-gradient-to: oklch(64.8% .2 131.684);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-lime-700</td><td>--en-gradient-from: oklch(53.2% .157 131.589);<br>--en-gradient-to: oklch(53.2% .157 131.589);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-lime-800</td><td>--en-gradient-from: oklch(45.3% .124 130.933);<br>--en-gradient-to: oklch(45.3% .124 130.933);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-lime-900</td><td>--en-gradient-from: oklch(40.5% .101 131.063);<br>--en-gradient-to: oklch(40.5% .101 131.063);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-lime-950</td><td>--en-gradient-from: oklch(27.4% .072 132.109);<br>--en-gradient-to: oklch(27.4% .072 132.109);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-green-50</td><td>--en-gradient-from: oklch(98.2% .018 155.826);<br>--en-gradient-to: oklch(98.2% .018 155.826);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-green-100</td><td>--en-gradient-from: oklch(96.2% .044 156.743);<br>--en-gradient-to: oklch(96.2% .044 156.743);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-green-200</td><td>--en-gradient-from: oklch(92.5% .084 155.995);<br>--en-gradient-to: oklch(92.5% .084 155.995);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-green-300</td><td>--en-gradient-from: oklch(87.1% .15 154.449);<br>--en-gradient-to: oklch(87.1% .15 154.449);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-green-400</td><td>--en-gradient-from: oklch(79.2% .209 151.711);<br>--en-gradient-to: oklch(79.2% .209 151.711);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-green-500</td><td>--en-gradient-from: oklch(72.3% .219 149.579);<br>--en-gradient-to: oklch(72.3% .219 149.579);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-green-600</td><td>--en-gradient-from: oklch(62.7% .194 149.214);<br>--en-gradient-to: oklch(62.7% .194 149.214);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-green-700</td><td>--en-gradient-from: oklch(52.7% .154 150.069);<br>--en-gradient-to: oklch(52.7% .154 150.069);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-green-800</td><td>--en-gradient-from: oklch(44.8% .119 151.328);<br>--en-gradient-to: oklch(44.8% .119 151.328);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-green-900</td><td>--en-gradient-from: oklch(39.3% .095 152.535);<br>--en-gradient-to: oklch(39.3% .095 152.535);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-green-950</td><td>--en-gradient-from: oklch(26.6% .065 152.934);<br>--en-gradient-to: oklch(26.6% .065 152.934);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-emerald-50</td><td>--en-gradient-from: oklch(97.9% .021 166.113);<br>--en-gradient-to: oklch(97.9% .021 166.113);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-emerald-100</td><td>--en-gradient-from: oklch(95% .052 163.051);<br>--en-gradient-to: oklch(95% .052 163.051);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-emerald-200</td><td>--en-gradient-from: oklch(90.5% .093 164.15);<br>--en-gradient-to: oklch(90.5% .093 164.15);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-emerald-300</td><td>--en-gradient-from: oklch(84.5% .143 164.978);<br>--en-gradient-to: oklch(84.5% .143 164.978);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-emerald-400</td><td>--en-gradient-from: oklch(76.5% .177 163.223);<br>--en-gradient-to: oklch(76.5% .177 163.223);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-emerald-500</td><td>--en-gradient-from: oklch(69.6% .17 162.48);<br>--en-gradient-to: oklch(69.6% .17 162.48);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-emerald-600</td><td>--en-gradient-from: oklch(59.6% .145 163.225);<br>--en-gradient-to: oklch(59.6% .145 163.225);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-emerald-700</td><td>--en-gradient-from: oklch(50.8% .118 165.612);<br>--en-gradient-to: oklch(50.8% .118 165.612);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-emerald-800</td><td>--en-gradient-from: oklch(43.2% .095 166.913);<br>--en-gradient-to: oklch(43.2% .095 166.913);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-emerald-900</td><td>--en-gradient-from: oklch(37.8% .077 168.94);<br>--en-gradient-to: oklch(37.8% .077 168.94);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-emerald-950</td><td>--en-gradient-from: oklch(26.2% .051 172.552);<br>--en-gradient-to: oklch(26.2% .051 172.552);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-teal-50</td><td>--en-gradient-from: oklch(98.4% .014 180.72);<br>--en-gradient-to: oklch(98.4% .014 180.72);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-teal-100</td><td>--en-gradient-from: oklch(95.3% .051 180.801);<br>--en-gradient-to: oklch(95.3% .051 180.801);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-teal-200</td><td>--en-gradient-from: oklch(91% .096 180.426);<br>--en-gradient-to: oklch(91% .096 180.426);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-teal-300</td><td>--en-gradient-from: oklch(85.5% .138 181.071);<br>--en-gradient-to: oklch(85.5% .138 181.071);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-teal-400</td><td>--en-gradient-from: oklch(77.7% .152 181.912);<br>--en-gradient-to: oklch(77.7% .152 181.912);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-teal-500</td><td>--en-gradient-from: oklch(70.4% .14 182.503);<br>--en-gradient-to: oklch(70.4% .14 182.503);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-teal-600</td><td>--en-gradient-from: oklch(60% .118 184.704);<br>--en-gradient-to: oklch(60% .118 184.704);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-teal-700</td><td>--en-gradient-from: oklch(51.1% .096 186.391);<br>--en-gradient-to: oklch(51.1% .096 186.391);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-teal-800</td><td>--en-gradient-from: oklch(43.7% .078 188.216);<br>--en-gradient-to: oklch(43.7% .078 188.216);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-teal-900</td><td>--en-gradient-from: oklch(38.6% .063 188.416);<br>--en-gradient-to: oklch(38.6% .063 188.416);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-teal-950</td><td>--en-gradient-from: oklch(27.7% .046 192.524);<br>--en-gradient-to: oklch(27.7% .046 192.524);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-cyan-50</td><td>--en-gradient-from: oklch(98.4% .019 200.873);<br>--en-gradient-to: oklch(98.4% .019 200.873);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-cyan-100</td><td>--en-gradient-from: oklch(95.6% .045 203.388);<br>--en-gradient-to: oklch(95.6% .045 203.388);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-cyan-200</td><td>--en-gradient-from: oklch(91.7% .08 205.041);<br>--en-gradient-to: oklch(91.7% .08 205.041);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-cyan-300</td><td>--en-gradient-from: oklch(86.5% .127 207.078);<br>--en-gradient-to: oklch(86.5% .127 207.078);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-cyan-400</td><td>--en-gradient-from: oklch(78.9% .154 211.53);<br>--en-gradient-to: oklch(78.9% .154 211.53);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-cyan-500</td><td>--en-gradient-from: oklch(71.5% .143 215.221);<br>--en-gradient-to: oklch(71.5% .143 215.221);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-cyan-600</td><td>--en-gradient-from: oklch(60.9% .126 221.723);<br>--en-gradient-to: oklch(60.9% .126 221.723);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-cyan-700</td><td>--en-gradient-from: oklch(52% .105 223.128);<br>--en-gradient-to: oklch(52% .105 223.128);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-cyan-800</td><td>--en-gradient-from: oklch(45% .085 224.283);<br>--en-gradient-to: oklch(45% .085 224.283);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-cyan-900</td><td>--en-gradient-from: oklch(39.8% .07 227.392);<br>--en-gradient-to: oklch(39.8% .07 227.392);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-cyan-950</td><td>--en-gradient-from: oklch(30.2% .056 229.695);<br>--en-gradient-to: oklch(30.2% .056 229.695);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-sky-50</td><td>--en-gradient-from: oklch(97.7% .013 236.62);<br>--en-gradient-to: oklch(97.7% .013 236.62);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-sky-100</td><td>--en-gradient-from: oklch(95.1% .026 236.824);<br>--en-gradient-to: oklch(95.1% .026 236.824);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-sky-200</td><td>--en-gradient-from: oklch(90.1% .058 230.902);<br>--en-gradient-to: oklch(90.1% .058 230.902);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-sky-300</td><td>--en-gradient-from: oklch(82.8% .111 230.318);<br>--en-gradient-to: oklch(82.8% .111 230.318);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-sky-400</td><td>--en-gradient-from: oklch(74.6% .16 232.661);<br>--en-gradient-to: oklch(74.6% .16 232.661);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-sky-500</td><td>--en-gradient-from: oklch(68.5% .169 237.323);<br>--en-gradient-to: oklch(68.5% .169 237.323);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-sky-600</td><td>--en-gradient-from: oklch(58.8% .158 241.966);<br>--en-gradient-to: oklch(58.8% .158 241.966);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-sky-700</td><td>--en-gradient-from: oklch(50% .134 242.749);<br>--en-gradient-to: oklch(50% .134 242.749);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-sky-800</td><td>--en-gradient-from: oklch(44.3% .11 240.79);<br>--en-gradient-to: oklch(44.3% .11 240.79);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-sky-900</td><td>--en-gradient-from: oklch(39.1% .09 240.876);<br>--en-gradient-to: oklch(39.1% .09 240.876);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-sky-950</td><td>--en-gradient-from: oklch(29.3% .066 243.157);<br>--en-gradient-to: oklch(29.3% .066 243.157);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-blue-50</td><td>--en-gradient-from: oklch(97% .014 254.604);<br>--en-gradient-to: oklch(97% .014 254.604);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-blue-100</td><td>--en-gradient-from: oklch(93.2% .032 255.585);<br>--en-gradient-to: oklch(93.2% .032 255.585);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-blue-200</td><td>--en-gradient-from: oklch(88.2% .059 254.128);<br>--en-gradient-to: oklch(88.2% .059 254.128);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-blue-300</td><td>--en-gradient-from: oklch(80.9% .105 251.813);<br>--en-gradient-to: oklch(80.9% .105 251.813);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-blue-400</td><td>--en-gradient-from: oklch(70.7% .165 254.624);<br>--en-gradient-to: oklch(70.7% .165 254.624);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-blue-500</td><td>--en-gradient-from: oklch(62.3% .214 259.815);<br>--en-gradient-to: oklch(62.3% .214 259.815);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-blue-600</td><td>--en-gradient-from: oklch(54.6% .245 262.881);<br>--en-gradient-to: oklch(54.6% .245 262.881);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-blue-700</td><td>--en-gradient-from: oklch(48.8% .243 264.376);<br>--en-gradient-to: oklch(48.8% .243 264.376);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-blue-800</td><td>--en-gradient-from: oklch(42.4% .199 265.638);<br>--en-gradient-to: oklch(42.4% .199 265.638);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-blue-900</td><td>--en-gradient-from: oklch(37.9% .146 265.522);<br>--en-gradient-to: oklch(37.9% .146 265.522);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-blue-950</td><td>--en-gradient-from: oklch(28.2% .091 267.935);<br>--en-gradient-to: oklch(28.2% .091 267.935);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-indigo-50</td><td>--en-gradient-from: oklch(96.2% .018 272.314);<br>--en-gradient-to: oklch(96.2% .018 272.314);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-indigo-100</td><td>--en-gradient-from: oklch(93% .034 272.788);<br>--en-gradient-to: oklch(93% .034 272.788);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-indigo-200</td><td>--en-gradient-from: oklch(87% .065 274.039);<br>--en-gradient-to: oklch(87% .065 274.039);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-indigo-300</td><td>--en-gradient-from: oklch(78.5% .115 274.713);<br>--en-gradient-to: oklch(78.5% .115 274.713);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-indigo-400</td><td>--en-gradient-from: oklch(67.3% .182 276.935);<br>--en-gradient-to: oklch(67.3% .182 276.935);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-indigo-500</td><td>--en-gradient-from: oklch(58.5% .233 277.117);<br>--en-gradient-to: oklch(58.5% .233 277.117);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-indigo-600</td><td>--en-gradient-from: oklch(51.1% .262 276.966);<br>--en-gradient-to: oklch(51.1% .262 276.966);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-indigo-700</td><td>--en-gradient-from: oklch(45.7% .24 277.023);<br>--en-gradient-to: oklch(45.7% .24 277.023);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-indigo-800</td><td>--en-gradient-from: oklch(39.8% .195 277.366);<br>--en-gradient-to: oklch(39.8% .195 277.366);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-indigo-900</td><td>--en-gradient-from: oklch(35.9% .144 278.697);<br>--en-gradient-to: oklch(35.9% .144 278.697);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-indigo-950</td><td>--en-gradient-from: oklch(25.7% .09 281.288);<br>--en-gradient-to: oklch(25.7% .09 281.288);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-violet-50</td><td>--en-gradient-from: oklch(96.9% .016 293.756);<br>--en-gradient-to: oklch(96.9% .016 293.756);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-violet-100</td><td>--en-gradient-from: oklch(94.3% .029 294.588);<br>--en-gradient-to: oklch(94.3% .029 294.588);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-violet-200</td><td>--en-gradient-from: oklch(89.4% .057 293.283);<br>--en-gradient-to: oklch(89.4% .057 293.283);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-violet-300</td><td>--en-gradient-from: oklch(81.1% .111 293.571);<br>--en-gradient-to: oklch(81.1% .111 293.571);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-violet-400</td><td>--en-gradient-from: oklch(70.2% .183 293.541);<br>--en-gradient-to: oklch(70.2% .183 293.541);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-violet-500</td><td>--en-gradient-from: oklch(60.6% .25 292.717);<br>--en-gradient-to: oklch(60.6% .25 292.717);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-violet-600</td><td>--en-gradient-from: oklch(54.1% .281 293.009);<br>--en-gradient-to: oklch(54.1% .281 293.009);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-violet-700</td><td>--en-gradient-from: oklch(49.1% .27 292.581);<br>--en-gradient-to: oklch(49.1% .27 292.581);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-violet-800</td><td>--en-gradient-from: oklch(43.2% .232 292.759);<br>--en-gradient-to: oklch(43.2% .232 292.759);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-violet-900</td><td>--en-gradient-from: oklch(38% .189 293.745);<br>--en-gradient-to: oklch(38% .189 293.745);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-violet-950</td><td>--en-gradient-from: oklch(28.3% .141 291.089);<br>--en-gradient-to: oklch(28.3% .141 291.089);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-purple-50</td><td>--en-gradient-from: oklch(97.7% .014 308.299);<br>--en-gradient-to: oklch(97.7% .014 308.299);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-purple-100</td><td>--en-gradient-from: oklch(94.6% .033 307.174);<br>--en-gradient-to: oklch(94.6% .033 307.174);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-purple-200</td><td>--en-gradient-from: oklch(90.2% .063 306.703);<br>--en-gradient-to: oklch(90.2% .063 306.703);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-purple-300</td><td>--en-gradient-from: oklch(82.7% .119 306.383);<br>--en-gradient-to: oklch(82.7% .119 306.383);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-purple-400</td><td>--en-gradient-from: oklch(71.4% .203 305.504);<br>--en-gradient-to: oklch(71.4% .203 305.504);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-purple-500</td><td>--en-gradient-from: oklch(62.7% .265 303.9);<br>--en-gradient-to: oklch(62.7% .265 303.9);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-purple-600</td><td>--en-gradient-from: oklch(55.8% .288 302.321);<br>--en-gradient-to: oklch(55.8% .288 302.321);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-purple-700</td><td>--en-gradient-from: oklch(49.6% .265 301.924);<br>--en-gradient-to: oklch(49.6% .265 301.924);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-purple-800</td><td>--en-gradient-from: oklch(43.8% .218 303.724);<br>--en-gradient-to: oklch(43.8% .218 303.724);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-purple-900</td><td>--en-gradient-from: oklch(38.1% .176 304.987);<br>--en-gradient-to: oklch(38.1% .176 304.987);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-purple-950</td><td>--en-gradient-from: oklch(29.1% .149 302.717);<br>--en-gradient-to: oklch(29.1% .149 302.717);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-fuchsia-50</td><td>--en-gradient-from: oklch(97.7% .017 320.058);<br>--en-gradient-to: oklch(97.7% .017 320.058);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-fuchsia-100</td><td>--en-gradient-from: oklch(95.2% .037 318.852);<br>--en-gradient-to: oklch(95.2% .037 318.852);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-fuchsia-200</td><td>--en-gradient-from: oklch(90.3% .076 319.62);<br>--en-gradient-to: oklch(90.3% .076 319.62);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-fuchsia-300</td><td>--en-gradient-from: oklch(83.3% .145 321.434);<br>--en-gradient-to: oklch(83.3% .145 321.434);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-fuchsia-400</td><td>--en-gradient-from: oklch(74% .238 322.16);<br>--en-gradient-to: oklch(74% .238 322.16);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-fuchsia-500</td><td>--en-gradient-from: oklch(66.7% .295 322.15);<br>--en-gradient-to: oklch(66.7% .295 322.15);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-fuchsia-600</td><td>--en-gradient-from: oklch(59.1% .293 322.896);<br>--en-gradient-to: oklch(59.1% .293 322.896);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-fuchsia-700</td><td>--en-gradient-from: oklch(51.8% .253 323.949);<br>--en-gradient-to: oklch(51.8% .253 323.949);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-fuchsia-800</td><td>--en-gradient-from: oklch(45.2% .211 324.591);<br>--en-gradient-to: oklch(45.2% .211 324.591);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-fuchsia-900</td><td>--en-gradient-from: oklch(40.1% .17 325.612);<br>--en-gradient-to: oklch(40.1% .17 325.612);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-fuchsia-950</td><td>--en-gradient-from: oklch(29.3% .136 325.661);<br>--en-gradient-to: oklch(29.3% .136 325.661);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-pink-50</td><td>--en-gradient-from: oklch(97.1% .014 343.198);<br>--en-gradient-to: oklch(97.1% .014 343.198);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-pink-100</td><td>--en-gradient-from: oklch(94.8% .028 342.258);<br>--en-gradient-to: oklch(94.8% .028 342.258);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-pink-200</td><td>--en-gradient-from: oklch(89.9% .061 343.231);<br>--en-gradient-to: oklch(89.9% .061 343.231);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-pink-300</td><td>--en-gradient-from: oklch(82.3% .12 346.018);<br>--en-gradient-to: oklch(82.3% .12 346.018);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-pink-400</td><td>--en-gradient-from: oklch(71.8% .202 349.761);<br>--en-gradient-to: oklch(71.8% .202 349.761);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-pink-500</td><td>--en-gradient-from: oklch(65.6% .241 354.308);<br>--en-gradient-to: oklch(65.6% .241 354.308);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-pink-600</td><td>--en-gradient-from: oklch(59.2% .249 .584);<br>--en-gradient-to: oklch(59.2% .249 .584);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-pink-700</td><td>--en-gradient-from: oklch(52.5% .223 3.958);<br>--en-gradient-to: oklch(52.5% .223 3.958);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-pink-800</td><td>--en-gradient-from: oklch(45.9% .187 3.815);<br>--en-gradient-to: oklch(45.9% .187 3.815);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-pink-900</td><td>--en-gradient-from: oklch(40.8% .153 2.432);<br>--en-gradient-to: oklch(40.8% .153 2.432);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-pink-950</td><td>--en-gradient-from: oklch(28.4% .109 3.907);<br>--en-gradient-to: oklch(28.4% .109 3.907);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-rose-50</td><td>--en-gradient-from: oklch(96.9% .015 12.422);<br>--en-gradient-to: oklch(96.9% .015 12.422);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-rose-100</td><td>--en-gradient-from: oklch(94.1% .03 12.58);<br>--en-gradient-to: oklch(94.1% .03 12.58);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-rose-200</td><td>--en-gradient-from: oklch(89.2% .058 10.001);<br>--en-gradient-to: oklch(89.2% .058 10.001);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-rose-300</td><td>--en-gradient-from: oklch(81% .117 11.638);<br>--en-gradient-to: oklch(81% .117 11.638);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-rose-400</td><td>--en-gradient-from: oklch(71.2% .194 13.428);<br>--en-gradient-to: oklch(71.2% .194 13.428);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-rose-500</td><td>--en-gradient-from: oklch(64.5% .246 16.439);<br>--en-gradient-to: oklch(64.5% .246 16.439);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-rose-600</td><td>--en-gradient-from: oklch(58.6% .253 17.585);<br>--en-gradient-to: oklch(58.6% .253 17.585);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-rose-700</td><td>--en-gradient-from: oklch(51.4% .222 16.935);<br>--en-gradient-to: oklch(51.4% .222 16.935);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-rose-800</td><td>--en-gradient-from: oklch(45.5% .188 13.697);<br>--en-gradient-to: oklch(45.5% .188 13.697);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-rose-900</td><td>--en-gradient-from: oklch(41% .159 10.272);<br>--en-gradient-to: oklch(41% .159 10.272);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-rose-950</td><td>--en-gradient-from: oklch(27.1% .105 12.094);<br>--en-gradient-to: oklch(27.1% .105 12.094);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-slate-50</td><td>--en-gradient-from: oklch(98.4% .003 247.858);<br>--en-gradient-to: oklch(98.4% .003 247.858);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-slate-100</td><td>--en-gradient-from: oklch(96.8% .007 247.896);<br>--en-gradient-to: oklch(96.8% .007 247.896);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-slate-200</td><td>--en-gradient-from: oklch(92.9% .013 255.508);<br>--en-gradient-to: oklch(92.9% .013 255.508);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-slate-300</td><td>--en-gradient-from: oklch(86.9% .022 252.894);<br>--en-gradient-to: oklch(86.9% .022 252.894);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-slate-400</td><td>--en-gradient-from: oklch(70.4% .04 256.788);<br>--en-gradient-to: oklch(70.4% .04 256.788);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-slate-500</td><td>--en-gradient-from: oklch(55.4% .046 257.417);<br>--en-gradient-to: oklch(55.4% .046 257.417);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-slate-600</td><td>--en-gradient-from: oklch(44.6% .043 257.281);<br>--en-gradient-to: oklch(44.6% .043 257.281);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-slate-700</td><td>--en-gradient-from: oklch(37.2% .044 257.287);<br>--en-gradient-to: oklch(37.2% .044 257.287);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-slate-800</td><td>--en-gradient-from: oklch(27.9% .041 260.031);<br>--en-gradient-to: oklch(27.9% .041 260.031);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-slate-900</td><td>--en-gradient-from: oklch(20.8% .042 265.755);<br>--en-gradient-to: oklch(20.8% .042 265.755);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-slate-950</td><td>--en-gradient-from: oklch(12.9% .042 264.695);<br>--en-gradient-to: oklch(12.9% .042 264.695);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-gray-50</td><td>--en-gradient-from: oklch(98.5% .002 247.839);<br>--en-gradient-to: oklch(98.5% .002 247.839);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-gray-100</td><td>--en-gradient-from: oklch(96.7% .003 264.542);<br>--en-gradient-to: oklch(96.7% .003 264.542);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-gray-200</td><td>--en-gradient-from: oklch(92.8% .006 264.531);<br>--en-gradient-to: oklch(92.8% .006 264.531);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-gray-300</td><td>--en-gradient-from: oklch(87.2% .01 258.338);<br>--en-gradient-to: oklch(87.2% .01 258.338);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-gray-400</td><td>--en-gradient-from: oklch(70.7% .022 261.325);<br>--en-gradient-to: oklch(70.7% .022 261.325);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-gray-500</td><td>--en-gradient-from: oklch(55.1% .027 264.364);<br>--en-gradient-to: oklch(55.1% .027 264.364);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-gray-600</td><td>--en-gradient-from: oklch(44.6% .03 256.802);<br>--en-gradient-to: oklch(44.6% .03 256.802);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-gray-700</td><td>--en-gradient-from: oklch(37.3% .034 259.733);<br>--en-gradient-to: oklch(37.3% .034 259.733);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-gray-800</td><td>--en-gradient-from: oklch(27.8% .033 256.848);<br>--en-gradient-to: oklch(27.8% .033 256.848);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-gray-900</td><td>--en-gradient-from: oklch(21% .034 264.665);<br>--en-gradient-to: oklch(21% .034 264.665);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-gray-950</td><td>--en-gradient-from: oklch(13% .028 261.692);<br>--en-gradient-to: oklch(13% .028 261.692);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-zinc-50</td><td>--en-gradient-from: oklch(98.5% 0 0);<br>--en-gradient-to: oklch(98.5% 0 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-zinc-100</td><td>--en-gradient-from: oklch(96.7% .001 286.375);<br>--en-gradient-to: oklch(96.7% .001 286.375);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-zinc-200</td><td>--en-gradient-from: oklch(92% .004 286.32);<br>--en-gradient-to: oklch(92% .004 286.32);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-zinc-300</td><td>--en-gradient-from: oklch(87.1% .006 286.286);<br>--en-gradient-to: oklch(87.1% .006 286.286);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-zinc-400</td><td>--en-gradient-from: oklch(70.5% .015 286.067);<br>--en-gradient-to: oklch(70.5% .015 286.067);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-zinc-500</td><td>--en-gradient-from: oklch(55.2% .016 285.938);<br>--en-gradient-to: oklch(55.2% .016 285.938);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-zinc-600</td><td>--en-gradient-from: oklch(44.2% .017 285.786);<br>--en-gradient-to: oklch(44.2% .017 285.786);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-zinc-700</td><td>--en-gradient-from: oklch(37% .013 285.805);<br>--en-gradient-to: oklch(37% .013 285.805);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-zinc-800</td><td>--en-gradient-from: oklch(27.4% .006 286.033);<br>--en-gradient-to: oklch(27.4% .006 286.033);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-zinc-900</td><td>--en-gradient-from: oklch(21% .006 285.885);<br>--en-gradient-to: oklch(21% .006 285.885);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-zinc-950</td><td>--en-gradient-from: oklch(14.1% .005 285.823);<br>--en-gradient-to: oklch(14.1% .005 285.823);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-neutral-50</td><td>--en-gradient-from: oklch(98.5% 0 0);<br>--en-gradient-to: oklch(98.5% 0 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-neutral-100</td><td>--en-gradient-from: oklch(97% 0 0);<br>--en-gradient-to: oklch(97% 0 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-neutral-200</td><td>--en-gradient-from: oklch(92.2% 0 0);<br>--en-gradient-to: oklch(92.2% 0 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-neutral-300</td><td>--en-gradient-from: oklch(87% 0 0);<br>--en-gradient-to: oklch(87% 0 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-neutral-400</td><td>--en-gradient-from: oklch(70.8% 0 0);<br>--en-gradient-to: oklch(70.8% 0 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-neutral-500</td><td>--en-gradient-from: oklch(55.6% 0 0);<br>--en-gradient-to: oklch(55.6% 0 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-neutral-600</td><td>--en-gradient-from: oklch(43.9% 0 0);<br>--en-gradient-to: oklch(43.9% 0 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-neutral-700</td><td>--en-gradient-from: oklch(37.1% 0 0);<br>--en-gradient-to: oklch(37.1% 0 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-neutral-800</td><td>--en-gradient-from: oklch(26.9% 0 0);<br>--en-gradient-to: oklch(26.9% 0 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-neutral-900</td><td>--en-gradient-from: oklch(20.5% 0 0);<br>--en-gradient-to: oklch(20.5% 0 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-neutral-950</td><td>--en-gradient-from: oklch(14.5% 0 0);<br>--en-gradient-to: oklch(14.5% 0 0);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-stone-50</td><td>--en-gradient-from: oklch(98.5% .001 106.423);<br>--en-gradient-to: oklch(98.5% .001 106.423);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-stone-100</td><td>--en-gradient-from: oklch(97% .001 106.424);<br>--en-gradient-to: oklch(97% .001 106.424);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-stone-200</td><td>--en-gradient-from: oklch(92.3% .003 48.717);<br>--en-gradient-to: oklch(92.3% .003 48.717);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-stone-300</td><td>--en-gradient-from: oklch(86.9% .005 56.366);<br>--en-gradient-to: oklch(86.9% .005 56.366);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-stone-400</td><td>--en-gradient-from: oklch(70.9% .01 56.259);<br>--en-gradient-to: oklch(70.9% .01 56.259);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-stone-500</td><td>--en-gradient-from: oklch(55.3% .013 58.071);<br>--en-gradient-to: oklch(55.3% .013 58.071);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-stone-600</td><td>--en-gradient-from: oklch(44.4% .011 73.639);<br>--en-gradient-to: oklch(44.4% .011 73.639);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-stone-700</td><td>--en-gradient-from: oklch(37.4% .01 67.558);<br>--en-gradient-to: oklch(37.4% .01 67.558);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-stone-800</td><td>--en-gradient-from: oklch(26.8% .007 34.298);<br>--en-gradient-to: oklch(26.8% .007 34.298);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-stone-900</td><td>--en-gradient-from: oklch(21.6% .006 56.043);<br>--en-gradient-to: oklch(21.6% .006 56.043);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-stone-950</td><td>--en-gradient-from: oklch(14.7% .004 49.25);<br>--en-gradient-to: oklch(14.7% .004 49.25);<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-black</td><td>--en-gradient-from: #000;<br>--en-gradient-to: #000;<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>from-white</td><td>--en-gradient-from: #fff;<br>--en-gradient-to: #fff;<br>--en-gradient-stops: var(--en-gradient-from), var(--en-gradient-to);</td></tr>
+    <tr><td>via-inherit</td><td>--en-gradient-to: transparent;<br>--en-gradient-stops: var(--en-gradient-from), inherit, var(--en-gradient-to);</td></tr>
+    <tr><td>via-current</td><td>--en-gradient-to: transparent;<br>--en-gradient-stops: var(--en-gradient-from), currentColor, var(--en-gradient-to);</td></tr>
+    <tr><td>via-transparent</td><td>--en-gradient-to: transparent;<br>--en-gradient-stops: var(--en-gradient-from), transparent, var(--en-gradient-to);</td></tr>
+    <tr><td>via-red-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(97.1% .013 17.38), var(--en-gradient-to);</td></tr>
+    <tr><td>via-red-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(93.6% .032 17.717), var(--en-gradient-to);</td></tr>
+    <tr><td>via-red-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(88.5% .062 18.334), var(--en-gradient-to);</td></tr>
+    <tr><td>via-red-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(80.8% .114 19.571), var(--en-gradient-to);</td></tr>
+    <tr><td>via-red-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(70.4% .191 22.216), var(--en-gradient-to);</td></tr>
+    <tr><td>via-red-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(63.7% .237 25.331), var(--en-gradient-to);</td></tr>
+    <tr><td>via-red-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(57.7% .245 27.325), var(--en-gradient-to);</td></tr>
+    <tr><td>via-red-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(50.5% .213 27.518), var(--en-gradient-to);</td></tr>
+    <tr><td>via-red-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(44.4% .177 26.899), var(--en-gradient-to);</td></tr>
+    <tr><td>via-red-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(39.6% .141 25.723), var(--en-gradient-to);</td></tr>
+    <tr><td>via-red-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(25.8% .092 26.042), var(--en-gradient-to);</td></tr>
+    <tr><td>via-orange-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(98% .016 73.684), var(--en-gradient-to);</td></tr>
+    <tr><td>via-orange-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(95.4% .038 75.164), var(--en-gradient-to);</td></tr>
+    <tr><td>via-orange-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(90.1% .076 70.697), var(--en-gradient-to);</td></tr>
+    <tr><td>via-orange-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(83.7% .128 66.29), var(--en-gradient-to);</td></tr>
+    <tr><td>via-orange-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(75% .183 55.934), var(--en-gradient-to);</td></tr>
+    <tr><td>via-orange-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(70.5% .213 47.604), var(--en-gradient-to);</td></tr>
+    <tr><td>via-orange-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(64.6% .222 41.116), var(--en-gradient-to);</td></tr>
+    <tr><td>via-orange-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(55.3% .195 38.402), var(--en-gradient-to);</td></tr>
+    <tr><td>via-orange-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(47% .157 37.304), var(--en-gradient-to);</td></tr>
+    <tr><td>via-orange-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(40.8% .123 38.172), var(--en-gradient-to);</td></tr>
+    <tr><td>via-orange-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(26.6% .079 36.259), var(--en-gradient-to);</td></tr>
+    <tr><td>via-amber-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(98.7% .022 95.277), var(--en-gradient-to);</td></tr>
+    <tr><td>via-amber-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(96.2% .059 95.617), var(--en-gradient-to);</td></tr>
+    <tr><td>via-amber-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(92.4% .12 95.746), var(--en-gradient-to);</td></tr>
+    <tr><td>via-amber-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(87.9% .169 91.605), var(--en-gradient-to);</td></tr>
+    <tr><td>via-amber-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(82.8% .189 84.429), var(--en-gradient-to);</td></tr>
+    <tr><td>via-amber-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(76.9% .188 70.08), var(--en-gradient-to);</td></tr>
+    <tr><td>via-amber-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(66.6% .179 58.318), var(--en-gradient-to);</td></tr>
+    <tr><td>via-amber-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(55.5% .163 48.998), var(--en-gradient-to);</td></tr>
+    <tr><td>via-amber-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(47.3% .137 46.201), var(--en-gradient-to);</td></tr>
+    <tr><td>via-amber-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(41.4% .112 45.904), var(--en-gradient-to);</td></tr>
+    <tr><td>via-amber-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(27.9% .077 45.635), var(--en-gradient-to);</td></tr>
+    <tr><td>via-yellow-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(98.7% .026 102.212), var(--en-gradient-to);</td></tr>
+    <tr><td>via-yellow-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(97.3% .071 103.193), var(--en-gradient-to);</td></tr>
+    <tr><td>via-yellow-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(94.5% .129 101.54), var(--en-gradient-to);</td></tr>
+    <tr><td>via-yellow-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(90.5% .182 98.111), var(--en-gradient-to);</td></tr>
+    <tr><td>via-yellow-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(85.2% .199 91.936), var(--en-gradient-to);</td></tr>
+    <tr><td>via-yellow-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(79.5% .184 86.047), var(--en-gradient-to);</td></tr>
+    <tr><td>via-yellow-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(68.1% .162 75.834), var(--en-gradient-to);</td></tr>
+    <tr><td>via-yellow-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(55.4% .135 66.442), var(--en-gradient-to);</td></tr>
+    <tr><td>via-yellow-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(47.6% .114 61.907), var(--en-gradient-to);</td></tr>
+    <tr><td>via-yellow-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(42.1% .095 57.708), var(--en-gradient-to);</td></tr>
+    <tr><td>via-yellow-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(28.6% .066 53.813), var(--en-gradient-to);</td></tr>
+    <tr><td>via-lime-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(98.6% .031 120.757), var(--en-gradient-to);</td></tr>
+    <tr><td>via-lime-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(96.7% .067 122.328), var(--en-gradient-to);</td></tr>
+    <tr><td>via-lime-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(93.8% .127 124.321), var(--en-gradient-to);</td></tr>
+    <tr><td>via-lime-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(89.7% .196 126.665), var(--en-gradient-to);</td></tr>
+    <tr><td>via-lime-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(84.1% .238 128.85), var(--en-gradient-to);</td></tr>
+    <tr><td>via-lime-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(76.8% .233 130.85), var(--en-gradient-to);</td></tr>
+    <tr><td>via-lime-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(64.8% .2 131.684), var(--en-gradient-to);</td></tr>
+    <tr><td>via-lime-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(53.2% .157 131.589), var(--en-gradient-to);</td></tr>
+    <tr><td>via-lime-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(45.3% .124 130.933), var(--en-gradient-to);</td></tr>
+    <tr><td>via-lime-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(40.5% .101 131.063), var(--en-gradient-to);</td></tr>
+    <tr><td>via-lime-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(27.4% .072 132.109), var(--en-gradient-to);</td></tr>
+    <tr><td>via-green-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(98.2% .018 155.826), var(--en-gradient-to);</td></tr>
+    <tr><td>via-green-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(96.2% .044 156.743), var(--en-gradient-to);</td></tr>
+    <tr><td>via-green-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(92.5% .084 155.995), var(--en-gradient-to);</td></tr>
+    <tr><td>via-green-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(87.1% .15 154.449), var(--en-gradient-to);</td></tr>
+    <tr><td>via-green-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(79.2% .209 151.711), var(--en-gradient-to);</td></tr>
+    <tr><td>via-green-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(72.3% .219 149.579), var(--en-gradient-to);</td></tr>
+    <tr><td>via-green-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(62.7% .194 149.214), var(--en-gradient-to);</td></tr>
+    <tr><td>via-green-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(52.7% .154 150.069), var(--en-gradient-to);</td></tr>
+    <tr><td>via-green-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(44.8% .119 151.328), var(--en-gradient-to);</td></tr>
+    <tr><td>via-green-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(39.3% .095 152.535), var(--en-gradient-to);</td></tr>
+    <tr><td>via-green-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(26.6% .065 152.934), var(--en-gradient-to);</td></tr>
+    <tr><td>via-emerald-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(97.9% .021 166.113), var(--en-gradient-to);</td></tr>
+    <tr><td>via-emerald-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(95% .052 163.051), var(--en-gradient-to);</td></tr>
+    <tr><td>via-emerald-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(90.5% .093 164.15), var(--en-gradient-to);</td></tr>
+    <tr><td>via-emerald-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(84.5% .143 164.978), var(--en-gradient-to);</td></tr>
+    <tr><td>via-emerald-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(76.5% .177 163.223), var(--en-gradient-to);</td></tr>
+    <tr><td>via-emerald-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(69.6% .17 162.48), var(--en-gradient-to);</td></tr>
+    <tr><td>via-emerald-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(59.6% .145 163.225), var(--en-gradient-to);</td></tr>
+    <tr><td>via-emerald-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(50.8% .118 165.612), var(--en-gradient-to);</td></tr>
+    <tr><td>via-emerald-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(43.2% .095 166.913), var(--en-gradient-to);</td></tr>
+    <tr><td>via-emerald-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(37.8% .077 168.94), var(--en-gradient-to);</td></tr>
+    <tr><td>via-emerald-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(26.2% .051 172.552), var(--en-gradient-to);</td></tr>
+    <tr><td>via-teal-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(98.4% .014 180.72), var(--en-gradient-to);</td></tr>
+    <tr><td>via-teal-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(95.3% .051 180.801), var(--en-gradient-to);</td></tr>
+    <tr><td>via-teal-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(91% .096 180.426), var(--en-gradient-to);</td></tr>
+    <tr><td>via-teal-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(85.5% .138 181.071), var(--en-gradient-to);</td></tr>
+    <tr><td>via-teal-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(77.7% .152 181.912), var(--en-gradient-to);</td></tr>
+    <tr><td>via-teal-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(70.4% .14 182.503), var(--en-gradient-to);</td></tr>
+    <tr><td>via-teal-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(60% .118 184.704), var(--en-gradient-to);</td></tr>
+    <tr><td>via-teal-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(51.1% .096 186.391), var(--en-gradient-to);</td></tr>
+    <tr><td>via-teal-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(43.7% .078 188.216), var(--en-gradient-to);</td></tr>
+    <tr><td>via-teal-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(38.6% .063 188.416), var(--en-gradient-to);</td></tr>
+    <tr><td>via-teal-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(27.7% .046 192.524), var(--en-gradient-to);</td></tr>
+    <tr><td>via-cyan-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(98.4% .019 200.873), var(--en-gradient-to);</td></tr>
+    <tr><td>via-cyan-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(95.6% .045 203.388), var(--en-gradient-to);</td></tr>
+    <tr><td>via-cyan-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(91.7% .08 205.041), var(--en-gradient-to);</td></tr>
+    <tr><td>via-cyan-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(86.5% .127 207.078), var(--en-gradient-to);</td></tr>
+    <tr><td>via-cyan-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(78.9% .154 211.53), var(--en-gradient-to);</td></tr>
+    <tr><td>via-cyan-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(71.5% .143 215.221), var(--en-gradient-to);</td></tr>
+    <tr><td>via-cyan-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(60.9% .126 221.723), var(--en-gradient-to);</td></tr>
+    <tr><td>via-cyan-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(52% .105 223.128), var(--en-gradient-to);</td></tr>
+    <tr><td>via-cyan-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(45% .085 224.283), var(--en-gradient-to);</td></tr>
+    <tr><td>via-cyan-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(39.8% .07 227.392), var(--en-gradient-to);</td></tr>
+    <tr><td>via-cyan-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(30.2% .056 229.695), var(--en-gradient-to);</td></tr>
+    <tr><td>via-sky-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(97.7% .013 236.62), var(--en-gradient-to);</td></tr>
+    <tr><td>via-sky-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(95.1% .026 236.824), var(--en-gradient-to);</td></tr>
+    <tr><td>via-sky-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(90.1% .058 230.902), var(--en-gradient-to);</td></tr>
+    <tr><td>via-sky-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(82.8% .111 230.318), var(--en-gradient-to);</td></tr>
+    <tr><td>via-sky-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(74.6% .16 232.661), var(--en-gradient-to);</td></tr>
+    <tr><td>via-sky-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(68.5% .169 237.323), var(--en-gradient-to);</td></tr>
+    <tr><td>via-sky-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(58.8% .158 241.966), var(--en-gradient-to);</td></tr>
+    <tr><td>via-sky-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(50% .134 242.749), var(--en-gradient-to);</td></tr>
+    <tr><td>via-sky-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(44.3% .11 240.79), var(--en-gradient-to);</td></tr>
+    <tr><td>via-sky-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(39.1% .09 240.876), var(--en-gradient-to);</td></tr>
+    <tr><td>via-sky-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(29.3% .066 243.157), var(--en-gradient-to);</td></tr>
+    <tr><td>via-blue-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(97% .014 254.604), var(--en-gradient-to);</td></tr>
+    <tr><td>via-blue-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(93.2% .032 255.585), var(--en-gradient-to);</td></tr>
+    <tr><td>via-blue-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(88.2% .059 254.128), var(--en-gradient-to);</td></tr>
+    <tr><td>via-blue-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(80.9% .105 251.813), var(--en-gradient-to);</td></tr>
+    <tr><td>via-blue-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(70.7% .165 254.624), var(--en-gradient-to);</td></tr>
+    <tr><td>via-blue-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(62.3% .214 259.815), var(--en-gradient-to);</td></tr>
+    <tr><td>via-blue-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(54.6% .245 262.881), var(--en-gradient-to);</td></tr>
+    <tr><td>via-blue-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(48.8% .243 264.376), var(--en-gradient-to);</td></tr>
+    <tr><td>via-blue-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(42.4% .199 265.638), var(--en-gradient-to);</td></tr>
+    <tr><td>via-blue-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(37.9% .146 265.522), var(--en-gradient-to);</td></tr>
+    <tr><td>via-blue-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(28.2% .091 267.935), var(--en-gradient-to);</td></tr>
+    <tr><td>via-indigo-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(96.2% .018 272.314), var(--en-gradient-to);</td></tr>
+    <tr><td>via-indigo-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(93% .034 272.788), var(--en-gradient-to);</td></tr>
+    <tr><td>via-indigo-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(87% .065 274.039), var(--en-gradient-to);</td></tr>
+    <tr><td>via-indigo-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(78.5% .115 274.713), var(--en-gradient-to);</td></tr>
+    <tr><td>via-indigo-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(67.3% .182 276.935), var(--en-gradient-to);</td></tr>
+    <tr><td>via-indigo-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(58.5% .233 277.117), var(--en-gradient-to);</td></tr>
+    <tr><td>via-indigo-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(51.1% .262 276.966), var(--en-gradient-to);</td></tr>
+    <tr><td>via-indigo-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(45.7% .24 277.023), var(--en-gradient-to);</td></tr>
+    <tr><td>via-indigo-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(39.8% .195 277.366), var(--en-gradient-to);</td></tr>
+    <tr><td>via-indigo-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(35.9% .144 278.697), var(--en-gradient-to);</td></tr>
+    <tr><td>via-indigo-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(25.7% .09 281.288), var(--en-gradient-to);</td></tr>
+    <tr><td>via-violet-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(96.9% .016 293.756), var(--en-gradient-to);</td></tr>
+    <tr><td>via-violet-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(94.3% .029 294.588), var(--en-gradient-to);</td></tr>
+    <tr><td>via-violet-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(89.4% .057 293.283), var(--en-gradient-to);</td></tr>
+    <tr><td>via-violet-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(81.1% .111 293.571), var(--en-gradient-to);</td></tr>
+    <tr><td>via-violet-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(70.2% .183 293.541), var(--en-gradient-to);</td></tr>
+    <tr><td>via-violet-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(60.6% .25 292.717), var(--en-gradient-to);</td></tr>
+    <tr><td>via-violet-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(54.1% .281 293.009), var(--en-gradient-to);</td></tr>
+    <tr><td>via-violet-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(49.1% .27 292.581), var(--en-gradient-to);</td></tr>
+    <tr><td>via-violet-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(43.2% .232 292.759), var(--en-gradient-to);</td></tr>
+    <tr><td>via-violet-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(38% .189 293.745), var(--en-gradient-to);</td></tr>
+    <tr><td>via-violet-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(28.3% .141 291.089), var(--en-gradient-to);</td></tr>
+    <tr><td>via-purple-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(97.7% .014 308.299), var(--en-gradient-to);</td></tr>
+    <tr><td>via-purple-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(94.6% .033 307.174), var(--en-gradient-to);</td></tr>
+    <tr><td>via-purple-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(90.2% .063 306.703), var(--en-gradient-to);</td></tr>
+    <tr><td>via-purple-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(82.7% .119 306.383), var(--en-gradient-to);</td></tr>
+    <tr><td>via-purple-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(71.4% .203 305.504), var(--en-gradient-to);</td></tr>
+    <tr><td>via-purple-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(62.7% .265 303.9), var(--en-gradient-to);</td></tr>
+    <tr><td>via-purple-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(55.8% .288 302.321), var(--en-gradient-to);</td></tr>
+    <tr><td>via-purple-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(49.6% .265 301.924), var(--en-gradient-to);</td></tr>
+    <tr><td>via-purple-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(43.8% .218 303.724), var(--en-gradient-to);</td></tr>
+    <tr><td>via-purple-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(38.1% .176 304.987), var(--en-gradient-to);</td></tr>
+    <tr><td>via-purple-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(29.1% .149 302.717), var(--en-gradient-to);</td></tr>
+    <tr><td>via-fuchsia-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(97.7% .017 320.058), var(--en-gradient-to);</td></tr>
+    <tr><td>via-fuchsia-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(95.2% .037 318.852), var(--en-gradient-to);</td></tr>
+    <tr><td>via-fuchsia-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(90.3% .076 319.62), var(--en-gradient-to);</td></tr>
+    <tr><td>via-fuchsia-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(83.3% .145 321.434), var(--en-gradient-to);</td></tr>
+    <tr><td>via-fuchsia-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(74% .238 322.16), var(--en-gradient-to);</td></tr>
+    <tr><td>via-fuchsia-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(66.7% .295 322.15), var(--en-gradient-to);</td></tr>
+    <tr><td>via-fuchsia-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(59.1% .293 322.896), var(--en-gradient-to);</td></tr>
+    <tr><td>via-fuchsia-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(51.8% .253 323.949), var(--en-gradient-to);</td></tr>
+    <tr><td>via-fuchsia-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(45.2% .211 324.591), var(--en-gradient-to);</td></tr>
+    <tr><td>via-fuchsia-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(40.1% .17 325.612), var(--en-gradient-to);</td></tr>
+    <tr><td>via-fuchsia-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(29.3% .136 325.661), var(--en-gradient-to);</td></tr>
+    <tr><td>via-pink-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(97.1% .014 343.198), var(--en-gradient-to);</td></tr>
+    <tr><td>via-pink-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(94.8% .028 342.258), var(--en-gradient-to);</td></tr>
+    <tr><td>via-pink-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(89.9% .061 343.231), var(--en-gradient-to);</td></tr>
+    <tr><td>via-pink-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(82.3% .12 346.018), var(--en-gradient-to);</td></tr>
+    <tr><td>via-pink-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(71.8% .202 349.761), var(--en-gradient-to);</td></tr>
+    <tr><td>via-pink-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(65.6% .241 354.308), var(--en-gradient-to);</td></tr>
+    <tr><td>via-pink-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(59.2% .249 .584), var(--en-gradient-to);</td></tr>
+    <tr><td>via-pink-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(52.5% .223 3.958), var(--en-gradient-to);</td></tr>
+    <tr><td>via-pink-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(45.9% .187 3.815), var(--en-gradient-to);</td></tr>
+    <tr><td>via-pink-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(40.8% .153 2.432), var(--en-gradient-to);</td></tr>
+    <tr><td>via-pink-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(28.4% .109 3.907), var(--en-gradient-to);</td></tr>
+    <tr><td>via-rose-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(96.9% .015 12.422), var(--en-gradient-to);</td></tr>
+    <tr><td>via-rose-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(94.1% .03 12.58), var(--en-gradient-to);</td></tr>
+    <tr><td>via-rose-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(89.2% .058 10.001), var(--en-gradient-to);</td></tr>
+    <tr><td>via-rose-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(81% .117 11.638), var(--en-gradient-to);</td></tr>
+    <tr><td>via-rose-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(71.2% .194 13.428), var(--en-gradient-to);</td></tr>
+    <tr><td>via-rose-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(64.5% .246 16.439), var(--en-gradient-to);</td></tr>
+    <tr><td>via-rose-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(58.6% .253 17.585), var(--en-gradient-to);</td></tr>
+    <tr><td>via-rose-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(51.4% .222 16.935), var(--en-gradient-to);</td></tr>
+    <tr><td>via-rose-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(45.5% .188 13.697), var(--en-gradient-to);</td></tr>
+    <tr><td>via-rose-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(41% .159 10.272), var(--en-gradient-to);</td></tr>
+    <tr><td>via-rose-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(27.1% .105 12.094), var(--en-gradient-to);</td></tr>
+    <tr><td>via-slate-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(98.4% .003 247.858), var(--en-gradient-to);</td></tr>
+    <tr><td>via-slate-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(96.8% .007 247.896), var(--en-gradient-to);</td></tr>
+    <tr><td>via-slate-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(92.9% .013 255.508), var(--en-gradient-to);</td></tr>
+    <tr><td>via-slate-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(86.9% .022 252.894), var(--en-gradient-to);</td></tr>
+    <tr><td>via-slate-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(70.4% .04 256.788), var(--en-gradient-to);</td></tr>
+    <tr><td>via-slate-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(55.4% .046 257.417), var(--en-gradient-to);</td></tr>
+    <tr><td>via-slate-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(44.6% .043 257.281), var(--en-gradient-to);</td></tr>
+    <tr><td>via-slate-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(37.2% .044 257.287), var(--en-gradient-to);</td></tr>
+    <tr><td>via-slate-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(27.9% .041 260.031), var(--en-gradient-to);</td></tr>
+    <tr><td>via-slate-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(20.8% .042 265.755), var(--en-gradient-to);</td></tr>
+    <tr><td>via-slate-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(12.9% .042 264.695), var(--en-gradient-to);</td></tr>
+    <tr><td>via-gray-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(98.5% .002 247.839), var(--en-gradient-to);</td></tr>
+    <tr><td>via-gray-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(96.7% .003 264.542), var(--en-gradient-to);</td></tr>
+    <tr><td>via-gray-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(92.8% .006 264.531), var(--en-gradient-to);</td></tr>
+    <tr><td>via-gray-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(87.2% .01 258.338), var(--en-gradient-to);</td></tr>
+    <tr><td>via-gray-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(70.7% .022 261.325), var(--en-gradient-to);</td></tr>
+    <tr><td>via-gray-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(55.1% .027 264.364), var(--en-gradient-to);</td></tr>
+    <tr><td>via-gray-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(44.6% .03 256.802), var(--en-gradient-to);</td></tr>
+    <tr><td>via-gray-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(37.3% .034 259.733), var(--en-gradient-to);</td></tr>
+    <tr><td>via-gray-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(27.8% .033 256.848), var(--en-gradient-to);</td></tr>
+    <tr><td>via-gray-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(21% .034 264.665), var(--en-gradient-to);</td></tr>
+    <tr><td>via-gray-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(13% .028 261.692), var(--en-gradient-to);</td></tr>
+    <tr><td>via-zinc-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(98.5% 0 0), var(--en-gradient-to);</td></tr>
+    <tr><td>via-zinc-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(96.7% .001 286.375), var(--en-gradient-to);</td></tr>
+    <tr><td>via-zinc-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(92% .004 286.32), var(--en-gradient-to);</td></tr>
+    <tr><td>via-zinc-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(87.1% .006 286.286), var(--en-gradient-to);</td></tr>
+    <tr><td>via-zinc-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(70.5% .015 286.067), var(--en-gradient-to);</td></tr>
+    <tr><td>via-zinc-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(55.2% .016 285.938), var(--en-gradient-to);</td></tr>
+    <tr><td>via-zinc-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(44.2% .017 285.786), var(--en-gradient-to);</td></tr>
+    <tr><td>via-zinc-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(37% .013 285.805), var(--en-gradient-to);</td></tr>
+    <tr><td>via-zinc-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(27.4% .006 286.033), var(--en-gradient-to);</td></tr>
+    <tr><td>via-zinc-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(21% .006 285.885), var(--en-gradient-to);</td></tr>
+    <tr><td>via-zinc-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(14.1% .005 285.823), var(--en-gradient-to);</td></tr>
+    <tr><td>via-neutral-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(98.5% 0 0), var(--en-gradient-to);</td></tr>
+    <tr><td>via-neutral-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(97% 0 0), var(--en-gradient-to);</td></tr>
+    <tr><td>via-neutral-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(92.2% 0 0), var(--en-gradient-to);</td></tr>
+    <tr><td>via-neutral-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(87% 0 0), var(--en-gradient-to);</td></tr>
+    <tr><td>via-neutral-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(70.8% 0 0), var(--en-gradient-to);</td></tr>
+    <tr><td>via-neutral-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(55.6% 0 0), var(--en-gradient-to);</td></tr>
+    <tr><td>via-neutral-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(43.9% 0 0), var(--en-gradient-to);</td></tr>
+    <tr><td>via-neutral-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(37.1% 0 0), var(--en-gradient-to);</td></tr>
+    <tr><td>via-neutral-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(26.9% 0 0), var(--en-gradient-to);</td></tr>
+    <tr><td>via-neutral-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(20.5% 0 0), var(--en-gradient-to);</td></tr>
+    <tr><td>via-neutral-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(14.5% 0 0), var(--en-gradient-to);</td></tr>
+    <tr><td>via-stone-50</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(98.5% .001 106.423), var(--en-gradient-to);</td></tr>
+    <tr><td>via-stone-100</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(97% .001 106.424), var(--en-gradient-to);</td></tr>
+    <tr><td>via-stone-200</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(92.3% .003 48.717), var(--en-gradient-to);</td></tr>
+    <tr><td>via-stone-300</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(86.9% .005 56.366), var(--en-gradient-to);</td></tr>
+    <tr><td>via-stone-400</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(70.9% .01 56.259), var(--en-gradient-to);</td></tr>
+    <tr><td>via-stone-500</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(55.3% .013 58.071), var(--en-gradient-to);</td></tr>
+    <tr><td>via-stone-600</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(44.4% .011 73.639), var(--en-gradient-to);</td></tr>
+    <tr><td>via-stone-700</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(37.4% .01 67.558), var(--en-gradient-to);</td></tr>
+    <tr><td>via-stone-800</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(26.8% .007 34.298), var(--en-gradient-to);</td></tr>
+    <tr><td>via-stone-900</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(21.6% .006 56.043), var(--en-gradient-to);</td></tr>
+    <tr><td>via-stone-950</td><td>--en-gradient-stops: var(--en-gradient-from), oklch(14.7% .004 49.25), var(--en-gradient-to);</td></tr>
+    <tr><td>via-black</td><td>--en-gradient-stops: var(--en-gradient-from), #000, var(--en-gradient-to);</td></tr>
+    <tr><td>via-white</td><td>--en-gradient-stops: var(--en-gradient-from), #fff, var(--en-gradient-to);</td></tr>
+    <tr><td>to-inherit</td><td>--en-gradient-to: inherit;</td></tr>
+    <tr><td>to-current</td><td>--en-gradient-to: currentColor;</td></tr>
+    <tr><td>to-transparent</td><td>--en-gradient-to: transparent;</td></tr>
+    <tr><td>to-slate-50</td><td>--en-gradient-to: rgb(248 250 252);</td></tr>
+    <tr><td>to-red-50</td><td>--en-gradient-to: oklch(97.1% .013 17.38);</td></tr>
+    <tr><td>to-red-100</td><td>--en-gradient-to: oklch(93.6% .032 17.717);</td></tr>
+    <tr><td>to-red-200</td><td>--en-gradient-to: oklch(88.5% .062 18.334);</td></tr>
+    <tr><td>to-red-300</td><td>--en-gradient-to: oklch(80.8% .114 19.571);</td></tr>
+    <tr><td>to-red-400</td><td>--en-gradient-to: oklch(70.4% .191 22.216);</td></tr>
+    <tr><td>to-red-500</td><td>--en-gradient-to: oklch(63.7% .237 25.331);</td></tr>
+    <tr><td>to-red-600</td><td>--en-gradient-to: oklch(57.7% .245 27.325);</td></tr>
+    <tr><td>to-red-700</td><td>--en-gradient-to: oklch(50.5% .213 27.518);</td></tr>
+    <tr><td>to-red-800</td><td>--en-gradient-to: oklch(44.4% .177 26.899);</td></tr>
+    <tr><td>to-red-900</td><td>--en-gradient-to: oklch(39.6% .141 25.723);</td></tr>
+    <tr><td>to-red-950</td><td>--en-gradient-to: oklch(25.8% .092 26.042);</td></tr>
+    <tr><td>to-orange-50</td><td>--en-gradient-to: oklch(98% .016 73.684);</td></tr>
+    <tr><td>to-orange-100</td><td>--en-gradient-to: oklch(95.4% .038 75.164);</td></tr>
+    <tr><td>to-orange-200</td><td>--en-gradient-to: oklch(90.1% .076 70.697);</td></tr>
+    <tr><td>to-orange-300</td><td>--en-gradient-to: oklch(83.7% .128 66.29);</td></tr>
+    <tr><td>to-orange-400</td><td>--en-gradient-to: oklch(75% .183 55.934);</td></tr>
+    <tr><td>to-orange-500</td><td>--en-gradient-to: oklch(70.5% .213 47.604);</td></tr>
+    <tr><td>to-orange-600</td><td>--en-gradient-to: oklch(64.6% .222 41.116);</td></tr>
+    <tr><td>to-orange-700</td><td>--en-gradient-to: oklch(55.3% .195 38.402);</td></tr>
+    <tr><td>to-orange-800</td><td>--en-gradient-to: oklch(47% .157 37.304);</td></tr>
+    <tr><td>to-orange-900</td><td>--en-gradient-to: oklch(40.8% .123 38.172);</td></tr>
+    <tr><td>to-orange-950</td><td>--en-gradient-to: oklch(26.6% .079 36.259);</td></tr>
+    <tr><td>to-amber-50</td><td>--en-gradient-to: oklch(98.7% .022 95.277);</td></tr>
+    <tr><td>to-amber-100</td><td>--en-gradient-to: oklch(96.2% .059 95.617);</td></tr>
+    <tr><td>to-amber-200</td><td>--en-gradient-to: oklch(92.4% .12 95.746);</td></tr>
+    <tr><td>to-amber-300</td><td>--en-gradient-to: oklch(87.9% .169 91.605);</td></tr>
+    <tr><td>to-amber-400</td><td>--en-gradient-to: oklch(82.8% .189 84.429);</td></tr>
+    <tr><td>to-amber-500</td><td>--en-gradient-to: oklch(76.9% .188 70.08);</td></tr>
+    <tr><td>to-amber-600</td><td>--en-gradient-to: oklch(66.6% .179 58.318);</td></tr>
+    <tr><td>to-amber-700</td><td>--en-gradient-to: oklch(55.5% .163 48.998);</td></tr>
+    <tr><td>to-amber-800</td><td>--en-gradient-to: oklch(47.3% .137 46.201);</td></tr>
+    <tr><td>to-amber-900</td><td>--en-gradient-to: oklch(41.4% .112 45.904);</td></tr>
+    <tr><td>to-amber-950</td><td>--en-gradient-to: oklch(27.9% .077 45.635);</td></tr>
+    <tr><td>to-yellow-50</td><td>--en-gradient-to: oklch(98.7% .026 102.212);</td></tr>
+    <tr><td>to-yellow-100</td><td>--en-gradient-to: oklch(97.3% .071 103.193);</td></tr>
+    <tr><td>to-yellow-200</td><td>--en-gradient-to: oklch(94.5% .129 101.54);</td></tr>
+    <tr><td>to-yellow-300</td><td>--en-gradient-to: oklch(90.5% .182 98.111);</td></tr>
+    <tr><td>to-yellow-400</td><td>--en-gradient-to: oklch(85.2% .199 91.936);</td></tr>
+    <tr><td>to-yellow-500</td><td>--en-gradient-to: oklch(79.5% .184 86.047);</td></tr>
+    <tr><td>to-yellow-600</td><td>--en-gradient-to: oklch(68.1% .162 75.834);</td></tr>
+    <tr><td>to-yellow-700</td><td>--en-gradient-to: oklch(55.4% .135 66.442);</td></tr>
+    <tr><td>to-yellow-800</td><td>--en-gradient-to: oklch(47.6% .114 61.907);</td></tr>
+    <tr><td>to-yellow-900</td><td>--en-gradient-to: oklch(42.1% .095 57.708);</td></tr>
+    <tr><td>to-yellow-950</td><td>--en-gradient-to: oklch(28.6% .066 53.813);</td></tr>
+    <tr><td>to-lime-50</td><td>--en-gradient-to: oklch(98.6% .031 120.757);</td></tr>
+    <tr><td>to-lime-100</td><td>--en-gradient-to: oklch(96.7% .067 122.328);</td></tr>
+    <tr><td>to-lime-200</td><td>--en-gradient-to: oklch(93.8% .127 124.321);</td></tr>
+    <tr><td>to-lime-300</td><td>--en-gradient-to: oklch(89.7% .196 126.665);</td></tr>
+    <tr><td>to-lime-400</td><td>--en-gradient-to: oklch(84.1% .238 128.85);</td></tr>
+    <tr><td>to-lime-500</td><td>--en-gradient-to: oklch(76.8% .233 130.85);</td></tr>
+    <tr><td>to-lime-600</td><td>--en-gradient-to: oklch(64.8% .2 131.684);</td></tr>
+    <tr><td>to-lime-700</td><td>--en-gradient-to: oklch(53.2% .157 131.589);</td></tr>
+    <tr><td>to-lime-800</td><td>--en-gradient-to: oklch(45.3% .124 130.933);</td></tr>
+    <tr><td>to-lime-900</td><td>--en-gradient-to: oklch(40.5% .101 131.063);</td></tr>
+    <tr><td>to-lime-950</td><td>--en-gradient-to: oklch(27.4% .072 132.109);</td></tr>
+    <tr><td>to-green-50</td><td>--en-gradient-to: oklch(98.2% .018 155.826);</td></tr>
+    <tr><td>to-green-100</td><td>--en-gradient-to: oklch(96.2% .044 156.743);</td></tr>
+    <tr><td>to-green-200</td><td>--en-gradient-to: oklch(92.5% .084 155.995);</td></tr>
+    <tr><td>to-green-300</td><td>--en-gradient-to: oklch(87.1% .15 154.449);</td></tr>
+    <tr><td>to-green-400</td><td>--en-gradient-to: oklch(79.2% .209 151.711);</td></tr>
+    <tr><td>to-green-500</td><td>--en-gradient-to: oklch(72.3% .219 149.579);</td></tr>
+    <tr><td>to-green-600</td><td>--en-gradient-to: oklch(62.7% .194 149.214);</td></tr>
+    <tr><td>to-green-700</td><td>--en-gradient-to: oklch(52.7% .154 150.069);</td></tr>
+    <tr><td>to-green-800</td><td>--en-gradient-to: oklch(44.8% .119 151.328);</td></tr>
+    <tr><td>to-green-900</td><td>--en-gradient-to: oklch(39.3% .095 152.535);</td></tr>
+    <tr><td>to-green-950</td><td>--en-gradient-to: oklch(26.6% .065 152.934);</td></tr>
+    <tr><td>to-emerald-50</td><td>--en-gradient-to: oklch(97.9% .021 166.113);</td></tr>
+    <tr><td>to-emerald-100</td><td>--en-gradient-to: oklch(95% .052 163.051);</td></tr>
+    <tr><td>to-emerald-200</td><td>--en-gradient-to: oklch(90.5% .093 164.15);</td></tr>
+    <tr><td>to-emerald-300</td><td>--en-gradient-to: oklch(84.5% .143 164.978);</td></tr>
+    <tr><td>to-emerald-400</td><td>--en-gradient-to: oklch(76.5% .177 163.223);</td></tr>
+    <tr><td>to-emerald-500</td><td>--en-gradient-to: oklch(69.6% .17 162.48);</td></tr>
+    <tr><td>to-emerald-600</td><td>--en-gradient-to: oklch(59.6% .145 163.225);</td></tr>
+    <tr><td>to-emerald-700</td><td>--en-gradient-to: oklch(50.8% .118 165.612);</td></tr>
+    <tr><td>to-emerald-800</td><td>--en-gradient-to: oklch(43.2% .095 166.913);</td></tr>
+    <tr><td>to-emerald-900</td><td>--en-gradient-to: oklch(37.8% .077 168.94);</td></tr>
+    <tr><td>to-emerald-950</td><td>--en-gradient-to: oklch(26.2% .051 172.552);</td></tr>
+    <tr><td>to-teal-50</td><td>--en-gradient-to: oklch(98.4% .014 180.72);</td></tr>
+    <tr><td>to-teal-100</td><td>--en-gradient-to: oklch(95.3% .051 180.801);</td></tr>
+    <tr><td>to-teal-200</td><td>--en-gradient-to: oklch(91% .096 180.426);</td></tr>
+    <tr><td>to-teal-300</td><td>--en-gradient-to: oklch(85.5% .138 181.071);</td></tr>
+    <tr><td>to-teal-400</td><td>--en-gradient-to: oklch(77.7% .152 181.912);</td></tr>
+    <tr><td>to-teal-500</td><td>--en-gradient-to: oklch(70.4% .14 182.503);</td></tr>
+    <tr><td>to-teal-600</td><td>--en-gradient-to: oklch(60% .118 184.704);</td></tr>
+    <tr><td>to-teal-700</td><td>--en-gradient-to: oklch(51.1% .096 186.391);</td></tr>
+    <tr><td>to-teal-800</td><td>--en-gradient-to: oklch(43.7% .078 188.216);</td></tr>
+    <tr><td>to-teal-900</td><td>--en-gradient-to: oklch(38.6% .063 188.416);</td></tr>
+    <tr><td>to-teal-950</td><td>--en-gradient-to: oklch(27.7% .046 192.524);</td></tr>
+    <tr><td>to-cyan-50</td><td>--en-gradient-to: oklch(98.4% .019 200.873);</td></tr>
+    <tr><td>to-cyan-100</td><td>--en-gradient-to: oklch(95.6% .045 203.388);</td></tr>
+    <tr><td>to-cyan-200</td><td>--en-gradient-to: oklch(91.7% .08 205.041);</td></tr>
+    <tr><td>to-cyan-300</td><td>--en-gradient-to: oklch(86.5% .127 207.078);</td></tr>
+    <tr><td>to-cyan-400</td><td>--en-gradient-to: oklch(78.9% .154 211.53);</td></tr>
+    <tr><td>to-cyan-500</td><td>--en-gradient-to: oklch(71.5% .143 215.221);</td></tr>
+    <tr><td>to-cyan-600</td><td>--en-gradient-to: oklch(60.9% .126 221.723);</td></tr>
+    <tr><td>to-cyan-700</td><td>--en-gradient-to: oklch(52% .105 223.128);</td></tr>
+    <tr><td>to-cyan-800</td><td>--en-gradient-to: oklch(45% .085 224.283);</td></tr>
+    <tr><td>to-cyan-900</td><td>--en-gradient-to: oklch(39.8% .07 227.392);</td></tr>
+    <tr><td>to-cyan-950</td><td>--en-gradient-to: oklch(30.2% .056 229.695);</td></tr>
+    <tr><td>to-sky-50</td><td>--en-gradient-to: oklch(97.7% .013 236.62);</td></tr>
+    <tr><td>to-sky-100</td><td>--en-gradient-to: oklch(95.1% .026 236.824);</td></tr>
+    <tr><td>to-sky-200</td><td>--en-gradient-to: oklch(90.1% .058 230.902);</td></tr>
+    <tr><td>to-sky-300</td><td>--en-gradient-to: oklch(82.8% .111 230.318);</td></tr>
+    <tr><td>to-sky-400</td><td>--en-gradient-to: oklch(74.6% .16 232.661);</td></tr>
+    <tr><td>to-sky-500</td><td>--en-gradient-to: oklch(68.5% .169 237.323);</td></tr>
+    <tr><td>to-sky-600</td><td>--en-gradient-to: oklch(58.8% .158 241.966);</td></tr>
+    <tr><td>to-sky-700</td><td>--en-gradient-to: oklch(50% .134 242.749);</td></tr>
+    <tr><td>to-sky-800</td><td>--en-gradient-to: oklch(44.3% .11 240.79);</td></tr>
+    <tr><td>to-sky-900</td><td>--en-gradient-to: oklch(39.1% .09 240.876);</td></tr>
+    <tr><td>to-sky-950</td><td>--en-gradient-to: oklch(29.3% .066 243.157);</td></tr>
+    <tr><td>to-blue-50</td><td>--en-gradient-to: oklch(97% .014 254.604);</td></tr>
+    <tr><td>to-blue-100</td><td>--en-gradient-to: oklch(93.2% .032 255.585);</td></tr>
+    <tr><td>to-blue-200</td><td>--en-gradient-to: oklch(88.2% .059 254.128);</td></tr>
+    <tr><td>to-blue-300</td><td>--en-gradient-to: oklch(80.9% .105 251.813);</td></tr>
+    <tr><td>to-blue-400</td><td>--en-gradient-to: oklch(70.7% .165 254.624);</td></tr>
+    <tr><td>to-blue-500</td><td>--en-gradient-to: oklch(62.3% .214 259.815);</td></tr>
+    <tr><td>to-blue-600</td><td>--en-gradient-to: oklch(54.6% .245 262.881);</td></tr>
+    <tr><td>to-blue-700</td><td>--en-gradient-to: oklch(48.8% .243 264.376);</td></tr>
+    <tr><td>to-blue-800</td><td>--en-gradient-to: oklch(42.4% .199 265.638);</td></tr>
+    <tr><td>to-blue-900</td><td>--en-gradient-to: oklch(37.9% .146 265.522);</td></tr>
+    <tr><td>to-blue-950</td><td>--en-gradient-to: oklch(28.2% .091 267.935);</td></tr>
+    <tr><td>to-indigo-50</td><td>--en-gradient-to: oklch(96.2% .018 272.314);</td></tr>
+    <tr><td>to-indigo-100</td><td>--en-gradient-to: oklch(93% .034 272.788);</td></tr>
+    <tr><td>to-indigo-200</td><td>--en-gradient-to: oklch(87% .065 274.039);</td></tr>
+    <tr><td>to-indigo-300</td><td>--en-gradient-to: oklch(78.5% .115 274.713);</td></tr>
+    <tr><td>to-indigo-400</td><td>--en-gradient-to: oklch(67.3% .182 276.935);</td></tr>
+    <tr><td>to-indigo-500</td><td>--en-gradient-to: oklch(58.5% .233 277.117);</td></tr>
+    <tr><td>to-indigo-600</td><td>--en-gradient-to: oklch(51.1% .262 276.966);</td></tr>
+    <tr><td>to-indigo-700</td><td>--en-gradient-to: oklch(45.7% .24 277.023);</td></tr>
+    <tr><td>to-indigo-800</td><td>--en-gradient-to: oklch(39.8% .195 277.366);</td></tr>
+    <tr><td>to-indigo-900</td><td>--en-gradient-to: oklch(35.9% .144 278.697);</td></tr>
+    <tr><td>to-indigo-950</td><td>--en-gradient-to: oklch(25.7% .09 281.288);</td></tr>
+    <tr><td>to-violet-50</td><td>--en-gradient-to: oklch(96.9% .016 293.756);</td></tr>
+    <tr><td>to-violet-100</td><td>--en-gradient-to: oklch(94.3% .029 294.588);</td></tr>
+    <tr><td>to-violet-200</td><td>--en-gradient-to: oklch(89.4% .057 293.283);</td></tr>
+    <tr><td>to-violet-300</td><td>--en-gradient-to: oklch(81.1% .111 293.571);</td></tr>
+    <tr><td>to-violet-400</td><td>--en-gradient-to: oklch(70.2% .183 293.541);</td></tr>
+    <tr><td>to-violet-500</td><td>--en-gradient-to: oklch(60.6% .25 292.717);</td></tr>
+    <tr><td>to-violet-600</td><td>--en-gradient-to: oklch(54.1% .281 293.009);</td></tr>
+    <tr><td>to-violet-700</td><td>--en-gradient-to: oklch(49.1% .27 292.581);</td></tr>
+    <tr><td>to-violet-800</td><td>--en-gradient-to: oklch(43.2% .232 292.759);</td></tr>
+    <tr><td>to-violet-900</td><td>--en-gradient-to: oklch(38% .189 293.745);</td></tr>
+    <tr><td>to-violet-950</td><td>--en-gradient-to: oklch(28.3% .141 291.089);</td></tr>
+    <tr><td>to-purple-50</td><td>--en-gradient-to: oklch(97.7% .014 308.299);</td></tr>
+    <tr><td>to-purple-100</td><td>--en-gradient-to: oklch(94.6% .033 307.174);</td></tr>
+    <tr><td>to-purple-200</td><td>--en-gradient-to: oklch(90.2% .063 306.703);</td></tr>
+    <tr><td>to-purple-300</td><td>--en-gradient-to: oklch(82.7% .119 306.383);</td></tr>
+    <tr><td>to-purple-400</td><td>--en-gradient-to: oklch(71.4% .203 305.504);</td></tr>
+    <tr><td>to-purple-500</td><td>--en-gradient-to: oklch(62.7% .265 303.9);</td></tr>
+    <tr><td>to-purple-600</td><td>--en-gradient-to: oklch(55.8% .288 302.321);</td></tr>
+    <tr><td>to-purple-700</td><td>--en-gradient-to: oklch(49.6% .265 301.924);</td></tr>
+    <tr><td>to-purple-800</td><td>--en-gradient-to: oklch(43.8% .218 303.724);</td></tr>
+    <tr><td>to-purple-900</td><td>--en-gradient-to: oklch(38.1% .176 304.987);</td></tr>
+    <tr><td>to-purple-950</td><td>--en-gradient-to: oklch(29.1% .149 302.717);</td></tr>
+    <tr><td>to-fuchsia-50</td><td>--en-gradient-to: oklch(97.7% .017 320.058);</td></tr>
+    <tr><td>to-fuchsia-100</td><td>--en-gradient-to: oklch(95.2% .037 318.852);</td></tr>
+    <tr><td>to-fuchsia-200</td><td>--en-gradient-to: oklch(90.3% .076 319.62);</td></tr>
+    <tr><td>to-fuchsia-300</td><td>--en-gradient-to: oklch(83.3% .145 321.434);</td></tr>
+    <tr><td>to-fuchsia-400</td><td>--en-gradient-to: oklch(74% .238 322.16);</td></tr>
+    <tr><td>to-fuchsia-500</td><td>--en-gradient-to: oklch(66.7% .295 322.15);</td></tr>
+    <tr><td>to-fuchsia-600</td><td>--en-gradient-to: oklch(59.1% .293 322.896);</td></tr>
+    <tr><td>to-fuchsia-700</td><td>--en-gradient-to: oklch(51.8% .253 323.949);</td></tr>
+    <tr><td>to-fuchsia-800</td><td>--en-gradient-to: oklch(45.2% .211 324.591);</td></tr>
+    <tr><td>to-fuchsia-900</td><td>--en-gradient-to: oklch(40.1% .17 325.612);</td></tr>
+    <tr><td>to-fuchsia-950</td><td>--en-gradient-to: oklch(29.3% .136 325.661);</td></tr>
+    <tr><td>to-pink-50</td><td>--en-gradient-to: oklch(97.1% .014 343.198);</td></tr>
+    <tr><td>to-pink-100</td><td>--en-gradient-to: oklch(94.8% .028 342.258);</td></tr>
+    <tr><td>to-pink-200</td><td>--en-gradient-to: oklch(89.9% .061 343.231);</td></tr>
+    <tr><td>to-pink-300</td><td>--en-gradient-to: oklch(82.3% .12 346.018);</td></tr>
+    <tr><td>to-pink-400</td><td>--en-gradient-to: oklch(71.8% .202 349.761);</td></tr>
+    <tr><td>to-pink-500</td><td>--en-gradient-to: oklch(65.6% .241 354.308);</td></tr>
+    <tr><td>to-pink-600</td><td>--en-gradient-to: oklch(59.2% .249 .584);</td></tr>
+    <tr><td>to-pink-700</td><td>--en-gradient-to: oklch(52.5% .223 3.958);</td></tr>
+    <tr><td>to-pink-800</td><td>--en-gradient-to: oklch(45.9% .187 3.815);</td></tr>
+    <tr><td>to-pink-900</td><td>--en-gradient-to: oklch(40.8% .153 2.432);</td></tr>
+    <tr><td>to-pink-950</td><td>--en-gradient-to: oklch(28.4% .109 3.907);</td></tr>
+    <tr><td>to-rose-50</td><td>--en-gradient-to: oklch(96.9% .015 12.422);</td></tr>
+    <tr><td>to-rose-100</td><td>--en-gradient-to: oklch(94.1% .03 12.58);</td></tr>
+    <tr><td>to-rose-200</td><td>--en-gradient-to: oklch(89.2% .058 10.001);</td></tr>
+    <tr><td>to-rose-300</td><td>--en-gradient-to: oklch(81% .117 11.638);</td></tr>
+    <tr><td>to-rose-400</td><td>--en-gradient-to: oklch(71.2% .194 13.428);</td></tr>
+    <tr><td>to-rose-500</td><td>--en-gradient-to: oklch(64.5% .246 16.439);</td></tr>
+    <tr><td>to-rose-600</td><td>--en-gradient-to: oklch(58.6% .253 17.585);</td></tr>
+    <tr><td>to-rose-700</td><td>--en-gradient-to: oklch(51.4% .222 16.935);</td></tr>
+    <tr><td>to-rose-800</td><td>--en-gradient-to: oklch(45.5% .188 13.697);</td></tr>
+    <tr><td>to-rose-900</td><td>--en-gradient-to: oklch(41% .159 10.272);</td></tr>
+    <tr><td>to-rose-950</td><td>--en-gradient-to: oklch(27.1% .105 12.094);</td></tr>
+    <tr><td>to-slate-50</td><td>--en-gradient-to: oklch(98.4% .003 247.858);</td></tr>
+    <tr><td>to-slate-100</td><td>--en-gradient-to: oklch(96.8% .007 247.896);</td></tr>
+    <tr><td>to-slate-200</td><td>--en-gradient-to: oklch(92.9% .013 255.508);</td></tr>
+    <tr><td>to-slate-300</td><td>--en-gradient-to: oklch(86.9% .022 252.894);</td></tr>
+    <tr><td>to-slate-400</td><td>--en-gradient-to: oklch(70.4% .04 256.788);</td></tr>
+    <tr><td>to-slate-500</td><td>--en-gradient-to: oklch(55.4% .046 257.417);</td></tr>
+    <tr><td>to-slate-600</td><td>--en-gradient-to: oklch(44.6% .043 257.281);</td></tr>
+    <tr><td>to-slate-700</td><td>--en-gradient-to: oklch(37.2% .044 257.287);</td></tr>
+    <tr><td>to-slate-800</td><td>--en-gradient-to: oklch(27.9% .041 260.031);</td></tr>
+    <tr><td>to-slate-900</td><td>--en-gradient-to: oklch(20.8% .042 265.755);</td></tr>
+    <tr><td>to-slate-950</td><td>--en-gradient-to: oklch(12.9% .042 264.695);</td></tr>
+    <tr><td>to-gray-50</td><td>--en-gradient-to: oklch(98.5% .002 247.839);</td></tr>
+    <tr><td>to-gray-100</td><td>--en-gradient-to: oklch(96.7% .003 264.542);</td></tr>
+    <tr><td>to-gray-200</td><td>--en-gradient-to: oklch(92.8% .006 264.531);</td></tr>
+    <tr><td>to-gray-300</td><td>--en-gradient-to: oklch(87.2% .01 258.338);</td></tr>
+    <tr><td>to-gray-400</td><td>--en-gradient-to: oklch(70.7% .022 261.325);</td></tr>
+    <tr><td>to-gray-500</td><td>--en-gradient-to: oklch(55.1% .027 264.364);</td></tr>
+    <tr><td>to-gray-600</td><td>--en-gradient-to: oklch(44.6% .03 256.802);</td></tr>
+    <tr><td>to-gray-700</td><td>--en-gradient-to: oklch(37.3% .034 259.733);</td></tr>
+    <tr><td>to-gray-800</td><td>--en-gradient-to: oklch(27.8% .033 256.848);</td></tr>
+    <tr><td>to-gray-900</td><td>--en-gradient-to: oklch(21% .034 264.665);</td></tr>
+    <tr><td>to-gray-950</td><td>--en-gradient-to: oklch(13% .028 261.692);</td></tr>
+    <tr><td>to-zinc-50</td><td>--en-gradient-to: oklch(98.5% 0 0);</td></tr>
+    <tr><td>to-zinc-100</td><td>--en-gradient-to: oklch(96.7% .001 286.375);</td></tr>
+    <tr><td>to-zinc-200</td><td>--en-gradient-to: oklch(92% .004 286.32);</td></tr>
+    <tr><td>to-zinc-300</td><td>--en-gradient-to: oklch(87.1% .006 286.286);</td></tr>
+    <tr><td>to-zinc-400</td><td>--en-gradient-to: oklch(70.5% .015 286.067);</td></tr>
+    <tr><td>to-zinc-500</td><td>--en-gradient-to: oklch(55.2% .016 285.938);</td></tr>
+    <tr><td>to-zinc-600</td><td>--en-gradient-to: oklch(44.2% .017 285.786);</td></tr>
+    <tr><td>to-zinc-700</td><td>--en-gradient-to: oklch(37% .013 285.805);</td></tr>
+    <tr><td>to-zinc-800</td><td>--en-gradient-to: oklch(27.4% .006 286.033);</td></tr>
+    <tr><td>to-zinc-900</td><td>--en-gradient-to: oklch(21% .006 285.885);</td></tr>
+    <tr><td>to-zinc-950</td><td>--en-gradient-to: oklch(14.1% .005 285.823);</td></tr>
+    <tr><td>to-neutral-50</td><td>--en-gradient-to: oklch(98.5% 0 0);</td></tr>
+    <tr><td>to-neutral-100</td><td>--en-gradient-to: oklch(97% 0 0);</td></tr>
+    <tr><td>to-neutral-200</td><td>--en-gradient-to: oklch(92.2% 0 0);</td></tr>
+    <tr><td>to-neutral-300</td><td>--en-gradient-to: oklch(87% 0 0);</td></tr>
+    <tr><td>to-neutral-400</td><td>--en-gradient-to: oklch(70.8% 0 0);</td></tr>
+    <tr><td>to-neutral-500</td><td>--en-gradient-to: oklch(55.6% 0 0);</td></tr>
+    <tr><td>to-neutral-600</td><td>--en-gradient-to: oklch(43.9% 0 0);</td></tr>
+    <tr><td>to-neutral-700</td><td>--en-gradient-to: oklch(37.1% 0 0);</td></tr>
+    <tr><td>to-neutral-800</td><td>--en-gradient-to: oklch(26.9% 0 0);</td></tr>
+    <tr><td>to-neutral-900</td><td>--en-gradient-to: oklch(20.5% 0 0);</td></tr>
+    <tr><td>to-neutral-950</td><td>--en-gradient-to: oklch(14.5% 0 0);</td></tr>
+    <tr><td>to-stone-50</td><td>--en-gradient-to: oklch(98.5% .001 106.423);</td></tr>
+    <tr><td>to-stone-100</td><td>--en-gradient-to: oklch(97% .001 106.424);</td></tr>
+    <tr><td>to-stone-200</td><td>--en-gradient-to: oklch(92.3% .003 48.717);</td></tr>
+    <tr><td>to-stone-300</td><td>--en-gradient-to: oklch(86.9% .005 56.366);</td></tr>
+    <tr><td>to-stone-400</td><td>--en-gradient-to: oklch(70.9% .01 56.259);</td></tr>
+    <tr><td>to-stone-500</td><td>--en-gradient-to: oklch(55.3% .013 58.071);</td></tr>
+    <tr><td>to-stone-600</td><td>--en-gradient-to: oklch(44.4% .011 73.639);</td></tr>
+    <tr><td>to-stone-700</td><td>--en-gradient-to: oklch(37.4% .01 67.558);</td></tr>
+    <tr><td>to-stone-800</td><td>--en-gradient-to: oklch(26.8% .007 34.298);</td></tr>
+    <tr><td>to-stone-900</td><td>--en-gradient-to: oklch(21.6% .006 56.043);</td></tr>
+    <tr><td>to-stone-950</td><td>--en-gradient-to: oklch(14.7% .004 49.25);</td></tr>
+    <tr><td>to-black</td><td>--en-gradient-to: #000;</td></tr>
+    <tr><td>to-white</td><td>--en-gradient-to: #fff;</td></tr>
   </tbody>
 </table>
 

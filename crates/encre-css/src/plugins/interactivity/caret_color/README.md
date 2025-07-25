@@ -5,234 +5,257 @@ Utilities for controlling the color of the text input cursor.
     <tr>
       <th style="text-align: center;">Class</th>
       <th style="text-align: center;">Properties</th>
+      <th style="text-align: center;">Color</th>
     </tr>
   </thead>
   <tbody>
-    <tr><td>caret-inherit</td><td>caret-color: inherit;</td></tr>
-    <tr><td>caret-current</td><td>caret-color: currentColor;</td></tr>
-    <tr><td>caret-transparent</td><td>caret-color: transparent;</td></tr>
-    <tr><td>caret-black</td><td>caret-color: rgb(0 0 0);</td></tr>
-    <tr><td>caret-white</td><td>caret-color: rgb(255 255 255);</td></tr>
-    <tr><td>caret-slate-50</td><td>caret-color: rgb(248 250 252);</td></tr>
-    <tr><td>caret-slate-100</td><td>caret-color: rgb(241 245 249);</td></tr>
-    <tr><td>caret-slate-200</td><td>caret-color: rgb(226 232 240);</td></tr>
-    <tr><td>caret-slate-300</td><td>caret-color: rgb(203 213 225);</td></tr>
-    <tr><td>caret-slate-400</td><td>caret-color: rgb(148 163 184);</td></tr>
-    <tr><td>caret-slate-500</td><td>caret-color: rgb(100 116 139);</td></tr>
-    <tr><td>caret-slate-600</td><td>caret-color: rgb(71 85 105);</td></tr>
-    <tr><td>caret-slate-700</td><td>caret-color: rgb(51 65 85);</td></tr>
-    <tr><td>caret-slate-800</td><td>caret-color: rgb(30 41 59);</td></tr>
-    <tr><td>caret-slate-900</td><td>caret-color: rgb(15 23 42);</td></tr>
-    <tr><td>caret-gray-50</td><td>caret-color: rgb(249 250 251);</td></tr>
-    <tr><td>caret-gray-100</td><td>caret-color: rgb(243 244 246);</td></tr>
-    <tr><td>caret-gray-200</td><td>caret-color: rgb(229 231 235);</td></tr>
-    <tr><td>caret-gray-300</td><td>caret-color: rgb(209 213 219);</td></tr>
-    <tr><td>caret-gray-400</td><td>caret-color: rgb(156 163 175);</td></tr>
-    <tr><td>caret-gray-500</td><td>caret-color: rgb(107 114 128);</td></tr>
-    <tr><td>caret-gray-600</td><td>caret-color: rgb(75 85 99);</td></tr>
-    <tr><td>caret-gray-700</td><td>caret-color: rgb(55 65 81);</td></tr>
-    <tr><td>caret-gray-800</td><td>caret-color: rgb(31 41 55);</td></tr>
-    <tr><td>caret-gray-900</td><td>caret-color: rgb(17 24 39);</td></tr>
-    <tr><td>caret-zinc-50</td><td>caret-color: rgb(250 250 250);</td></tr>
-    <tr><td>caret-zinc-100</td><td>caret-color: rgb(244 244 245);</td></tr>
-    <tr><td>caret-zinc-200</td><td>caret-color: rgb(228 228 231);</td></tr>
-    <tr><td>caret-zinc-300</td><td>caret-color: rgb(212 212 216);</td></tr>
-    <tr><td>caret-zinc-400</td><td>caret-color: rgb(161 161 170);</td></tr>
-    <tr><td>caret-zinc-500</td><td>caret-color: rgb(113 113 122);</td></tr>
-    <tr><td>caret-zinc-600</td><td>caret-color: rgb(82 82 91);</td></tr>
-    <tr><td>caret-zinc-700</td><td>caret-color: rgb(63 63 70);</td></tr>
-    <tr><td>caret-zinc-800</td><td>caret-color: rgb(39 39 42);</td></tr>
-    <tr><td>caret-zinc-900</td><td>caret-color: rgb(24 24 27);</td></tr>
-    <tr><td>caret-neutral-50</td><td>caret-color: rgb(250 250 250);</td></tr>
-    <tr><td>caret-neutral-100</td><td>caret-color: rgb(245 245 245);</td></tr>
-    <tr><td>caret-neutral-200</td><td>caret-color: rgb(229 229 229);</td></tr>
-    <tr><td>caret-neutral-300</td><td>caret-color: rgb(212 212 212);</td></tr>
-    <tr><td>caret-neutral-400</td><td>caret-color: rgb(163 163 163);</td></tr>
-    <tr><td>caret-neutral-500</td><td>caret-color: rgb(115 115 115);</td></tr>
-    <tr><td>caret-neutral-600</td><td>caret-color: rgb(82 82 82);</td></tr>
-    <tr><td>caret-neutral-700</td><td>caret-color: rgb(64 64 64);</td></tr>
-    <tr><td>caret-neutral-800</td><td>caret-color: rgb(38 38 38);</td></tr>
-    <tr><td>caret-neutral-900</td><td>caret-color: rgb(23 23 23);</td></tr>
-    <tr><td>caret-stone-50</td><td>caret-color: rgb(250 250 249);</td></tr>
-    <tr><td>caret-stone-100</td><td>caret-color: rgb(245 245 244);</td></tr>
-    <tr><td>caret-stone-200</td><td>caret-color: rgb(231 229 228);</td></tr>
-    <tr><td>caret-stone-300</td><td>caret-color: rgb(214 211 209);</td></tr>
-    <tr><td>caret-stone-400</td><td>caret-color: rgb(168 162 158);</td></tr>
-    <tr><td>caret-stone-500</td><td>caret-color: rgb(120 113 108);</td></tr>
-    <tr><td>caret-stone-600</td><td>caret-color: rgb(87 83 78);</td></tr>
-    <tr><td>caret-stone-700</td><td>caret-color: rgb(68 64 60);</td></tr>
-    <tr><td>caret-stone-800</td><td>caret-color: rgb(41 37 36);</td></tr>
-    <tr><td>caret-stone-900</td><td>caret-color: rgb(28 25 23);</td></tr>
-    <tr><td>caret-red-50</td><td>caret-color: rgb(254 242 242);</td></tr>
-    <tr><td>caret-red-100</td><td>caret-color: rgb(254 226 226);</td></tr>
-    <tr><td>caret-red-200</td><td>caret-color: rgb(254 202 202);</td></tr>
-    <tr><td>caret-red-300</td><td>caret-color: rgb(252 165 165);</td></tr>
-    <tr><td>caret-red-400</td><td>caret-color: rgb(248 113 113);</td></tr>
-    <tr><td>caret-red-500</td><td>caret-color: rgb(239 68 68);</td></tr>
-    <tr><td>caret-red-600</td><td>caret-color: rgb(220 38 38);</td></tr>
-    <tr><td>caret-red-700</td><td>caret-color: rgb(185 28 28);</td></tr>
-    <tr><td>caret-red-800</td><td>caret-color: rgb(153 27 27);</td></tr>
-    <tr><td>caret-red-900</td><td>caret-color: rgb(127 29 29);</td></tr>
-    <tr><td>caret-orange-50</td><td>caret-color: rgb(255 247 237);</td></tr>
-    <tr><td>caret-orange-100</td><td>caret-color: rgb(255 237 213);</td></tr>
-    <tr><td>caret-orange-200</td><td>caret-color: rgb(254 215 170);</td></tr>
-    <tr><td>caret-orange-300</td><td>caret-color: rgb(253 186 116);</td></tr>
-    <tr><td>caret-orange-400</td><td>caret-color: rgb(251 146 60);</td></tr>
-    <tr><td>caret-orange-500</td><td>caret-color: rgb(249 115 22);</td></tr>
-    <tr><td>caret-orange-600</td><td>caret-color: rgb(234 88 12);</td></tr>
-    <tr><td>caret-orange-700</td><td>caret-color: rgb(194 65 12);</td></tr>
-    <tr><td>caret-orange-800</td><td>caret-color: rgb(154 52 18);</td></tr>
-    <tr><td>caret-orange-900</td><td>caret-color: rgb(124 45 18);</td></tr>
-    <tr><td>caret-amber-50</td><td>caret-color: rgb(255 251 235);</td></tr>
-    <tr><td>caret-amber-100</td><td>caret-color: rgb(254 243 199);</td></tr>
-    <tr><td>caret-amber-200</td><td>caret-color: rgb(253 230 138);</td></tr>
-    <tr><td>caret-amber-300</td><td>caret-color: rgb(252 211 77);</td></tr>
-    <tr><td>caret-amber-400</td><td>caret-color: rgb(251 191 36);</td></tr>
-    <tr><td>caret-amber-500</td><td>caret-color: rgb(245 158 11);</td></tr>
-    <tr><td>caret-amber-600</td><td>caret-color: rgb(217 119 6);</td></tr>
-    <tr><td>caret-amber-700</td><td>caret-color: rgb(180 83 9);</td></tr>
-    <tr><td>caret-amber-800</td><td>caret-color: rgb(146 64 14);</td></tr>
-    <tr><td>caret-amber-900</td><td>caret-color: rgb(120 53 15);</td></tr>
-    <tr><td>caret-yellow-50</td><td>caret-color: rgb(254 252 232);</td></tr>
-    <tr><td>caret-yellow-100</td><td>caret-color: rgb(254 249 195);</td></tr>
-    <tr><td>caret-yellow-200</td><td>caret-color: rgb(254 240 138);</td></tr>
-    <tr><td>caret-yellow-300</td><td>caret-color: rgb(253 224 71);</td></tr>
-    <tr><td>caret-yellow-400</td><td>caret-color: rgb(250 204 21);</td></tr>
-    <tr><td>caret-yellow-500</td><td>caret-color: rgb(234 179 8);</td></tr>
-    <tr><td>caret-yellow-600</td><td>caret-color: rgb(202 138 4);</td></tr>
-    <tr><td>caret-yellow-700</td><td>caret-color: rgb(161 98 7);</td></tr>
-    <tr><td>caret-yellow-800</td><td>caret-color: rgb(133 77 14);</td></tr>
-    <tr><td>caret-yellow-900</td><td>caret-color: rgb(113 63 18);</td></tr>
-    <tr><td>caret-lime-50</td><td>caret-color: rgb(247 254 231);</td></tr>
-    <tr><td>caret-lime-100</td><td>caret-color: rgb(236 252 203);</td></tr>
-    <tr><td>caret-lime-200</td><td>caret-color: rgb(217 249 157);</td></tr>
-    <tr><td>caret-lime-300</td><td>caret-color: rgb(190 242 100);</td></tr>
-    <tr><td>caret-lime-400</td><td>caret-color: rgb(163 230 53);</td></tr>
-    <tr><td>caret-lime-500</td><td>caret-color: rgb(132 204 22);</td></tr>
-    <tr><td>caret-lime-600</td><td>caret-color: rgb(101 163 13);</td></tr>
-    <tr><td>caret-lime-700</td><td>caret-color: rgb(77 124 15);</td></tr>
-    <tr><td>caret-lime-800</td><td>caret-color: rgb(63 98 18);</td></tr>
-    <tr><td>caret-lime-900</td><td>caret-color: rgb(54 83 20);</td></tr>
-    <tr><td>caret-green-50</td><td>caret-color: rgb(240 253 244);</td></tr>
-    <tr><td>caret-green-100</td><td>caret-color: rgb(220 252 231);</td></tr>
-    <tr><td>caret-green-200</td><td>caret-color: rgb(187 247 208);</td></tr>
-    <tr><td>caret-green-300</td><td>caret-color: rgb(134 239 172);</td></tr>
-    <tr><td>caret-green-400</td><td>caret-color: rgb(74 222 128);</td></tr>
-    <tr><td>caret-green-500</td><td>caret-color: rgb(34 197 94);</td></tr>
-    <tr><td>caret-green-600</td><td>caret-color: rgb(22 163 74);</td></tr>
-    <tr><td>caret-green-700</td><td>caret-color: rgb(21 128 61);</td></tr>
-    <tr><td>caret-green-800</td><td>caret-color: rgb(22 101 52);</td></tr>
-    <tr><td>caret-green-900</td><td>caret-color: rgb(20 83 45);</td></tr>
-    <tr><td>caret-emerald-50</td><td>caret-color: rgb(236 253 245);</td></tr>
-    <tr><td>caret-emerald-100</td><td>caret-color: rgb(209 250 229);</td></tr>
-    <tr><td>caret-emerald-200</td><td>caret-color: rgb(167 243 208);</td></tr>
-    <tr><td>caret-emerald-300</td><td>caret-color: rgb(110 231 183);</td></tr>
-    <tr><td>caret-emerald-400</td><td>caret-color: rgb(52 211 153);</td></tr>
-    <tr><td>caret-emerald-500</td><td>caret-color: rgb(16 185 129);</td></tr>
-    <tr><td>caret-emerald-600</td><td>caret-color: rgb(5 150 105);</td></tr>
-    <tr><td>caret-emerald-700</td><td>caret-color: rgb(4 120 87);</td></tr>
-    <tr><td>caret-emerald-800</td><td>caret-color: rgb(6 95 70);</td></tr>
-    <tr><td>caret-emerald-900</td><td>caret-color: rgb(6 78 59);</td></tr>
-    <tr><td>caret-teal-50</td><td>caret-color: rgb(240 253 250);</td></tr>
-    <tr><td>caret-teal-100</td><td>caret-color: rgb(204 251 241);</td></tr>
-    <tr><td>caret-teal-200</td><td>caret-color: rgb(153 246 228);</td></tr>
-    <tr><td>caret-teal-300</td><td>caret-color: rgb(94 234 212);</td></tr>
-    <tr><td>caret-teal-400</td><td>caret-color: rgb(45 212 191);</td></tr>
-    <tr><td>caret-teal-500</td><td>caret-color: rgb(20 184 166);</td></tr>
-    <tr><td>caret-teal-600</td><td>caret-color: rgb(13 148 136);</td></tr>
-    <tr><td>caret-teal-700</td><td>caret-color: rgb(15 118 110);</td></tr>
-    <tr><td>caret-teal-800</td><td>caret-color: rgb(17 94 89);</td></tr>
-    <tr><td>caret-teal-900</td><td>caret-color: rgb(19 78 74);</td></tr>
-    <tr><td>caret-cyan-50</td><td>caret-color: rgb(236 254 255);</td></tr>
-    <tr><td>caret-cyan-100</td><td>caret-color: rgb(207 250 254);</td></tr>
-    <tr><td>caret-cyan-200</td><td>caret-color: rgb(165 243 252);</td></tr>
-    <tr><td>caret-cyan-300</td><td>caret-color: rgb(103 232 249);</td></tr>
-    <tr><td>caret-cyan-400</td><td>caret-color: rgb(34 211 238);</td></tr>
-    <tr><td>caret-cyan-500</td><td>caret-color: rgb(6 182 212);</td></tr>
-    <tr><td>caret-cyan-600</td><td>caret-color: rgb(8 145 178);</td></tr>
-    <tr><td>caret-cyan-700</td><td>caret-color: rgb(14 116 144);</td></tr>
-    <tr><td>caret-cyan-800</td><td>caret-color: rgb(21 94 117);</td></tr>
-    <tr><td>caret-cyan-900</td><td>caret-color: rgb(22 78 99);</td></tr>
-    <tr><td>caret-sky-50</td><td>caret-color: rgb(240 249 255);</td></tr>
-    <tr><td>caret-sky-100</td><td>caret-color: rgb(224 242 254);</td></tr>
-    <tr><td>caret-sky-200</td><td>caret-color: rgb(186 230 253);</td></tr>
-    <tr><td>caret-sky-300</td><td>caret-color: rgb(125 211 252);</td></tr>
-    <tr><td>caret-sky-400</td><td>caret-color: rgb(56 189 248);</td></tr>
-    <tr><td>caret-sky-500</td><td>caret-color: rgb(14 165 233);</td></tr>
-    <tr><td>caret-sky-600</td><td>caret-color: rgb(2 132 199);</td></tr>
-    <tr><td>caret-sky-700</td><td>caret-color: rgb(3 105 161);</td></tr>
-    <tr><td>caret-sky-800</td><td>caret-color: rgb(7 89 133);</td></tr>
-    <tr><td>caret-sky-900</td><td>caret-color: rgb(12 74 110);</td></tr>
-    <tr><td>caret-blue-50</td><td>caret-color: rgb(239 246 255);</td></tr>
-    <tr><td>caret-blue-100</td><td>caret-color: rgb(219 234 254);</td></tr>
-    <tr><td>caret-blue-200</td><td>caret-color: rgb(191 219 254);</td></tr>
-    <tr><td>caret-blue-300</td><td>caret-color: rgb(147 197 253);</td></tr>
-    <tr><td>caret-blue-400</td><td>caret-color: rgb(96 165 250);</td></tr>
-    <tr><td>caret-blue-500</td><td>caret-color: rgb(59 130 246);</td></tr>
-    <tr><td>caret-blue-600</td><td>caret-color: rgb(37 99 235);</td></tr>
-    <tr><td>caret-blue-700</td><td>caret-color: rgb(29 78 216);</td></tr>
-    <tr><td>caret-blue-800</td><td>caret-color: rgb(30 64 175);</td></tr>
-    <tr><td>caret-blue-900</td><td>caret-color: rgb(30 58 138);</td></tr>
-    <tr><td>caret-indigo-50</td><td>caret-color: rgb(238 242 255);</td></tr>
-    <tr><td>caret-indigo-100</td><td>caret-color: rgb(224 231 255);</td></tr>
-    <tr><td>caret-indigo-200</td><td>caret-color: rgb(199 210 254);</td></tr>
-    <tr><td>caret-indigo-300</td><td>caret-color: rgb(165 180 252);</td></tr>
-    <tr><td>caret-indigo-400</td><td>caret-color: rgb(129 140 248);</td></tr>
-    <tr><td>caret-indigo-500</td><td>caret-color: rgb(99 102 241);</td></tr>
-    <tr><td>caret-indigo-600</td><td>caret-color: rgb(79 70 229);</td></tr>
-    <tr><td>caret-indigo-700</td><td>caret-color: rgb(67 56 202);</td></tr>
-    <tr><td>caret-indigo-800</td><td>caret-color: rgb(55 48 163);</td></tr>
-    <tr><td>caret-indigo-900</td><td>caret-color: rgb(49 46 129);</td></tr>
-    <tr><td>caret-violet-50</td><td>caret-color: rgb(245 243 255);</td></tr>
-    <tr><td>caret-violet-100</td><td>caret-color: rgb(237 233 254);</td></tr>
-    <tr><td>caret-violet-200</td><td>caret-color: rgb(221 214 254);</td></tr>
-    <tr><td>caret-violet-300</td><td>caret-color: rgb(196 181 253);</td></tr>
-    <tr><td>caret-violet-400</td><td>caret-color: rgb(167 139 250);</td></tr>
-    <tr><td>caret-violet-500</td><td>caret-color: rgb(139 92 246);</td></tr>
-    <tr><td>caret-violet-600</td><td>caret-color: rgb(124 58 237);</td></tr>
-    <tr><td>caret-violet-700</td><td>caret-color: rgb(109 40 217);</td></tr>
-    <tr><td>caret-violet-800</td><td>caret-color: rgb(91 33 182);</td></tr>
-    <tr><td>caret-violet-900</td><td>caret-color: rgb(76 29 149);</td></tr>
-    <tr><td>caret-purple-50</td><td>caret-color: rgb(250 245 255);</td></tr>
-    <tr><td>caret-purple-100</td><td>caret-color: rgb(243 232 255);</td></tr>
-    <tr><td>caret-purple-200</td><td>caret-color: rgb(233 213 255);</td></tr>
-    <tr><td>caret-purple-300</td><td>caret-color: rgb(216 180 254);</td></tr>
-    <tr><td>caret-purple-400</td><td>caret-color: rgb(192 132 252);</td></tr>
-    <tr><td>caret-purple-500</td><td>caret-color: rgb(168 85 247);</td></tr>
-    <tr><td>caret-purple-600</td><td>caret-color: rgb(147 51 234);</td></tr>
-    <tr><td>caret-purple-700</td><td>caret-color: rgb(126 34 206);</td></tr>
-    <tr><td>caret-purple-800</td><td>caret-color: rgb(107 33 168);</td></tr>
-    <tr><td>caret-purple-900</td><td>caret-color: rgb(88 28 135);</td></tr>
-    <tr><td>caret-fuchsia-50</td><td>caret-color: rgb(253 244 255);</td></tr>
-    <tr><td>caret-fuchsia-100</td><td>caret-color: rgb(250 232 255);</td></tr>
-    <tr><td>caret-fuchsia-200</td><td>caret-color: rgb(245 208 254);</td></tr>
-    <tr><td>caret-fuchsia-300</td><td>caret-color: rgb(240 171 252);</td></tr>
-    <tr><td>caret-fuchsia-400</td><td>caret-color: rgb(232 121 249);</td></tr>
-    <tr><td>caret-fuchsia-500</td><td>caret-color: rgb(217 70 239);</td></tr>
-    <tr><td>caret-fuchsia-600</td><td>caret-color: rgb(192 38 211);</td></tr>
-    <tr><td>caret-fuchsia-700</td><td>caret-color: rgb(162 28 175);</td></tr>
-    <tr><td>caret-fuchsia-800</td><td>caret-color: rgb(134 25 143);</td></tr>
-    <tr><td>caret-fuchsia-900</td><td>caret-color: rgb(112 26 117);</td></tr>
-    <tr><td>caret-pink-50</td><td>caret-color: rgb(253 242 248);</td></tr>
-    <tr><td>caret-pink-100</td><td>caret-color: rgb(252 231 243);</td></tr>
-    <tr><td>caret-pink-200</td><td>caret-color: rgb(251 207 232);</td></tr>
-    <tr><td>caret-pink-300</td><td>caret-color: rgb(249 168 212);</td></tr>
-    <tr><td>caret-pink-400</td><td>caret-color: rgb(244 114 182);</td></tr>
-    <tr><td>caret-pink-500</td><td>caret-color: rgb(236 72 153);</td></tr>
-    <tr><td>caret-pink-600</td><td>caret-color: rgb(219 39 119);</td></tr>
-    <tr><td>caret-pink-700</td><td>caret-color: rgb(190 24 93);</td></tr>
-    <tr><td>caret-pink-800</td><td>caret-color: rgb(157 23 77);</td></tr>
-    <tr><td>caret-pink-900</td><td>caret-color: rgb(131 24 67);</td></tr>
-    <tr><td>caret-rose-50</td><td>caret-color: rgb(255 241 242);</td></tr>
-    <tr><td>caret-rose-100</td><td>caret-color: rgb(255 228 230);</td></tr>
-    <tr><td>caret-rose-200</td><td>caret-color: rgb(254 205 211);</td></tr>
-    <tr><td>caret-rose-300</td><td>caret-color: rgb(253 164 175);</td></tr>
-    <tr><td>caret-rose-400</td><td>caret-color: rgb(251 113 133);</td></tr>
-    <tr><td>caret-rose-500</td><td>caret-color: rgb(244 63 94);</td></tr>
-    <tr><td>caret-rose-600</td><td>caret-color: rgb(225 29 72);</td></tr>
-    <tr><td>caret-rose-700</td><td>caret-color: rgb(190 18 60);</td></tr>
-    <tr><td>caret-rose-800</td><td>caret-color: rgb(159 18 57);</td></tr>
-    <tr><td>caret-rose-900</td><td>caret-color: rgb(136 19 55);</td></tr>
+    <tr><td>caret-inherit</td><td>caret-color: inherit;</td><td style="caret-color: inherit;"><input type="text" /></td></tr>
+    <tr><td>caret-current</td><td>caret-color: currentColor;</td><td style="caret-color: currentColor;"><input type="text" /></td></tr>
+    <tr><td>caret-transparent</td><td>caret-color: transparent;</td><td style="caret-color: transparent;"><input type="text" /></td></tr>
+    <tr><td>caret-red-50</td><td>caret-color: oklch(97.1% .013 17.38);</td><td style="caret-color: oklch(97.1% .013 17.38);"><input type="text" /></td></tr>
+    <tr><td>caret-red-100</td><td>caret-color: oklch(93.6% .032 17.717);</td><td style="caret-color: oklch(93.6% .032 17.717);"><input type="text" /></td></tr>
+    <tr><td>caret-red-200</td><td>caret-color: oklch(88.5% .062 18.334);</td><td style="caret-color: oklch(88.5% .062 18.334);"><input type="text" /></td></tr>
+    <tr><td>caret-red-300</td><td>caret-color: oklch(80.8% .114 19.571);</td><td style="caret-color: oklch(80.8% .114 19.571);"><input type="text" /></td></tr>
+    <tr><td>caret-red-400</td><td>caret-color: oklch(70.4% .191 22.216);</td><td style="caret-color: oklch(70.4% .191 22.216);"><input type="text" /></td></tr>
+    <tr><td>caret-red-500</td><td>caret-color: oklch(63.7% .237 25.331);</td><td style="caret-color: oklch(63.7% .237 25.331);"><input type="text" /></td></tr>
+    <tr><td>caret-red-600</td><td>caret-color: oklch(57.7% .245 27.325);</td><td style="caret-color: oklch(57.7% .245 27.325);"><input type="text" /></td></tr>
+    <tr><td>caret-red-700</td><td>caret-color: oklch(50.5% .213 27.518);</td><td style="caret-color: oklch(50.5% .213 27.518);"><input type="text" /></td></tr>
+    <tr><td>caret-red-800</td><td>caret-color: oklch(44.4% .177 26.899);</td><td style="caret-color: oklch(44.4% .177 26.899);"><input type="text" /></td></tr>
+    <tr><td>caret-red-900</td><td>caret-color: oklch(39.6% .141 25.723);</td><td style="caret-color: oklch(39.6% .141 25.723);"><input type="text" /></td></tr>
+    <tr><td>caret-red-950</td><td>caret-color: oklch(25.8% .092 26.042);</td><td style="caret-color: oklch(25.8% .092 26.042);"><input type="text" /></td></tr>
+    <tr><td>caret-orange-50</td><td>caret-color: oklch(98% .016 73.684);</td><td style="caret-color: oklch(98% .016 73.684);"><input type="text" /></td></tr>
+    <tr><td>caret-orange-100</td><td>caret-color: oklch(95.4% .038 75.164);</td><td style="caret-color: oklch(95.4% .038 75.164);"><input type="text" /></td></tr>
+    <tr><td>caret-orange-200</td><td>caret-color: oklch(90.1% .076 70.697);</td><td style="caret-color: oklch(90.1% .076 70.697);"><input type="text" /></td></tr>
+    <tr><td>caret-orange-300</td><td>caret-color: oklch(83.7% .128 66.29);</td><td style="caret-color: oklch(83.7% .128 66.29);"><input type="text" /></td></tr>
+    <tr><td>caret-orange-400</td><td>caret-color: oklch(75% .183 55.934);</td><td style="caret-color: oklch(75% .183 55.934);"><input type="text" /></td></tr>
+    <tr><td>caret-orange-500</td><td>caret-color: oklch(70.5% .213 47.604);</td><td style="caret-color: oklch(70.5% .213 47.604);"><input type="text" /></td></tr>
+    <tr><td>caret-orange-600</td><td>caret-color: oklch(64.6% .222 41.116);</td><td style="caret-color: oklch(64.6% .222 41.116);"><input type="text" /></td></tr>
+    <tr><td>caret-orange-700</td><td>caret-color: oklch(55.3% .195 38.402);</td><td style="caret-color: oklch(55.3% .195 38.402);"><input type="text" /></td></tr>
+    <tr><td>caret-orange-800</td><td>caret-color: oklch(47% .157 37.304);</td><td style="caret-color: oklch(47% .157 37.304);"><input type="text" /></td></tr>
+    <tr><td>caret-orange-900</td><td>caret-color: oklch(40.8% .123 38.172);</td><td style="caret-color: oklch(40.8% .123 38.172);"><input type="text" /></td></tr>
+    <tr><td>caret-orange-950</td><td>caret-color: oklch(26.6% .079 36.259);</td><td style="caret-color: oklch(26.6% .079 36.259);"><input type="text" /></td></tr>
+    <tr><td>caret-amber-50</td><td>caret-color: oklch(98.7% .022 95.277);</td><td style="caret-color: oklch(98.7% .022 95.277);"><input type="text" /></td></tr>
+    <tr><td>caret-amber-100</td><td>caret-color: oklch(96.2% .059 95.617);</td><td style="caret-color: oklch(96.2% .059 95.617);"><input type="text" /></td></tr>
+    <tr><td>caret-amber-200</td><td>caret-color: oklch(92.4% .12 95.746);</td><td style="caret-color: oklch(92.4% .12 95.746);"><input type="text" /></td></tr>
+    <tr><td>caret-amber-300</td><td>caret-color: oklch(87.9% .169 91.605);</td><td style="caret-color: oklch(87.9% .169 91.605);"><input type="text" /></td></tr>
+    <tr><td>caret-amber-400</td><td>caret-color: oklch(82.8% .189 84.429);</td><td style="caret-color: oklch(82.8% .189 84.429);"><input type="text" /></td></tr>
+    <tr><td>caret-amber-500</td><td>caret-color: oklch(76.9% .188 70.08);</td><td style="caret-color: oklch(76.9% .188 70.08);"><input type="text" /></td></tr>
+    <tr><td>caret-amber-600</td><td>caret-color: oklch(66.6% .179 58.318);</td><td style="caret-color: oklch(66.6% .179 58.318);"><input type="text" /></td></tr>
+    <tr><td>caret-amber-700</td><td>caret-color: oklch(55.5% .163 48.998);</td><td style="caret-color: oklch(55.5% .163 48.998);"><input type="text" /></td></tr>
+    <tr><td>caret-amber-800</td><td>caret-color: oklch(47.3% .137 46.201);</td><td style="caret-color: oklch(47.3% .137 46.201);"><input type="text" /></td></tr>
+    <tr><td>caret-amber-900</td><td>caret-color: oklch(41.4% .112 45.904);</td><td style="caret-color: oklch(41.4% .112 45.904);"><input type="text" /></td></tr>
+    <tr><td>caret-amber-950</td><td>caret-color: oklch(27.9% .077 45.635);</td><td style="caret-color: oklch(27.9% .077 45.635);"><input type="text" /></td></tr>
+    <tr><td>caret-yellow-50</td><td>caret-color: oklch(98.7% .026 102.212);</td><td style="caret-color: oklch(98.7% .026 102.212);"><input type="text" /></td></tr>
+    <tr><td>caret-yellow-100</td><td>caret-color: oklch(97.3% .071 103.193);</td><td style="caret-color: oklch(97.3% .071 103.193);"><input type="text" /></td></tr>
+    <tr><td>caret-yellow-200</td><td>caret-color: oklch(94.5% .129 101.54);</td><td style="caret-color: oklch(94.5% .129 101.54);"><input type="text" /></td></tr>
+    <tr><td>caret-yellow-300</td><td>caret-color: oklch(90.5% .182 98.111);</td><td style="caret-color: oklch(90.5% .182 98.111);"><input type="text" /></td></tr>
+    <tr><td>caret-yellow-400</td><td>caret-color: oklch(85.2% .199 91.936);</td><td style="caret-color: oklch(85.2% .199 91.936);"><input type="text" /></td></tr>
+    <tr><td>caret-yellow-500</td><td>caret-color: oklch(79.5% .184 86.047);</td><td style="caret-color: oklch(79.5% .184 86.047);"><input type="text" /></td></tr>
+    <tr><td>caret-yellow-600</td><td>caret-color: oklch(68.1% .162 75.834);</td><td style="caret-color: oklch(68.1% .162 75.834);"><input type="text" /></td></tr>
+    <tr><td>caret-yellow-700</td><td>caret-color: oklch(55.4% .135 66.442);</td><td style="caret-color: oklch(55.4% .135 66.442);"><input type="text" /></td></tr>
+    <tr><td>caret-yellow-800</td><td>caret-color: oklch(47.6% .114 61.907);</td><td style="caret-color: oklch(47.6% .114 61.907);"><input type="text" /></td></tr>
+    <tr><td>caret-yellow-900</td><td>caret-color: oklch(42.1% .095 57.708);</td><td style="caret-color: oklch(42.1% .095 57.708);"><input type="text" /></td></tr>
+    <tr><td>caret-yellow-950</td><td>caret-color: oklch(28.6% .066 53.813);</td><td style="caret-color: oklch(28.6% .066 53.813);"><input type="text" /></td></tr>
+    <tr><td>caret-lime-50</td><td>caret-color: oklch(98.6% .031 120.757);</td><td style="caret-color: oklch(98.6% .031 120.757);"><input type="text" /></td></tr>
+    <tr><td>caret-lime-100</td><td>caret-color: oklch(96.7% .067 122.328);</td><td style="caret-color: oklch(96.7% .067 122.328);"><input type="text" /></td></tr>
+    <tr><td>caret-lime-200</td><td>caret-color: oklch(93.8% .127 124.321);</td><td style="caret-color: oklch(93.8% .127 124.321);"><input type="text" /></td></tr>
+    <tr><td>caret-lime-300</td><td>caret-color: oklch(89.7% .196 126.665);</td><td style="caret-color: oklch(89.7% .196 126.665);"><input type="text" /></td></tr>
+    <tr><td>caret-lime-400</td><td>caret-color: oklch(84.1% .238 128.85);</td><td style="caret-color: oklch(84.1% .238 128.85);"><input type="text" /></td></tr>
+    <tr><td>caret-lime-500</td><td>caret-color: oklch(76.8% .233 130.85);</td><td style="caret-color: oklch(76.8% .233 130.85);"><input type="text" /></td></tr>
+    <tr><td>caret-lime-600</td><td>caret-color: oklch(64.8% .2 131.684);</td><td style="caret-color: oklch(64.8% .2 131.684);"><input type="text" /></td></tr>
+    <tr><td>caret-lime-700</td><td>caret-color: oklch(53.2% .157 131.589);</td><td style="caret-color: oklch(53.2% .157 131.589);"><input type="text" /></td></tr>
+    <tr><td>caret-lime-800</td><td>caret-color: oklch(45.3% .124 130.933);</td><td style="caret-color: oklch(45.3% .124 130.933);"><input type="text" /></td></tr>
+    <tr><td>caret-lime-900</td><td>caret-color: oklch(40.5% .101 131.063);</td><td style="caret-color: oklch(40.5% .101 131.063);"><input type="text" /></td></tr>
+    <tr><td>caret-lime-950</td><td>caret-color: oklch(27.4% .072 132.109);</td><td style="caret-color: oklch(27.4% .072 132.109);"><input type="text" /></td></tr>
+    <tr><td>caret-green-50</td><td>caret-color: oklch(98.2% .018 155.826);</td><td style="caret-color: oklch(98.2% .018 155.826);"><input type="text" /></td></tr>
+    <tr><td>caret-green-100</td><td>caret-color: oklch(96.2% .044 156.743);</td><td style="caret-color: oklch(96.2% .044 156.743);"><input type="text" /></td></tr>
+    <tr><td>caret-green-200</td><td>caret-color: oklch(92.5% .084 155.995);</td><td style="caret-color: oklch(92.5% .084 155.995);"><input type="text" /></td></tr>
+    <tr><td>caret-green-300</td><td>caret-color: oklch(87.1% .15 154.449);</td><td style="caret-color: oklch(87.1% .15 154.449);"><input type="text" /></td></tr>
+    <tr><td>caret-green-400</td><td>caret-color: oklch(79.2% .209 151.711);</td><td style="caret-color: oklch(79.2% .209 151.711);"><input type="text" /></td></tr>
+    <tr><td>caret-green-500</td><td>caret-color: oklch(72.3% .219 149.579);</td><td style="caret-color: oklch(72.3% .219 149.579);"><input type="text" /></td></tr>
+    <tr><td>caret-green-600</td><td>caret-color: oklch(62.7% .194 149.214);</td><td style="caret-color: oklch(62.7% .194 149.214);"><input type="text" /></td></tr>
+    <tr><td>caret-green-700</td><td>caret-color: oklch(52.7% .154 150.069);</td><td style="caret-color: oklch(52.7% .154 150.069);"><input type="text" /></td></tr>
+    <tr><td>caret-green-800</td><td>caret-color: oklch(44.8% .119 151.328);</td><td style="caret-color: oklch(44.8% .119 151.328);"><input type="text" /></td></tr>
+    <tr><td>caret-green-900</td><td>caret-color: oklch(39.3% .095 152.535);</td><td style="caret-color: oklch(39.3% .095 152.535);"><input type="text" /></td></tr>
+    <tr><td>caret-green-950</td><td>caret-color: oklch(26.6% .065 152.934);</td><td style="caret-color: oklch(26.6% .065 152.934);"><input type="text" /></td></tr>
+    <tr><td>caret-emerald-50</td><td>caret-color: oklch(97.9% .021 166.113);</td><td style="caret-color: oklch(97.9% .021 166.113);"><input type="text" /></td></tr>
+    <tr><td>caret-emerald-100</td><td>caret-color: oklch(95% .052 163.051);</td><td style="caret-color: oklch(95% .052 163.051);"><input type="text" /></td></tr>
+    <tr><td>caret-emerald-200</td><td>caret-color: oklch(90.5% .093 164.15);</td><td style="caret-color: oklch(90.5% .093 164.15);"><input type="text" /></td></tr>
+    <tr><td>caret-emerald-300</td><td>caret-color: oklch(84.5% .143 164.978);</td><td style="caret-color: oklch(84.5% .143 164.978);"><input type="text" /></td></tr>
+    <tr><td>caret-emerald-400</td><td>caret-color: oklch(76.5% .177 163.223);</td><td style="caret-color: oklch(76.5% .177 163.223);"><input type="text" /></td></tr>
+    <tr><td>caret-emerald-500</td><td>caret-color: oklch(69.6% .17 162.48);</td><td style="caret-color: oklch(69.6% .17 162.48);"><input type="text" /></td></tr>
+    <tr><td>caret-emerald-600</td><td>caret-color: oklch(59.6% .145 163.225);</td><td style="caret-color: oklch(59.6% .145 163.225);"><input type="text" /></td></tr>
+    <tr><td>caret-emerald-700</td><td>caret-color: oklch(50.8% .118 165.612);</td><td style="caret-color: oklch(50.8% .118 165.612);"><input type="text" /></td></tr>
+    <tr><td>caret-emerald-800</td><td>caret-color: oklch(43.2% .095 166.913);</td><td style="caret-color: oklch(43.2% .095 166.913);"><input type="text" /></td></tr>
+    <tr><td>caret-emerald-900</td><td>caret-color: oklch(37.8% .077 168.94);</td><td style="caret-color: oklch(37.8% .077 168.94);"><input type="text" /></td></tr>
+    <tr><td>caret-emerald-950</td><td>caret-color: oklch(26.2% .051 172.552);</td><td style="caret-color: oklch(26.2% .051 172.552);"><input type="text" /></td></tr>
+    <tr><td>caret-teal-50</td><td>caret-color: oklch(98.4% .014 180.72);</td><td style="caret-color: oklch(98.4% .014 180.72);"><input type="text" /></td></tr>
+    <tr><td>caret-teal-100</td><td>caret-color: oklch(95.3% .051 180.801);</td><td style="caret-color: oklch(95.3% .051 180.801);"><input type="text" /></td></tr>
+    <tr><td>caret-teal-200</td><td>caret-color: oklch(91% .096 180.426);</td><td style="caret-color: oklch(91% .096 180.426);"><input type="text" /></td></tr>
+    <tr><td>caret-teal-300</td><td>caret-color: oklch(85.5% .138 181.071);</td><td style="caret-color: oklch(85.5% .138 181.071);"><input type="text" /></td></tr>
+    <tr><td>caret-teal-400</td><td>caret-color: oklch(77.7% .152 181.912);</td><td style="caret-color: oklch(77.7% .152 181.912);"><input type="text" /></td></tr>
+    <tr><td>caret-teal-500</td><td>caret-color: oklch(70.4% .14 182.503);</td><td style="caret-color: oklch(70.4% .14 182.503);"><input type="text" /></td></tr>
+    <tr><td>caret-teal-600</td><td>caret-color: oklch(60% .118 184.704);</td><td style="caret-color: oklch(60% .118 184.704);"><input type="text" /></td></tr>
+    <tr><td>caret-teal-700</td><td>caret-color: oklch(51.1% .096 186.391);</td><td style="caret-color: oklch(51.1% .096 186.391);"><input type="text" /></td></tr>
+    <tr><td>caret-teal-800</td><td>caret-color: oklch(43.7% .078 188.216);</td><td style="caret-color: oklch(43.7% .078 188.216);"><input type="text" /></td></tr>
+    <tr><td>caret-teal-900</td><td>caret-color: oklch(38.6% .063 188.416);</td><td style="caret-color: oklch(38.6% .063 188.416);"><input type="text" /></td></tr>
+    <tr><td>caret-teal-950</td><td>caret-color: oklch(27.7% .046 192.524);</td><td style="caret-color: oklch(27.7% .046 192.524);"><input type="text" /></td></tr>
+    <tr><td>caret-cyan-50</td><td>caret-color: oklch(98.4% .019 200.873);</td><td style="caret-color: oklch(98.4% .019 200.873);"><input type="text" /></td></tr>
+    <tr><td>caret-cyan-100</td><td>caret-color: oklch(95.6% .045 203.388);</td><td style="caret-color: oklch(95.6% .045 203.388);"><input type="text" /></td></tr>
+    <tr><td>caret-cyan-200</td><td>caret-color: oklch(91.7% .08 205.041);</td><td style="caret-color: oklch(91.7% .08 205.041);"><input type="text" /></td></tr>
+    <tr><td>caret-cyan-300</td><td>caret-color: oklch(86.5% .127 207.078);</td><td style="caret-color: oklch(86.5% .127 207.078);"><input type="text" /></td></tr>
+    <tr><td>caret-cyan-400</td><td>caret-color: oklch(78.9% .154 211.53);</td><td style="caret-color: oklch(78.9% .154 211.53);"><input type="text" /></td></tr>
+    <tr><td>caret-cyan-500</td><td>caret-color: oklch(71.5% .143 215.221);</td><td style="caret-color: oklch(71.5% .143 215.221);"><input type="text" /></td></tr>
+    <tr><td>caret-cyan-600</td><td>caret-color: oklch(60.9% .126 221.723);</td><td style="caret-color: oklch(60.9% .126 221.723);"><input type="text" /></td></tr>
+    <tr><td>caret-cyan-700</td><td>caret-color: oklch(52% .105 223.128);</td><td style="caret-color: oklch(52% .105 223.128);"><input type="text" /></td></tr>
+    <tr><td>caret-cyan-800</td><td>caret-color: oklch(45% .085 224.283);</td><td style="caret-color: oklch(45% .085 224.283);"><input type="text" /></td></tr>
+    <tr><td>caret-cyan-900</td><td>caret-color: oklch(39.8% .07 227.392);</td><td style="caret-color: oklch(39.8% .07 227.392);"><input type="text" /></td></tr>
+    <tr><td>caret-cyan-950</td><td>caret-color: oklch(30.2% .056 229.695);</td><td style="caret-color: oklch(30.2% .056 229.695);"><input type="text" /></td></tr>
+    <tr><td>caret-sky-50</td><td>caret-color: oklch(97.7% .013 236.62);</td><td style="caret-color: oklch(97.7% .013 236.62);"><input type="text" /></td></tr>
+    <tr><td>caret-sky-100</td><td>caret-color: oklch(95.1% .026 236.824);</td><td style="caret-color: oklch(95.1% .026 236.824);"><input type="text" /></td></tr>
+    <tr><td>caret-sky-200</td><td>caret-color: oklch(90.1% .058 230.902);</td><td style="caret-color: oklch(90.1% .058 230.902);"><input type="text" /></td></tr>
+    <tr><td>caret-sky-300</td><td>caret-color: oklch(82.8% .111 230.318);</td><td style="caret-color: oklch(82.8% .111 230.318);"><input type="text" /></td></tr>
+    <tr><td>caret-sky-400</td><td>caret-color: oklch(74.6% .16 232.661);</td><td style="caret-color: oklch(74.6% .16 232.661);"><input type="text" /></td></tr>
+    <tr><td>caret-sky-500</td><td>caret-color: oklch(68.5% .169 237.323);</td><td style="caret-color: oklch(68.5% .169 237.323);"><input type="text" /></td></tr>
+    <tr><td>caret-sky-600</td><td>caret-color: oklch(58.8% .158 241.966);</td><td style="caret-color: oklch(58.8% .158 241.966);"><input type="text" /></td></tr>
+    <tr><td>caret-sky-700</td><td>caret-color: oklch(50% .134 242.749);</td><td style="caret-color: oklch(50% .134 242.749);"><input type="text" /></td></tr>
+    <tr><td>caret-sky-800</td><td>caret-color: oklch(44.3% .11 240.79);</td><td style="caret-color: oklch(44.3% .11 240.79);"><input type="text" /></td></tr>
+    <tr><td>caret-sky-900</td><td>caret-color: oklch(39.1% .09 240.876);</td><td style="caret-color: oklch(39.1% .09 240.876);"><input type="text" /></td></tr>
+    <tr><td>caret-sky-950</td><td>caret-color: oklch(29.3% .066 243.157);</td><td style="caret-color: oklch(29.3% .066 243.157);"><input type="text" /></td></tr>
+    <tr><td>caret-blue-50</td><td>caret-color: oklch(97% .014 254.604);</td><td style="caret-color: oklch(97% .014 254.604);"><input type="text" /></td></tr>
+    <tr><td>caret-blue-100</td><td>caret-color: oklch(93.2% .032 255.585);</td><td style="caret-color: oklch(93.2% .032 255.585);"><input type="text" /></td></tr>
+    <tr><td>caret-blue-200</td><td>caret-color: oklch(88.2% .059 254.128);</td><td style="caret-color: oklch(88.2% .059 254.128);"><input type="text" /></td></tr>
+    <tr><td>caret-blue-300</td><td>caret-color: oklch(80.9% .105 251.813);</td><td style="caret-color: oklch(80.9% .105 251.813);"><input type="text" /></td></tr>
+    <tr><td>caret-blue-400</td><td>caret-color: oklch(70.7% .165 254.624);</td><td style="caret-color: oklch(70.7% .165 254.624);"><input type="text" /></td></tr>
+    <tr><td>caret-blue-500</td><td>caret-color: oklch(62.3% .214 259.815);</td><td style="caret-color: oklch(62.3% .214 259.815);"><input type="text" /></td></tr>
+    <tr><td>caret-blue-600</td><td>caret-color: oklch(54.6% .245 262.881);</td><td style="caret-color: oklch(54.6% .245 262.881);"><input type="text" /></td></tr>
+    <tr><td>caret-blue-700</td><td>caret-color: oklch(48.8% .243 264.376);</td><td style="caret-color: oklch(48.8% .243 264.376);"><input type="text" /></td></tr>
+    <tr><td>caret-blue-800</td><td>caret-color: oklch(42.4% .199 265.638);</td><td style="caret-color: oklch(42.4% .199 265.638);"><input type="text" /></td></tr>
+    <tr><td>caret-blue-900</td><td>caret-color: oklch(37.9% .146 265.522);</td><td style="caret-color: oklch(37.9% .146 265.522);"><input type="text" /></td></tr>
+    <tr><td>caret-blue-950</td><td>caret-color: oklch(28.2% .091 267.935);</td><td style="caret-color: oklch(28.2% .091 267.935);"><input type="text" /></td></tr>
+    <tr><td>caret-indigo-50</td><td>caret-color: oklch(96.2% .018 272.314);</td><td style="caret-color: oklch(96.2% .018 272.314);"><input type="text" /></td></tr>
+    <tr><td>caret-indigo-100</td><td>caret-color: oklch(93% .034 272.788);</td><td style="caret-color: oklch(93% .034 272.788);"><input type="text" /></td></tr>
+    <tr><td>caret-indigo-200</td><td>caret-color: oklch(87% .065 274.039);</td><td style="caret-color: oklch(87% .065 274.039);"><input type="text" /></td></tr>
+    <tr><td>caret-indigo-300</td><td>caret-color: oklch(78.5% .115 274.713);</td><td style="caret-color: oklch(78.5% .115 274.713);"><input type="text" /></td></tr>
+    <tr><td>caret-indigo-400</td><td>caret-color: oklch(67.3% .182 276.935);</td><td style="caret-color: oklch(67.3% .182 276.935);"><input type="text" /></td></tr>
+    <tr><td>caret-indigo-500</td><td>caret-color: oklch(58.5% .233 277.117);</td><td style="caret-color: oklch(58.5% .233 277.117);"><input type="text" /></td></tr>
+    <tr><td>caret-indigo-600</td><td>caret-color: oklch(51.1% .262 276.966);</td><td style="caret-color: oklch(51.1% .262 276.966);"><input type="text" /></td></tr>
+    <tr><td>caret-indigo-700</td><td>caret-color: oklch(45.7% .24 277.023);</td><td style="caret-color: oklch(45.7% .24 277.023);"><input type="text" /></td></tr>
+    <tr><td>caret-indigo-800</td><td>caret-color: oklch(39.8% .195 277.366);</td><td style="caret-color: oklch(39.8% .195 277.366);"><input type="text" /></td></tr>
+    <tr><td>caret-indigo-900</td><td>caret-color: oklch(35.9% .144 278.697);</td><td style="caret-color: oklch(35.9% .144 278.697);"><input type="text" /></td></tr>
+    <tr><td>caret-indigo-950</td><td>caret-color: oklch(25.7% .09 281.288);</td><td style="caret-color: oklch(25.7% .09 281.288);"><input type="text" /></td></tr>
+    <tr><td>caret-violet-50</td><td>caret-color: oklch(96.9% .016 293.756);</td><td style="caret-color: oklch(96.9% .016 293.756);"><input type="text" /></td></tr>
+    <tr><td>caret-violet-100</td><td>caret-color: oklch(94.3% .029 294.588);</td><td style="caret-color: oklch(94.3% .029 294.588);"><input type="text" /></td></tr>
+    <tr><td>caret-violet-200</td><td>caret-color: oklch(89.4% .057 293.283);</td><td style="caret-color: oklch(89.4% .057 293.283);"><input type="text" /></td></tr>
+    <tr><td>caret-violet-300</td><td>caret-color: oklch(81.1% .111 293.571);</td><td style="caret-color: oklch(81.1% .111 293.571);"><input type="text" /></td></tr>
+    <tr><td>caret-violet-400</td><td>caret-color: oklch(70.2% .183 293.541);</td><td style="caret-color: oklch(70.2% .183 293.541);"><input type="text" /></td></tr>
+    <tr><td>caret-violet-500</td><td>caret-color: oklch(60.6% .25 292.717);</td><td style="caret-color: oklch(60.6% .25 292.717);"><input type="text" /></td></tr>
+    <tr><td>caret-violet-600</td><td>caret-color: oklch(54.1% .281 293.009);</td><td style="caret-color: oklch(54.1% .281 293.009);"><input type="text" /></td></tr>
+    <tr><td>caret-violet-700</td><td>caret-color: oklch(49.1% .27 292.581);</td><td style="caret-color: oklch(49.1% .27 292.581);"><input type="text" /></td></tr>
+    <tr><td>caret-violet-800</td><td>caret-color: oklch(43.2% .232 292.759);</td><td style="caret-color: oklch(43.2% .232 292.759);"><input type="text" /></td></tr>
+    <tr><td>caret-violet-900</td><td>caret-color: oklch(38% .189 293.745);</td><td style="caret-color: oklch(38% .189 293.745);"><input type="text" /></td></tr>
+    <tr><td>caret-violet-950</td><td>caret-color: oklch(28.3% .141 291.089);</td><td style="caret-color: oklch(28.3% .141 291.089);"><input type="text" /></td></tr>
+    <tr><td>caret-purple-50</td><td>caret-color: oklch(97.7% .014 308.299);</td><td style="caret-color: oklch(97.7% .014 308.299);"><input type="text" /></td></tr>
+    <tr><td>caret-purple-100</td><td>caret-color: oklch(94.6% .033 307.174);</td><td style="caret-color: oklch(94.6% .033 307.174);"><input type="text" /></td></tr>
+    <tr><td>caret-purple-200</td><td>caret-color: oklch(90.2% .063 306.703);</td><td style="caret-color: oklch(90.2% .063 306.703);"><input type="text" /></td></tr>
+    <tr><td>caret-purple-300</td><td>caret-color: oklch(82.7% .119 306.383);</td><td style="caret-color: oklch(82.7% .119 306.383);"><input type="text" /></td></tr>
+    <tr><td>caret-purple-400</td><td>caret-color: oklch(71.4% .203 305.504);</td><td style="caret-color: oklch(71.4% .203 305.504);"><input type="text" /></td></tr>
+    <tr><td>caret-purple-500</td><td>caret-color: oklch(62.7% .265 303.9);</td><td style="caret-color: oklch(62.7% .265 303.9);"><input type="text" /></td></tr>
+    <tr><td>caret-purple-600</td><td>caret-color: oklch(55.8% .288 302.321);</td><td style="caret-color: oklch(55.8% .288 302.321);"><input type="text" /></td></tr>
+    <tr><td>caret-purple-700</td><td>caret-color: oklch(49.6% .265 301.924);</td><td style="caret-color: oklch(49.6% .265 301.924);"><input type="text" /></td></tr>
+    <tr><td>caret-purple-800</td><td>caret-color: oklch(43.8% .218 303.724);</td><td style="caret-color: oklch(43.8% .218 303.724);"><input type="text" /></td></tr>
+    <tr><td>caret-purple-900</td><td>caret-color: oklch(38.1% .176 304.987);</td><td style="caret-color: oklch(38.1% .176 304.987);"><input type="text" /></td></tr>
+    <tr><td>caret-purple-950</td><td>caret-color: oklch(29.1% .149 302.717);</td><td style="caret-color: oklch(29.1% .149 302.717);"><input type="text" /></td></tr>
+    <tr><td>caret-fuchsia-50</td><td>caret-color: oklch(97.7% .017 320.058);</td><td style="caret-color: oklch(97.7% .017 320.058);"><input type="text" /></td></tr>
+    <tr><td>caret-fuchsia-100</td><td>caret-color: oklch(95.2% .037 318.852);</td><td style="caret-color: oklch(95.2% .037 318.852);"><input type="text" /></td></tr>
+    <tr><td>caret-fuchsia-200</td><td>caret-color: oklch(90.3% .076 319.62);</td><td style="caret-color: oklch(90.3% .076 319.62);"><input type="text" /></td></tr>
+    <tr><td>caret-fuchsia-300</td><td>caret-color: oklch(83.3% .145 321.434);</td><td style="caret-color: oklch(83.3% .145 321.434);"><input type="text" /></td></tr>
+    <tr><td>caret-fuchsia-400</td><td>caret-color: oklch(74% .238 322.16);</td><td style="caret-color: oklch(74% .238 322.16);"><input type="text" /></td></tr>
+    <tr><td>caret-fuchsia-500</td><td>caret-color: oklch(66.7% .295 322.15);</td><td style="caret-color: oklch(66.7% .295 322.15);"><input type="text" /></td></tr>
+    <tr><td>caret-fuchsia-600</td><td>caret-color: oklch(59.1% .293 322.896);</td><td style="caret-color: oklch(59.1% .293 322.896);"><input type="text" /></td></tr>
+    <tr><td>caret-fuchsia-700</td><td>caret-color: oklch(51.8% .253 323.949);</td><td style="caret-color: oklch(51.8% .253 323.949);"><input type="text" /></td></tr>
+    <tr><td>caret-fuchsia-800</td><td>caret-color: oklch(45.2% .211 324.591);</td><td style="caret-color: oklch(45.2% .211 324.591);"><input type="text" /></td></tr>
+    <tr><td>caret-fuchsia-900</td><td>caret-color: oklch(40.1% .17 325.612);</td><td style="caret-color: oklch(40.1% .17 325.612);"><input type="text" /></td></tr>
+    <tr><td>caret-fuchsia-950</td><td>caret-color: oklch(29.3% .136 325.661);</td><td style="caret-color: oklch(29.3% .136 325.661);"><input type="text" /></td></tr>
+    <tr><td>caret-pink-50</td><td>caret-color: oklch(97.1% .014 343.198);</td><td style="caret-color: oklch(97.1% .014 343.198);"><input type="text" /></td></tr>
+    <tr><td>caret-pink-100</td><td>caret-color: oklch(94.8% .028 342.258);</td><td style="caret-color: oklch(94.8% .028 342.258);"><input type="text" /></td></tr>
+    <tr><td>caret-pink-200</td><td>caret-color: oklch(89.9% .061 343.231);</td><td style="caret-color: oklch(89.9% .061 343.231);"><input type="text" /></td></tr>
+    <tr><td>caret-pink-300</td><td>caret-color: oklch(82.3% .12 346.018);</td><td style="caret-color: oklch(82.3% .12 346.018);"><input type="text" /></td></tr>
+    <tr><td>caret-pink-400</td><td>caret-color: oklch(71.8% .202 349.761);</td><td style="caret-color: oklch(71.8% .202 349.761);"><input type="text" /></td></tr>
+    <tr><td>caret-pink-500</td><td>caret-color: oklch(65.6% .241 354.308);</td><td style="caret-color: oklch(65.6% .241 354.308);"><input type="text" /></td></tr>
+    <tr><td>caret-pink-600</td><td>caret-color: oklch(59.2% .249 .584);</td><td style="caret-color: oklch(59.2% .249 .584);"><input type="text" /></td></tr>
+    <tr><td>caret-pink-700</td><td>caret-color: oklch(52.5% .223 3.958);</td><td style="caret-color: oklch(52.5% .223 3.958);"><input type="text" /></td></tr>
+    <tr><td>caret-pink-800</td><td>caret-color: oklch(45.9% .187 3.815);</td><td style="caret-color: oklch(45.9% .187 3.815);"><input type="text" /></td></tr>
+    <tr><td>caret-pink-900</td><td>caret-color: oklch(40.8% .153 2.432);</td><td style="caret-color: oklch(40.8% .153 2.432);"><input type="text" /></td></tr>
+    <tr><td>caret-pink-950</td><td>caret-color: oklch(28.4% .109 3.907);</td><td style="caret-color: oklch(28.4% .109 3.907);"><input type="text" /></td></tr>
+    <tr><td>caret-rose-50</td><td>caret-color: oklch(96.9% .015 12.422);</td><td style="caret-color: oklch(96.9% .015 12.422);"><input type="text" /></td></tr>
+    <tr><td>caret-rose-100</td><td>caret-color: oklch(94.1% .03 12.58);</td><td style="caret-color: oklch(94.1% .03 12.58);"><input type="text" /></td></tr>
+    <tr><td>caret-rose-200</td><td>caret-color: oklch(89.2% .058 10.001);</td><td style="caret-color: oklch(89.2% .058 10.001);"><input type="text" /></td></tr>
+    <tr><td>caret-rose-300</td><td>caret-color: oklch(81% .117 11.638);</td><td style="caret-color: oklch(81% .117 11.638);"><input type="text" /></td></tr>
+    <tr><td>caret-rose-400</td><td>caret-color: oklch(71.2% .194 13.428);</td><td style="caret-color: oklch(71.2% .194 13.428);"><input type="text" /></td></tr>
+    <tr><td>caret-rose-500</td><td>caret-color: oklch(64.5% .246 16.439);</td><td style="caret-color: oklch(64.5% .246 16.439);"><input type="text" /></td></tr>
+    <tr><td>caret-rose-600</td><td>caret-color: oklch(58.6% .253 17.585);</td><td style="caret-color: oklch(58.6% .253 17.585);"><input type="text" /></td></tr>
+    <tr><td>caret-rose-700</td><td>caret-color: oklch(51.4% .222 16.935);</td><td style="caret-color: oklch(51.4% .222 16.935);"><input type="text" /></td></tr>
+    <tr><td>caret-rose-800</td><td>caret-color: oklch(45.5% .188 13.697);</td><td style="caret-color: oklch(45.5% .188 13.697);"><input type="text" /></td></tr>
+    <tr><td>caret-rose-900</td><td>caret-color: oklch(41% .159 10.272);</td><td style="caret-color: oklch(41% .159 10.272);"><input type="text" /></td></tr>
+    <tr><td>caret-rose-950</td><td>caret-color: oklch(27.1% .105 12.094);</td><td style="caret-color: oklch(27.1% .105 12.094);"><input type="text" /></td></tr>
+    <tr><td>caret-slate-50</td><td>caret-color: oklch(98.4% .003 247.858);</td><td style="caret-color: oklch(98.4% .003 247.858);"><input type="text" /></td></tr>
+    <tr><td>caret-slate-100</td><td>caret-color: oklch(96.8% .007 247.896);</td><td style="caret-color: oklch(96.8% .007 247.896);"><input type="text" /></td></tr>
+    <tr><td>caret-slate-200</td><td>caret-color: oklch(92.9% .013 255.508);</td><td style="caret-color: oklch(92.9% .013 255.508);"><input type="text" /></td></tr>
+    <tr><td>caret-slate-300</td><td>caret-color: oklch(86.9% .022 252.894);</td><td style="caret-color: oklch(86.9% .022 252.894);"><input type="text" /></td></tr>
+    <tr><td>caret-slate-400</td><td>caret-color: oklch(70.4% .04 256.788);</td><td style="caret-color: oklch(70.4% .04 256.788);"><input type="text" /></td></tr>
+    <tr><td>caret-slate-500</td><td>caret-color: oklch(55.4% .046 257.417);</td><td style="caret-color: oklch(55.4% .046 257.417);"><input type="text" /></td></tr>
+    <tr><td>caret-slate-600</td><td>caret-color: oklch(44.6% .043 257.281);</td><td style="caret-color: oklch(44.6% .043 257.281);"><input type="text" /></td></tr>
+    <tr><td>caret-slate-700</td><td>caret-color: oklch(37.2% .044 257.287);</td><td style="caret-color: oklch(37.2% .044 257.287);"><input type="text" /></td></tr>
+    <tr><td>caret-slate-800</td><td>caret-color: oklch(27.9% .041 260.031);</td><td style="caret-color: oklch(27.9% .041 260.031);"><input type="text" /></td></tr>
+    <tr><td>caret-slate-900</td><td>caret-color: oklch(20.8% .042 265.755);</td><td style="caret-color: oklch(20.8% .042 265.755);"><input type="text" /></td></tr>
+    <tr><td>caret-slate-950</td><td>caret-color: oklch(12.9% .042 264.695);</td><td style="caret-color: oklch(12.9% .042 264.695);"><input type="text" /></td></tr>
+    <tr><td>caret-gray-50</td><td>caret-color: oklch(98.5% .002 247.839);</td><td style="caret-color: oklch(98.5% .002 247.839);"><input type="text" /></td></tr>
+    <tr><td>caret-gray-100</td><td>caret-color: oklch(96.7% .003 264.542);</td><td style="caret-color: oklch(96.7% .003 264.542);"><input type="text" /></td></tr>
+    <tr><td>caret-gray-200</td><td>caret-color: oklch(92.8% .006 264.531);</td><td style="caret-color: oklch(92.8% .006 264.531);"><input type="text" /></td></tr>
+    <tr><td>caret-gray-300</td><td>caret-color: oklch(87.2% .01 258.338);</td><td style="caret-color: oklch(87.2% .01 258.338);"><input type="text" /></td></tr>
+    <tr><td>caret-gray-400</td><td>caret-color: oklch(70.7% .022 261.325);</td><td style="caret-color: oklch(70.7% .022 261.325);"><input type="text" /></td></tr>
+    <tr><td>caret-gray-500</td><td>caret-color: oklch(55.1% .027 264.364);</td><td style="caret-color: oklch(55.1% .027 264.364);"><input type="text" /></td></tr>
+    <tr><td>caret-gray-600</td><td>caret-color: oklch(44.6% .03 256.802);</td><td style="caret-color: oklch(44.6% .03 256.802);"><input type="text" /></td></tr>
+    <tr><td>caret-gray-700</td><td>caret-color: oklch(37.3% .034 259.733);</td><td style="caret-color: oklch(37.3% .034 259.733);"><input type="text" /></td></tr>
+    <tr><td>caret-gray-800</td><td>caret-color: oklch(27.8% .033 256.848);</td><td style="caret-color: oklch(27.8% .033 256.848);"><input type="text" /></td></tr>
+    <tr><td>caret-gray-900</td><td>caret-color: oklch(21% .034 264.665);</td><td style="caret-color: oklch(21% .034 264.665);"><input type="text" /></td></tr>
+    <tr><td>caret-gray-950</td><td>caret-color: oklch(13% .028 261.692);</td><td style="caret-color: oklch(13% .028 261.692);"><input type="text" /></td></tr>
+    <tr><td>caret-zinc-50</td><td>caret-color: oklch(98.5% 0 0);</td><td style="caret-color: oklch(98.5% 0 0);"><input type="text" /></td></tr>
+    <tr><td>caret-zinc-100</td><td>caret-color: oklch(96.7% .001 286.375);</td><td style="caret-color: oklch(96.7% .001 286.375);"><input type="text" /></td></tr>
+    <tr><td>caret-zinc-200</td><td>caret-color: oklch(92% .004 286.32);</td><td style="caret-color: oklch(92% .004 286.32);"><input type="text" /></td></tr>
+    <tr><td>caret-zinc-300</td><td>caret-color: oklch(87.1% .006 286.286);</td><td style="caret-color: oklch(87.1% .006 286.286);"><input type="text" /></td></tr>
+    <tr><td>caret-zinc-400</td><td>caret-color: oklch(70.5% .015 286.067);</td><td style="caret-color: oklch(70.5% .015 286.067);"><input type="text" /></td></tr>
+    <tr><td>caret-zinc-500</td><td>caret-color: oklch(55.2% .016 285.938);</td><td style="caret-color: oklch(55.2% .016 285.938);"><input type="text" /></td></tr>
+    <tr><td>caret-zinc-600</td><td>caret-color: oklch(44.2% .017 285.786);</td><td style="caret-color: oklch(44.2% .017 285.786);"><input type="text" /></td></tr>
+    <tr><td>caret-zinc-700</td><td>caret-color: oklch(37% .013 285.805);</td><td style="caret-color: oklch(37% .013 285.805);"><input type="text" /></td></tr>
+    <tr><td>caret-zinc-800</td><td>caret-color: oklch(27.4% .006 286.033);</td><td style="caret-color: oklch(27.4% .006 286.033);"><input type="text" /></td></tr>
+    <tr><td>caret-zinc-900</td><td>caret-color: oklch(21% .006 285.885);</td><td style="caret-color: oklch(21% .006 285.885);"><input type="text" /></td></tr>
+    <tr><td>caret-zinc-950</td><td>caret-color: oklch(14.1% .005 285.823);</td><td style="caret-color: oklch(14.1% .005 285.823);"><input type="text" /></td></tr>
+    <tr><td>caret-neutral-50</td><td>caret-color: oklch(98.5% 0 0);</td><td style="caret-color: oklch(98.5% 0 0);"><input type="text" /></td></tr>
+    <tr><td>caret-neutral-100</td><td>caret-color: oklch(97% 0 0);</td><td style="caret-color: oklch(97% 0 0);"><input type="text" /></td></tr>
+    <tr><td>caret-neutral-200</td><td>caret-color: oklch(92.2% 0 0);</td><td style="caret-color: oklch(92.2% 0 0);"><input type="text" /></td></tr>
+    <tr><td>caret-neutral-300</td><td>caret-color: oklch(87% 0 0);</td><td style="caret-color: oklch(87% 0 0);"><input type="text" /></td></tr>
+    <tr><td>caret-neutral-400</td><td>caret-color: oklch(70.8% 0 0);</td><td style="caret-color: oklch(70.8% 0 0);"><input type="text" /></td></tr>
+    <tr><td>caret-neutral-500</td><td>caret-color: oklch(55.6% 0 0);</td><td style="caret-color: oklch(55.6% 0 0);"><input type="text" /></td></tr>
+    <tr><td>caret-neutral-600</td><td>caret-color: oklch(43.9% 0 0);</td><td style="caret-color: oklch(43.9% 0 0);"><input type="text" /></td></tr>
+    <tr><td>caret-neutral-700</td><td>caret-color: oklch(37.1% 0 0);</td><td style="caret-color: oklch(37.1% 0 0);"><input type="text" /></td></tr>
+    <tr><td>caret-neutral-800</td><td>caret-color: oklch(26.9% 0 0);</td><td style="caret-color: oklch(26.9% 0 0);"><input type="text" /></td></tr>
+    <tr><td>caret-neutral-900</td><td>caret-color: oklch(20.5% 0 0);</td><td style="caret-color: oklch(20.5% 0 0);"><input type="text" /></td></tr>
+    <tr><td>caret-neutral-950</td><td>caret-color: oklch(14.5% 0 0);</td><td style="caret-color: oklch(14.5% 0 0);"><input type="text" /></td></tr>
+    <tr><td>caret-stone-50</td><td>caret-color: oklch(98.5% .001 106.423);</td><td style="caret-color: oklch(98.5% .001 106.423);"><input type="text" /></td></tr>
+    <tr><td>caret-stone-100</td><td>caret-color: oklch(97% .001 106.424);</td><td style="caret-color: oklch(97% .001 106.424);"><input type="text" /></td></tr>
+    <tr><td>caret-stone-200</td><td>caret-color: oklch(92.3% .003 48.717);</td><td style="caret-color: oklch(92.3% .003 48.717);"><input type="text" /></td></tr>
+    <tr><td>caret-stone-300</td><td>caret-color: oklch(86.9% .005 56.366);</td><td style="caret-color: oklch(86.9% .005 56.366);"><input type="text" /></td></tr>
+    <tr><td>caret-stone-400</td><td>caret-color: oklch(70.9% .01 56.259);</td><td style="caret-color: oklch(70.9% .01 56.259);"><input type="text" /></td></tr>
+    <tr><td>caret-stone-500</td><td>caret-color: oklch(55.3% .013 58.071);</td><td style="caret-color: oklch(55.3% .013 58.071);"><input type="text" /></td></tr>
+    <tr><td>caret-stone-600</td><td>caret-color: oklch(44.4% .011 73.639);</td><td style="caret-color: oklch(44.4% .011 73.639);"><input type="text" /></td></tr>
+    <tr><td>caret-stone-700</td><td>caret-color: oklch(37.4% .01 67.558);</td><td style="caret-color: oklch(37.4% .01 67.558);"><input type="text" /></td></tr>
+    <tr><td>caret-stone-800</td><td>caret-color: oklch(26.8% .007 34.298);</td><td style="caret-color: oklch(26.8% .007 34.298);"><input type="text" /></td></tr>
+    <tr><td>caret-stone-900</td><td>caret-color: oklch(21.6% .006 56.043);</td><td style="caret-color: oklch(21.6% .006 56.043);"><input type="text" /></td></tr>
+    <tr><td>caret-stone-950</td><td>caret-color: oklch(14.7% .004 49.25);</td><td style="caret-color: oklch(14.7% .004 49.25);"><input type="text" /></td></tr>
+    <tr><td>caret-black</td><td>caret-color: #000;</td><td style="caret-color: #000;"><input type="text" /></td></tr>
+    <tr><td>caret-white</td><td>caret-color: #fff;</td><td style="caret-color: #fff;"><input type="text" /></td></tr>
   </tbody>
 </table>
 

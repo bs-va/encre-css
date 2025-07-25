@@ -8,231 +8,253 @@ Utilities for setting the color of outline ring offsets.
     </tr>
   </thead>
   <tbody>
-    <tr><td>ring-offset-inherit</td><td>--en-ring-offset-color: inherit;<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-current</td><td>--en-ring-offset-color: currentColor;<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-transparent</td><td>--en-ring-offset-color: transparent;<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-black</td><td>--en-ring-offset-color: rgb(0 0 0);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-white</td><td>--en-ring-offset-color: rgb(255 255 255);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-slate-50</td><td>--en-ring-offset-color: rgb(248 250 252);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-slate-100</td><td>--en-ring-offset-color: rgb(241 245 249);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-slate-200</td><td>--en-ring-offset-color: rgb(226 232 240);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-slate-300</td><td>--en-ring-offset-color: rgb(203 213 225);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-slate-400</td><td>--en-ring-offset-color: rgb(148 163 184);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-slate-500</td><td>--en-ring-offset-color: rgb(100 116 139);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-slate-600</td><td>--en-ring-offset-color: rgb(71 85 105);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-slate-700</td><td>--en-ring-offset-color: rgb(51 65 85);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-slate-800</td><td>--en-ring-offset-color: rgb(30 41 59);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-slate-900</td><td>--en-ring-offset-color: rgb(15 23 42);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-gray-50</td><td>--en-ring-offset-color: rgb(249 250 251);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-gray-100</td><td>--en-ring-offset-color: rgb(243 244 246);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-gray-200</td><td>--en-ring-offset-color: rgb(229 231 235);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-gray-300</td><td>--en-ring-offset-color: rgb(209 213 219);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-gray-400</td><td>--en-ring-offset-color: rgb(156 163 175);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-gray-500</td><td>--en-ring-offset-color: rgb(107 114 128);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-gray-600</td><td>--en-ring-offset-color: rgb(75 85 99);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-gray-700</td><td>--en-ring-offset-color: rgb(55 65 81);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-gray-800</td><td>--en-ring-offset-color: rgb(31 41 55);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-gray-900</td><td>--en-ring-offset-color: rgb(17 24 39);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-zinc-50</td><td>--en-ring-offset-color: rgb(250 250 250);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-zinc-100</td><td>--en-ring-offset-color: rgb(244 244 245);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-zinc-200</td><td>--en-ring-offset-color: rgb(228 228 231);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-zinc-300</td><td>--en-ring-offset-color: rgb(212 212 216);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-zinc-400</td><td>--en-ring-offset-color: rgb(161 161 170);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-zinc-500</td><td>--en-ring-offset-color: rgb(113 113 122);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-zinc-600</td><td>--en-ring-offset-color: rgb(82 82 91);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-zinc-700</td><td>--en-ring-offset-color: rgb(63 63 70);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-zinc-800</td><td>--en-ring-offset-color: rgb(39 39 42);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-zinc-900</td><td>--en-ring-offset-color: rgb(24 24 27);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-neutral-50</td><td>--en-ring-offset-color: rgb(250 250 250);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-neutral-100</td><td>--en-ring-offset-color: rgb(245 245 245);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-neutral-200</td><td>--en-ring-offset-color: rgb(229 229 229);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-neutral-300</td><td>--en-ring-offset-color: rgb(212 212 212);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-neutral-400</td><td>--en-ring-offset-color: rgb(163 163 163);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-neutral-500</td><td>--en-ring-offset-color: rgb(115 115 115);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-neutral-600</td><td>--en-ring-offset-color: rgb(82 82 82);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-neutral-700</td><td>--en-ring-offset-color: rgb(64 64 64);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-neutral-800</td><td>--en-ring-offset-color: rgb(38 38 38);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-neutral-900</td><td>--en-ring-offset-color: rgb(23 23 23);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-stone-50</td><td>--en-ring-offset-color: rgb(250 250 249);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-stone-100</td><td>--en-ring-offset-color: rgb(245 245 244);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-stone-200</td><td>--en-ring-offset-color: rgb(231 229 228);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-stone-300</td><td>--en-ring-offset-color: rgb(214 211 209);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-stone-400</td><td>--en-ring-offset-color: rgb(168 162 158);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-stone-500</td><td>--en-ring-offset-color: rgb(120 113 108);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-stone-600</td><td>--en-ring-offset-color: rgb(87 83 78);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-stone-700</td><td>--en-ring-offset-color: rgb(68 64 60);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-stone-800</td><td>--en-ring-offset-color: rgb(41 37 36);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-stone-900</td><td>--en-ring-offset-color: rgb(28 25 23);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-red-50</td><td>--en-ring-offset-color: rgb(254 242 242);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-red-100</td><td>--en-ring-offset-color: rgb(254 226 226);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-red-200</td><td>--en-ring-offset-color: rgb(254 202 202);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-red-300</td><td>--en-ring-offset-color: rgb(252 165 165);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-red-400</td><td>--en-ring-offset-color: rgb(248 113 113);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-red-500</td><td>--en-ring-offset-color: rgb(239 68 68);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-red-600</td><td>--en-ring-offset-color: rgb(220 38 38);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-red-700</td><td>--en-ring-offset-color: rgb(185 28 28);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-red-800</td><td>--en-ring-offset-color: rgb(153 27 27);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-red-900</td><td>--en-ring-offset-color: rgb(127 29 29);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-orange-50</td><td>--en-ring-offset-color: rgb(255 247 237);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-orange-100</td><td>--en-ring-offset-color: rgb(255 237 213);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-orange-200</td><td>--en-ring-offset-color: rgb(254 215 170);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-orange-300</td><td>--en-ring-offset-color: rgb(253 186 116);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-orange-400</td><td>--en-ring-offset-color: rgb(251 146 60);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-orange-500</td><td>--en-ring-offset-color: rgb(249 115 22);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-orange-600</td><td>--en-ring-offset-color: rgb(234 88 12);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-orange-700</td><td>--en-ring-offset-color: rgb(194 65 12);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-orange-800</td><td>--en-ring-offset-color: rgb(154 52 18);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-orange-900</td><td>--en-ring-offset-color: rgb(124 45 18);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-amber-50</td><td>--en-ring-offset-color: rgb(255 251 235);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-amber-100</td><td>--en-ring-offset-color: rgb(254 243 199);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-amber-200</td><td>--en-ring-offset-color: rgb(253 230 138);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-amber-300</td><td>--en-ring-offset-color: rgb(252 211 77);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-amber-400</td><td>--en-ring-offset-color: rgb(251 191 36);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-amber-500</td><td>--en-ring-offset-color: rgb(245 158 11);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-amber-600</td><td>--en-ring-offset-color: rgb(217 119 6);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-amber-700</td><td>--en-ring-offset-color: rgb(180 83 9);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-amber-800</td><td>--en-ring-offset-color: rgb(146 64 14);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-amber-900</td><td>--en-ring-offset-color: rgb(120 53 15);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-yellow-50</td><td>--en-ring-offset-color: rgb(254 252 232);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-yellow-100</td><td>--en-ring-offset-color: rgb(254 249 195);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-yellow-200</td><td>--en-ring-offset-color: rgb(254 240 138);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-yellow-300</td><td>--en-ring-offset-color: rgb(253 224 71);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-yellow-400</td><td>--en-ring-offset-color: rgb(250 204 21);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-yellow-500</td><td>--en-ring-offset-color: rgb(234 179 8);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-yellow-600</td><td>--en-ring-offset-color: rgb(202 138 4);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-yellow-700</td><td>--en-ring-offset-color: rgb(161 98 7);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-yellow-800</td><td>--en-ring-offset-color: rgb(133 77 14);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-yellow-900</td><td>--en-ring-offset-color: rgb(113 63 18);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-lime-50</td><td>--en-ring-offset-color: rgb(247 254 231);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-lime-100</td><td>--en-ring-offset-color: rgb(236 252 203);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-lime-200</td><td>--en-ring-offset-color: rgb(217 249 157);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-lime-300</td><td>--en-ring-offset-color: rgb(190 242 100);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-lime-400</td><td>--en-ring-offset-color: rgb(163 230 53);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-lime-500</td><td>--en-ring-offset-color: rgb(132 204 22);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-lime-600</td><td>--en-ring-offset-color: rgb(101 163 13);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-lime-700</td><td>--en-ring-offset-color: rgb(77 124 15);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-lime-800</td><td>--en-ring-offset-color: rgb(63 98 18);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-lime-900</td><td>--en-ring-offset-color: rgb(54 83 20);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-green-50</td><td>--en-ring-offset-color: rgb(240 253 244);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-green-100</td><td>--en-ring-offset-color: rgb(220 252 231);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-green-200</td><td>--en-ring-offset-color: rgb(187 247 208);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-green-300</td><td>--en-ring-offset-color: rgb(134 239 172);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-green-400</td><td>--en-ring-offset-color: rgb(74 222 128);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-green-500</td><td>--en-ring-offset-color: rgb(34 197 94);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-green-600</td><td>--en-ring-offset-color: rgb(22 163 74);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-green-700</td><td>--en-ring-offset-color: rgb(21 128 61);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-green-800</td><td>--en-ring-offset-color: rgb(22 101 52);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-green-900</td><td>--en-ring-offset-color: rgb(20 83 45);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-emerald-50</td><td>--en-ring-offset-color: rgb(236 253 245);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-emerald-100</td><td>--en-ring-offset-color: rgb(209 250 229);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-emerald-200</td><td>--en-ring-offset-color: rgb(167 243 208);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-emerald-300</td><td>--en-ring-offset-color: rgb(110 231 183);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-emerald-400</td><td>--en-ring-offset-color: rgb(52 211 153);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-emerald-500</td><td>--en-ring-offset-color: rgb(16 185 129);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-emerald-600</td><td>--en-ring-offset-color: rgb(5 150 105);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-emerald-700</td><td>--en-ring-offset-color: rgb(4 120 87);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-emerald-800</td><td>--en-ring-offset-color: rgb(6 95 70);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-emerald-900</td><td>--en-ring-offset-color: rgb(6 78 59);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-teal-50</td><td>--en-ring-offset-color: rgb(240 253 250);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-teal-100</td><td>--en-ring-offset-color: rgb(204 251 241);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-teal-200</td><td>--en-ring-offset-color: rgb(153 246 228);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-teal-300</td><td>--en-ring-offset-color: rgb(94 234 212);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-teal-400</td><td>--en-ring-offset-color: rgb(45 212 191);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-teal-500</td><td>--en-ring-offset-color: rgb(20 184 166);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-teal-600</td><td>--en-ring-offset-color: rgb(13 148 136);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-teal-700</td><td>--en-ring-offset-color: rgb(15 118 110);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-teal-800</td><td>--en-ring-offset-color: rgb(17 94 89);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-teal-900</td><td>--en-ring-offset-color: rgb(19 78 74);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-cyan-50</td><td>--en-ring-offset-color: rgb(236 254 255);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-cyan-100</td><td>--en-ring-offset-color: rgb(207 250 254);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-cyan-200</td><td>--en-ring-offset-color: rgb(165 243 252);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-cyan-300</td><td>--en-ring-offset-color: rgb(103 232 249);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-cyan-400</td><td>--en-ring-offset-color: rgb(34 211 238);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-cyan-500</td><td>--en-ring-offset-color: rgb(6 182 212);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-cyan-600</td><td>--en-ring-offset-color: rgb(8 145 178);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-cyan-700</td><td>--en-ring-offset-color: rgb(14 116 144);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-cyan-800</td><td>--en-ring-offset-color: rgb(21 94 117);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-cyan-900</td><td>--en-ring-offset-color: rgb(22 78 99);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-sky-50</td><td>--en-ring-offset-color: rgb(240 249 255);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-sky-100</td><td>--en-ring-offset-color: rgb(224 242 254);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-sky-200</td><td>--en-ring-offset-color: rgb(186 230 253);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-sky-300</td><td>--en-ring-offset-color: rgb(125 211 252);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-sky-400</td><td>--en-ring-offset-color: rgb(56 189 248);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-sky-500</td><td>--en-ring-offset-color: rgb(14 165 233);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-sky-600</td><td>--en-ring-offset-color: rgb(2 132 199);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-sky-700</td><td>--en-ring-offset-color: rgb(3 105 161);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-sky-800</td><td>--en-ring-offset-color: rgb(7 89 133);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-sky-900</td><td>--en-ring-offset-color: rgb(12 74 110);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-blue-50</td><td>--en-ring-offset-color: rgb(239 246 255);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-blue-100</td><td>--en-ring-offset-color: rgb(219 234 254);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-blue-200</td><td>--en-ring-offset-color: rgb(191 219 254);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-blue-300</td><td>--en-ring-offset-color: rgb(147 197 253);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-blue-400</td><td>--en-ring-offset-color: rgb(96 165 250);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-blue-500</td><td>--en-ring-offset-color: rgb(59 130 246);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-blue-600</td><td>--en-ring-offset-color: rgb(37 99 235);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-blue-700</td><td>--en-ring-offset-color: rgb(29 78 216);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-blue-800</td><td>--en-ring-offset-color: rgb(30 64 175);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-blue-900</td><td>--en-ring-offset-color: rgb(30 58 138);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-indigo-50</td><td>--en-ring-offset-color: rgb(238 242 255);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-indigo-100</td><td>--en-ring-offset-color: rgb(224 231 255);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-indigo-200</td><td>--en-ring-offset-color: rgb(199 210 254);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-indigo-300</td><td>--en-ring-offset-color: rgb(165 180 252);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-indigo-400</td><td>--en-ring-offset-color: rgb(129 140 248);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-indigo-500</td><td>--en-ring-offset-color: rgb(99 102 241);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-indigo-600</td><td>--en-ring-offset-color: rgb(79 70 229);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-indigo-700</td><td>--en-ring-offset-color: rgb(67 56 202);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-indigo-800</td><td>--en-ring-offset-color: rgb(55 48 163);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-indigo-900</td><td>--en-ring-offset-color: rgb(49 46 129);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-violet-50</td><td>--en-ring-offset-color: rgb(245 243 255);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-violet-100</td><td>--en-ring-offset-color: rgb(237 233 254);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-violet-200</td><td>--en-ring-offset-color: rgb(221 214 254);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-violet-300</td><td>--en-ring-offset-color: rgb(196 181 253);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-violet-400</td><td>--en-ring-offset-color: rgb(167 139 250);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-violet-500</td><td>--en-ring-offset-color: rgb(139 92 246);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-violet-600</td><td>--en-ring-offset-color: rgb(124 58 237);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-violet-700</td><td>--en-ring-offset-color: rgb(109 40 217);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-violet-800</td><td>--en-ring-offset-color: rgb(91 33 182);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-violet-900</td><td>--en-ring-offset-color: rgb(76 29 149);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-purple-50</td><td>--en-ring-offset-color: rgb(250 245 255);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-purple-100</td><td>--en-ring-offset-color: rgb(243 232 255);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-purple-200</td><td>--en-ring-offset-color: rgb(233 213 255);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-purple-300</td><td>--en-ring-offset-color: rgb(216 180 254);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-purple-400</td><td>--en-ring-offset-color: rgb(192 132 252);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-purple-500</td><td>--en-ring-offset-color: rgb(168 85 247);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-purple-600</td><td>--en-ring-offset-color: rgb(147 51 234);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-purple-700</td><td>--en-ring-offset-color: rgb(126 34 206);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-purple-800</td><td>--en-ring-offset-color: rgb(107 33 168);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-purple-900</td><td>--en-ring-offset-color: rgb(88 28 135);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-fuchsia-50</td><td>--en-ring-offset-color: rgb(253 244 255);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-fuchsia-100</td><td>--en-ring-offset-color: rgb(250 232 255);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-fuchsia-200</td><td>--en-ring-offset-color: rgb(245 208 254);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-fuchsia-300</td><td>--en-ring-offset-color: rgb(240 171 252);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-fuchsia-400</td><td>--en-ring-offset-color: rgb(232 121 249);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-fuchsia-500</td><td>--en-ring-offset-color: rgb(217 70 239);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-fuchsia-600</td><td>--en-ring-offset-color: rgb(192 38 211);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-fuchsia-700</td><td>--en-ring-offset-color: rgb(162 28 175);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-fuchsia-800</td><td>--en-ring-offset-color: rgb(134 25 143);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-fuchsia-900</td><td>--en-ring-offset-color: rgb(112 26 117);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-pink-50</td><td>--en-ring-offset-color: rgb(253 242 248);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-pink-100</td><td>--en-ring-offset-color: rgb(252 231 243);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-pink-200</td><td>--en-ring-offset-color: rgb(251 207 232);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-pink-300</td><td>--en-ring-offset-color: rgb(249 168 212);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-pink-400</td><td>--en-ring-offset-color: rgb(244 114 182);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-pink-500</td><td>--en-ring-offset-color: rgb(236 72 153);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-pink-600</td><td>--en-ring-offset-color: rgb(219 39 119);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-pink-700</td><td>--en-ring-offset-color: rgb(190 24 93);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-pink-800</td><td>--en-ring-offset-color: rgb(157 23 77);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-pink-900</td><td>--en-ring-offset-color: rgb(131 24 67);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-rose-50</td><td>--en-ring-offset-color: rgb(255 241 242);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-rose-100</td><td>--en-ring-offset-color: rgb(255 228 230);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-rose-200</td><td>--en-ring-offset-color: rgb(254 205 211);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-rose-300</td><td>--en-ring-offset-color: rgb(253 164 175);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-rose-400</td><td>--en-ring-offset-color: rgb(251 113 133);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-rose-500</td><td>--en-ring-offset-color: rgb(244 63 94);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-rose-600</td><td>--en-ring-offset-color: rgb(225 29 72);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-rose-700</td><td>--en-ring-offset-color: rgb(190 18 60);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-rose-800</td><td>--en-ring-offset-color: rgb(159 18 57);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
-    <tr><td>ring-offset-rose-900</td><td>--en-ring-offset-color: rgb(136 19 55);<br>box-shadow: 0 0 0 var(--en-ring-offset-width) var(--en-ring-offset-color), var(--en-ring-shadow);</td></tr>
+    <tr><td>ring-offset-inherit</td><td>--en-ring-offset-color: inherit;</td></tr>
+    <tr><td>ring-offset-current</td><td>--en-ring-offset-color: currentColor;</td></tr>
+    <tr><td>ring-offset-transparent</td><td>--en-ring-offset-color: transparent;</td></tr>
+    <tr><td>ring-offset-red-50</td><td>--en-ring-offset-color: oklch(97.1% .013 17.38);</td></tr>
+    <tr><td>ring-offset-red-100</td><td>--en-ring-offset-color: oklch(93.6% .032 17.717);</td></tr>
+    <tr><td>ring-offset-red-200</td><td>--en-ring-offset-color: oklch(88.5% .062 18.334);</td></tr>
+    <tr><td>ring-offset-red-300</td><td>--en-ring-offset-color: oklch(80.8% .114 19.571);</td></tr>
+    <tr><td>ring-offset-red-400</td><td>--en-ring-offset-color: oklch(70.4% .191 22.216);</td></tr>
+    <tr><td>ring-offset-red-500</td><td>--en-ring-offset-color: oklch(63.7% .237 25.331);</td></tr>
+    <tr><td>ring-offset-red-600</td><td>--en-ring-offset-color: oklch(57.7% .245 27.325);</td></tr>
+    <tr><td>ring-offset-red-700</td><td>--en-ring-offset-color: oklch(50.5% .213 27.518);</td></tr>
+    <tr><td>ring-offset-red-800</td><td>--en-ring-offset-color: oklch(44.4% .177 26.899);</td></tr>
+    <tr><td>ring-offset-red-900</td><td>--en-ring-offset-color: oklch(39.6% .141 25.723);</td></tr>
+    <tr><td>ring-offset-red-950</td><td>--en-ring-offset-color: oklch(25.8% .092 26.042);</td></tr>
+    <tr><td>ring-offset-orange-50</td><td>--en-ring-offset-color: oklch(98% .016 73.684);</td></tr>
+    <tr><td>ring-offset-orange-100</td><td>--en-ring-offset-color: oklch(95.4% .038 75.164);</td></tr>
+    <tr><td>ring-offset-orange-200</td><td>--en-ring-offset-color: oklch(90.1% .076 70.697);</td></tr>
+    <tr><td>ring-offset-orange-300</td><td>--en-ring-offset-color: oklch(83.7% .128 66.29);</td></tr>
+    <tr><td>ring-offset-orange-400</td><td>--en-ring-offset-color: oklch(75% .183 55.934);</td></tr>
+    <tr><td>ring-offset-orange-500</td><td>--en-ring-offset-color: oklch(70.5% .213 47.604);</td></tr>
+    <tr><td>ring-offset-orange-600</td><td>--en-ring-offset-color: oklch(64.6% .222 41.116);</td></tr>
+    <tr><td>ring-offset-orange-700</td><td>--en-ring-offset-color: oklch(55.3% .195 38.402);</td></tr>
+    <tr><td>ring-offset-orange-800</td><td>--en-ring-offset-color: oklch(47% .157 37.304);</td></tr>
+    <tr><td>ring-offset-orange-900</td><td>--en-ring-offset-color: oklch(40.8% .123 38.172);</td></tr>
+    <tr><td>ring-offset-orange-950</td><td>--en-ring-offset-color: oklch(26.6% .079 36.259);</td></tr>
+    <tr><td>ring-offset-amber-50</td><td>--en-ring-offset-color: oklch(98.7% .022 95.277);</td></tr>
+    <tr><td>ring-offset-amber-100</td><td>--en-ring-offset-color: oklch(96.2% .059 95.617);</td></tr>
+    <tr><td>ring-offset-amber-200</td><td>--en-ring-offset-color: oklch(92.4% .12 95.746);</td></tr>
+    <tr><td>ring-offset-amber-300</td><td>--en-ring-offset-color: oklch(87.9% .169 91.605);</td></tr>
+    <tr><td>ring-offset-amber-400</td><td>--en-ring-offset-color: oklch(82.8% .189 84.429);</td></tr>
+    <tr><td>ring-offset-amber-500</td><td>--en-ring-offset-color: oklch(76.9% .188 70.08);</td></tr>
+    <tr><td>ring-offset-amber-600</td><td>--en-ring-offset-color: oklch(66.6% .179 58.318);</td></tr>
+    <tr><td>ring-offset-amber-700</td><td>--en-ring-offset-color: oklch(55.5% .163 48.998);</td></tr>
+    <tr><td>ring-offset-amber-800</td><td>--en-ring-offset-color: oklch(47.3% .137 46.201);</td></tr>
+    <tr><td>ring-offset-amber-900</td><td>--en-ring-offset-color: oklch(41.4% .112 45.904);</td></tr>
+    <tr><td>ring-offset-amber-950</td><td>--en-ring-offset-color: oklch(27.9% .077 45.635);</td></tr>
+    <tr><td>ring-offset-yellow-50</td><td>--en-ring-offset-color: oklch(98.7% .026 102.212);</td></tr>
+    <tr><td>ring-offset-yellow-100</td><td>--en-ring-offset-color: oklch(97.3% .071 103.193);</td></tr>
+    <tr><td>ring-offset-yellow-200</td><td>--en-ring-offset-color: oklch(94.5% .129 101.54);</td></tr>
+    <tr><td>ring-offset-yellow-300</td><td>--en-ring-offset-color: oklch(90.5% .182 98.111);</td></tr>
+    <tr><td>ring-offset-yellow-400</td><td>--en-ring-offset-color: oklch(85.2% .199 91.936);</td></tr>
+    <tr><td>ring-offset-yellow-500</td><td>--en-ring-offset-color: oklch(79.5% .184 86.047);</td></tr>
+    <tr><td>ring-offset-yellow-600</td><td>--en-ring-offset-color: oklch(68.1% .162 75.834);</td></tr>
+    <tr><td>ring-offset-yellow-700</td><td>--en-ring-offset-color: oklch(55.4% .135 66.442);</td></tr>
+    <tr><td>ring-offset-yellow-800</td><td>--en-ring-offset-color: oklch(47.6% .114 61.907);</td></tr>
+    <tr><td>ring-offset-yellow-900</td><td>--en-ring-offset-color: oklch(42.1% .095 57.708);</td></tr>
+    <tr><td>ring-offset-yellow-950</td><td>--en-ring-offset-color: oklch(28.6% .066 53.813);</td></tr>
+    <tr><td>ring-offset-lime-50</td><td>--en-ring-offset-color: oklch(98.6% .031 120.757);</td></tr>
+    <tr><td>ring-offset-lime-100</td><td>--en-ring-offset-color: oklch(96.7% .067 122.328);</td></tr>
+    <tr><td>ring-offset-lime-200</td><td>--en-ring-offset-color: oklch(93.8% .127 124.321);</td></tr>
+    <tr><td>ring-offset-lime-300</td><td>--en-ring-offset-color: oklch(89.7% .196 126.665);</td></tr>
+    <tr><td>ring-offset-lime-400</td><td>--en-ring-offset-color: oklch(84.1% .238 128.85);</td></tr>
+    <tr><td>ring-offset-lime-500</td><td>--en-ring-offset-color: oklch(76.8% .233 130.85);</td></tr>
+    <tr><td>ring-offset-lime-600</td><td>--en-ring-offset-color: oklch(64.8% .2 131.684);</td></tr>
+    <tr><td>ring-offset-lime-700</td><td>--en-ring-offset-color: oklch(53.2% .157 131.589);</td></tr>
+    <tr><td>ring-offset-lime-800</td><td>--en-ring-offset-color: oklch(45.3% .124 130.933);</td></tr>
+    <tr><td>ring-offset-lime-900</td><td>--en-ring-offset-color: oklch(40.5% .101 131.063);</td></tr>
+    <tr><td>ring-offset-lime-950</td><td>--en-ring-offset-color: oklch(27.4% .072 132.109);</td></tr>
+    <tr><td>ring-offset-green-50</td><td>--en-ring-offset-color: oklch(98.2% .018 155.826);</td></tr>
+    <tr><td>ring-offset-green-100</td><td>--en-ring-offset-color: oklch(96.2% .044 156.743);</td></tr>
+    <tr><td>ring-offset-green-200</td><td>--en-ring-offset-color: oklch(92.5% .084 155.995);</td></tr>
+    <tr><td>ring-offset-green-300</td><td>--en-ring-offset-color: oklch(87.1% .15 154.449);</td></tr>
+    <tr><td>ring-offset-green-400</td><td>--en-ring-offset-color: oklch(79.2% .209 151.711);</td></tr>
+    <tr><td>ring-offset-green-500</td><td>--en-ring-offset-color: oklch(72.3% .219 149.579);</td></tr>
+    <tr><td>ring-offset-green-600</td><td>--en-ring-offset-color: oklch(62.7% .194 149.214);</td></tr>
+    <tr><td>ring-offset-green-700</td><td>--en-ring-offset-color: oklch(52.7% .154 150.069);</td></tr>
+    <tr><td>ring-offset-green-800</td><td>--en-ring-offset-color: oklch(44.8% .119 151.328);</td></tr>
+    <tr><td>ring-offset-green-900</td><td>--en-ring-offset-color: oklch(39.3% .095 152.535);</td></tr>
+    <tr><td>ring-offset-green-950</td><td>--en-ring-offset-color: oklch(26.6% .065 152.934);</td></tr>
+    <tr><td>ring-offset-emerald-50</td><td>--en-ring-offset-color: oklch(97.9% .021 166.113);</td></tr>
+    <tr><td>ring-offset-emerald-100</td><td>--en-ring-offset-color: oklch(95% .052 163.051);</td></tr>
+    <tr><td>ring-offset-emerald-200</td><td>--en-ring-offset-color: oklch(90.5% .093 164.15);</td></tr>
+    <tr><td>ring-offset-emerald-300</td><td>--en-ring-offset-color: oklch(84.5% .143 164.978);</td></tr>
+    <tr><td>ring-offset-emerald-400</td><td>--en-ring-offset-color: oklch(76.5% .177 163.223);</td></tr>
+    <tr><td>ring-offset-emerald-500</td><td>--en-ring-offset-color: oklch(69.6% .17 162.48);</td></tr>
+    <tr><td>ring-offset-emerald-600</td><td>--en-ring-offset-color: oklch(59.6% .145 163.225);</td></tr>
+    <tr><td>ring-offset-emerald-700</td><td>--en-ring-offset-color: oklch(50.8% .118 165.612);</td></tr>
+    <tr><td>ring-offset-emerald-800</td><td>--en-ring-offset-color: oklch(43.2% .095 166.913);</td></tr>
+    <tr><td>ring-offset-emerald-900</td><td>--en-ring-offset-color: oklch(37.8% .077 168.94);</td></tr>
+    <tr><td>ring-offset-emerald-950</td><td>--en-ring-offset-color: oklch(26.2% .051 172.552);</td></tr>
+    <tr><td>ring-offset-teal-50</td><td>--en-ring-offset-color: oklch(98.4% .014 180.72);</td></tr>
+    <tr><td>ring-offset-teal-100</td><td>--en-ring-offset-color: oklch(95.3% .051 180.801);</td></tr>
+    <tr><td>ring-offset-teal-200</td><td>--en-ring-offset-color: oklch(91% .096 180.426);</td></tr>
+    <tr><td>ring-offset-teal-300</td><td>--en-ring-offset-color: oklch(85.5% .138 181.071);</td></tr>
+    <tr><td>ring-offset-teal-400</td><td>--en-ring-offset-color: oklch(77.7% .152 181.912);</td></tr>
+    <tr><td>ring-offset-teal-500</td><td>--en-ring-offset-color: oklch(70.4% .14 182.503);</td></tr>
+    <tr><td>ring-offset-teal-600</td><td>--en-ring-offset-color: oklch(60% .118 184.704);</td></tr>
+    <tr><td>ring-offset-teal-700</td><td>--en-ring-offset-color: oklch(51.1% .096 186.391);</td></tr>
+    <tr><td>ring-offset-teal-800</td><td>--en-ring-offset-color: oklch(43.7% .078 188.216);</td></tr>
+    <tr><td>ring-offset-teal-900</td><td>--en-ring-offset-color: oklch(38.6% .063 188.416);</td></tr>
+    <tr><td>ring-offset-teal-950</td><td>--en-ring-offset-color: oklch(27.7% .046 192.524);</td></tr>
+    <tr><td>ring-offset-cyan-50</td><td>--en-ring-offset-color: oklch(98.4% .019 200.873);</td></tr>
+    <tr><td>ring-offset-cyan-100</td><td>--en-ring-offset-color: oklch(95.6% .045 203.388);</td></tr>
+    <tr><td>ring-offset-cyan-200</td><td>--en-ring-offset-color: oklch(91.7% .08 205.041);</td></tr>
+    <tr><td>ring-offset-cyan-300</td><td>--en-ring-offset-color: oklch(86.5% .127 207.078);</td></tr>
+    <tr><td>ring-offset-cyan-400</td><td>--en-ring-offset-color: oklch(78.9% .154 211.53);</td></tr>
+    <tr><td>ring-offset-cyan-500</td><td>--en-ring-offset-color: oklch(71.5% .143 215.221);</td></tr>
+    <tr><td>ring-offset-cyan-600</td><td>--en-ring-offset-color: oklch(60.9% .126 221.723);</td></tr>
+    <tr><td>ring-offset-cyan-700</td><td>--en-ring-offset-color: oklch(52% .105 223.128);</td></tr>
+    <tr><td>ring-offset-cyan-800</td><td>--en-ring-offset-color: oklch(45% .085 224.283);</td></tr>
+    <tr><td>ring-offset-cyan-900</td><td>--en-ring-offset-color: oklch(39.8% .07 227.392);</td></tr>
+    <tr><td>ring-offset-cyan-950</td><td>--en-ring-offset-color: oklch(30.2% .056 229.695);</td></tr>
+    <tr><td>ring-offset-sky-50</td><td>--en-ring-offset-color: oklch(97.7% .013 236.62);</td></tr>
+    <tr><td>ring-offset-sky-100</td><td>--en-ring-offset-color: oklch(95.1% .026 236.824);</td></tr>
+    <tr><td>ring-offset-sky-200</td><td>--en-ring-offset-color: oklch(90.1% .058 230.902);</td></tr>
+    <tr><td>ring-offset-sky-300</td><td>--en-ring-offset-color: oklch(82.8% .111 230.318);</td></tr>
+    <tr><td>ring-offset-sky-400</td><td>--en-ring-offset-color: oklch(74.6% .16 232.661);</td></tr>
+    <tr><td>ring-offset-sky-500</td><td>--en-ring-offset-color: oklch(68.5% .169 237.323);</td></tr>
+    <tr><td>ring-offset-sky-600</td><td>--en-ring-offset-color: oklch(58.8% .158 241.966);</td></tr>
+    <tr><td>ring-offset-sky-700</td><td>--en-ring-offset-color: oklch(50% .134 242.749);</td></tr>
+    <tr><td>ring-offset-sky-800</td><td>--en-ring-offset-color: oklch(44.3% .11 240.79);</td></tr>
+    <tr><td>ring-offset-sky-900</td><td>--en-ring-offset-color: oklch(39.1% .09 240.876);</td></tr>
+    <tr><td>ring-offset-sky-950</td><td>--en-ring-offset-color: oklch(29.3% .066 243.157);</td></tr>
+    <tr><td>ring-offset-blue-50</td><td>--en-ring-offset-color: oklch(97% .014 254.604);</td></tr>
+    <tr><td>ring-offset-blue-100</td><td>--en-ring-offset-color: oklch(93.2% .032 255.585);</td></tr>
+    <tr><td>ring-offset-blue-200</td><td>--en-ring-offset-color: oklch(88.2% .059 254.128);</td></tr>
+    <tr><td>ring-offset-blue-300</td><td>--en-ring-offset-color: oklch(80.9% .105 251.813);</td></tr>
+    <tr><td>ring-offset-blue-400</td><td>--en-ring-offset-color: oklch(70.7% .165 254.624);</td></tr>
+    <tr><td>ring-offset-blue-500</td><td>--en-ring-offset-color: oklch(62.3% .214 259.815);</td></tr>
+    <tr><td>ring-offset-blue-600</td><td>--en-ring-offset-color: oklch(54.6% .245 262.881);</td></tr>
+    <tr><td>ring-offset-blue-700</td><td>--en-ring-offset-color: oklch(48.8% .243 264.376);</td></tr>
+    <tr><td>ring-offset-blue-800</td><td>--en-ring-offset-color: oklch(42.4% .199 265.638);</td></tr>
+    <tr><td>ring-offset-blue-900</td><td>--en-ring-offset-color: oklch(37.9% .146 265.522);</td></tr>
+    <tr><td>ring-offset-blue-950</td><td>--en-ring-offset-color: oklch(28.2% .091 267.935);</td></tr>
+    <tr><td>ring-offset-indigo-50</td><td>--en-ring-offset-color: oklch(96.2% .018 272.314);</td></tr>
+    <tr><td>ring-offset-indigo-100</td><td>--en-ring-offset-color: oklch(93% .034 272.788);</td></tr>
+    <tr><td>ring-offset-indigo-200</td><td>--en-ring-offset-color: oklch(87% .065 274.039);</td></tr>
+    <tr><td>ring-offset-indigo-300</td><td>--en-ring-offset-color: oklch(78.5% .115 274.713);</td></tr>
+    <tr><td>ring-offset-indigo-400</td><td>--en-ring-offset-color: oklch(67.3% .182 276.935);</td></tr>
+    <tr><td>ring-offset-indigo-500</td><td>--en-ring-offset-color: oklch(58.5% .233 277.117);</td></tr>
+    <tr><td>ring-offset-indigo-600</td><td>--en-ring-offset-color: oklch(51.1% .262 276.966);</td></tr>
+    <tr><td>ring-offset-indigo-700</td><td>--en-ring-offset-color: oklch(45.7% .24 277.023);</td></tr>
+    <tr><td>ring-offset-indigo-800</td><td>--en-ring-offset-color: oklch(39.8% .195 277.366);</td></tr>
+    <tr><td>ring-offset-indigo-900</td><td>--en-ring-offset-color: oklch(35.9% .144 278.697);</td></tr>
+    <tr><td>ring-offset-indigo-950</td><td>--en-ring-offset-color: oklch(25.7% .09 281.288);</td></tr>
+    <tr><td>ring-offset-violet-50</td><td>--en-ring-offset-color: oklch(96.9% .016 293.756);</td></tr>
+    <tr><td>ring-offset-violet-100</td><td>--en-ring-offset-color: oklch(94.3% .029 294.588);</td></tr>
+    <tr><td>ring-offset-violet-200</td><td>--en-ring-offset-color: oklch(89.4% .057 293.283);</td></tr>
+    <tr><td>ring-offset-violet-300</td><td>--en-ring-offset-color: oklch(81.1% .111 293.571);</td></tr>
+    <tr><td>ring-offset-violet-400</td><td>--en-ring-offset-color: oklch(70.2% .183 293.541);</td></tr>
+    <tr><td>ring-offset-violet-500</td><td>--en-ring-offset-color: oklch(60.6% .25 292.717);</td></tr>
+    <tr><td>ring-offset-violet-600</td><td>--en-ring-offset-color: oklch(54.1% .281 293.009);</td></tr>
+    <tr><td>ring-offset-violet-700</td><td>--en-ring-offset-color: oklch(49.1% .27 292.581);</td></tr>
+    <tr><td>ring-offset-violet-800</td><td>--en-ring-offset-color: oklch(43.2% .232 292.759);</td></tr>
+    <tr><td>ring-offset-violet-900</td><td>--en-ring-offset-color: oklch(38% .189 293.745);</td></tr>
+    <tr><td>ring-offset-violet-950</td><td>--en-ring-offset-color: oklch(28.3% .141 291.089);</td></tr>
+    <tr><td>ring-offset-purple-50</td><td>--en-ring-offset-color: oklch(97.7% .014 308.299);</td></tr>
+    <tr><td>ring-offset-purple-100</td><td>--en-ring-offset-color: oklch(94.6% .033 307.174);</td></tr>
+    <tr><td>ring-offset-purple-200</td><td>--en-ring-offset-color: oklch(90.2% .063 306.703);</td></tr>
+    <tr><td>ring-offset-purple-300</td><td>--en-ring-offset-color: oklch(82.7% .119 306.383);</td></tr>
+    <tr><td>ring-offset-purple-400</td><td>--en-ring-offset-color: oklch(71.4% .203 305.504);</td></tr>
+    <tr><td>ring-offset-purple-500</td><td>--en-ring-offset-color: oklch(62.7% .265 303.9);</td></tr>
+    <tr><td>ring-offset-purple-600</td><td>--en-ring-offset-color: oklch(55.8% .288 302.321);</td></tr>
+    <tr><td>ring-offset-purple-700</td><td>--en-ring-offset-color: oklch(49.6% .265 301.924);</td></tr>
+    <tr><td>ring-offset-purple-800</td><td>--en-ring-offset-color: oklch(43.8% .218 303.724);</td></tr>
+    <tr><td>ring-offset-purple-900</td><td>--en-ring-offset-color: oklch(38.1% .176 304.987);</td></tr>
+    <tr><td>ring-offset-purple-950</td><td>--en-ring-offset-color: oklch(29.1% .149 302.717);</td></tr>
+    <tr><td>ring-offset-fuchsia-50</td><td>--en-ring-offset-color: oklch(97.7% .017 320.058);</td></tr>
+    <tr><td>ring-offset-fuchsia-100</td><td>--en-ring-offset-color: oklch(95.2% .037 318.852);</td></tr>
+    <tr><td>ring-offset-fuchsia-200</td><td>--en-ring-offset-color: oklch(90.3% .076 319.62);</td></tr>
+    <tr><td>ring-offset-fuchsia-300</td><td>--en-ring-offset-color: oklch(83.3% .145 321.434);</td></tr>
+    <tr><td>ring-offset-fuchsia-400</td><td>--en-ring-offset-color: oklch(74% .238 322.16);</td></tr>
+    <tr><td>ring-offset-fuchsia-500</td><td>--en-ring-offset-color: oklch(66.7% .295 322.15);</td></tr>
+    <tr><td>ring-offset-fuchsia-600</td><td>--en-ring-offset-color: oklch(59.1% .293 322.896);</td></tr>
+    <tr><td>ring-offset-fuchsia-700</td><td>--en-ring-offset-color: oklch(51.8% .253 323.949);</td></tr>
+    <tr><td>ring-offset-fuchsia-800</td><td>--en-ring-offset-color: oklch(45.2% .211 324.591);</td></tr>
+    <tr><td>ring-offset-fuchsia-900</td><td>--en-ring-offset-color: oklch(40.1% .17 325.612);</td></tr>
+    <tr><td>ring-offset-fuchsia-950</td><td>--en-ring-offset-color: oklch(29.3% .136 325.661);</td></tr>
+    <tr><td>ring-offset-pink-50</td><td>--en-ring-offset-color: oklch(97.1% .014 343.198);</td></tr>
+    <tr><td>ring-offset-pink-100</td><td>--en-ring-offset-color: oklch(94.8% .028 342.258);</td></tr>
+    <tr><td>ring-offset-pink-200</td><td>--en-ring-offset-color: oklch(89.9% .061 343.231);</td></tr>
+    <tr><td>ring-offset-pink-300</td><td>--en-ring-offset-color: oklch(82.3% .12 346.018);</td></tr>
+    <tr><td>ring-offset-pink-400</td><td>--en-ring-offset-color: oklch(71.8% .202 349.761);</td></tr>
+    <tr><td>ring-offset-pink-500</td><td>--en-ring-offset-color: oklch(65.6% .241 354.308);</td></tr>
+    <tr><td>ring-offset-pink-600</td><td>--en-ring-offset-color: oklch(59.2% .249 .584);</td></tr>
+    <tr><td>ring-offset-pink-700</td><td>--en-ring-offset-color: oklch(52.5% .223 3.958);</td></tr>
+    <tr><td>ring-offset-pink-800</td><td>--en-ring-offset-color: oklch(45.9% .187 3.815);</td></tr>
+    <tr><td>ring-offset-pink-900</td><td>--en-ring-offset-color: oklch(40.8% .153 2.432);</td></tr>
+    <tr><td>ring-offset-pink-950</td><td>--en-ring-offset-color: oklch(28.4% .109 3.907);</td></tr>
+    <tr><td>ring-offset-rose-50</td><td>--en-ring-offset-color: oklch(96.9% .015 12.422);</td></tr>
+    <tr><td>ring-offset-rose-100</td><td>--en-ring-offset-color: oklch(94.1% .03 12.58);</td></tr>
+    <tr><td>ring-offset-rose-200</td><td>--en-ring-offset-color: oklch(89.2% .058 10.001);</td></tr>
+    <tr><td>ring-offset-rose-300</td><td>--en-ring-offset-color: oklch(81% .117 11.638);</td></tr>
+    <tr><td>ring-offset-rose-400</td><td>--en-ring-offset-color: oklch(71.2% .194 13.428);</td></tr>
+    <tr><td>ring-offset-rose-500</td><td>--en-ring-offset-color: oklch(64.5% .246 16.439);</td></tr>
+    <tr><td>ring-offset-rose-600</td><td>--en-ring-offset-color: oklch(58.6% .253 17.585);</td></tr>
+    <tr><td>ring-offset-rose-700</td><td>--en-ring-offset-color: oklch(51.4% .222 16.935);</td></tr>
+    <tr><td>ring-offset-rose-800</td><td>--en-ring-offset-color: oklch(45.5% .188 13.697);</td></tr>
+    <tr><td>ring-offset-rose-900</td><td>--en-ring-offset-color: oklch(41% .159 10.272);</td></tr>
+    <tr><td>ring-offset-rose-950</td><td>--en-ring-offset-color: oklch(27.1% .105 12.094);</td></tr>
+    <tr><td>ring-offset-slate-50</td><td>--en-ring-offset-color: oklch(98.4% .003 247.858);</td></tr>
+    <tr><td>ring-offset-slate-100</td><td>--en-ring-offset-color: oklch(96.8% .007 247.896);</td></tr>
+    <tr><td>ring-offset-slate-200</td><td>--en-ring-offset-color: oklch(92.9% .013 255.508);</td></tr>
+    <tr><td>ring-offset-slate-300</td><td>--en-ring-offset-color: oklch(86.9% .022 252.894);</td></tr>
+    <tr><td>ring-offset-slate-400</td><td>--en-ring-offset-color: oklch(70.4% .04 256.788);</td></tr>
+    <tr><td>ring-offset-slate-500</td><td>--en-ring-offset-color: oklch(55.4% .046 257.417);</td></tr>
+    <tr><td>ring-offset-slate-600</td><td>--en-ring-offset-color: oklch(44.6% .043 257.281);</td></tr>
+    <tr><td>ring-offset-slate-700</td><td>--en-ring-offset-color: oklch(37.2% .044 257.287);</td></tr>
+    <tr><td>ring-offset-slate-800</td><td>--en-ring-offset-color: oklch(27.9% .041 260.031);</td></tr>
+    <tr><td>ring-offset-slate-900</td><td>--en-ring-offset-color: oklch(20.8% .042 265.755);</td></tr>
+    <tr><td>ring-offset-slate-950</td><td>--en-ring-offset-color: oklch(12.9% .042 264.695);</td></tr>
+    <tr><td>ring-offset-gray-50</td><td>--en-ring-offset-color: oklch(98.5% .002 247.839);</td></tr>
+    <tr><td>ring-offset-gray-100</td><td>--en-ring-offset-color: oklch(96.7% .003 264.542);</td></tr>
+    <tr><td>ring-offset-gray-200</td><td>--en-ring-offset-color: oklch(92.8% .006 264.531);</td></tr>
+    <tr><td>ring-offset-gray-300</td><td>--en-ring-offset-color: oklch(87.2% .01 258.338);</td></tr>
+    <tr><td>ring-offset-gray-400</td><td>--en-ring-offset-color: oklch(70.7% .022 261.325);</td></tr>
+    <tr><td>ring-offset-gray-500</td><td>--en-ring-offset-color: oklch(55.1% .027 264.364);</td></tr>
+    <tr><td>ring-offset-gray-600</td><td>--en-ring-offset-color: oklch(44.6% .03 256.802);</td></tr>
+    <tr><td>ring-offset-gray-700</td><td>--en-ring-offset-color: oklch(37.3% .034 259.733);</td></tr>
+    <tr><td>ring-offset-gray-800</td><td>--en-ring-offset-color: oklch(27.8% .033 256.848);</td></tr>
+    <tr><td>ring-offset-gray-900</td><td>--en-ring-offset-color: oklch(21% .034 264.665);</td></tr>
+    <tr><td>ring-offset-gray-950</td><td>--en-ring-offset-color: oklch(13% .028 261.692);</td></tr>
+    <tr><td>ring-offset-zinc-50</td><td>--en-ring-offset-color: oklch(98.5% 0 0);</td></tr>
+    <tr><td>ring-offset-zinc-100</td><td>--en-ring-offset-color: oklch(96.7% .001 286.375);</td></tr>
+    <tr><td>ring-offset-zinc-200</td><td>--en-ring-offset-color: oklch(92% .004 286.32);</td></tr>
+    <tr><td>ring-offset-zinc-300</td><td>--en-ring-offset-color: oklch(87.1% .006 286.286);</td></tr>
+    <tr><td>ring-offset-zinc-400</td><td>--en-ring-offset-color: oklch(70.5% .015 286.067);</td></tr>
+    <tr><td>ring-offset-zinc-500</td><td>--en-ring-offset-color: oklch(55.2% .016 285.938);</td></tr>
+    <tr><td>ring-offset-zinc-600</td><td>--en-ring-offset-color: oklch(44.2% .017 285.786);</td></tr>
+    <tr><td>ring-offset-zinc-700</td><td>--en-ring-offset-color: oklch(37% .013 285.805);</td></tr>
+    <tr><td>ring-offset-zinc-800</td><td>--en-ring-offset-color: oklch(27.4% .006 286.033);</td></tr>
+    <tr><td>ring-offset-zinc-900</td><td>--en-ring-offset-color: oklch(21% .006 285.885);</td></tr>
+    <tr><td>ring-offset-zinc-950</td><td>--en-ring-offset-color: oklch(14.1% .005 285.823);</td></tr>
+    <tr><td>ring-offset-neutral-50</td><td>--en-ring-offset-color: oklch(98.5% 0 0);</td></tr>
+    <tr><td>ring-offset-neutral-100</td><td>--en-ring-offset-color: oklch(97% 0 0);</td></tr>
+    <tr><td>ring-offset-neutral-200</td><td>--en-ring-offset-color: oklch(92.2% 0 0);</td></tr>
+    <tr><td>ring-offset-neutral-300</td><td>--en-ring-offset-color: oklch(87% 0 0);</td></tr>
+    <tr><td>ring-offset-neutral-400</td><td>--en-ring-offset-color: oklch(70.8% 0 0);</td></tr>
+    <tr><td>ring-offset-neutral-500</td><td>--en-ring-offset-color: oklch(55.6% 0 0);</td></tr>
+    <tr><td>ring-offset-neutral-600</td><td>--en-ring-offset-color: oklch(43.9% 0 0);</td></tr>
+    <tr><td>ring-offset-neutral-700</td><td>--en-ring-offset-color: oklch(37.1% 0 0);</td></tr>
+    <tr><td>ring-offset-neutral-800</td><td>--en-ring-offset-color: oklch(26.9% 0 0);</td></tr>
+    <tr><td>ring-offset-neutral-900</td><td>--en-ring-offset-color: oklch(20.5% 0 0);</td></tr>
+    <tr><td>ring-offset-neutral-950</td><td>--en-ring-offset-color: oklch(14.5% 0 0);</td></tr>
+    <tr><td>ring-offset-stone-50</td><td>--en-ring-offset-color: oklch(98.5% .001 106.423);</td></tr>
+    <tr><td>ring-offset-stone-100</td><td>--en-ring-offset-color: oklch(97% .001 106.424);</td></tr>
+    <tr><td>ring-offset-stone-200</td><td>--en-ring-offset-color: oklch(92.3% .003 48.717);</td></tr>
+    <tr><td>ring-offset-stone-300</td><td>--en-ring-offset-color: oklch(86.9% .005 56.366);</td></tr>
+    <tr><td>ring-offset-stone-400</td><td>--en-ring-offset-color: oklch(70.9% .01 56.259);</td></tr>
+    <tr><td>ring-offset-stone-500</td><td>--en-ring-offset-color: oklch(55.3% .013 58.071);</td></tr>
+    <tr><td>ring-offset-stone-600</td><td>--en-ring-offset-color: oklch(44.4% .011 73.639);</td></tr>
+    <tr><td>ring-offset-stone-700</td><td>--en-ring-offset-color: oklch(37.4% .01 67.558);</td></tr>
+    <tr><td>ring-offset-stone-800</td><td>--en-ring-offset-color: oklch(26.8% .007 34.298);</td></tr>
+    <tr><td>ring-offset-stone-900</td><td>--en-ring-offset-color: oklch(21.6% .006 56.043);</td></tr>
+    <tr><td>ring-offset-stone-950</td><td>--en-ring-offset-color: oklch(14.7% .004 49.25);</td></tr>
+    <tr><td>ring-offset-black</td><td>--en-ring-offset-color: #000;</td></tr>
+    <tr><td>ring-offset-white</td><td>--en-ring-offset-color: #fff;</td></tr>
   </tbody>
 </table>
 
