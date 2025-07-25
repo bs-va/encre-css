@@ -26,24 +26,6 @@
   <a href="https://docs.rs/encre-css">
     <img alt="Documentation on docs.rs" src="https://img.shields.io/docsrs/encre-css" />
   </a>
-
-  <br>
-
-  <a href="https://gitlab.com/encre-org/encre-css">
-    <img alt="Number of files" src="https://tokei.rs/b1/gitlab/encre-org/encre-css?category=files" />
-  </a>
-
-  <a href="https://gitlab.com/encre-org/encre-css">
-    <img alt="Number of lines of code" src="https://tokei.rs/b1/gitlab/encre-org/encre-css?category=code" />
-  </a>
-
-  <a href="https://gitlab.com/encre-org/encre-css">
-    <img alt="Number of lines of comments" src="https://tokei.rs/b1/gitlab/encre-org/encre-css?category=comments" />
-  </a>
-
-  <a href="https://gitlab.com/encre-org/encre-css">
-    <img alt="Total number of lines" src="https://tokei.rs/b1/gitlab/encre-org/encre-css" />
-  </a>
 </div>
 
 > Since v0.16.0, this library only supports TailwindCSS v4.0.
