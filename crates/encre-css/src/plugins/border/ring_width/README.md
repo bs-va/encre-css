@@ -8,8 +8,8 @@ Utilities for creating outline rings with box-shadows.
     </tr>
   </thead>
   <tbody>
-    <tr><td>ring-<i>&lt;integer&gt;</i></td><td>box-shadow: var(--en-ring-inset) 0 0 0 calc(<i>&lt;integer&gt;</i>px + var(--en-ring-offset-width)) var(--en-ring-color);</td></tr>
-    <tr><td>ring-inset</td><td>--en-ring-inset: inset;</td></tr>
+    <tr><td>ring-<i>&lt;integer&gt;</i></td><td>box-shadow: 0 0 0 calc(<i>&lt;integer&gt;</i>px + var(--en-ring-offset-width)) var(--en-ring-color);</td></tr>
+    <tr><td>inset-ring-<i>&lt;integer&gt;</i></td><td>box-shadow: inset 0 0 0 calc(<i>&lt;integer&gt;</i>px + var(--en-ring-offset-width)) var(--en-ring-color);</td></tr>
   </tbody>
 </table>
 

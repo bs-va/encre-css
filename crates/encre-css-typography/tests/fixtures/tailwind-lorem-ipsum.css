@@ -1015,7 +1015,7 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 
 .shadow-xl {
   --en-shadow: 0 20px 25px -5px var(--en-shadow-color, rgb(0 0 0 / 0.1)), 0 8px 10px -6px var(--en-shadow-color, rgb(0 0 0 / 0.1));
-  box-shadow: var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow);
+  box-shadow: var(--en-inset-shadow, 0 0 #0000), var(--en-inset-ring-shadow, 0 0 #0000), var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow);
 }
 
 .shadow-slate-700\/10 {
@@ -1023,8 +1023,8 @@ button, input:where([type='button'], [type='reset'], [type='submit']), ::file-se
 }
 
 .ring-1 {
-  --en-ring-shadow: var(--en-ring-inset) 0 0 0 calc(1px + var(--en-ring-offset-width)) var(--en-ring-color);
-  box-shadow: var(--en-ring-offset-shadow), var(--en-ring-shadow), var(--en-shadow, 0 0 #0000);
+  --en-ring-shadow: 0 0 0 calc(1px + var(--en-ring-offset-width)) var(--en-ring-color);
+  box-shadow: var(--en-inset-shadow, 0 0 #0000), var(--en-inset-ring-shadow, 0 0 #0000), var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow), var(--en-shadow, 0 0 #0000);
 }
 
 .ring-gray-900\/5 {

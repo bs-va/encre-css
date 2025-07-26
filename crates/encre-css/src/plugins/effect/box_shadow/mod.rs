@@ -9,7 +9,7 @@ impl Plugin for PluginDefinition {
     fn can_handle(&self, context: ContextCanHandle) -> bool {
         match context.modifier {
             Modifier::Builtin { value, .. } => {
-                ["2xs", "xs", "sm", "md", "lg", "xl", "2xl", "inner", "none"].contains(&&**value)
+                ["2xs", "xs", "sm", "md", "lg", "xl", "2xl", "none"].contains(&&**value)
             }
             Modifier::Arbitrary { hint, value, .. } => {
                 *hint == "shadow" || (hint.is_empty() && is_matching_shadow(value))
@@ -55,12 +55,7 @@ impl Plugin for PluginDefinition {
                         "--en-shadow: 0 25px 50px -12px var(--en-shadow-color, rgb(0 0 0 / 0.25));",
                     ]);
                 }
-                "inner" => {
-                    context.buffer.lines([
-                        "--en-shadow: inset 0 2px 4px 0 var(--en-shadow-color, rgb(0 0 0 / 0.05));",
-                    ]);
-                }
-                "none" => return context.buffer.line("box-shadow: none;"),
+                "none" => context.buffer.line("--en-shadow: 0 0 #0000;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {
@@ -72,6 +67,55 @@ impl Plugin for PluginDefinition {
             }
         }
 
-        context.buffer.line("box-shadow: var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow);");
+        context.buffer.line("box-shadow: var(--en-inset-shadow, 0 0 #0000), var(--en-inset-ring-shadow, 0 0 #0000), var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow);");
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct PluginInsetDefinition;
+
+impl Plugin for PluginInsetDefinition {
+    fn can_handle(&self, context: ContextCanHandle) -> bool {
+        match context.modifier {
+            Modifier::Builtin { value, .. } => {
+                ["2xs", "xs", "sm"].contains(&&**value)
+            }
+            Modifier::Arbitrary { hint, value, .. } => {
+                *hint == "shadow" || (hint.is_empty() && is_matching_shadow(value))
+            }
+        }
+    }
+
+    fn handle(&self, context: &mut ContextHandle) {
+        match context.modifier {
+            Modifier::Builtin { value, .. } => match *value {
+                "2xs" => {
+                    context.buffer.lines([
+                        "--en-inset-shadow: inset 0 1px var(--en-inset-shadow-color, rgb(0 0 0 / 0.05));",
+                    ]);
+                }
+                "xs" => {
+                    context.buffer.lines([
+                        "--en-inset-shadow: inset 0 1px 1px var(--en-inset-shadow-color, rgb(0 0 0 / 0.05));",
+                    ]);
+                }
+                "sm" => {
+                    context.buffer.lines([
+                        "--en-inset-shadow: 0 2px 4px var(--en-inset-shadow-color, rgb(0 0 0 / 0.05));",
+                    ]);
+                }
+                "none" => context.buffer.line("--en-inset-shadow: inset 0 0 #0000;"),
+                _ => unreachable!(),
+            },
+            Modifier::Arbitrary { value, .. } => {
+                let mut shadow = shadow::ShadowList::parse(value).unwrap();
+                shadow.replace_all_colors("var(--en-inset-shadow-color, {})");
+                context
+                    .buffer
+                    .line(format_args!("--en-inset-shadow: {shadow};"));
+            }
+        }
+
+        context.buffer.line("box-shadow: var(--en-inset-shadow), var(--en-inset-ring-shadow, 0 0 #0000), var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow, 0 0 #0000);");
     }
 }

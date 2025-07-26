@@ -360,21 +360,29 @@ mod tests {
         assert_eq!(
             generate(["ring"], &base_config()),
             ".ring {
-  --en-ring-shadow: var(--en-ring-inset) 0 0 0 calc(1px + var(--en-ring-offset-width)) var(--en-ring-color);
-  box-shadow: var(--en-ring-offset-shadow), var(--en-ring-shadow), var(--en-shadow, 0 0 #0000);
+  --en-ring-shadow: 0 0 0 calc(1px + var(--en-ring-offset-width)) var(--en-ring-color);
+  box-shadow: var(--en-inset-shadow, 0 0 #0000), var(--en-inset-ring-shadow, 0 0 #0000), var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow), var(--en-shadow, 0 0 #0000);
 }"
         );
         assert_eq!(
             generate(["ring-11"], &base_config()),
             ".ring-11 {
-  --en-ring-shadow: var(--en-ring-inset) 0 0 0 calc(11px + var(--en-ring-offset-width)) var(--en-ring-color);
-  box-shadow: var(--en-ring-offset-shadow), var(--en-ring-shadow), var(--en-shadow, 0 0 #0000);
+  --en-ring-shadow: 0 0 0 calc(11px + var(--en-ring-offset-width)) var(--en-ring-color);
+  box-shadow: var(--en-inset-shadow, 0 0 #0000), var(--en-inset-ring-shadow, 0 0 #0000), var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow), var(--en-shadow, 0 0 #0000);
 }"
         );
         assert_eq!(
-            generate(["ring-inset"], &base_config()),
-            ".ring-inset {
-  --en-ring-inset: inset;
+            generate(["inset-ring"], &base_config()),
+            ".inset-ring {
+  --en-inset-ring-shadow: inset 0 0 0 calc(1px + var(--en-ring-offset-width)) var(--en-ring-color);
+  box-shadow: var(--en-inset-shadow, 0 0 #0000), var(--en-inset-ring-shadow), var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow, 0 0 #0000);
+}"
+        );
+        assert_eq!(
+            generate(["inset-ring-12"], &base_config()),
+            ".inset-ring-12 {
+  --en-inset-ring-shadow: inset 0 0 0 calc(12px + var(--en-ring-offset-width)) var(--en-ring-color);
+  box-shadow: var(--en-inset-shadow, 0 0 #0000), var(--en-inset-ring-shadow), var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow, 0 0 #0000);
 }"
         );
     }
@@ -391,6 +399,12 @@ mod tests {
             generate(["ring-[rgb(12,12,12)]"], &base_config()),
             r".ring-\[rgb\(12\,12\,12\)\] {
   --en-ring-color: rgb(12,12,12);
+}"
+        );
+        assert_eq!(
+            generate(["inset-ring-red-400"], &base_config()),
+            ".inset-ring-red-400 {
+  --en-inset-ring-color: oklch(70.4% .191 22.216);
 }"
         );
     }

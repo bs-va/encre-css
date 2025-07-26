@@ -35,34 +35,44 @@ mod tests {
             generate(["shadow-sm"], &base_config()),
             ".shadow-sm {
   --en-shadow: 0 1px 3px 0 var(--en-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--en-shadow-color, rgb(0 0 0 / 0.1));
-  box-shadow: var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow);
+  box-shadow: var(--en-inset-shadow, 0 0 #0000), var(--en-inset-ring-shadow, 0 0 #0000), var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow);
 }"
         );
         assert_eq!(
             generate(["shadow-2xl"], &base_config()),
             ".shadow-2xl {
   --en-shadow: 0 25px 50px -12px var(--en-shadow-color, rgb(0 0 0 / 0.25));
-  box-shadow: var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow);
-}"
-        );
-        assert_eq!(
-            generate(["shadow-inner"], &base_config()),
-            ".shadow-inner {
-  --en-shadow: inset 0 2px 4px 0 var(--en-shadow-color, rgb(0 0 0 / 0.05));
-  box-shadow: var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow);
+  box-shadow: var(--en-inset-shadow, 0 0 #0000), var(--en-inset-ring-shadow, 0 0 #0000), var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow);
 }"
         );
         assert_eq!(
             generate(["shadow-none"], &base_config()),
             ".shadow-none {
-  box-shadow: none;
+  --en-shadow: 0 0 #0000;
+  box-shadow: var(--en-inset-shadow, 0 0 #0000), var(--en-inset-ring-shadow, 0 0 #0000), var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow);
 }"
         );
         assert_eq!(
             generate(["shadow-[12px_3rem_12rem_2em_#f00]"], &base_config()),
             r".shadow-\[12px_3rem_12rem_2em_\#f00\] {
   --en-shadow: 12px 3rem 12rem 2em var(--en-shadow-color, #f00);
-  box-shadow: var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow);
+  box-shadow: var(--en-inset-shadow, 0 0 #0000), var(--en-inset-ring-shadow, 0 0 #0000), var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow);
+}"
+        );
+
+        assert_eq!(
+            generate(["inset-shadow-sm"], &base_config()),
+            r".inset-shadow-sm {
+  --en-inset-shadow: 0 2px 4px var(--en-inset-shadow-color, rgb(0 0 0 / 0.05));
+  box-shadow: var(--en-inset-shadow), var(--en-inset-ring-shadow, 0 0 #0000), var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow, 0 0 #0000);
+}"
+        );
+
+        assert_eq!(
+            generate(["inset-shadow-[0_2px_2px_rgb(0_0_0_/_0.1)]"], &base_config()),
+            r".inset-shadow-\[0_2px_2px_rgb\(0_0_0_\/_0\.1\)\] {
+  --en-inset-shadow: 0 2px 2px var(--en-inset-shadow-color, rgb(0 0 0 / 0.1));
+  box-shadow: var(--en-inset-shadow), var(--en-inset-ring-shadow, 0 0 #0000), var(--en-ring-offset-shadow, 0 0 #0000), var(--en-ring-shadow, 0 0 #0000), var(--en-shadow, 0 0 #0000);
 }"
         );
     }
@@ -79,6 +89,12 @@ mod tests {
             generate(["shadow-[rgb(12,12,12)]"], &base_config()),
             r".shadow-\[rgb\(12\,12\,12\)\] {
   --en-shadow-color: rgb(12,12,12);
+}"
+        );
+        assert_eq!(
+            generate(["inset-shadow-red-400"], &base_config()),
+            ".inset-shadow-red-400 {
+  --en-inset-shadow-color: oklch(70.4% .191 22.216);
 }"
         );
     }
