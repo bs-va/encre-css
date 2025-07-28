@@ -4,7 +4,7 @@ use encre_css::{
     error::{Error, Result},
     generate, Config as EncreConfig,
 };
-use notify_debouncer_mini::{new_debouncer, notify::RecursiveMode, DebounceEventResult};
+use notify::{event::ModifyKind, EventKind, RecursiveMode, Watcher};
 use serde::Deserialize;
 use std::{
     env, fs,
@@ -13,7 +13,6 @@ use std::{
     path::{Path, PathBuf},
     result,
     sync::{mpsc::channel, Arc},
-    time::Duration,
 };
 use wax::Glob;
 
@@ -167,13 +166,7 @@ fn build_single<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, outpu
 fn watch<T: AsRef<Path>>(config_file: &str, extra_input: Option<&T>, output: Option<&String>) {
     let (tx, rx) = channel();
 
-    let mut debouncer = new_debouncer(
-        Duration::from_millis(500),
-        move |result: DebounceEventResult| {
-            tx.send(result).ok();
-        },
-    )
-    .unwrap();
+    let mut watcher = notify::recommended_watcher(tx).unwrap();
 
     let (mut input, mut config) = {
         let config = match Config::from_file(config_file) {
@@ -189,8 +182,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: Option<&T>, output: Opt
 
     // Due to https://github.com/notify-rs/notify/issues/247, the whole current directory is
     // watched
-    debouncer
-        .watcher()
+    watcher
         .watch(
             &extra_input
                 .as_ref()
@@ -221,103 +213,113 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: Option<&T>, output: Opt
 
     loop {
         match rx.recv() {
-            Ok(Ok(events)) => {
-                for event in events {
-                    let mut need_reloading = false;
+            Ok(Ok(event)) => {
+                let mut need_reloading = false;
 
-                    let mut files = input.iter().flat_map(|glob_path| {
-                        let (prefix, glob) = match Glob::new(
-                            glob_path
-                                .to_str()
-                                .expect("failed to convert the glob to a string"),
-                        ) {
-                            Ok(g) => g.partition(),
-                            Err(e) => panic!("{}", e),
-                        };
-
-                        if &prefix == glob_path {
-                            iter::once(glob_path.clone()).collect::<Vec<PathBuf>>()
-                        } else {
-                            glob.walk(prefix)
-                                .map(|e| e.unwrap().into_path())
-                                .collect::<Vec<PathBuf>>()
-                        }
-                    });
-
-                    let extra_input_files = if let Some(ref extra_input) = extra_input.as_ref() {
-                        let (prefix, glob) = match Glob::new(
-                            extra_input
-                                .as_ref()
-                                .to_str()
-                                .expect("failed to convert the glob to a string"),
-                        ) {
-                            Ok(g) => g.partition(),
-                            Err(e) => panic!("{}", e),
-                        };
-
-                        if prefix == extra_input.as_ref() {
-                            Some(
-                                iter::once(extra_input.as_ref().to_path_buf())
-                                    .collect::<Vec<PathBuf>>(),
-                            )
-                        } else {
-                            Some(
-                                glob.walk(prefix)
-                                    .map(|e| e.unwrap().into_path())
-                                    .collect::<Vec<PathBuf>>(),
-                            )
-                        }
-                    } else {
-                        None
+                let mut files = input.iter().flat_map(|glob_path| {
+                    let (prefix, glob) = match Glob::new(
+                        glob_path
+                            .to_str()
+                            .expect("failed to convert the glob to a string"),
+                    ) {
+                        Ok(g) => g.partition(),
+                        Err(e) => panic!("{}", e),
                     };
 
-                    // Check that the changed file is watched
-                    if files.any(|file_path| {
-                        result_equal(file_path.canonicalize(), event.path.canonicalize())
-                    }) || (extra_input_files.is_some()
-                        && extra_input_files.unwrap().iter().any(|file_path| {
-                            result_equal(file_path.canonicalize(), event.path.canonicalize())
-                        }))
-                    {
-                        println!("Changes detected. Reloading\u{2026}");
-                        need_reloading = true;
-                    } else if result_equal(
-                        event.path.canonicalize(),
-                        PathBuf::from(DEFAULT_CONFIG_FILE).canonicalize(),
+                    if &prefix == glob_path {
+                        iter::once(glob_path.clone()).collect::<Vec<PathBuf>>()
+                    } else {
+                        glob.walk(prefix)
+                            .map(|e| e.unwrap().into_path())
+                            .collect::<Vec<PathBuf>>()
+                    }
+                });
+
+                let extra_input_files = if let Some(ref extra_input) = extra_input.as_ref() {
+                    let (prefix, glob) = match Glob::new(
+                        extra_input
+                            .as_ref()
+                            .to_str()
+                            .expect("failed to convert the glob to a string"),
                     ) {
-                        // Handle configuration changes
-                        println!("Configuration file changed. Reloading\u{2026}");
+                        Ok(g) => g.partition(),
+                        Err(e) => panic!("{}", e),
+                    };
 
-                        let (new_input, new_config) = {
-                            let config = match Config::from_file(config_file) {
-                                Ok(config) => config,
-                                Err(e) => {
-                                    eprintln!("{e}");
-                                    Config::default()
-                                }
-                            };
+                    if prefix == extra_input.as_ref() {
+                        Some(
+                            iter::once(extra_input.as_ref().to_path_buf())
+                                .collect::<Vec<PathBuf>>(),
+                        )
+                    } else {
+                        Some(
+                            glob.walk(prefix)
+                                .map(|e| e.unwrap().into_path())
+                                .collect::<Vec<PathBuf>>(),
+                        )
+                    }
+                } else {
+                    None
+                };
 
-                            (Arc::new(config.input), config.encre_config)
+                if matches!(event.kind, EventKind::Access(..) | EventKind::Modify(ModifyKind::Metadata(..))) {
+                    continue;
+                }
+
+                // Check that the changed file is watched
+                if files.any(|file_path| {
+                    event
+                        .paths
+                        .iter()
+                        .any(|event_path| result_equal(file_path.canonicalize(), event_path.canonicalize()))
+                }) || (extra_input_files.is_some()
+                    && extra_input_files.unwrap().iter().any(|file_path| {
+                        event
+                            .paths
+                            .iter()
+                            .any(|event_path| result_equal(file_path.canonicalize(), event_path.canonicalize()))
+                    }))
+                {
+                    println!("Changes detected. Reloading\u{2026}");
+                    need_reloading = true;
+                } else if event.paths.iter().any(|event_path| {
+                    result_equal(
+                        event_path.canonicalize(),
+                        PathBuf::from(DEFAULT_CONFIG_FILE).canonicalize(),
+                    )
+                }) {
+                    // Handle configuration changes
+                    println!("Configuration file changed. Reloading\u{2026}");
+
+                    let (new_input, new_config) = {
+                        let config = match Config::from_file(config_file) {
+                            Ok(config) => config,
+                            Err(e) => {
+                                eprintln!("{e}");
+                                Config::default()
+                            }
                         };
 
-                        input = new_input;
-                        config = new_config;
-                        need_reloading = true;
+                        (Arc::new(config.input), config.encre_config)
+                    };
+
+                    input = new_input;
+                    config = new_config;
+                    need_reloading = true;
+                }
+
+                if need_reloading {
+                    buffer.clear();
+
+                    if let Some(ref glob_path) = extra_input.as_ref() {
+                        scan_path(glob_path, &mut buffer);
                     }
 
-                    if need_reloading {
-                        buffer.clear();
+                    input.iter().for_each(|glob_path| {
+                        scan_path(glob_path, &mut buffer);
+                    });
 
-                        if let Some(ref glob_path) = extra_input.as_ref() {
-                            scan_path(glob_path, &mut buffer);
-                        }
-
-                        input.iter().for_each(|glob_path| {
-                            scan_path(glob_path, &mut buffer);
-                        });
-
-                        gen_css([buffer.as_str()], &config, output.as_ref());
-                    }
+                    gen_css([buffer.as_str()], &config, output.as_ref());
                 }
             }
             Ok(Err(e)) => eprintln!("Watch error: {e}"),
