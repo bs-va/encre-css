@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.17.1] - 2025-07-28
+
+### Bug Fixes
+
+- Classes having the same modifier to be recognized as the same even if they use different plugins (e.g `border-x-transparent` and `border-t-transparent`)
+- Cli loop generating in watch mode because of `Access` file operations
+
+### Documentation
+
+- Add missing documentation for `border-{x,y,s,e,t,r,b,l}` colors
+
 ## [0.17.0] - 2025-07-27
 
 ### Bug Fixes
