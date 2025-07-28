@@ -288,7 +288,11 @@ impl PartialOrd for Selector<'_> {
 
 impl Ord for Selector<'_> {
     fn cmp(&self, other: &Self) -> Ordering {
-        if self == other {
+        // We need to check the order as well as the strict egality because the PartialEq
+        // implementation for Selector does not check if two selectors have the same plugin which
+        // can lead two selectors having the same modifier to be recognized as the same although
+        // they use different plugins
+        if self.order == other.order && self == other {
             return Ordering::Equal;
         }
 
