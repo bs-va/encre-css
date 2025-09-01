@@ -114,7 +114,7 @@ pub(crate) fn underscores_to_spaces(mut val: Cow<str>) -> Cow<str> {
 ///  -  `_` (underscores) are converted to ` ` (spaces) (not in `url`s or if prefixed by a backslash);
 ///  - Spaces are added around operators in the `calc` CSS function.
 ///  - The value is unescaped (see [`unescape`])
-pub(crate) fn to_css_value(val: &str) -> Cow<str> {
+pub(crate) fn to_css_value(val: &str) -> Cow<'_, str> {
     let mut val = underscores_to_spaces(Cow::from(val));
 
     // Add spaces around operators in the `calc` CSS function
@@ -596,7 +596,7 @@ fn parse_recursive<'a>(
     }
 }
 
-fn parse_modifier(mut modifier: &str, is_negative: bool) -> Option<Modifier> {
+fn parse_modifier(mut modifier: &str, is_negative: bool) -> Option<Modifier<'_>> {
     if modifier.is_empty() {
         return Some(Modifier::Builtin {
             is_negative: false,
