@@ -33,11 +33,11 @@ use color_eyre::Report;
 use std::{env, path::PathBuf};
 
 mod build;
-mod others;
+mod utils;
 mod playground;
 
 use build::build;
-use others::generate_config;
+use utils::generate_config;
 use playground::launch;
 
 pub const DEFAULT_CONFIG_FILE: &str = "encre.toml";
