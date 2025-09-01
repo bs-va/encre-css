@@ -46,20 +46,21 @@ fn gen_css<'a, T: AsRef<Path>>(
     sources: impl IntoIterator<Item = &'a str>,
     config: &EncreConfig,
     output: Option<T>,
-) {
+) -> color_eyre::Result<()> {
     let css = generate(sources, config);
 
     if let Some(file) = output {
         if let Some(parent) = file.as_ref().parent() {
             // Create parent directories
-            fs::create_dir_all(parent).expect("failed to create parent directories");
+            fs::create_dir_all(parent)?;
         }
 
-        fs::write(file, css).expect("failed to write to the file");
+        fs::write(file, css)?;
     } else {
         // If no file is specified, the CSS generated is written to the standard output
         println!("{css}");
     }
+    Ok(())
 }
 
 fn scan_path<T: AsRef<Path>>(glob_path: T, buffer: &mut String) {
@@ -140,7 +141,11 @@ fn scan_path<T: AsRef<Path>>(glob_path: T, buffer: &mut String) {
     }
 }
 
-fn build_single<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, output: Option<String>) {
+fn build_single<T: AsRef<Path>>(
+    config_file: &str,
+    extra_input: Option<T>,
+    output: Option<String>,
+) -> color_eyre::Result<()> {
     let config = match Config::from_file(config_file) {
         Ok(config) => config,
         Err(e) => {
@@ -159,14 +164,18 @@ fn build_single<T: AsRef<Path>>(config_file: &str, extra_input: Option<T>, outpu
         scan_path(glob_path, &mut buffer);
     });
 
-    gen_css([buffer.as_str()], &config.encre_config, output);
+    gen_css([buffer.as_str()], &config.encre_config, output)
 }
 
 #[allow(clippy::too_many_lines)]
-fn watch<T: AsRef<Path>>(config_file: &str, extra_input: Option<&T>, output: Option<&String>) {
+fn watch<T: AsRef<Path>>(
+    config_file: &str,
+    extra_input: Option<&T>,
+    output: Option<&String>,
+) -> color_eyre::Result<()> {
     let (tx, rx) = channel();
 
-    let mut watcher = notify::recommended_watcher(tx).unwrap();
+    let mut watcher = notify::recommended_watcher(tx)?;
 
     let (mut input, mut config) = {
         let config = match Config::from_file(config_file) {
@@ -182,17 +191,13 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: Option<&T>, output: Opt
 
     // Due to https://github.com/notify-rs/notify/issues/247, the whole current directory is
     // watched
-    watcher
-        .watch(
-            &extra_input
-                .as_ref()
-                .and_then(|i| i.as_ref().parent().map(PathBuf::from))
-                .unwrap_or_else(|| {
-                    env::current_dir().expect("failed to access the current directory")
-                }),
-            RecursiveMode::Recursive,
-        )
-        .unwrap();
+    watcher.watch(
+        &extra_input
+            .as_ref()
+            .and_then(|i| i.as_ref().parent().map(PathBuf::from))
+            .unwrap_or_else(|| env::current_dir().expect("failed to access the current directory")),
+        RecursiveMode::Recursive,
+    )?;
 
     let mut buffer = String::new();
 
@@ -206,7 +211,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: Option<&T>, output: Opt
             scan_path(glob_path, &mut buffer);
         });
 
-        gen_css([buffer.as_str()], &config, output.as_ref());
+        gen_css([buffer.as_str()], &config, output.as_ref())?;
     }
 
     println!("`encre-css` successfully launched in watch mode");
@@ -236,15 +241,13 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: Option<&T>, output: Opt
                 });
 
                 let extra_input_files = if let Some(ref extra_input) = extra_input.as_ref() {
-                    let (prefix, glob) = match Glob::new(
+                    let (prefix, glob) = Glob::new(
                         extra_input
                             .as_ref()
                             .to_str()
                             .expect("failed to convert the glob to a string"),
-                    ) {
-                        Ok(g) => g.partition(),
-                        Err(e) => panic!("{}", e),
-                    };
+                    )?
+                    .partition();
 
                     if prefix == extra_input.as_ref() {
                         Some(
@@ -262,22 +265,23 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: Option<&T>, output: Opt
                     None
                 };
 
-                if matches!(event.kind, EventKind::Access(..) | EventKind::Modify(ModifyKind::Metadata(..))) {
+                if matches!(
+                    event.kind,
+                    EventKind::Access(..) | EventKind::Modify(ModifyKind::Metadata(..))
+                ) {
                     continue;
                 }
 
                 // Check that the changed file is watched
                 if files.any(|file_path| {
-                    event
-                        .paths
-                        .iter()
-                        .any(|event_path| result_equal(file_path.canonicalize(), event_path.canonicalize()))
+                    event.paths.iter().any(|event_path| {
+                        result_equal(file_path.canonicalize(), event_path.canonicalize())
+                    })
                 }) || (extra_input_files.is_some()
                     && extra_input_files.unwrap().iter().any(|file_path| {
-                        event
-                            .paths
-                            .iter()
-                            .any(|event_path| result_equal(file_path.canonicalize(), event_path.canonicalize()))
+                        event.paths.iter().any(|event_path| {
+                            result_equal(file_path.canonicalize(), event_path.canonicalize())
+                        })
                     }))
                 {
                     println!("Changes detected. Reloading\u{2026}");
@@ -319,7 +323,7 @@ fn watch<T: AsRef<Path>>(config_file: &str, extra_input: Option<&T>, output: Opt
                         scan_path(glob_path, &mut buffer);
                     });
 
-                    gen_css([buffer.as_str()], &config, output.as_ref());
+                    gen_css([buffer.as_str()], &config, output.as_ref())?;
                 }
             }
             Ok(Err(e)) => eprintln!("Watch error: {e}"),
@@ -333,7 +337,7 @@ pub(crate) fn build<T: AsRef<Path>>(
     extra_input: Option<T>,
     output: Option<String>,
     need_watch: bool,
-) {
+) -> color_eyre::Result<()> {
     let config_file = if let Some(config_file) = config {
         config_file
     } else {
@@ -341,8 +345,8 @@ pub(crate) fn build<T: AsRef<Path>>(
     };
 
     if need_watch {
-        watch(config_file, extra_input.as_ref(), output.as_ref());
+        watch(config_file, extra_input.as_ref(), output.as_ref())
     } else {
-        build_single(config_file, extra_input, output);
+        build_single(config_file, extra_input, output)
     }
 }

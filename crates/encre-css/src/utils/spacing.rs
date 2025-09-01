@@ -9,9 +9,9 @@ use std::borrow::Cow;
 pub fn is_matching_builtin_spacing(value: &str) -> bool {
     value == "px"
         || value.parse::<f64>().is_ok()
-        || value.split_once('/').is_some_and(|(a, b)| {
-            a.parse::<usize>().is_ok() && b.parse::<usize>().is_ok()
-        })
+        || value
+            .split_once('/')
+            .is_some_and(|(a, b)| a.parse::<usize>().is_ok() && b.parse::<usize>().is_ok())
 }
 
 /// Get a spacing value from a modifier.
@@ -19,7 +19,7 @@ pub fn is_matching_builtin_spacing(value: &str) -> bool {
 /// Spacing values don't follow Tailwind's philosophy of limiting possible values and are closer
 /// to [Windi CSS](https://windicss.org/features/value-auto-infer.html#numbers). They are
 /// however perfectly compatible with Tailwind's values.
-pub fn get(value: &str, is_negative: bool) -> Option<Cow<str>> {
+pub fn get(value: &str, is_negative: bool) -> Option<Cow<'_, str>> {
     if value == "px" {
         if is_negative {
             Some(Cow::from("-1px"))
