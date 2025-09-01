@@ -33,9 +33,11 @@ use color_eyre::Report;
 use std::{env, path::PathBuf};
 
 mod build;
+mod others;
 mod playground;
 
 use build::build;
+use others::generate_config;
 use playground::launch;
 
 pub const DEFAULT_CONFIG_FILE: &str = "encre.toml";
@@ -67,6 +69,8 @@ enum Commands {
         #[clap(short, long)]
         watch: bool,
     },
+    /// Generates default configuration, written to standard output.
+    GenerateConfig,
 }
 
 #[derive(Parser)]
@@ -94,7 +98,6 @@ fn main() -> Result<(), Report> {
             output,
             watch,
         } => build(config.as_ref(), extra_input, output, watch),
+        Commands::GenerateConfig => generate_config(),
     }
-
-    Ok(())
 }

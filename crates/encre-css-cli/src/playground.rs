@@ -1,5 +1,6 @@
 use crate::DEFAULT_CONFIG_FILE;
 
+use color_eyre::{eyre::WrapErr, Result};
 use rand::distr::{Alphanumeric, SampleString};
 use std::{fs, path::PathBuf};
 
@@ -21,7 +22,7 @@ const DEFAULT_CONFIG_CONTENT: &str = r#"input = ["index.html"]"#;
 /// Launch a new playground environment:
 /// - Create a new directory
 /// - Create the `index.html` and `encre.toml` files in it and fill them with the default content
-pub fn launch(name: Option<String>) {
+pub fn launch(name: Option<String>) -> Result<()> {
     let name = name.unwrap_or_else(|| {
         format!(
             "playground-{}",
@@ -30,11 +31,14 @@ pub fn launch(name: Option<String>) {
     });
     let dir_path = PathBuf::from(&name);
 
-    fs::create_dir(&name).expect("failed to create a new directory in the current directory");
-    fs::write(dir_path.join("index.html"), DEFAULT_HTML_CONTENT)
-        .expect("failed to create an `encre.toml` file in the created directory");
-    fs::write(dir_path.join(DEFAULT_CONFIG_FILE), DEFAULT_CONFIG_CONTENT)
-        .expect("failed to create the configuration file in the created directory");
+    fs::create_dir(&name)?;
+    fs::write(dir_path.join("index.html"), DEFAULT_HTML_CONTENT).wrap_err(format!(
+        "failed to create an `index.html` file in `{name}` directory",
+    ))?;
+    fs::write(dir_path.join(DEFAULT_CONFIG_FILE), DEFAULT_CONFIG_CONTENT).wrap_err(format!(
+        "failed to create `{DEFAULT_CONFIG_FILE}` file in `{name}` directory"
+    ))?;
 
     println!("  `{name}` is ready!\n  To start editing it, run: `cd {name} && encre build --watch -o styles.css` and open the `index.html` file in your preferred editor");
+    Ok(())
 }
