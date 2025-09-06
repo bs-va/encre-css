@@ -1089,7 +1089,6 @@ pub const BUILTIN_PLUGINS: &[(Cow<'static, str>, &'static (dyn Plugin + Send + S
 /// It defines how the `dark:` variant should behave.
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "lowercase")]
-#[serde(tag = "type", content = "class")]
 pub enum DarkMode {
     /// The `dark:` variant will modify the class of the selector. You'll then need to toggle this
     /// class to enable the dark theme.
