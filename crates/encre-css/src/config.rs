@@ -1087,6 +1087,9 @@ pub const BUILTIN_PLUGINS: &[(Cow<'static, str>, &'static (dyn Plugin + Send + S
 /// Configuration for the [`Theme::dark_mode`] field.
 ///
 /// It defines how the `dark:` variant should behave.
+///
+/// The default value is [`DarkMode::Media`] which enables the automatic detection of the theme based
+/// on  user preference.
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "lowercase")]
 pub enum DarkMode {
@@ -1114,6 +1117,8 @@ pub enum DarkMode {
 
     /// The `dark:` variant will generates a `@media (prefers-color-scheme: dark)` rule to enable
     /// the dark theme following user preference.
+    ///
+    /// This is the default value.
     ///
     /// # Example
     ///
