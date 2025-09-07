@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.18.0] - 2025-09-07
+
+### Bug Fixes
+
+- [**breaking**] Avoid using a custom-tagged serde enum representation for the `DarkMode` configuration field
+- [**breaking**] Avoid using a custom-tagged serde enum representation for the `Preflight` to be consistent with `DarkMode`
+
+### Documentation
+
+- State that `DakrMode::Media` is the default value
+- Document how to write TOML corresponding to all config fields
+
+### Miscellaneous Tasks
+
+- Update crates
+
+### Refactor
+
+- Rename the `others` module as `utils`
+
 ## [0.17.1] - 2025-07-28
 
 ### Bug Fixes
