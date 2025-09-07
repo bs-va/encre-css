@@ -399,10 +399,28 @@ const DEFAULT_PREFLIGHT: &str = concat!(
 
 /// The set of default styles.
 ///
+/// The default value is
+///
+/// ```
+/// # use encre_css::Preflight;
+/// # let _ =
+/// Preflight::Full {
+///     font_feature_settings_sans: None,
+///     font_variation_settings_sans: None,
+///     font_feature_settings_mono: None,
+///     font_variation_settings_mono: None,
+///     font_family_sans: None,
+///     font_family_mono: None,
+/// }
+/// # ;
+/// ```
+///
+/// i.e it will include the full preflight with the default values for all fields. Check the methods
+/// to see what they are.
+///
 /// See [`crate::preflight`].
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "lowercase")]
-#[serde(tag = "type", content = "css")]
 pub enum Preflight {
     /// No preflight will be generated.
     None,

@@ -1,4 +1,5 @@
 safelist = []
+preflight = "none"
 max_shortcut_depth = 5
 
 [theme.dark_mode]
@@ -16,9 +17,6 @@ yellow-400 = "#ffef0e"
 
 [theme.aria]
 current = 'current="page"'
-
-[preflight]
-type = "none"
 
 [shortcuts]
 
