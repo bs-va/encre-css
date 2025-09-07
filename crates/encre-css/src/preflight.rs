@@ -22,9 +22,7 @@
 //!
 //! Using TOML:
 //!
-//! ```toml
-//! preflight = { full = { font_family_mono = "'Fira Code'" } }
-//! ```
+//! <div class="example-wrap"><pre class="rust rust-example-rendered"><code>preflight = { full = { font_family_mono = <span class="string">"'Fira Code'"</span> } }</code></pre></div>
 //!
 //! ### Custom preflight
 //!
@@ -49,9 +47,7 @@
 //!
 //! Using TOML:
 //!
-//! ```toml
-//! preflight = { custom = "html, body { width: 100vw; height: 100vh; margin: 0; }" }
-//! ```
+//! <div class="example-wrap"><pre class="rust rust-example-rendered"><code>preflight = { custom = <span class="string">"html, body { width: 100vw; height: 100vh; margin: 0; }"</span> }</code></pre></div>
 //!
 //! Note that newlines [are not yet supported in TOML](https://github.com/toml-rs/toml/issues/397)
 //! so it might be better to define it in Rust if you have a long custom preflight.
@@ -70,9 +66,7 @@
 //!
 //! Using TOML:
 //!
-//! ```toml
-//! preflight = "none"
-//! ```
+//! <div class="example-wrap"><pre class="rust rust-example-rendered"><code>preflight = <span class="string">"none"</span></code></pre></div>
 //!
 //! [`Config::preflight`]: crate::config::Config::preflight
 use serde::{Deserialize, Serialize};

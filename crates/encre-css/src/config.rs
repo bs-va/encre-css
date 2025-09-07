@@ -1320,10 +1320,8 @@ impl Colors {
 ///
 /// ### Corresponding TOML configuration
 ///
-/// ```toml
-/// [shortcuts]
-/// btn = "border-1 rounded-xl bg-red-500"
-/// ```
+/// <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">[shortcuts]</span>
+/// btn = <span class="string">"border-1 rounded-xl bg-red-500"</span></code></pre></div>
 #[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize, Clone)]
 pub struct Shortcuts(BTreeMap<Cow<'static, str>, Cow<'static, str>>);
 
@@ -1424,9 +1422,7 @@ impl Default for MaxShortcutDepth {
 ///
 /// ### Corresponding TOML configuration
 ///
-/// ```toml
-/// safelist = ["text-blue-400", "text-gray-400"]
-/// ```
+/// <div class="example-wrap"><pre class="rust rust-example-rendered"><code>safelist = [<span class="string">"text-blue-400"</span>, <span class="string">"text-gray-400"</span>]</code></pre></div>
 #[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize, Clone)]
 pub struct Safelist(BTreeSet<Cow<'static, str>>);
 
@@ -1527,22 +1523,16 @@ impl Extra {
 ///
 /// ### Corresponding TOML configuration
 ///
-/// ```toml
-/// [theme]
-/// dark_mode = { class = "body.dark" }
-///
-/// [theme.colors]
-/// primary = "#d3198c"
-///
-/// [theme.screens]
-/// tablet = "640px"
-///
-/// [theme.containers]
-/// medium = "640px"
-///
-/// [theme.aria]
-/// current = 'current="page"'
-/// ```
+/// <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">[theme]</span>
+/// dark_mode = { class = <span class="string">"body.dark"</span> }<br>
+/// <span class="kw">[theme.colors]</span>
+/// primary = <span class="string">"#d3198c"</span><br>
+/// <span class="kw">[theme.screens]</span>
+/// tablet = <span class="string">"640px"</span><br>
+/// <span class="kw">[theme.containers]</span>
+/// medium = <span class="string">"640px"</span><br>
+/// <span class="kw">[theme.aria]</span>
+/// current = <span class="string">'current="page"'</span></code></pre></div>
 #[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize, Clone)]
 pub struct Theme {
     /// Dark mode configuration.
