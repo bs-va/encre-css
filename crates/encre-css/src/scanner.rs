@@ -15,7 +15,7 @@ use std::{collections::BTreeSet, sync::Arc};
 /// HTML attribute.
 ///
 /// ```
-/// use encre_css::{Config, Scanner, utils::split_ignore_arbitrary};
+/// use encre_css::{Config, Scanner};
 /// use std::collections::BTreeSet;
 ///
 /// let mut config = Config::default();

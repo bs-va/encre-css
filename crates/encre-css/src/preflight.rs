@@ -1,5 +1,9 @@
 //! Define the default set of base CSS styles used to make websites consistent across browsers.
 //!
+//! Based on [Tailwind's default preflight](https://tailwindcss.com/docs/preflight).
+//!
+//! ### Full preflight
+//!
 //! By default, this base CSS is included in the generated CSS and you can customize it
 //! by manually setting the [`Config::preflight`] configuration field to `Preflight::new_full()`
 //! and by using the various associated methods, e.g [`Preflight::font_family_sans`]
@@ -15,6 +19,14 @@
 //! assert!(encre_css::generate([], &config).contains("code, kbd, samp, pre {
 //!   font-family: 'Fira Code';"));
 //! ```
+//!
+//! Using TOML:
+//!
+//! ```toml
+//! preflight = { full = { font_family_mono = "'Fira Code'" } }
+//! ```
+//!
+//! ### Custom preflight
 //!
 //! You can also use your own default CSS using [`Preflight::new_custom`].
 //!
@@ -35,6 +47,16 @@
 //! }");
 //! ```
 //!
+//! Using TOML:
+//!
+//! ```toml
+//! preflight = { custom = "html, body { width: 100vw; height: 100vh; margin: 0; }" }
+//! ```
+//!
+//! Note that newlines [are not yet supported in TOML](https://github.com/toml-rs/toml/issues/397)
+//! so it might be better to define it in Rust if you have a long custom preflight.
+//!
+//! ### Empty preflight
 //! Finally you can disable it using [`Preflight::new_none`].
 //!
 //! ```
@@ -43,10 +65,14 @@
 //! let mut config = Config::default();
 //! config.preflight = Preflight::new_none();
 //!
-//! assert_eq!(encre_css::generate([], &config), "");
+//! assert!(encre_css::generate([], &config).is_empty());
 //! ```
 //!
-//! Based on [Tailwind's default preflight](https://tailwindcss.com/docs/preflight).
+//! Using TOML:
+//!
+//! ```toml
+//! preflight = "none"
+//! ```
 //!
 //! [`Config::preflight`]: crate::config::Config::preflight
 use serde::{Deserialize, Serialize};
