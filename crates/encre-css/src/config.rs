@@ -36,7 +36,7 @@
 //! The previous example is equivalent to the following TOML configuration file:
 //!
 //! <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">[theme]</span>
-//! dark_mode = { type = <span class="string">"class"</span>, class = <span class="string">".dark"</span> }
+//! dark_mode = { class = <span class="string">".dark"</span> }
 //! colors = { primary = <span class="string">"#d3198c"</span>, secondary = <span class="string">"#fff"</span> }
 //! screens = { tablet = <span class="string">"640px"</span>, laptop = <span class="string">"1024px"</span>, desktop = <span class="string">"1280px"</span> }
 //! </code></pre></div>
@@ -1594,7 +1594,7 @@ pub struct Theme {
 ///
 /// <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment"># encre-css.toml</span>
 /// <span class="kw">[theme]</span>
-/// dark_mode = { type = <span class="string">"class"</span>, class = <span class="string">".dark"</span> }
+/// dark_mode = { class = <span class="string">".dark"</span> }
 /// screens = { 3xl = <span class="string">"1600px"</span>, lg = <span class="string">"2000px"</span> }<br>
 /// <span class="kw">[theme.colors]</span>
 /// primary = <span class="string">"#e5186a"</span>
