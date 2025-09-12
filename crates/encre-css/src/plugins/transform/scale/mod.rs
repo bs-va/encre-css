@@ -29,7 +29,7 @@ fn scale_handle(css_properties: &[&str], context: &mut ContextHandle) {
             for css_prop in css_properties {
                 context
                     .buffer
-                    .line(format_args!("{}: {};", css_prop, value));
+                    .line(format_args!("{css_prop}: {value};"));
             }
         }
     }
