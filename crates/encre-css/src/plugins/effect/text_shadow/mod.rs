@@ -45,7 +45,7 @@ impl Plugin for PluginDefinition {
                         "text-shadow: 0px 1px 2px var(--en-text-shadow-color, rgb(0 0 0 / 0.1)), 0px 3px 2px var(--en-text-shadow-color, rgb(0 0 0 / 0.1)), 0px 4px 8px var(--en-text-shadow-color, rgb(0 0 0 / 0.1));",
                     ]);
                 }
-                "none" => return context.buffer.line("text-shadow: none;"),
+                "none" => context.buffer.line("text-shadow: none;"),
                 _ => unreachable!(),
             },
             Modifier::Arbitrary { value, .. } => {

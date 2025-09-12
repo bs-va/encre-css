@@ -29,10 +29,10 @@ impl Plugin for PluginDefinition {
                     "none" => "none",
                     _ => unreachable!(),
                 };
-                context.buffer.line(format_args!("perspective: {};", value));
+                context.buffer.line(format_args!("perspective: {value};"));
             }
             Modifier::Arbitrary { value, .. } => {
-                context.buffer.line(format_args!("perspective: {};", value));
+                context.buffer.line(format_args!("perspective: {value};"));
             }
         }
     }

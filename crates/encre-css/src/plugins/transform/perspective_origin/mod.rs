@@ -36,7 +36,7 @@ impl Plugin for PluginDefinition {
             Modifier::Arbitrary { value, .. } => {
                 context
                     .buffer
-                    .line(format_args!("perspective-origin: {};", value));
+                    .line(format_args!("perspective-origin: {value};"));
             }
         }
     }
