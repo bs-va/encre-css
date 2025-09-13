@@ -19,6 +19,7 @@ clap = { version = "4.5.41", features = ["derive"] }
 rand = "0.9.2"
 wax = "0.6.0"
 color-eyre = "0.6.5"
-toml = "0.9.2"
-serde = { version = "1.0.219", features = ["derive"] }
+toml = { workspace = true }
+serde = { workspace = true }
 notify = "8.1.0"
+
