@@ -203,8 +203,8 @@ fn sort_selectors_recursive<'a>(
                 // Sort variant groups
                 let start = split_ignore_arbitrary(v.trim(), '(', false)
                     .nth(1)
-                    .unwrap()
-                    .0;
+                    .map(|(n, _s)| n)
+                    .unwrap_or_default();
 
                 Some(FoundSelector::Group(format!(
                     "{}{})",
@@ -216,8 +216,8 @@ fn sort_selectors_recursive<'a>(
                         config,
                     )
                 )))
-            } else if !selectors.is_empty() {
-                match selectors.into_iter().next().unwrap() {
+            } else {
+                match selectors.into_iter().next()? {
                     Ok(selector) => Some(FoundSelector::KnownSelector(selector)),
                     Err(ParseError {
                         kind:
@@ -228,8 +228,6 @@ fn sort_selectors_recursive<'a>(
                         ..
                     }) => Some(FoundSelector::UnknownSelector(selector)),
                 }
-            } else {
-                None
             }
         })
         .collect::<Vec<FoundSelector>>();
