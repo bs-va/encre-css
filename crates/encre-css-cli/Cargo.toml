@@ -21,5 +21,6 @@ wax = "0.6.0"
 color-eyre = "0.6.5"
 toml = { workspace = true }
 serde = { workspace = true }
+thiserror = { workspace = true }
 notify = "8.1.0"
 
