@@ -7,7 +7,6 @@ use encre_css::{
 };
 use notify::{event::ModifyKind, EventKind, RecursiveMode, Watcher};
 use serde::Deserialize;
-use std::collections::VecDeque;
 use std::{
     env, fs,
     io::Read,
@@ -125,13 +124,13 @@ fn build_single<T: AsRef<Path>>(
     // Each glob path can make `scan_path` fail. But we won't make the whole function failed just
     // because one `scan_path` fails. We collect the successful ones and failed ones.
     // We will make this function fail if no `scan_path` is successful.
-    let mut failed_scans = VecDeque::new();
+    let mut failed_scans = vec![];
     let mut successful_scans = vec![];
 
     if let Some(glob_path) = extra_input {
         match scan_path(glob_path, &mut buffer) {
             Ok(s) => successful_scans.push(s),
-            Err(e) => failed_scans.push_back(e),
+            Err(e) => failed_scans.push(e),
         }
     }
 
@@ -142,15 +141,16 @@ fn build_single<T: AsRef<Path>>(
             eprintln!("Scan {}...", glob_path.to_string_lossy());
             scan_path(glob_path, &mut buffer)
         })
-        .filter_map(|s| s.map_err(|e| failed_scans.push_back(e)).ok());
+        .filter_map(|s| s.map_err(|e| failed_scans.push(e)).ok());
     successful_scans.extend(success_iter);
 
     // If no scan succeeds, we use the first scan's error as the function's error and return early.
     if successful_scans.is_empty() {
-        let first_error = failed_scans
-            .pop_front()
-            .map(Report::from)
-            .unwrap_or(eyre!("No path to scan!"));
+        let first_error = if failed_scans.is_empty() {
+            eyre!("No path to scan!")
+        } else {
+            Report::from(failed_scans.swap_remove(0))
+        };
         return Err(first_error);
     }
 
@@ -190,29 +190,30 @@ fn watch<T: AsRef<Path>>(
     // Each glob path can make `scan_path` fail. But we won't make the whole function failed just
     // because one `scan_path` fails. We collect the successful ones and failed ones.
     // We will make this function fail if no `scan_path` is successful.
-    let mut failed_scans = VecDeque::new();
+    let mut failed_scans = vec![];
     let mut successful_scans = vec![];
 
     // Initial generation
     if let Some(glob_path) = extra_input {
         match scan_path(glob_path, &mut buffer) {
             Ok(s) => successful_scans.push(s),
-            Err(e) => failed_scans.push_back(e),
+            Err(e) => failed_scans.push(e),
         }
     }
 
     let success_iter = input
         .iter()
         .map(|glob_path| scan_path(glob_path, &mut buffer))
-        .filter_map(|s| s.map_err(|e| failed_scans.push_back(e)).ok());
+        .filter_map(|s| s.map_err(|e| failed_scans.push(e)).ok());
     successful_scans.extend(success_iter);
 
     // If no scan succeeds, we use the first scan's error as the function's error and return early.
     if successful_scans.is_empty() {
-        let first_error = failed_scans
-            .pop_front()
-            .map(Report::from)
-            .unwrap_or(eyre!("No path to scan!"));
+        let first_error = if failed_scans.is_empty() {
+            eyre!("No path to scan!")
+        } else {
+            Report::from(failed_scans.swap_remove(0))
+        };
         return Err(first_error);
     }
 
@@ -318,7 +319,7 @@ fn watch<T: AsRef<Path>>(
                         let config = match Config::from_file(config_file) {
                             Ok(config) => config,
                             Err(e) => {
-                                eprintln!("{e}");
+                                eprintln!("Warning: {e}");
                                 Config::default()
                             }
                         };
@@ -339,19 +340,19 @@ fn watch<T: AsRef<Path>>(
                     if let Some(glob_path) = extra_input {
                         match scan_path(glob_path, &mut buffer) {
                             Ok(s) => successful_scans.push(s),
-                            Err(e) => failed_scans.push_back(e),
+                            Err(e) => failed_scans.push(e),
                         }
                     }
                     let success_iter = input
                         .iter()
                         .map(|glob_path| scan_path(glob_path, &mut buffer))
-                        .filter_map(|s| s.map_err(|e| failed_scans.push_back(e)).ok());
+                        .filter_map(|s| s.map_err(|e| failed_scans.push(e)).ok());
                     successful_scans.extend(success_iter);
 
                     // If no scan is successful, continue loop.
                     if successful_scans.is_empty() {
-                        if let Some(e) = failed_scans.pop_front() {
-                            eprintln!("Warning: {e}")
+                        if let Some(e) = failed_scans.first() {
+                            eprintln!("Warning: {e}");
                         }
                         continue;
                     }
