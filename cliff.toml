@@ -17,7 +17,7 @@ body = """
 {% for group, commits in commits | group_by(attribute="group") %}
     ### {{ group | upper_first }}
     {% for commit in commits %}
-        - {% if commit.breaking %}[**breaking**] {% endif %}{{ commit.message | upper_first }}\
+        - {% if commit.breaking %}[**breaking**] {% endif %}{{ commit.message | split(pat="\n") | first | trim_end | upper_first }}\
     {% endfor %}
 {% endfor %}\n
 """
@@ -32,7 +32,7 @@ footer = """
 # parse the commits based on https://www.conventionalcommits.org
 conventional_commits = true
 # filter out the commits that are not conventional
-filter_unconventional = true
+filter_unconventional = false
 # process each line of a commit as an individual commit
 split_commits = false
 # regex for preprocessing the commit messages
@@ -46,9 +46,16 @@ commit_parsers = [
     { message = "^refactor", group = "Refactor"},
     { message = "^style", group = "Styling"},
     { message = "^test", group = "Testing"},
+    { message = "^ci", group = "CI"},
+    { message = "^build", group = "Build"},
+    { message = "^revert", group = "Revert"},
+
     { message = "^chore: release", skip = true},
+    { message = "^Merge", skip = true},
+
     { message = "^chore", group = "Miscellaneous Tasks"},
     { body = ".*security", group = "Security"},
+    { message = ".*", group = "Others" },
 ]
 # filter out the commits that are not matched by commit parsers
 filter_commits = false
