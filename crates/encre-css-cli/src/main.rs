@@ -28,17 +28,18 @@
     clippy::indexing_slicing
 )]
 
-use clap::{Parser, Subcommand};
-use color_eyre::Report;
 use std::{env, path::PathBuf};
 
+use clap::{Parser, Subcommand};
+use color_eyre::Report;
+
 mod build;
-mod utils;
 mod playground;
+mod utils;
 
 use build::build;
-use utils::generate_config;
 use playground::launch;
+use utils::generate_config;
 
 pub const DEFAULT_CONFIG_FILE: &str = "encre.toml";
 

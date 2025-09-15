@@ -1,5 +1,6 @@
 use crate::DEFAULT_CONFIG_FILE;
 
+use color_eyre::eyre::{eyre, Report};
 use encre_css::{
     error::{Error, Result},
     generate, Config as EncreConfig,
@@ -8,13 +9,14 @@ use notify::{event::ModifyKind, EventKind, RecursiveMode, Watcher};
 use serde::Deserialize;
 use std::{
     env, fs,
-    io::{BufReader, Read, Seek, SeekFrom},
-    iter,
+    io::Read,
     path::{Path, PathBuf},
     result,
     sync::{mpsc::channel, Arc},
 };
 use wax::Glob;
+
+use super::utils::has_file_match;
 
 #[derive(Default, PartialEq, Debug, Deserialize)]
 struct Config {
@@ -34,12 +36,14 @@ impl Config {
     }
 }
 
-fn result_equal<T: PartialEq, E>(res1: result::Result<T, E>, res2: result::Result<T, E>) -> bool {
-    if let (Ok(res1), Ok(res2)) = (res1, res2) {
-        res1 == res2
-    } else {
-        false
-    }
+#[derive(thiserror::Error, Debug)]
+pub(crate) enum ScanError {
+    #[error(transparent)]
+    Glob(#[from] wax::BuildError),
+    #[error(transparent)]
+    Io(#[from] std::io::Error),
+    #[error(transparent)]
+    IntConversion(#[from] std::num::TryFromIntError),
 }
 
 fn gen_css<'a, T: AsRef<Path>>(
@@ -63,81 +67,42 @@ fn gen_css<'a, T: AsRef<Path>>(
     Ok(())
 }
 
-fn scan_path<T: AsRef<Path>>(glob_path: T, buffer: &mut String) {
-    let (prefix, glob) = match Glob::new(
-        glob_path
-            .as_ref()
-            .to_str()
-            .expect("failed to convert the glob to a string"),
-    ) {
-        Ok(g) => g.partition(),
-        Err(e) => panic!("{}", e),
-    };
-
+fn scan_path<T: AsRef<Path>>(glob_path: T, buffer: &mut String) -> result::Result<(), ScanError> {
+    let glob_string = glob_path.as_ref().to_string_lossy();
+    let (prefix, glob) = Glob::new(glob_string.as_ref())?.partition();
     if prefix == glob_path.as_ref() && prefix.is_file() {
-        match fs::File::open(&glob_path) {
-            Ok(mut file) => {
-                let file_len = file
-                    .seek(SeekFrom::End(0))
-                    .expect("failed to seek to the end of the file");
-                file.rewind()
-                    .expect("failed to seek to the start of the file");
-
-                #[allow(clippy::cast_possible_truncation)]
-                buffer.reserve(file_len as usize);
-
-                if let Err(e) = file.read_to_string(buffer) {
-                    eprintln!(
-                        "Failed to read the file {}: {}",
-                        glob_path.as_ref().display(),
-                        e
-                    );
-                }
-            }
-            Err(e) => eprintln!(
-                "Failed to open the file {}: {}",
-                glob_path.as_ref().display(),
-                e
-            ),
-        }
+        let file_len: usize = prefix.metadata()?.len().try_into().inspect_err(|_e| {
+            eprintln!(
+                "Warning: File {} is too big. Skip!",
+                prefix.to_string_lossy()
+            );
+        })?;
+        let mut file = fs::File::open(&glob_path)?;
+        buffer.reserve(file_len);
+        file.read_to_string(buffer)?;
+        Ok(())
     } else {
-        glob.walk(prefix).for_each(|entry| {
-            if let Ok(entry) = entry {
+        glob.walk(prefix)
+            .filter_map(|entry| -> Option<usize> {
+                let entry = entry.ok()?;
                 let path = entry.path();
-
-                if path.is_file() {
-                    match fs::File::open(path) {
-                        Ok(file) => {
-                            let mut reader = BufReader::new(file);
-                            let file_len = reader
-                                .seek(SeekFrom::End(0))
-                                .expect("failed to seek to the end of the file");
-                            reader
-                                .rewind()
-                                .expect("failed to seek to the start of the file");
-
-                            #[allow(clippy::cast_possible_truncation)]
-                            buffer.reserve(file_len as usize);
-
-                            if let Err(e) = reader.read_to_string(buffer) {
-                                eprintln!(
-                                    "Failed to read the file {}: {}",
-                                    glob_path.as_ref().display(),
-                                    e
-                                );
-                            }
-                        }
-                        Err(e) => {
-                            eprintln!(
-                                "Failed to open the file {}: {}",
-                                glob_path.as_ref().display(),
-                                e
-                            );
-                        }
-                    }
-                }
-            }
-        });
+                // Return early if `path` is not a file.
+                path.is_file().then_some(())?;
+                let file_len: usize = path
+                    .metadata()
+                    .ok()?
+                    .len()
+                    .try_into()
+                    .inspect_err(|_e| {
+                        eprintln!("Warning: File {} is too big. Skip!", path.to_string_lossy());
+                    })
+                    .ok()?;
+                let mut file = fs::File::open(path).ok()?;
+                buffer.reserve(file_len);
+                file.read_to_string(buffer).ok()
+            })
+            .sum::<usize>();
+        Ok(())
     }
 }
 
@@ -146,23 +111,44 @@ fn build_single<T: AsRef<Path>>(
     extra_input: Option<T>,
     output: Option<String>,
 ) -> color_eyre::Result<()> {
-    let config = match Config::from_file(config_file) {
-        Ok(config) => config,
-        Err(e) => {
-            eprintln!("{e}");
-            Config::default()
-        }
-    };
+    let config = Config::from_file(config_file)
+        .inspect_err(|e| eprintln!("Warning: {e}"))
+        .unwrap_or_default();
 
     let mut buffer = String::new();
+    // We have a list of glob paths. We will iterate over them, calling `scan_path` on each.
+    // Each glob path can make `scan_path` fail. But we won't make the whole function failed just
+    // because one `scan_path` fails. We collect the successful ones and failed ones.
+    // We will make this function fail if no `scan_path` is successful.
+    let mut failed_scans = vec![];
+    let mut successful_scans = vec![];
 
     if let Some(glob_path) = extra_input {
-        scan_path(glob_path, &mut buffer);
+        match scan_path(glob_path, &mut buffer) {
+            Ok(s) => successful_scans.push(s),
+            Err(e) => failed_scans.push(e),
+        }
     }
 
-    config.input.iter().for_each(|glob_path| {
-        scan_path(glob_path, &mut buffer);
-    });
+    let success_iter = config
+        .input
+        .iter()
+        .map(|glob_path| {
+            eprintln!("Scan {}...", glob_path.to_string_lossy());
+            scan_path(glob_path, &mut buffer)
+        })
+        .filter_map(|s| s.map_err(|e| failed_scans.push(e)).ok());
+    successful_scans.extend(success_iter);
+
+    // If no scan succeeds, we use the first scan's error as the function's error and return early.
+    if successful_scans.is_empty() {
+        let first_error = if failed_scans.is_empty() {
+            eyre!("No path to scan!")
+        } else {
+            Report::from(failed_scans.swap_remove(0))
+        };
+        return Err(first_error);
+    }
 
     gen_css([buffer.as_str()], &config.encre_config, output)
 }
@@ -178,93 +164,62 @@ fn watch<T: AsRef<Path>>(
     let mut watcher = notify::recommended_watcher(tx)?;
 
     let (mut input, mut config) = {
-        let config = match Config::from_file(config_file) {
-            Ok(config) => config,
-            Err(e) => {
-                eprintln!("{e}");
-                Config::default()
-            }
-        };
+        let config = Config::from_file(config_file).unwrap_or_else(|e| {
+            eprintln!("Warning: Failed to load config from file. {e}");
+            Config::default()
+        });
 
         (Arc::new(config.input), config.encre_config)
     };
 
+    let watched_dir = match extra_input.and_then(|i| i.as_ref().parent()) {
+        Some(p) => p.to_path_buf(),
+        None => env::current_dir()?,
+    };
     // Due to https://github.com/notify-rs/notify/issues/247, the whole current directory is
     // watched
-    watcher.watch(
-        &extra_input
-            .as_ref()
-            .and_then(|i| i.as_ref().parent().map(PathBuf::from))
-            .unwrap_or_else(|| env::current_dir().expect("failed to access the current directory")),
-        RecursiveMode::Recursive,
-    )?;
+    watcher.watch(&watched_dir, RecursiveMode::Recursive)?;
 
     let mut buffer = String::new();
 
-    {
-        // Initial generation
-        if let Some(ref glob_path) = extra_input.as_ref() {
-            scan_path(glob_path, &mut buffer);
+    // We have a list of glob paths. We will iterate over them, calling `scan_path` on each.
+    // Each glob path can make `scan_path` fail. But we won't make the whole function failed just
+    // because one `scan_path` fails. We collect the successful ones and failed ones.
+    // We will make this function fail if no `scan_path` is successful.
+    let mut failed_scans = vec![];
+    let mut successful_scans = vec![];
+
+    // Initial generation
+    if let Some(glob_path) = extra_input {
+        match scan_path(glob_path, &mut buffer) {
+            Ok(s) => successful_scans.push(s),
+            Err(e) => failed_scans.push(e),
         }
-
-        input.iter().for_each(|glob_path| {
-            scan_path(glob_path, &mut buffer);
-        });
-
-        gen_css([buffer.as_str()], &config, output.as_ref())?;
     }
 
-    println!("`encre-css` successfully launched in watch mode");
+    let success_iter = input
+        .iter()
+        .map(|glob_path| scan_path(glob_path, &mut buffer))
+        .filter_map(|s| s.map_err(|e| failed_scans.push(e)).ok());
+    successful_scans.extend(success_iter);
+
+    // If no scan succeeds, we use the first scan's error as the function's error and return early.
+    if successful_scans.is_empty() {
+        let first_error = if failed_scans.is_empty() {
+            eyre!("No path to scan!")
+        } else {
+            Report::from(failed_scans.swap_remove(0))
+        };
+        return Err(first_error);
+    }
+
+    gen_css([buffer.as_str()], &config, output.as_ref())?;
+
+    eprintln!("`encre-css` successfully launched in watch mode");
 
     loop {
         match rx.recv() {
             Ok(Ok(event)) => {
-                let mut need_reloading = false;
-
-                let mut files = input.iter().flat_map(|glob_path| {
-                    let (prefix, glob) = match Glob::new(
-                        glob_path
-                            .to_str()
-                            .expect("failed to convert the glob to a string"),
-                    ) {
-                        Ok(g) => g.partition(),
-                        Err(e) => panic!("{}", e),
-                    };
-
-                    if &prefix == glob_path {
-                        iter::once(glob_path.clone()).collect::<Vec<PathBuf>>()
-                    } else {
-                        glob.walk(prefix)
-                            .map(|e| e.unwrap().into_path())
-                            .collect::<Vec<PathBuf>>()
-                    }
-                });
-
-                let extra_input_files = if let Some(ref extra_input) = extra_input.as_ref() {
-                    let (prefix, glob) = Glob::new(
-                        extra_input
-                            .as_ref()
-                            .to_str()
-                            .expect("failed to convert the glob to a string"),
-                    )?
-                    .partition();
-
-                    if prefix == extra_input.as_ref() {
-                        Some(
-                            iter::once(extra_input.as_ref().to_path_buf())
-                                .collect::<Vec<PathBuf>>(),
-                        )
-                    } else {
-                        Some(
-                            glob.walk(prefix)
-                                .map(|e| e.unwrap().into_path())
-                                .collect::<Vec<PathBuf>>(),
-                        )
-                    }
-                } else {
-                    None
-                };
-
                 if matches!(
                     event.kind,
                     EventKind::Access(..) | EventKind::Modify(ModifyKind::Metadata(..))
@@ -272,34 +227,95 @@ fn watch<T: AsRef<Path>>(
                     continue;
                 }
 
-                // Check that the changed file is watched
-                if files.any(|file_path| {
-                    event.paths.iter().any(|event_path| {
-                        result_equal(file_path.canonicalize(), event_path.canonicalize())
+                let mut need_reloading = false;
+
+                let files = input
+                    .iter()
+                    .filter_map(|path| {
+                        let glob_string = path.as_path().to_str()?;
+                        Glob::new(glob_string)
+                            .inspect_err(|e| eprintln!("Warning: {e}"))
+                            .map(|g| {
+                                let (prefix, g) = g.partition();
+                                (prefix, g, path)
+                            })
+                            .ok()
                     })
-                }) || (extra_input_files.is_some()
-                    && extra_input_files.unwrap().iter().any(|file_path| {
-                        event.paths.iter().any(|event_path| {
-                            result_equal(file_path.canonicalize(), event_path.canonicalize())
-                        })
-                    }))
+                    .flat_map(|(prefix, glob, glob_path)| {
+                        if prefix == *glob_path {
+                            vec![prefix]
+                        } else {
+                            glob.walk(prefix)
+                                .filter_map(|wr| wr.map(wax::WalkEntry::into_path).ok())
+                                .collect::<Vec<_>>()
+                        }
+                    });
+
+                let extra_input_files = if let Some(extra_input) = extra_input {
+                    let (prefix, glob) = extra_input
+                        .as_ref()
+                        .to_str()
+                        .map(Glob::new)
+                        .transpose()?
+                        .map(Glob::partition)
+                        .ok_or(eyre!("Non UTF-8 path!"))?;
+
+                    if prefix == *extra_input.as_ref() {
+                        Some(vec![prefix])
+                    } else {
+                        Some(
+                            glob.walk(prefix)
+                                .filter_map(|wr| wr.map(wax::WalkEntry::into_path).ok())
+                                .collect::<Vec<_>>(),
+                        )
+                    }
+                } else {
+                    None
+                };
+
+                let canonical_reported_pathbufs = event
+                    .paths
+                    .iter()
+                    .filter_map(|p| p.canonicalize().ok())
+                    .collect::<Vec<_>>();
+                let canonial_reported_paths: Vec<_> = canonical_reported_pathbufs
+                    .iter()
+                    .map(PathBuf::as_path)
+                    .collect();
+
+                let canonical_file_pathbufs: Vec<_> =
+                    files.filter_map(|pb| pb.canonicalize().ok()).collect();
+                let canonical_file_paths = canonical_file_pathbufs.iter().map(PathBuf::as_path);
+
+                let canonical_extra_file_pathbufs = extra_input_files
+                    .as_deref()
+                    .map(|v| {
+                        v.iter()
+                            .filter_map(|p| p.canonicalize().ok())
+                            .collect::<Vec<_>>()
+                    })
+                    .unwrap_or_default();
+                let canonical_extra_file_paths =
+                    canonical_extra_file_pathbufs.iter().map(PathBuf::as_path);
+
+                // Check that the changed file is watched
+                if has_file_match(canonical_file_paths, &canonial_reported_paths.iter())
+                    || has_file_match(canonical_extra_file_paths, &canonial_reported_paths.iter())
                 {
-                    println!("Changes detected. Reloading\u{2026}");
+                    eprintln!("Changes detected. Reloading\u{2026}");
                     need_reloading = true;
-                } else if event.paths.iter().any(|event_path| {
-                    result_equal(
-                        event_path.canonicalize(),
-                        PathBuf::from(DEFAULT_CONFIG_FILE).canonicalize(),
-                    )
-                }) {
+                } else if PathBuf::from(DEFAULT_CONFIG_FILE)
+                    .canonicalize()
+                    .is_ok_and(|f| canonial_reported_paths.iter().any(|p| *p == f))
+                {
                     // Handle configuration changes
-                    println!("Configuration file changed. Reloading\u{2026}");
+                    eprintln!("Configuration file changed. Reloading\u{2026}");
 
                     let (new_input, new_config) = {
                         let config = match Config::from_file(config_file) {
                             Ok(config) => config,
                             Err(e) => {
-                                eprintln!("{e}");
+                                eprintln!("Warning: {e}");
                                 Config::default()
                             }
                         };
@@ -314,20 +330,44 @@ fn watch<T: AsRef<Path>>(
 
                 if need_reloading {
                     buffer.clear();
+                    successful_scans.clear();
+                    failed_scans.clear();
 
-                    if let Some(ref glob_path) = extra_input.as_ref() {
-                        scan_path(glob_path, &mut buffer);
+                    if let Some(glob_path) = extra_input {
+                        match scan_path(glob_path, &mut buffer) {
+                            Ok(s) => successful_scans.push(s),
+                            Err(e) => failed_scans.push(e),
+                        }
+                    }
+                    let success_iter = input
+                        .iter()
+                        .map(|glob_path| scan_path(glob_path, &mut buffer))
+                        .filter_map(|s| s.map_err(|e| failed_scans.push(e)).ok());
+                    successful_scans.extend(success_iter);
+
+                    // If no scan is successful, continue loop.
+                    if successful_scans.is_empty() {
+                        if let Some(e) = failed_scans.first() {
+                            eprintln!("Warning: {e}");
+                        }
+                        continue;
                     }
 
-                    input.iter().for_each(|glob_path| {
-                        scan_path(glob_path, &mut buffer);
-                    });
-
-                    gen_css([buffer.as_str()], &config, output.as_ref())?;
+                    if let Err(e) = gen_css([buffer.as_str()], &config, output.as_ref()) {
+                        eprintln!("Warning: {e}");
+                    }
                 }
             }
-            Ok(Err(e)) => eprintln!("Watch error: {e}"),
-            Err(e) => eprintln!("MPSC channel error: {e}"),
+            Ok(Err(e)) => {
+                eprintln!("Watch error: {e}");
+                break Err(Report::from(e));
+            }
+            Err(e) => {
+                eprintln!("MPSC channel error: {e}");
+                // The other side of channel is already closed.
+                // It does not make sense to keep running.
+                break Err(Report::from(e));
+            }
         }
     }
 }
