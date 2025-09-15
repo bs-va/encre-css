@@ -67,10 +67,7 @@ fn gen_css<'a, T: AsRef<Path>>(
     Ok(())
 }
 
-fn scan_path<T: AsRef<Path>>(
-    glob_path: T,
-    buffer: &mut String,
-) -> result::Result<usize, ScanError> {
+fn scan_path<T: AsRef<Path>>(glob_path: T, buffer: &mut String) -> result::Result<(), ScanError> {
     let glob_string = glob_path.as_ref().to_string_lossy();
     let (prefix, glob) = Glob::new(glob_string.as_ref())?.partition();
     if prefix == glob_path.as_ref() && prefix.is_file() {
@@ -82,11 +79,10 @@ fn scan_path<T: AsRef<Path>>(
         })?;
         let mut file = fs::File::open(&glob_path)?;
         buffer.reserve(file_len);
-        let read = file.read_to_string(buffer)?;
-        Ok(read)
+        file.read_to_string(buffer)?;
+        Ok(())
     } else {
-        let how_much_read: usize = glob
-            .walk(prefix)
+        glob.walk(prefix)
             .filter_map(|entry| -> Option<usize> {
                 let entry = entry.ok()?;
                 let path = entry.path();
@@ -105,8 +101,8 @@ fn scan_path<T: AsRef<Path>>(
                 buffer.reserve(file_len);
                 file.read_to_string(buffer).ok()
             })
-            .sum();
-        Ok(how_much_read)
+            .sum::<usize>();
+        Ok(())
     }
 }
 
