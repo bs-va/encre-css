@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.18.1] - 2025-09-15
+
+### Miscellaneous Tasks
+
+- Update changelog generation
+
+### Others
+
+- Fix inconsistency in docs
+- Fix per clippy recommendation
+- Define workspace dependencies
+- Avoid unwrap in encre-css crate
+- Properly handle error, without panic
+- Don't use VecDeque
+- No need to return number of bytes read
+
 ## [0.18.0] - 2025-09-07
 
 ### Bug Fixes
@@ -13,10 +29,15 @@ All notable changes to this project will be documented in this file.
 
 - State that `DakrMode::Media` is the default value
 - Document how to write TOML corresponding to all config fields
+- Add syntax highlighting to all TOML documentation snippets
 
 ### Miscellaneous Tasks
 
 - Update crates
+
+### Others
+
+- Add command to generate default config.
 
 ### Refactor
 
@@ -135,6 +156,10 @@ All notable changes to this project will be documented in this file.
 
 - Publish encre-css v0.15.0, encre-css-cli v0.15.0, encre-css-typography v0.1.5 and encre-css-icons v0.2.0
 
+### Others
+
+- Update variants
+
 ## [0.14.1] - 2024-09-01
 
 ### Bug Fixes
@@ -179,6 +204,10 @@ All notable changes to this project will be documented in this file.
 
 - Prevent cycles during shortcut expansion by defining a maximum expansion depth
 
+### CI
+
+- Fix failing test due to source change in an Iconify icon
+
 ### Documentation
 
 - Update crate documentation
@@ -195,10 +224,6 @@ All notable changes to this project will be documented in this file.
 
 - Update copyright year
 
-### Ci
-
-- Fix failing test due to source change in an Iconify icon
-
 ## [0.12.0] - 2024-04-11
 
 ### Documentation
@@ -209,12 +234,20 @@ All notable changes to this project will be documented in this file.
 
 - Add support for nested shortcuts
 
+### Others
+
+- Add ARIA states
+
 ## [0.11.0] - 2023-12-26
 
 ### Bug Fixes
 
 - Support WebAssembly
 - Use `ureq` instead of `reqwest`
+
+### Build
+
+- Update all crates
 
 ### Documentation
 
@@ -233,15 +266,16 @@ All notable changes to this project will be documented in this file.
 - Add `resolver = "2"` to appease Cargo
 - Fix `encre-css-icons` pipeline
 
-### Build
-
-- Update all crates
-
 ## [0.10.1] - 2023-07-01
 
 ### Bug Fixes
 
 - Remove dashed requirement for arbitrary values because it breaks arbitrary variants
+
+### CI
+
+- Use Rust stable
+- Use musl target for grcov because of a glibc version conflict
 
 ### Documentation
 
@@ -251,16 +285,15 @@ All notable changes to this project will be documented in this file.
 
 - Prepare `encre-css-icons` and `encre-css-typography` to be published on crates.io
 
-### Ci
-
-- Use Rust stable
-- Use musl target for grcov because of a glibc version conflict
-
 ## [0.10.0] - 2023-04-18
 
 ### Bug Fixes
 
 - Arbitrary css property containing spaces
+
+### Build
+
+- Update dependencies
 
 ### Documentation
 
@@ -274,16 +307,16 @@ All notable changes to this project will be documented in this file.
 
 - Run rustfmt
 
-### Build
-
-- Update dependencies
-
 ## [0.9.0] - 2023-02-24
 
 ### Bug Fixes
 
 - `ring` plugin
 - Try to read only files
+
+### CI
+
+- Add grcov-based test coverage
 
 ### Features
 
@@ -294,10 +327,6 @@ All notable changes to this project will be documented in this file.
 - Improve performance of class name generation, use `phf` to generate hashed structures of colors and variants
 - Reserve Vec with capacity when parsing variants
 - Optimize scanning
-
-### Ci
-
-- Add grcov-based test coverage
 
 ## [0.8.1] - 2023-02-21
 
@@ -449,13 +478,13 @@ All notable changes to this project will be documented in this file.
 
 - [**breaking**] Return a `Vec` instead of a `BTreeSet` in the closure passed to a `Scanner`
 
-### Testing
-
-- Fix tests
-
 ### Revert
 
 - "refactor!: return a `Vec` instead of a `BTreeSet` in the closure passed to a `Scanner`"
+
+### Testing
+
+- Fix tests
 
 ## [0.5.0] - 2022-07-13
 
@@ -510,6 +539,10 @@ All notable changes to this project will be documented in this file.
 - Show real duration of commands
 - Fix badly generated font families due to spaces
 
+### CI
+
+- Cache the cargo directory
+
 ### Documentation
 
 - Update the readme and add a logo
@@ -529,10 +562,6 @@ All notable changes to this project will be documented in this file.
 ### Styling
 
 - Run `cargo fmt`
-
-### Ci
-
-- Cache the cargo directory
 
 ## [0.2.0] - 2022-06-15
 
@@ -556,6 +585,13 @@ All notable changes to this project will be documented in this file.
 - Remove some `.to_string()` + fix bad indentation
 - Fix Clippy warnings
 - Bump wax to `0.5.0` + fix extra newlines in `space-x` and `space-y`
+
+### CI
+
+- Add Gitlab CI configuration file
+- Cache cargo build artifacts
+- Fix Gitlab CI configuration file
+- Print rustc and cargo version
 
 ### Documentation
 
@@ -637,12 +673,5 @@ All notable changes to this project will be documented in this file.
 - Add tests for all value matchers
 - Add a test for arbitrary values (+ fix background urls)
 - Fix failing tests due to different sorting
-
-### Ci
-
-- Add Gitlab CI configuration file
-- Cache cargo build artifacts
-- Fix Gitlab CI configuration file
-- Print rustc and cargo version
 
 <!-- generated by git-cliff -->
