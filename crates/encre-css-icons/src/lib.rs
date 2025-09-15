@@ -123,8 +123,11 @@ use encre_css::{
     Config,
 };
 
-#[cfg(feature = "fs-cache")]
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(
+    feature = "fs-cache",
+    not(feature = "embed-icons"),
+    not(target_arch = "wasm32")
+))]
 use directories::BaseDirs;
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -134,8 +137,11 @@ use once_cell::sync::Lazy;
 use std::sync::OnceLock;
 use std::{collections::BTreeMap, sync::Mutex};
 
-#[cfg(feature = "fs-cache")]
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(
+    feature = "fs-cache",
+    not(feature = "embed-icons"),
+    not(target_arch = "wasm32")
+))]
 use std::{
     env,
     fs::{self, File},
@@ -283,8 +289,11 @@ const COLLECTIONS: &[&str] = &[
 #[cfg(not(any(target_arch = "wasm32", feature = "embed-icons")))]
 const DEFAULT_CDN: &str = "https://esm.sh";
 
-#[cfg(feature = "fs-cache")]
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(
+    feature = "fs-cache",
+    not(feature = "embed-icons"),
+    not(target_arch = "wasm32")
+))]
 const CACHE_SUB_DIR_NAME: &str = "encre-css-icons-cache";
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -462,7 +471,7 @@ fn fetch_or_cache_collection(config: &Config, collection: &'static str) {
         Some(dirs) => PathBuf::from(dirs.cache_dir()),
         None => {
             // If the home directory is not set, use the current directory
-            env::current_dir().expect("failed to get the current directory")
+            env::current_dir().unwrap_or(std::path::PathBuf::from("."))
         }
     };
 
@@ -475,13 +484,13 @@ fn fetch_or_cache_collection(config: &Config, collection: &'static str) {
     #[cfg(feature = "fs-cache")]
     if collection_file.exists() {
         // File already in cache, use it
-        let file = File::open(&collection_file).expect("failed to open the collection file");
-        let reader = BufReader::new(file);
-        MEM_CACHE.lock().unwrap().insert(
-            collection,
-            serde_json::from_reader(reader)
-                .expect("failed to deserialize the response body as JSON"),
-        );
+        if let Some(content) = File::open(&collection_file)
+            .ok()
+            .map(|f| BufReader::new(f))
+            .and_then(|reader| serde_json::from_reader(reader).ok())
+        {
+            MEM_CACHE.lock().unwrap().insert(collection, content);
+        }
         return;
     }
 
@@ -508,25 +517,45 @@ fn fetch_or_cache_collection(config: &Config, collection: &'static str) {
 
     let url = format!("{custom_cdn}/@iconify-json/{collection}/icons.json");
 
-    let content = ureq::get(&url)
-        .call()
-        .unwrap_or_else(|_| panic!("failed to get the response from `{url}`"))
-        .body_mut()
-        .read_to_string()
-        .expect("failed to deserialize the response body as JSON");
+    let mut res = match ureq::get(&url).call() {
+        Ok(r) => r,
+        Err(e) => {
+            eprintln!("encre_css_icons: failed to download the icon pack: {e}");
+            return;
+        }
+    };
+
+    let content = match res.body_mut().read_to_string() {
+        Ok(r) => r,
+        Err(e) => {
+            eprintln!("encre_css_icons: failed to read the content of the icon pack: {e}");
+            return;
+        }
+    };
+
+    let json = match serde_json::from_str(&content) {
+        Ok(r) => r,
+        Err(e) => {
+            eprintln!(
+                "encre_css_icons: failed to deserialize the content of the icon pack to JSON: {e}"
+            );
+            return;
+        }
+    };
 
     #[cfg(feature = "fs-cache")]
     {
         // Write the cached file to the disk
-        fs::create_dir_all(collection_file.with_file_name(""))
-            .expect("failed to create cache directory");
-        fs::write(collection_file, &content).expect("failed to write the collection file");
+        if let Err(e) = fs::create_dir_all(collection_file.with_file_name("")) {
+            eprintln!("encre_css_icons: failed to write the cached file to the disk: {e}");
+        }
+
+        if let Err(e) = fs::write(collection_file, &content) {
+            eprintln!("encre_css_icons: failed to write the cached file to the disk: {e}");
+        }
     }
 
-    MEM_CACHE.lock().unwrap().insert(
-        collection,
-        serde_json::from_str(&content).expect("failed to deserialize the response body as JSON"),
-    );
+    MEM_CACHE.lock().unwrap().insert(collection, json);
 }
 
 #[derive(Debug)]
@@ -540,6 +569,7 @@ impl Plugin for Icons {
     fn handle(&self, context: &mut ContextHandle) {
         match context.modifier {
             Modifier::Builtin { value, .. } => {
+                // Unwrapping won't panic because it's asserted by the `can_handle` method
                 let (collection, rest) = COLLECTIONS
                     .iter()
                     .find_map(|c| value.strip_prefix(c).map(|r| (c, r)))
@@ -566,16 +596,13 @@ impl Plugin for Icons {
                 ]);
 
                 #[cfg(feature = "embed-icons")]
-                if let Some(content) = EMBEDDED_ICONS
+                if let Some(json) = EMBEDDED_ICONS
                     .get()
                     .and_then(|i| i.get_file(format!("{collection}.json")))
                     .and_then(|f| f.contents_utf8())
+                    .and_then(|c| serde_json::from_str(&c).ok())
                 {
-                    MEM_CACHE.lock().unwrap().insert(
-                        collection,
-                        serde_json::from_str(&content)
-                            .expect("failed to deserialize the icon collection file as JSON"),
-                    );
+                    MEM_CACHE.lock().unwrap().insert(collection, json);
                 }
 
                 #[cfg(not(target_arch = "wasm32"))]
@@ -610,7 +637,7 @@ impl Plugin for Icons {
                         ]);
                     }
                 } else {
-                    println!("encre_css_icons: Warning: the collection `{collection}` is not loaded but referenced. It can happen if you embed icons in the binary and forgot to add the JSON file containing the icons in the directory you specified");
+                    eprintln!("encre_css_icons: Warning: the collection `{collection}` is not loaded but referenced. It can happen if you embed icons in the binary and forgot to add the JSON file containing the icons in the directory you specified");
                 }
             }
             Modifier::Arbitrary { .. } => unreachable!(),
@@ -626,7 +653,7 @@ pub fn register(config: &mut Config) {
                 if let Some(prefix) = prefix_value.as_str() {
                     Cow::Owned(prefix.trim_end_matches('-').to_string())
                 } else {
-                    println!("Bad type for the `prefix` extra field (in the `icons` field): expected `String`, found `{}`. Using the default prefix instead.", prefix_value.type_str());
+                    eprintln!("encre_css_icons: Bad type for the `prefix` extra field (in the `icons` field): expected `String`, found `{}`. Using the default prefix instead.", prefix_value.type_str());
                     Cow::Borrowed("")
                 }
             } else {
@@ -665,7 +692,8 @@ pub fn register(config: &mut Config, embedded_dir: include_dir::Dir<'static>) {
         Cow::Borrowed("")
     };
 
-    EMBEDDED_ICONS.set(embedded_dir).unwrap();
+    // When EMBEDDED_ICONS is already set, just do nothing
+    let _ = EMBEDDED_ICONS.set(embedded_dir);
     config.register_plugin(prefix, &Icons);
 }
 
