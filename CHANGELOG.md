@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.18.2] - 2025-09-20
+
+### Bug Fixes
+
+- Avoid panicking
+- Split by backslash when scanning to support classes inside transformed Vue components
+
+### CI
+
+- Fix the ci errors about lcov once and for all
+
+### Miscellaneous Tasks
+
+- Update copyright year
+
 ## [0.18.1] - 2025-09-15
 
 ### Miscellaneous Tasks
