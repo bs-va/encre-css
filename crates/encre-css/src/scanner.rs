@@ -72,9 +72,6 @@ impl Default for Scanner {
                 let mut is_arbitrary = false;
 
                 val.split(|ch| {
-                    // Escape all characters in arbitrary values prefixed by a dash (used to avoid
-                    // ignoring values in, for example, JS arrays, given that they are defined
-                    // using square brackets)
                     match ch {
                         '[' => {
                             is_arbitrary = true;
