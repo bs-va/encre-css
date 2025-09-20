@@ -87,7 +87,11 @@ impl Default for Scanner {
                         _ => {
                             ch == ' '
                                 || (!is_arbitrary
-                                    && (ch == '\'' || ch == '"' || ch == '`' || ch == '\n'))
+                                    && (ch == '\''
+                                        || ch == '"'
+                                        || ch == '`'
+                                        || ch == '\n'
+                                        || ch == '\\'))
                         }
                     }
                 })
@@ -164,12 +168,7 @@ mod tests {
     fn scan_with_arbitrary_variant() {
         assert_eq!(
             Scanner::default().scan(r#"<div class="[input[type='text']]:block"></div>"#),
-            BTreeSet::from([
-                "<div",
-                "></div>",
-                "class=",
-                "[input[type='text']]:block",
-            ])
+            BTreeSet::from(["<div", "></div>", "class=", "[input[type='text']]:block",])
         );
     }
 }
