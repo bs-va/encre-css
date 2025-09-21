@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.19.0] - 2025-09-21
+
+### Bug Fixes
+
+- [**breaking**] Define a new set of escape codes in arbitrary values and remove the use of backslash to escape characters
+
 ## [0.18.2] - 2025-09-20
 
 ### Bug Fixes
