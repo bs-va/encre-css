@@ -42,16 +42,23 @@ mod tests {
 }"
         );
         assert_eq!(
-            generate(["before:content-['1234_some_words']"], &base_config()),
-            r".before\:content-\[\'1234_some_words\'\]::before {
+            generate(["before:content-[&#39;1234_some_words&#39;]"], &base_config()),
+            r".before\:content-\[\&\#39\;1234_some_words\&\#39\;\]::before {
   --en-content: '1234 some words';
   content: var(--en-content);
 }"
         );
         assert_eq!(
-            generate(["before:content-[':-><-:']"], &base_config()),
-            r".before\:content-\[\'\:-\>\<-\:\'\]::before {
+            generate(["before:content-[&#39;:-><-:&#39;]"], &base_config()),
+            r".before\:content-\[\&\#39\;\:-\>\<-\:\&\#39\;\]::before {
   --en-content: ':-><-:';
+  content: var(--en-content);
+}"
+        );
+        assert_eq!(
+            generate(["before:content-[&#39;&#91;inside&#93;&#39;]"], &base_config()),
+            r".before\:content-\[\&\#39\;\&\#91\;inside\&\#93\;\&\#39\;\]::before {
+  --en-content: '[inside]';
   content: var(--en-content);
 }"
         );
@@ -66,8 +73,8 @@ mod tests {
 }"#
         );
         assert_eq!(
-            generate(["font-['Open_Sans',Roboto,sans-serif]"], &base_config()),
-            r".font-\[\'Open_Sans\'\,Roboto\,sans-serif\] {
+            generate(["font-[&#39;Open_Sans&#39;,Roboto,sans-serif]"], &base_config()),
+            r".font-\[\&\#39\;Open_Sans\&\#39\;\,Roboto\,sans-serif\] {
   font-family: 'Open Sans',Roboto,sans-serif;
 }"
         );

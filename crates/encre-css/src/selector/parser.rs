@@ -15,8 +15,6 @@ pub(crate) const GROUP_START: char = '(';
 pub(crate) const GROUP_END: char = ')';
 pub(crate) const ESCAPE: char = '\\';
 
-const WILL_BE_REPLACED_BY_UNDERSCORE: &str = "WILL-BE-REPLACED-BY-UNDERSCORE";
-
 const VALID_PLUGIN_HINT: [&str; 13] = [
     "color",
     "length",
@@ -39,34 +37,8 @@ pub(crate) fn unwrap_string(val: &mut &str) {
     *val = &val[1..len - 1];
 }
 
-/// Remove escape characters from an arbitrary values.
-///
-/// - `\[` is replaced with `[`
-/// - `\]` is replaced with `]`
-/// - `\(` is replaced with `(`
-/// - `\)` is replaced with `)`
-pub(crate) fn unescape(mut val: Cow<str>) -> Cow<str> {
-    if val.contains("\\[") {
-        val = Cow::from(val.replace("\\[", "["));
-    }
-
-    if val.contains("\\]") {
-        val = Cow::from(val.replace("\\]", "]"));
-    }
-
-    if val.contains("\\(") {
-        val = Cow::from(val.replace("\\(", "("));
-    }
-
-    if val.contains("\\)") {
-        val = Cow::from(val.replace("\\)", ")"));
-    }
-
-    val
-}
-
-/// Replace all underscores with spaces (not in `url()` or if the underscore is prefixed by a backslash).
-pub(crate) fn underscores_to_spaces(mut val: Cow<str>) -> Cow<str> {
+/// Replace all underscores with spaces (not in `url()`).
+pub(crate) fn underscores_to_spaces(val: Cow<str>) -> Cow<str> {
     // Don't replace `_` if it is a URL
     if val.contains("url(") {
         // For the `CursorPlugin`, `ContentPlugin` and `ImagePlugin` plugins, we need to keep underscores in URLs
@@ -91,29 +63,43 @@ pub(crate) fn underscores_to_spaces(mut val: Cow<str>) -> Cow<str> {
                 }
             })
             .collect()
+    } else if val.contains('_') {
+        // Replace `_` by ` ` (space)
+        Cow::from(val.replace('_', " "))
     } else {
-        // Replace `_` with ` ` (spaces) if not prefixed by a backslash
-        if val.contains('_') {
-            if val.contains("\\_") {
-                val = Cow::from(val.replace("\\_", WILL_BE_REPLACED_BY_UNDERSCORE));
-            }
-
-            val = Cow::from(val.replace('_', " "));
-
-            if val.contains(WILL_BE_REPLACED_BY_UNDERSCORE) {
-                val = Cow::from(val.replace(WILL_BE_REPLACED_BY_UNDERSCORE, "_"));
-            }
-        }
-
         val
     }
 }
 
+/// Replace:
+/// - `&#34;` by `"`
+/// - `&#39;` by `'`
+/// - `&#40;` by `(`
+/// - `&#41;` by `)`
+/// - `&#91;` by `[`
+/// - `&#92;` by `\`
+/// - `&#93;` by `]`
+/// - `&#95;` by `_`
+/// - `&#96;` by `` ` ``
+pub(crate) fn replace_escape_codes(val: Cow<str>) -> Cow<str> {
+    Cow::from(
+        val.replace("&#34;", "\"")
+            .replace("&#39;", "'")
+            .replace("&#40;", "(")
+            .replace("&#41;", ")")
+            .replace("&#91;", "[")
+            .replace("&#92;", "\\")
+            .replace("&#93;", "]")
+            .replace("&#95;", "_")
+            .replace("&#96;", "`"),
+    )
+}
+
 /// Convert an arbitrary value into a CSS value.
 ///
-///  -  `_` (underscores) are converted to ` ` (spaces) (not in `url`s or if prefixed by a backslash);
+///  -  `_` (underscores) are converted to ` ` (spaces) (not in `url`s or if using `&#95;`);
 ///  - Spaces are added around operators in the `calc` CSS function.
-///  - The value is unescaped (see [`unescape`])
+///  - Some escape codes are replaced by the characters, see [replace_escape_codes]
 pub(crate) fn to_css_value(val: &str) -> Cow<'_, str> {
     let mut val = underscores_to_spaces(Cow::from(val));
 
@@ -138,7 +124,7 @@ pub(crate) fn to_css_value(val: &str) -> Cow<'_, str> {
         );
     }
 
-    unescape(val)
+    replace_escape_codes(val)
 }
 
 pub(crate) fn parse<'a>(
@@ -173,7 +159,7 @@ fn push_variant<'a>(
         variant_list.push(Variant {
             order: config.last_variant_order(),
             prefixed: false,
-            template: underscores_to_spaces(unescape(Cow::from(full_variant))),
+            template: replace_escape_codes(underscores_to_spaces(Cow::from(full_variant))),
         });
         return Ok(());
     } else if let Some(variant) = BUILTIN_VARIANTS.get(full_variant) {
@@ -198,7 +184,7 @@ fn push_variant<'a>(
     } else if let Some((prefix, value)) = full_variant.split_once(ARBITRARY_START) {
         if let Some(prefix) = prefix.strip_suffix("-") {
             if let Some(value) = value.strip_suffix(ARBITRARY_END) {
-                let value = underscores_to_spaces(unescape(Cow::Borrowed(value)));
+                let value = replace_escape_codes(underscores_to_spaces(Cow::Borrowed(value)));
                 let mut variant = if let Some(variant) = BUILTIN_VARIANTS.get(prefix).cloned() {
                     variant
                 } else if let Some(variant) = config
@@ -1496,7 +1482,7 @@ mod tests {
         let config = Config::default();
         assert_eq!(
             parse(
-                r"[\[type='input'\]_&>:*]:bg-red-300",
+                r"[&#91;type=&#39;input&#39;&#93;_&>:*]:bg-red-300",
                 None,
                 None,
                 &config,
@@ -1505,7 +1491,7 @@ mod tests {
             .as_ref()
             .unwrap(),
             &Selector {
-                full: r"[\[type='input'\]_&>:*]:bg-red-300",
+                full: r"[&#91;type=&#39;input&#39;&#93;_&>:*]:bg-red-300",
                 order: Default::default(),
                 plugin: &background::background_color::PluginDefinition,
                 variants: vec![Variant {
@@ -1615,7 +1601,7 @@ mod tests {
         let config = Config::default();
         assert_eq!(
             parse(
-                r"bg-[url('/url_with_\]\)\'.png')]",
+                r"bg-[url(&#34;/url_with_&#93;&#41;&#39;.png&#34;)]",
                 None,
                 None,
                 &config,
@@ -1624,14 +1610,14 @@ mod tests {
             .as_ref()
             .unwrap(),
             &Selector {
-                full: r"bg-[url('/url_with_\]\)\'.png')]",
+                full: r"bg-[url(&#34;/url_with_&#93;&#41;&#39;.png&#34;)]",
                 order: Default::default(),
                 plugin: &background::background_image::PluginDefinition,
                 variants: vec![],
                 modifier: Modifier::Arbitrary {
                     prefix: "",
                     hint: "",
-                    value: Cow::from(r"url('/url_with_])\'.png')"),
+                    value: Cow::from(r#"url("/url_with_])'.png")"#),
                 },
                 is_important: false,
             }
@@ -1899,7 +1885,7 @@ mod tests {
         let config = Config::default();
         assert_eq!(
             parse(
-                r"focus:([&>*]:-m-4,xl:dark:([\[type='text'\].light_&,.foo]:bg-red-100,text-[color:black,]))",
+                r"focus:([&>*]:-m-4,xl:dark:([&#91;type=&#39;text&#39;&#93;.light_&,.foo]:bg-red-100,text-[color:black,]))",
                 None,
                 None,
                 &config,
@@ -1907,7 +1893,7 @@ mod tests {
             ),
             vec![
                 Ok(Selector {
-                    full: r"focus:([&>*]:-m-4,xl:dark:([\[type='text'\].light_&,.foo]:bg-red-100,text-[color:black,]))",
+                    full: r"focus:([&>*]:-m-4,xl:dark:([&#91;type=&#39;text&#39;&#93;.light_&,.foo]:bg-red-100,text-[color:black,]))",
                     order: Default::default(),
                     plugin: &spacing::margin::PluginDefinition,
                     variants: vec![
@@ -1929,7 +1915,7 @@ mod tests {
                     is_important: false,
                 }),
                 Ok(Selector {
-                    full: r"focus:([&>*]:-m-4,xl:dark:([\[type='text'\].light_&,.foo]:bg-red-100,text-[color:black,]))",
+                    full: r"focus:([&>*]:-m-4,xl:dark:([&#91;type=&#39;text&#39;&#93;.light_&,.foo]:bg-red-100,text-[color:black,]))",
                     order: Default::default(),
                     plugin: &background::background_color::PluginDefinition,
                     variants: vec![
@@ -1961,7 +1947,7 @@ mod tests {
                     is_important: false,
                 }),
                 Ok(Selector {
-                    full: r"focus:([&>*]:-m-4,xl:dark:([\[type='text'\].light_&,.foo]:bg-red-100,text-[color:black,]))",
+                    full: r"focus:([&>*]:-m-4,xl:dark:([&#91;type=&#39;text&#39;&#93;.light_&,.foo]:bg-red-100,text-[color:black,]))",
                     order: Default::default(),
                     plugin: &typography::text_color::PluginDefinition,
                     variants: vec![

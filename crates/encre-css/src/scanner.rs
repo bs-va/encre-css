@@ -69,30 +69,8 @@ impl Default for Scanner {
     fn default() -> Self {
         Self {
             scan_fn: Arc::new(|val| {
-                let mut is_arbitrary = false;
-
-                val.split(|ch| {
-                    match ch {
-                        '[' => {
-                            is_arbitrary = true;
-                            false
-                        }
-                        ']' => {
-                            is_arbitrary = false;
-                            false
-                        }
-                        _ => {
-                            ch == ' '
-                                || (!is_arbitrary
-                                    && (ch == '\''
-                                        || ch == '"'
-                                        || ch == '`'
-                                        || ch == '\n'
-                                        || ch == '\\'))
-                        }
-                    }
-                })
-                .collect::<BTreeSet<&str>>()
+                val.split([' ', '\n', '\'', '"', '`', '\\'])
+                    .collect::<BTreeSet<&str>>()
             }),
         }
     }
@@ -150,13 +128,13 @@ mod tests {
     #[test]
     fn scan_prevent_splitting_arbitrary_values() {
         assert_eq!(
-            Scanner::default().scan(r#"<div class="bg-red-300 content-['hello:>"']"></div>"#),
+            Scanner::default().scan(r#"<div class="bg-red-300 content-[&#39;hello:>&#34;&#39;]"></div>"#),
             BTreeSet::from([
                 "<div",
                 "></div>",
                 "bg-red-300",
                 "class=",
-                "content-['hello:>\"']",
+                "content-[&#39;hello:>&#34;&#39;]",
             ])
         );
     }
@@ -164,8 +142,8 @@ mod tests {
     #[test]
     fn scan_with_arbitrary_variant() {
         assert_eq!(
-            Scanner::default().scan(r#"<div class="[input[type='text']]:block"></div>"#),
-            BTreeSet::from(["<div", "></div>", "class=", "[input[type='text']]:block",])
+            Scanner::default().scan(r#"<div class="[input[type=&#39;text&#39;]]:block"></div>"#),
+            BTreeSet::from(["<div", "></div>", "class=", "[input[type=&#39;text&#39;]]:block",])
         );
     }
 }

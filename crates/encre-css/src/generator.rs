@@ -584,7 +584,7 @@ mod tests {
             [
                 "w[12px]",
                 "bg-[red]",
-                "bg-[url('../img/image_with_underscores.png')]",
+                "bg-[url(../img/image_with_underscores.png)]",
                 "mt-[calc(100%-10px)]",
                 "2xl:pb-[calc((100%/2)-10px+2rem)]",
             ],
@@ -606,8 +606,8 @@ mod tests {
   background-color: red;
 }
 
-.bg-\[url\(\'\.\.\/img\/image_with_underscores\.png\'\)\] {
-  background-image: url('../img/image_with_underscores.png');
+.bg-\[url\(\.\.\/img\/image_with_underscores\.png\)\] {
+  background-image: url(../img/image_with_underscores.png);
 }
 
 @media (width >= 96rem) {
@@ -663,7 +663,7 @@ mod tests {
             "2xl:motion-safe:landscape:focus-within:visited:first:odd:checked:open:rtl:bg-purple-100",
             "hover:file:bg-pink-600",
             "file:hover:bg-pink-600",
-            "sm:before:target:content-['Hello_world!']",
+            "sm:before:target:content-[&#39;Hello_world!&#39;]",
             "marker:selection:hover:bg-green-200",
             "group-hover:bg-green-300",
             "group-focus:bg-green-400",
@@ -710,7 +710,7 @@ mod tests {
 }
 
 @media (width >= 40rem) {
-  .sm\:before\:target\:content-\[\'Hello_world\!\'\]::before:target {
+  .sm\:before\:target\:content-\[\&\#39\;Hello_world\!\&\#39\;\]::before:target {
     --en-content: 'Hello world!';
     content: var(--en-content);
   }
@@ -789,7 +789,7 @@ mod tests {
     fn gen_css_for_selector_with_arbitrary_variant() {
         let generated = generate(
             [
-                "[&_>_*]:before:content-['hello-']",
+                "[&_>_*]:before:content-[&#39;hello-&#39;]",
                 "[&:has(.active)]:bg-blue-500",
                 "[@supports_(display:grid)]:grid",
                 "[@supports_not_(display:grid)]:float-right",
@@ -816,7 +816,7 @@ mod tests {
   background-color: oklch(62.3% .214 259.815);
 }
 
-.\[\&_\>_\*\]\:before\:content-\[\'hello-\'\] > *::before {
+.\[\&_\>_\*\]\:before\:content-\[\&\#39\;hello-\&\#39\;\] > *::before {
   --en-content: 'hello-';
   content: var(--en-content);
 }"
@@ -922,8 +922,8 @@ mod tests {
     fn gen_css_for_font_with_spaces() {
         let generated = generate(
             [
-                "font-['Times_New_Roman',Helvetica,serif]",
-                "font-[Roboto,'Open_Sans',sans-serif]",
+                "font-[&#39;Times_New_Roman&#39;,Helvetica,serif]",
+                "font-[Roboto,&#39;Open_Sans&#39;,sans-serif]",
             ],
             &base_config(),
         );
@@ -931,11 +931,11 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r".font-\[\'Times_New_Roman\'\,Helvetica\,serif\] {
+                r".font-\[\&\#39\;Times_New_Roman\&\#39\;\,Helvetica\,serif\] {
   font-family: 'Times New Roman',Helvetica,serif;
 }
 
-.font-\[Roboto\,\'Open_Sans\'\,sans-serif\] {
+.font-\[Roboto\,\&\#39\;Open_Sans\&\#39\;\,sans-serif\] {
   font-family: Roboto,'Open Sans',sans-serif;
 }"
             )
@@ -1042,7 +1042,7 @@ mod tests {
         let generated = generate(
             [
                 "before:bg-red-500",
-                "before:content-['Hello_world!']",
+                "before:content-[&#39;Hello_world!&#39;]",
                 "after:rounded-full",
                 "after:content-[counter(foo)]",
             ],
@@ -1052,7 +1052,7 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r".before\:content-\[\'Hello_world\!\'\]::before {
+                r".before\:content-\[\&\#39\;Hello_world\!\&\#39\;\]::before {
   --en-content: 'Hello world!';
   content: var(--en-content);
 }

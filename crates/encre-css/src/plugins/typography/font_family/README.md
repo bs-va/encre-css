@@ -17,6 +17,18 @@ Utilities for controlling the font family of an element.
 ### Arbitrary values
 
 Any property **not starting with a number** is allowed as arbitrary value.
-For example, `font-[Roboto,'Open_Sans',sans-serif]`.
+For example, `font-[Roboto,&#39;Open_Sans&#39;,sans-serif]`.
+
+Because the default scanner splits by some special characters, you **must** use the following escape codes in arbitrary values:
+
+- `&#34;` for `"`
+- `&#39;` for `'`
+- `&#40;` for `(`
+- `&#41;` for `)`
+- `&#91;` for `[`
+- `&#92;` for `\`
+- `&#93;` for `]`
+- `&#95;` for `_` (because by default `_` is replaced by a space in arbitrary values, so `&#95;` prevents this behavior)
+- `&#96;` for `` ` ``
 
 [Tailwind reference](https://tailwindcss.com/docs/font-family)
