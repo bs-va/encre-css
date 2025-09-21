@@ -106,7 +106,10 @@ pub fn generate_class<T: FnOnce(&mut ContextHandle)>(
     let mut base_class = String::with_capacity(1 + selector.full.len());
     base_class.push('.');
 
-    selector.full.chars().enumerate().for_each(|(i, ch)| {
+    // The browser will automatically replace the escape codes in the classes, so we need to also
+    // replace them in the generated CSS full selector
+    let unescaped_full_selector = crate::selector::parser::replace_escape_codes(Cow::Borrowed(selector.full));
+    unescaped_full_selector.chars().enumerate().for_each(|(i, ch)| {
         if !ch.is_alphanumeric() && ch != '-' && ch != '_' {
             base_class.push('\\');
             base_class.push(ch);
@@ -710,7 +713,7 @@ mod tests {
 }
 
 @media (width >= 40rem) {
-  .sm\:before\:target\:content-\[\&\#39\;Hello_world\!\&\#39\;\]::before:target {
+  .sm\:before\:target\:content-\[\'Hello_world\!\'\]::before:target {
     --en-content: 'Hello world!';
     content: var(--en-content);
   }
@@ -816,7 +819,7 @@ mod tests {
   background-color: oklch(62.3% .214 259.815);
 }
 
-.\[\&_\>_\*\]\:before\:content-\[\&\#39\;hello-\&\#39\;\] > *::before {
+.\[\&_\>_\*\]\:before\:content-\[\'hello-\'\] > *::before {
   --en-content: 'hello-';
   content: var(--en-content);
 }"
@@ -931,11 +934,11 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r".font-\[\&\#39\;Times_New_Roman\&\#39\;\,Helvetica\,serif\] {
+                r".font-\[\'Times_New_Roman\'\,Helvetica\,serif\] {
   font-family: 'Times New Roman',Helvetica,serif;
 }
 
-.font-\[Roboto\,\&\#39\;Open_Sans\&\#39\;\,sans-serif\] {
+.font-\[Roboto\,\'Open_Sans\'\,sans-serif\] {
   font-family: Roboto,'Open Sans',sans-serif;
 }"
             )
@@ -1052,7 +1055,7 @@ mod tests {
         assert_eq!(
             generated,
             String::from(
-                r".before\:content-\[\&\#39\;Hello_world\!\&\#39\;\]::before {
+                r".before\:content-\[\'Hello_world\!\'\]::before {
   --en-content: 'Hello world!';
   content: var(--en-content);
 }

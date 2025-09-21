@@ -135,13 +135,13 @@ mod tests {
         );
         assert_eq!(
             generate(["bg-[url(&#39;/hello.png&#39;)]"], &base_config()),
-            r".bg-\[url\(\&\#39\;\/hello\.png\&\#39\;\)\] {
+            r".bg-\[url\(\'\/hello\.png\'\)\] {
   background-image: url('/hello.png');
 }"
         );
         assert_eq!(
             generate(["bg-[url(&#39;/hello_with_underscores.png&#39;)]"], &base_config()),
-            r".bg-\[url\(\&\#39\;\/hello_with_underscores\.png\&\#39\;\)\] {
+            r".bg-\[url\(\'\/hello_with_underscores\.png\'\)\] {
   background-image: url('/hello_with_underscores.png');
 }"
         );
