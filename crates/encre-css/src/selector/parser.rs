@@ -71,6 +71,66 @@ pub(crate) fn underscores_to_spaces(val: Cow<str>) -> Cow<str> {
     }
 }
 
+/// Surround all dashes with spaces (not in `var()`).
+pub(crate) fn surround_dashes_with_spaces(val: Cow<str>) -> String {
+    const VAR_PATTERN: &'static str = "var(";
+    if let Some(index) = val.find(VAR_PATTERN) {
+        let start = index + VAR_PATTERN.len();
+        let mut result = val[..start].replace('-', " - ");
+
+        let mut skip_until_idx = None;
+        let mut open_braces = 1;
+        for (idx, char) in val.char_indices().skip(start) {
+            if let Some(last_skip_idx) = skip_until_idx {
+                if last_skip_idx == idx {
+                    skip_until_idx = None;
+                }
+                continue;
+            }
+
+            match char {
+                '(' => open_braces = open_braces + 1,
+                ')' => {
+                    open_braces = open_braces - 1;
+                    result.push(char);
+
+                    if open_braces == 0 {
+                        // at this point we're outside of var()
+                        if val.len() == idx {
+                            return result; //
+                        }
+                        let remainder = &val[(idx + 1)..];
+                        if let Some(new_index) = remainder.find(VAR_PATTERN) {
+                            let skip_end = idx + new_index + VAR_PATTERN.len();
+                            // remainder start till end of var pattern, inclusive
+                            result.push_str(&val[idx + 1..=skip_end].replace('-', " - "));
+                            skip_until_idx = Some(skip_end);
+                            open_braces = 1;
+                        } else {
+                            result.push_str(&remainder.replace('-', " - "));
+                            return result;
+                        }
+                    }
+                    continue;
+                }
+                '-' => {
+                    if open_braces == 0 {
+                        result.push_str(" - ");
+                        continue;
+                    }
+                }
+                _ => {}
+            }
+
+            result.push(char);
+        }
+
+        return result;
+    }
+
+    return val.replace('-', " - ");
+}
+
 /// Replace:
 /// - `&#34;` by `"`
 /// - `&#39;` by `'`
@@ -109,16 +169,9 @@ pub(crate) fn to_css_value(val: &str) -> Cow<'_, str> {
             val.split(' ')
                 .map(|v| {
                     if v.starts_with("calc(") {
-                        let v = if v.contains("var(") {
-                            v.split("--")
-                                .map(|c| c.replace('-', " - "))
-                                .collect::<Vec<String>>()
-                                .join("--")
-                        } else {
-                            v.replace('-', " - ")
-                        };
                         Cow::from(
-                            v.replace('+', " + ")
+                            surround_dashes_with_spaces(Cow::from(v))
+                                .replace('+', " + ")
                                 .replace('/', " / ")
                                 .replace('*', " * "),
                         )
@@ -654,6 +707,16 @@ mod tests {
         assert_eq!(
             underscores_to_spaces(Cow::Borrowed(r#"url("[l8""#)),
             r#"url("[l8""#
+        );
+    }
+
+    #[test]
+    fn surround_dashes_with_spaces_test() {
+        assert_eq!(
+            surround_dashes_with_spaces(Cow::Borrowed(
+                "1-var(--a-b-c, var(--d-e-f))-var(--g-h-i)-1-var(--x-y-z)"
+            )),
+            "1 - var(--a-b-c, var(--d-e-f)) - var(--g-h-i) - 1 - var(--x-y-z)",
         );
     }
 
