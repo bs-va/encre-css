@@ -98,7 +98,7 @@ pub(crate) fn replace_escape_codes(val: Cow<str>) -> Cow<str> {
 /// Convert an arbitrary value into a CSS value.
 ///
 ///  -  `_` (underscores) are converted to ` ` (spaces) (not in `url`s or if using `&#95;`);
-///  - Spaces are added around operators in the `calc` CSS function.
+///  - Spaces are added around operators in the `calc` CSS function (not in `var`s).
 ///  - Some escape codes are replaced by the characters, see [replace_escape_codes]
 pub(crate) fn to_css_value(val: &str) -> Cow<'_, str> {
     let mut val = underscores_to_spaces(Cow::from(val));
@@ -109,9 +109,16 @@ pub(crate) fn to_css_value(val: &str) -> Cow<'_, str> {
             val.split(' ')
                 .map(|v| {
                     if v.starts_with("calc(") {
-                        Cow::from(
+                        let v = if v.contains("var(") {
+                            v.split("--")
+                                .map(|c| c.replace('-', " - "))
+                                .collect::<Vec<String>>()
+                                .join("--")
+                        } else {
                             v.replace('-', " - ")
-                                .replace('+', " + ")
+                        };
+                        Cow::from(
+                            v.replace('+', " + ")
                                 .replace('/', " / ")
                                 .replace('*', " * "),
                         )
